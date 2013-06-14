@@ -1,0 +1,7 @@
+name = action
+description = Webforms as online actions
+core = 7.x
+package = Campaignion
+
+dependencies[] = campaignion
+dependencies[] = webform_template
