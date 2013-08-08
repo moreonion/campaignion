@@ -1,0 +1,323 @@
+<?php
+
+/**
+ * Implements hook_form_(form_id)_alter().
+ */
+function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
+  $page_count = $form['details']['page_count']['#value'];
+  if($page_count > 1) {
+    $nid = $form['#node']->nid;
+    $node = node_load($nid);
+    $page_num = $form['details']['page_num']['#value'];
+    $steps = _generate_steps($form, $form_state);
+
+    array_unshift($form['#submit'], 'global_mark_step_done');
+
+    array_unshift($form['#validate'], 'global_clear_steps');
+
+    $button_label = t('Next');
+    if($page_num === 1 && $node->webform['first_button_text']) {
+      $button_label = $node->webform['first_button_text'];
+    } else if ($page_num > 1 && $node->webform['next_button_text']) {
+      $button_label = $node->webform['next_button_text'];
+    }
+
+
+    $form['actions']['next']['#value'] = $button_label;
+    $form['actions']['next']['#name'] = 'next';
+    if (isset($form['actions']['previous'])) {
+      $form['actions']['previous']['#value'] = t('Previous');
+    }
+    $form['actions']['previous']['#access'] = FALSE;
+    $form['submitted']['steps'] = array(
+      '#type' => 'container',
+      '#weight' => -1000,
+      '#attributes' => array('id' => array('webform-steps-wrapper')),
+    ) + $steps;
+  }
+  //dpm($form);
+  return $form;
+}
+
+function clear_steps($form, &$form_state) {
+  unset($form_state['values']['submitted']['steps']);
+  unset($form_state['values']['submitted']['step_payment_method']['selected']);
+}
+
+function _generate_steps($form, $form_state) {
+  $components = $form['#node']->webform['components'];
+  $use_ajax = FALSE;
+  if (module_exists('webform_ajax') && $form['#node']->webform['webform_ajax']) {
+    $use_ajax = TRUE;
+  };
+
+  $pagebreak_names = array();
+  $fieldset_weights = array();
+  foreach ($components as $component) {
+    $page_num = $component['page_num'];
+    // use the fieldset with the lowest weight, omit nested fieldsets
+    if($component['type'] === 'fieldset' && $component['pid'] === '0') {
+      if(!isset($fieldset_weights[$page_num]) || $component['weight'] < $fieldset_weights[$page_num]) {
+        $pagebreak_names[$page_num] = $component['name'];
+        $fieldset_weights[$page_num] = $component['weight'];
+      }
+    }
+    // use the title of the page break (will be overriden by any fieldset
+    // on the same step page)
+    if($component['type'] === 'pagebreak') {
+      // set it only if not set already by a step name field
+      if(!isset($pagebreak_names[$page_num])) {
+        $pagebreak_names[$page_num] = $component['name'];
+      }
+    }
+  }
+  $count = $form['details']['page_count']['#value'];
+  $current = $form['details']['page_num']['#value'];
+  $finished = isset($form_state['steps_finished']) ? $form_state['steps_finished'] : 0;
+
+  $steps = array();
+  $ajax_default = array();
+  $button_default = array(
+    '#type' => 'submit',
+    '#submit' => array('global_step_navigation_callback', 'webform_client_form_pages', 'webform_client_form_submit'),
+    '#attributes' => array('class' => array('step-button')),
+    '#name' => 'step-btn',
+  );
+  if ($use_ajax) {
+    // generate wrapper id like in webform_ajax.module
+    // we have to create it on our own because webform_ajax runs after us
+    $wrapper = '';
+    if (isset($form_state['values']['webform_ajax_wrapper_id'])) {
+      $wrapper = $form_state['values']['webform_ajax_wrapper_id'];
+    }
+    elseif (isset($form['#node']->webform['webform_ajax_wrapper_id'])) {
+      $wrapper = $form['#node']->webform['webform_ajax_wrapper_id'];
+    }
+    else {
+      // At last, generate a unique ID.
+      $wrapper = 'webform-ajax-wrapper-' . $form['#node']->nid;
+    }
+
+    $ajax_default['#ajax'] = array(
+      'effect' => 'none',
+      'callback' => 'webform_ajax_callback',
+      'wrapper' => $wrapper,
+      'progress' => array(
+        'message' => '',
+        'type' => 'none',
+      ),
+    );
+    $button_default += $ajax_default;
+  }
+  $i = 1;
+
+  while($i <= $count) {
+    $step = array(
+      '#value' => $i,
+    ) + $button_default;
+    $step_name = isset($pagebreak_names[$i]) ? $pagebreak_names[$i] : t('No label');
+    $label = array(
+      '#markup' => '<span class="step-label">' . $step_name . '</span>',
+    );
+    $ruler = array(
+      '#markup' => '<hr class="step-line">',
+    );
+    $steps['btn-' . $i] = array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'class' => array('step'),
+      ),
+      'button' => $step,
+      'label' => $label,
+      'line' => $ruler,
+    );
+    if($i === $current) {
+      $steps['btn-' . $i]['#attributes']['class'][] = 'current';
+    }
+    if($i > ($finished + 1)) {
+      $steps['btn-' . $i]['#attributes']['class'][] = 'disabled';
+      $steps['btn-' . $i]['button']['#attributes']['class'][] = 'disabled';
+      $steps['btn-' . $i]['button']['#attributes']['disabled'] = 'disabled';
+    }
+    if ($use_ajax) {
+      $steps['btn-' . $i]['button']['#id'] = drupal_html_id('edit-webform-ajax-btn-' . $i);
+    }
+
+    $i++;
+  }
+
+  // thank you step
+  $step_name = t('Thank you');
+  $label = array(
+    '#markup' => '<span class="step-label">' . $step_name . '</span>',
+  );
+  $step = array(
+    '#markup' => '<div class="step-button">' . ($count + 1) . '</div>',
+  );
+  $steps['thank-you'] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array('step', 'disabled'),
+    ),
+    'button' => $step,
+    'label' => $label,
+  );
+
+  return $steps;
+}
+
+/**
+ * to generate the steps on a thank you page
+ * (confirmation or redirected page)
+ */
+function _generate_step_thank_you($node) {
+  $components = $node->webform['components'];
+  $pagebreak_names = array();
+  $fieldset_weights = array();
+  foreach ($components as $component) {
+    $page_num = $component['page_num'];
+    // use the fieldset with the lowest weight, omit nested fieldsets
+    if($component['type'] === 'fieldset' && $component['pid'] === '0') {
+      if(!isset($fieldset_weights[$page_num]) || $component['weight'] < $fieldset_weights[$page_num]) {
+        $pagebreak_names[$page_num] = $component['name'];
+        $fieldset_weights[$page_num] = $component['weight'];
+      }
+    }
+    // use the title of the page break (will be overriden by any fieldset
+    // on the same step page)
+    if($component['type'] === 'pagebreak') {
+      // set it only if not set already by a step name field
+      if(!isset($pagebreak_names[$page_num])) {
+        $pagebreak_names[$page_num] = $component['name'];
+      }
+    }
+  }
+  $count = count($pagebreak_names);
+
+  $steps = array();
+  $i = 1;
+
+  while($i <= $count) {
+    $step = array(
+      '#markup' => '<div class="step-button">' . $i . '</div>',
+    );
+    $step_name = isset($pagebreak_names[$i]) ? $pagebreak_names[$i] : t('No label');
+    $label = array(
+      '#markup' => '<span class="step-label">' . $step_name . '</span>',
+    );
+    $ruler = array(
+      '#markup' => '<hr class="step-line">',
+    );
+    $steps['btn-' . $i] = array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'class' => array('step'),
+      ),
+      'button' => $step,
+      'label' => $label,
+      'line' => $ruler,
+    );
+    $steps['btn-' . $i]['#attributes']['class'][] = 'disabled';
+    $steps['btn-' . $i]['button']['#attributes']['class'][] = 'disabled';
+
+    $i++;
+  }
+
+  // thank you step
+  $step_name = t('Thank you');
+  $label = array(
+    '#markup' => '<span class="step-label">' . $step_name . '</span>',
+  );
+  $step = array(
+    '#markup' => '<div class="step-button">' . ($count + 1) . '</div>',
+  );
+  $steps['thank-you'] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array('step', 'current'),
+    ),
+    'button' => $step,
+    'label' => $label,
+  );
+
+  $stepsarray['steps'] = array(
+      '#type' => 'container',
+      '#weight' => -1000,
+      '#attributes' => array('id' => array('webform-steps-wrapper')),
+    ) + $steps;
+
+  if ($count < 2) {
+    return array();
+  } else {
+    return $stepsarray;
+  }
+}
+
+function step_navigation_callback(&$form, &$form_state) {
+  $value = $form_state['clicked_button']['#value'];
+  $form_state['webform']['page_num'] = $value + 1;
+  // if we try to click on last page
+  // --> use different logic and trick the webform_client_form_pages #submit
+  // into believing, that we are coming from the second to last page
+  if($value == $form_state['webform']['page_count']) {
+    $form_state['clicked_button']['#parents'][] =  'next';
+    $form_state['webform']['page_num'] = $value - 1;
+  }
+  return $form;
+}
+function mark_step_done(&$form, &$form_state) {
+  $finished = isset($form_state['steps_finished']) ? $form_state['steps_finished'] : 0;
+  $current_step = $form['details']['page_num']['#value'];
+  if ($current_step > $finished) {
+    $form_state['steps_finished'] = $form['details']['page_num']['#value'];
+  }
+
+  // set this session var for use in redirected nodes
+  // see: global_webform_steps_node_view
+  $nid = $form['#node']->nid;
+  $_SESSION['redirected_from_nid'] = $nid;
+
+  return $form;
+}
+
+/**
+ * Implements hook_node_view().
+ *
+ * display the steps of the redirecting webform if you are
+ * on a thank_you_page node.
+ */
+function webform_steps_node_view($node) {
+  if ($node->type == 'thank_you_page') {
+    $nid = '';
+    if (isset($_SESSION['redirected_from_nid'])) {
+      $nid = $_SESSION['redirected_from_nid'];
+      unset($_SESSION['redirected_from_nid']);
+    } else if(isset($_GET['share'])) {
+      $nid = substr($_GET['share'], 5);
+    };
+    if ($from_node = node_load($nid)) {
+      $step_thank_you = _generate_step_thank_you($from_node);
+      $node->content['steps'] = array(
+        '#type' => 'markup',
+        '#weight' => -100,
+        '#markup' => drupal_render($step_thank_you),
+      );
+    }
+  }
+}
+
+//function webform_steps_block_info() {
+//  $block['steps'] = array(
+//    'info' => t('Webform Steps'),
+//    'cache' => DRUPAL_NO_CACHE,
+//  );
+//  return $block;
+//}
+//
+//function webform_steps_block_view($delta = '') {
+//  $node = menu_get_object();
+//  $block['subject'] = t('Steps');
+//  $block['content'] = l(t('AJAX'), 'system/ajax', array('attributes' => array('class' => array('abdiepost', 'use-ajax'))));
+//
+//  return $block;
+//}
