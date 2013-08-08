@@ -9,11 +9,11 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
     $nid = $form['#node']->nid;
     $node = node_load($nid);
     $page_num = $form['details']['page_num']['#value'];
-    $steps = _generate_steps($form, $form_state);
+    $steps = _webform_steps_generate($form, $form_state);
 
-    array_unshift($form['#submit'], 'global_mark_step_done');
+    array_unshift($form['#submit'], '_webform_steps_mark_step_done');
 
-    array_unshift($form['#validate'], 'global_clear_steps');
+    array_unshift($form['#validate'], '_webform_steps_clear');
 
     $button_label = t('Next');
     if($page_num === 1 && $node->webform['first_button_text']) {
@@ -39,12 +39,12 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
   return $form;
 }
 
-function clear_steps($form, &$form_state) {
+function _webform_steps_clear($form, &$form_state) {
   unset($form_state['values']['submitted']['steps']);
   unset($form_state['values']['submitted']['step_payment_method']['selected']);
 }
 
-function _generate_steps($form, $form_state) {
+function _webform_steps_generate($form, $form_state) {
   $components = $form['#node']->webform['components'];
   $use_ajax = FALSE;
   if (module_exists('webform_ajax') && $form['#node']->webform['webform_ajax']) {
@@ -79,7 +79,7 @@ function _generate_steps($form, $form_state) {
   $ajax_default = array();
   $button_default = array(
     '#type' => 'submit',
-    '#submit' => array('global_step_navigation_callback', 'webform_client_form_pages', 'webform_client_form_submit'),
+    '#submit' => array('webform_steps_navigation_callback', 'webform_client_form_pages', 'webform_client_form_submit'),
     '#attributes' => array('class' => array('step-button')),
     '#name' => 'step-btn',
   );
@@ -119,9 +119,6 @@ function _generate_steps($form, $form_state) {
     $label = array(
       '#markup' => '<span class="step-label">' . $step_name . '</span>',
     );
-    $ruler = array(
-      '#markup' => '<hr class="step-line">',
-    );
     $steps['btn-' . $i] = array(
       '#type' => 'container',
       '#attributes' => array(
@@ -129,7 +126,6 @@ function _generate_steps($form, $form_state) {
       ),
       'button' => $step,
       'label' => $label,
-      'line' => $ruler,
     );
     if($i === $current) {
       $steps['btn-' . $i]['#attributes']['class'][] = 'current';
@@ -170,7 +166,7 @@ function _generate_steps($form, $form_state) {
  * to generate the steps on a thank you page
  * (confirmation or redirected page)
  */
-function _generate_step_thank_you($node) {
+function _webform_steps_generate_step_thank_you($node) {
   $components = $node->webform['components'];
   $pagebreak_names = array();
   $fieldset_weights = array();
@@ -253,7 +249,8 @@ function _generate_step_thank_you($node) {
   }
 }
 
-function step_navigation_callback(&$form, &$form_state) {
+function webform_steps_navigation_callback(&$form, &$form_state) {
+  $form_state['values']['op'] = 'next';
   $value = $form_state['clicked_button']['#value'];
   $form_state['webform']['page_num'] = $value + 1;
   // if we try to click on last page
@@ -265,7 +262,7 @@ function step_navigation_callback(&$form, &$form_state) {
   }
   return $form;
 }
-function mark_step_done(&$form, &$form_state) {
+function _webform_steps_mark_step_done(&$form, &$form_state) {
   $finished = isset($form_state['steps_finished']) ? $form_state['steps_finished'] : 0;
   $current_step = $form['details']['page_num']['#value'];
   if ($current_step > $finished) {
@@ -296,7 +293,7 @@ function webform_steps_node_view($node) {
       $nid = substr($_GET['share'], 5);
     };
     if ($from_node = node_load($nid)) {
-      $step_thank_you = _generate_step_thank_you($from_node);
+      $step_thank_you = _webform_steps_generate_step_thank_you($from_node);
       $node->content['steps'] = array(
         '#type' => 'markup',
         '#weight' => -100,
