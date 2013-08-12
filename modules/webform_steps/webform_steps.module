@@ -32,7 +32,7 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
     $form['submitted']['steps'] = array(
       '#type' => 'container',
       '#weight' => -1000,
-      '#attributes' => array('id' => array('webform-steps-wrapper')),
+      '#attributes' => array('id' => array('webform-steps-wrapper'), 'class' => array('webform-steps-wrapper')),
     ) + $steps;
   }
   //dpm($form);
@@ -207,7 +207,7 @@ function _webform_steps_generate_step_thank_you($node) {
   $stepsarray['steps'] = array(
       '#type' => 'container',
       '#weight' => -1000,
-      '#attributes' => array('id' => array('webform-steps-wrapper')),
+      '#attributes' => array('id' => array('webform-steps-wrapper'), 'class' => array('webform-steps-wrapper')),
     ) + $steps;
 
   if ($count < 2) {

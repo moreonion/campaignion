@@ -6,3 +6,4 @@ package = "Campaignion"
 dependencies[] = webform
 ; dependencies[] = webform_ajax
 
+scripts[] = webform_steps.js
