@@ -206,7 +206,7 @@ function _webform_steps_generate_step_thank_you($node) {
 
   // thank you step
   $steps['thank-you'] = array(
-    '#prefix' => '<span class="webform-step current"><span>' . t('Thank you'),
+    '#prefix' => '<span class="webform-step current last"><span>' . t('Thank you'),
     '#suffix' => '</span></span>',
     '#markup' => '<div class="step-button">' . ($count + 1) . '</div>',
   );
