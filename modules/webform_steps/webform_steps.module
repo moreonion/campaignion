@@ -144,9 +144,12 @@ class WebformStepsButtonBuilder {
       $wrapper_classes[] = 'current';
     }
     if ($i == 1) {
-      $button['#attributes']['class'][] = 'first';
+      $wrapper_classes[] = 'first';
     }
     if($i > ($this->finished + 1)) {
+      if ($i == $this->finished + 2) {
+        $wrapper_classes[] = 'first-disabled';
+      }
       $wrapper_classes[] = 'disabled';
       $button['#attributes']['class'][] = 'disabled';
       $button['#attributes']['disabled'] = 'disabled';
