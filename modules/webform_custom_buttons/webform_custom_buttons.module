@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function webform_custom_buttons_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
+  $page_count = $form['details']['page_count']['#value'];
+  if($page_count > 1) {
+    $nid = $form['#node']->nid;
+    $node = node_load($nid);
+    $button_label = t('Next');
+    $page_num = $form['details']['page_num']['#value'];
+    if($page_num === 1 && $node->webform['first_button_text']) {
+      $button_label = $node->webform['first_button_text'];
+    } else if ($page_num > 1 && $node->webform['next_button_text']) {
+      $button_label = $node->webform['next_button_text'];
+    }
+
+
+    $form['actions']['next']['#value'] = $button_label;
+    $form['actions']['next']['#name'] = 'next';
+    if (isset($form['actions']['previous'])) {
+      $form['actions']['previous']['#value'] = t('Previous');
+    }
+    $form['actions']['previous']['#access'] = FALSE;
+  }
+}

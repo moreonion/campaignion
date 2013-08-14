@@ -6,29 +6,12 @@
 function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
   $page_count = $form['details']['page_count']['#value'];
   if($page_count > 1) {
-    $nid = $form['#node']->nid;
-    $node = node_load($nid);
-    $page_num = $form['details']['page_num']['#value'];
     $steps = _webform_steps_generate($form, $form_state);
 
     array_unshift($form['#submit'], '_webform_steps_mark_step_done');
 
     array_unshift($form['#validate'], '_webform_steps_clear');
 
-    $button_label = t('Next');
-    if($page_num === 1 && $node->webform['first_button_text']) {
-      $button_label = $node->webform['first_button_text'];
-    } else if ($page_num > 1 && $node->webform['next_button_text']) {
-      $button_label = $node->webform['next_button_text'];
-    }
-
-
-    $form['actions']['next']['#value'] = $button_label;
-    $form['actions']['next']['#name'] = 'next';
-    if (isset($form['actions']['previous'])) {
-      $form['actions']['previous']['#value'] = t('Previous');
-    }
-    $form['actions']['previous']['#access'] = FALSE;
     $form['submitted']['steps'] = array(
       '#type' => 'container',
       '#weight' => -1000,
@@ -43,7 +26,6 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
  */
 function _webform_steps_clear($form, &$form_state) {
   unset($form_state['values']['submitted']['steps']);
-  unset($form_state['values']['submitted']['step_payment_method']['selected']);
 }
 
 /**
