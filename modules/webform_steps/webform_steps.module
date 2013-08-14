@@ -35,21 +35,22 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
       '#attributes' => array('id' => array('webform-steps-wrapper'), 'class' => array('webform-steps-wrapper')),
     ) + $steps;
   }
-  //dpm($form);
   return $form;
 }
 
+/**
+ * Validate callback: Don't save steps container.
+ */
 function _webform_steps_clear($form, &$form_state) {
   unset($form_state['values']['submitted']['steps']);
   unset($form_state['values']['submitted']['step_payment_method']['selected']);
 }
 
+/**
+ * Generate the form-array for the webform step buttons.
+ */
 function _webform_steps_generate($form, $form_state) {
   $components = $form['#node']->webform['components'];
-  $use_ajax = FALSE;
-  if (module_exists('webform_ajax') && $form['#node']->webform['webform_ajax']) {
-    $use_ajax = TRUE;
-  };
 
   $pagebreak_names = array();
   $fieldset_weights = array();
@@ -77,8 +78,9 @@ function _webform_steps_generate($form, $form_state) {
 
   $steps = array();
   $button_builder = new WebformStepsButtonBuilder($current, $finished);
+  $use_ajax = module_exists('webform_ajax') && $form['#node']->webform['webform_ajax'];
   if ($use_ajax) {
-    $this->activateAjax($form_state, $form);
+    $button_builder->activateAjax($form_state, $form);
   }
 
   for ($i = 1; $i <= $count; $i++) {
