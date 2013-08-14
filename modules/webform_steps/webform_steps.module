@@ -135,16 +135,17 @@ class WebformStepsButtonBuilder {
       $button['#id'] = drupal_html_id('edit-webform-ajax-btn-' . $i);
     }
     $button += array(
-      '#prefix' => '<span class="webform-step ' . implode(' ', $wrapper_classes) . '"><span>' . $title,
+      '#prefix' => '<span class="webform-step ' . implode(' ', $wrapper_classes) . '"><span>',
       '#suffix' => '</span></span>',
-      '#value' => $i,
+      '#value' => $title,
+      '#page' => $i,
     );
     return $button;
   }
 }
 
 function webform_steps_navigation_callback(&$form, &$form_state) {
-  $new_page = (int) $form_state['clicked_button']['#value'];
+  $new_page = (int) $form_state['clicked_button']['#page'];
   $old_page = &$form_state['webform']['page_num'];
   if ($old_page <= $new_page && $new_page > 1) {
     // simulate click on next.
