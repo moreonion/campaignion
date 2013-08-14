@@ -1,7 +1,10 @@
 <?php
 
 /**
- * Implements hook_form_(form_id)_alter().
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add webform_steps to the top of the webform.
+ * Add submit and validate handlers to handle the step-switching.
  */
 function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
   $page_count = $form['details']['page_count']['#value'];
@@ -9,7 +12,6 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
     $steps = _webform_steps_generate($form, $form_state);
 
     array_unshift($form['#submit'], '_webform_steps_mark_step_done');
-
     array_unshift($form['#validate'], '_webform_steps_clear');
 
     $form['submitted']['steps'] = array(
@@ -144,6 +146,12 @@ class WebformStepsButtonBuilder {
   }
 }
 
+/**
+ * Submit callback for the step button
+ *
+ * We simulate next and previous button clicks for
+ * @see webform_client_form_pages().
+ */
 function webform_steps_navigation_callback(&$form, &$form_state) {
   $new_page = (int) $form_state['clicked_button']['#page'];
   $old_page = &$form_state['webform']['page_num'];
@@ -159,6 +167,9 @@ function webform_steps_navigation_callback(&$form, &$form_state) {
   return $form;
 }
 
+/**
+ * Keep the last finished page number in the $form_state.
+ */
 function _webform_steps_mark_step_done(&$form, &$form_state) {
   $finished = isset($form_state['steps_finished']) ? $form_state['steps_finished'] : 0;
   $current_step = $form['details']['page_num']['#value'];

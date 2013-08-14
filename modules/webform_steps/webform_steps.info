@@ -1,7 +1,7 @@
 name = "Webform steps"
 description = "Visualize steps in multi-step webforms."
 core = 7.x
-package = "Campaignion"
+package = "Webform"
 
 dependencies[] = webform
 ; dependencies[] = webform_ajax
