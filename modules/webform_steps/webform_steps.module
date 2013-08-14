@@ -162,16 +162,17 @@ class WebformStepsButtonBuilder {
 }
 
 function webform_steps_navigation_callback(&$form, &$form_state) {
-  $form_state['values']['op'] = 'next';
-  $value = $form_state['clicked_button']['#value'];
-  $form_state['webform']['page_num'] = $value + 1;
-  // if we try to click on last page
-  // --> use different logic and trick the webform_client_form_pages #submit
-  // into believing, that we are coming from the second to last page
-  if($value == $form_state['webform']['page_count']) {
+  $new_page = (int) $form_state['clicked_button']['#value'];
+  $old_page = &$form_state['webform']['page_num'];
+  if ($old_page <= $new_page && $new_page > 1) {
+    // simulate click on next.
     $form_state['clicked_button']['#parents'][] =  'next';
-    $form_state['webform']['page_num'] = $value - 1;
+    $old_page = $new_page - 1;
+  } else {
+    // simulate click on previous.
+    $old_page = $new_page + 1;
   }
+  $form_state['values']['op'] = 'next';
   return $form;
 }
 
