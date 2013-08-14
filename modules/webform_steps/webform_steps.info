@@ -1,9 +1,0 @@
-name = "Webform steps"
-description = "Visualize steps in multi-step webforms."
-core = 7.x
-package = "Webform"
-
-dependencies[] = webform
-; dependencies[] = webform_ajax
-
-scripts[] = webform_steps.js
