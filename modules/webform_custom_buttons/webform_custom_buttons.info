@@ -2,3 +2,5 @@ name = Webform custom buttons
 description = Allows the user to edit the submit-button labels of webforms
 core = 7.x
 package = Webform
+
+dependencies[] = webform
