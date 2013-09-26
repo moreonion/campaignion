@@ -1,0 +1,45 @@
+<?php
+
+function campaignion_activity_schema() { 
+  $schema['campaignion_activity'] = array(
+    'description' => 'Logged activities',
+    'fields' => array(
+      'activity_id' => array(
+        'description' => 'Auto-incrementing ID for activities',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'contact_id' => array(
+        'description' => 'Redhen contact_id',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'description' => 'Activity Type key',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'Unix-timestamp when the activity was logged',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'campaignion_activity_contact' => array('contact_id'),
+      'campaignion_activity_type' => array('type'),
+      'campaignion_activity_created' => array('created'),
+    ),
+    'foreign keys' => array(
+      'campaignion_activity_contact' => array(
+        'table' => 'redhen_contact',
+        'columns' => array('contact_id' => 'contact_id'),
+      ),
+    ),
+    'primary key' => array('activity_id'),
+  );
+  return $schema;
+}

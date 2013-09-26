@@ -1,0 +1,7 @@
+name = Campaignion Activity
+description = Activity logging for CRM contacts
+package = campaignion
+core = 7.x
+
+dependencies[] = campaignion
+dependencies[] = redhen_contact
