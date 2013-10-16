@@ -10,3 +10,7 @@ function campaignion_activity_ctools_plugin_type() {
   );
   return $plugins;
 }
+
+if (module_exists('webform')) {
+  require_once dirname(__FILE__) . '/modules/webform.php';
+}

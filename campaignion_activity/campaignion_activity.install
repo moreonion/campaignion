@@ -1,6 +1,11 @@
 <?php
 
 function campaignion_activity_schema() { 
+  $unsigned_int_not_null = array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'unsigned' => TRUE,
+  );
   $schema['campaignion_activity'] = array(
     'description' => 'Logged activities',
     'fields' => array(
@@ -11,10 +16,7 @@ function campaignion_activity_schema() {
       ),
       'contact_id' => array(
         'description' => 'Redhen contact_id',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
+      ) + $unsigned_int_not_null,
       'type' => array(
         'description' => 'Activity Type key',
         'type' => 'varchar',
@@ -40,6 +42,40 @@ function campaignion_activity_schema() {
       ),
     ),
     'primary key' => array('activity_id'),
+  );
+  $schema['campaignion_activity_webform'] = array(
+    'description' => 'Link an activity to a webform submission.',
+    'fields' => array(
+      'activity_id' => array(
+        'description' => 'Foreign key to the activity.',
+      ) + $unsigned_int_not_null,
+      'nid' => array(
+        'description' => 'Node ID: The webform node this submission belongs to.',
+      ) + $unsigned_int_not_null,
+      'sid' => array(
+        'description' => 'Webform submission ID.',
+      ) + $unsigned_int_not_null,
+    ),
+    'primary key' => array('activity_id'),
+    'indexes' => array(
+      'campaignion_activity_webform_activity' => array('activity_id'),
+      'campaignion_activity_webform_node' => array('nid'),
+      'campaignion_activity_webform_submission' => array('nid', 'sid'),
+    ),
+    'foreign keys' => array(
+      'campaignion_activity_webform_activity' => array(
+        'table' => 'campaignion_activity',
+        'columns' => array('activity_id' => 'activity_id'),
+      ),
+      'campaignion_activity_webform_node' => array(
+        'table' => 'node',
+        'columns' => array('nid' => 'nid'),
+      ),
+      'campaignion_activity_webform_submission' => array(
+        'table' => 'webform_submission',
+        'columns' => array('nid' => 'nid', 'sid' => 'sid'),
+      ),
+    ),
   );
   return $schema;
 }

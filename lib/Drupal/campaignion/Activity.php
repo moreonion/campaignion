@@ -3,6 +3,11 @@
 namespace Drupal\campaignion;
 
 class Activity implements Interfaces\Activity {
+  protected $activity_id = NULL;
+  protected $contact_id;
+  protected $type;
+  protected $created;
+  
   public function __construct($data = array()) {
     foreach ($data as $k => &$v) {
       $this->{$k} = &$v;
@@ -18,23 +23,36 @@ class Activity implements Interfaces\Activity {
   }
   
   public function save() {
-    $data = (array) $this;
-    unset($data['activity_id']);
     if (isset($this->activity_id)) {
-      db_update('campaignion_activity')
-        ->condition('activity_id', $this->activity_id)
-        ->fields($data)
-        ->execute();
+      $this->onUpdate();
     } else {
-      $this->activity_id = db_insert('campaignion_activity')
-        ->fields($data)
-        ->execute();
+      $this->onInsert();
     }
   }
-  
+
   public function delete() {
     if (isset($this->activity_id)) {
       db_delete('campaignion_activity')->condition('activity_id', $this->activity_id)->execute();
     }
+  }
+
+  protected function values($keys) {
+    $data = array();
+    foreach ($keys as $k) {
+      $data[$k] = isset($this->{$k}) ? $this->{$k} : NULL;
+    }
+    return $data;
+  }
+
+  protected function update() {
+    db_update('campaignion_activity')
+      ->condition('activity_id', $this->activity_id)
+      ->fields($this->values(array('contact_id', 'type', 'created')))
+      ->execute();
+  }
+  protected function insert() {
+    $this->activity_id = db_insert('campaignion_activity')
+      ->fields($this->values(array('contact_id', 'type', 'created')))
+      ->execute();
   }
 }

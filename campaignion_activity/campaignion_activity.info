@@ -4,4 +4,5 @@ package = campaignion
 core = 7.x
 
 dependencies[] = campaignion
+dependencies[] = little_helpers
 dependencies[] = redhen_contact
