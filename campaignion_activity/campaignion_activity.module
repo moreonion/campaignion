@@ -10,3 +10,12 @@ function campaignion_activity_ctools_plugin_type() {
   );
   return $plugins;
 }
+
+/**
+ * Implements hook_views_api().
+ */
+function campaignion_activity_views_api() {
+  return array(
+    'api'  => 3,
+  );
+}

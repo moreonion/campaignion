@@ -5,3 +5,5 @@ core = 7.x
 
 dependencies[] = campaignion
 dependencies[] = redhen_contact
+
+files[] = views_handler_filter_activity_type.inc

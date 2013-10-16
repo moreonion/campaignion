@@ -1,6 +1,6 @@
 <?php
 
-function campaignion_activity_schema() { 
+function campaignion_activity_schema() {
   $schema['campaignion_activity'] = array(
     'description' => 'Logged activities',
     'fields' => array(
