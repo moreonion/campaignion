@@ -40,6 +40,14 @@ function campaignion_activity_views_data() {
       'handler'        => 'views_handler_field',
       'click sortable' => TRUE,
     ),
+    'relationship' => array(
+      'title'      => t('RedHen Contact'),
+      'help'       => t('The RedHen contact which is connected to this activity.'),
+      'base'       => 'redhen_contact',
+      'base field' => 'contact_id',
+      'handler'    => 'views_handler_relationship',
+      'label'      => t('RedHen Contact'),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
