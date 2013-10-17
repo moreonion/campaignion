@@ -12,6 +12,9 @@ class Activity implements Interfaces\Activity {
     foreach ($data as $k => &$v) {
       $this->{$k} = &$v;
     }
+    if (!isset($this->created)) {
+      $this->created = time();
+    }
   }
   
   public static function load($activity_id) {
@@ -24,9 +27,9 @@ class Activity implements Interfaces\Activity {
   
   public function save() {
     if (isset($this->activity_id)) {
-      $this->onUpdate();
+      $this->update();
     } else {
-      $this->onInsert();
+      $this->insert();
     }
   }
 

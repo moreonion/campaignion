@@ -8,18 +8,10 @@ function webform_campaignion_activity_type_info() {
  * Implements hook_webform_submission_insert().
  */
 function campaignion_activity_webform_submission_insert($node, $submission) {
-  $s = new Drupal\little_helpers\WebformSubmission($node, $submission);
-  $sql = <<<SQL
-SELECT entity_id
-FROM field_data_redhen_contact_email
-WHERE redhen_contact_email_value = :email
-SQL;
-
-  $contact_id = db_query($sql, array(':email' => $s->valueByKey('email_address')))->fetchField();
-  if (!$contact_id) {
-    // create contact.
+  try {
+    $activity = \Drupal\campaignion\Activity\WebformSubmission::fromSubmission($node, $submission);
+    $activity->save();
+  } catch (Exception $e) {
+    watchdog('campaignion_activity', 'Error when trying to log activity: !message', array('!message' => $e->getMessage()), WATCHDOG_WARNING);
   }
-
-  $activity = \Drupal\campaignion\Activity\WebformSubmission::fromSubmission($node, $submission);
-  $activity->save();
 }
