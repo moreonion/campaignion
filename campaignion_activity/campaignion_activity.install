@@ -55,6 +55,11 @@ function campaignion_activity_schema() {
       'sid' => array(
         'description' => 'Webform submission ID.',
       ) + $unsigned_int_not_null,
+      'confirmed' => array(
+        'description' => 'Timestamp for when the webform submission was confirmed (or NULL if not).',
+        'type' => 'int',
+        'default' => NULL,
+      ),
     ),
     'primary key' => array('activity_id'),
     'indexes' => array(

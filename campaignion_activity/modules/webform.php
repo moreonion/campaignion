@@ -15,3 +15,9 @@ function campaignion_activity_webform_submission_insert($node, $submission) {
     watchdog('campaignion_activity', 'Error when trying to log activity: !message', array('!message' => $e->getMessage()), WATCHDOG_WARNING);
   }
 }
+
+function campaignion_activity_email_confirmed($node, $submission) {
+  $activity = \Drupal\campaignion\Activity\WebformSubmission::bySubmission($node, $submission);
+  $activity->confirmed = time();
+  $activity->save();
+}
