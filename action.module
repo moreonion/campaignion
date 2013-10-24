@@ -6,7 +6,11 @@
 function action_node_insert($node) {
   if (isset($node->action) || Drupal\campaignion\ActionType::isAction($node->type)) {
     $action = Drupal\campaignion\Action::fromNode($node);
-    $action->applyDefaultTemplate();
+    if (isset($node->translation_source)) {
+      $action->copyForm($node->translation_source->nid);
+    } else {
+      $action->applyDefaultTemplate();
+    }
   }
 }
 
