@@ -22,11 +22,15 @@ function campaignion_manage_admin_paths() {
   );
 }
 
-class CampaignionManageNodeQuery extends EntityFieldQuery {
-  public function finishQuery($select_query, $id_key = 'entity_id') {
-    $select_query->where();
-    return parent::finishQuery($select_query, $id_key);
+function campaignion_manage_action_list($entity_type) {
+  $my_actions = array();
+  $actions = actions_list();
+  foreach($actions as $id => &$action) {
+    if ($action['type'] == $entity_type) {
+      $my_actions[$id] = &$action;
+    }
   }
+  return $my_actions;
 }
 
 /**
@@ -48,7 +52,7 @@ function campaignion_manage_content_page() {
     $row->translations = array();
     $original_nodes[$row->nid] = $row;
   }
-  
+
   $sql = <<<SQL
 SELECT n.tnid, n.nid, n.title, n.language, n.status, n.uid, u.name
 FROM {node} n 
@@ -57,18 +61,101 @@ WHERE n.tnid IN(:nids)
 ORDER BY n.language
 SQL;
 
+  $rows = array();
+  if (count($original_nodes)) {
   $result = db_query($sql, array(':nids' => array_keys($original_nodes)));
-  
   foreach($result as $row) {
     $original_nodes[$row->tnid]->translations[$row->language] = $row;
   }
-  
-  return array(
-    array(
-    '#theme' => 'campaignion_manage_node_listing',
-    '#nodes' => $original_nodes,
+
+  $row_default = array(
+    'bulk' => array(
+      'data' => array(
+        '#type' => 'checkbox',
+        '#name' => 'bulk_tnid[]',
+        '#attributes' => array('title' => "Select this content and all it's translations for bulk operations."),
+      ),
     ),
-    array(
+    'content' => array(
+      'data' => array(
+        'tset' => array(
+          '#markup' => 'Translation set: ',
+        ),
+      ),
+    ),
+    'links' => array(
+      'data' => array(
+        '#theme' => 'links__ctools_dropbutton',
+        '#links' => array(),
+        '#image' => TRUE,
+      ),
+    ),
+  );
+
+  campaignion_manage_action_list('node');
+
+  foreach ($original_nodes as $nid => $node) {
+    $links = array();
+    foreach (array('edit' => t('Edit'), 'translate' => t('Translate'), 'view' => t('View page'), 'delete' => t('Delete')) as $path => $title) {
+      $links[$path] = array(
+        'href' => "node/$nid/$path",
+        'title' => $title,
+      );
+    }
+    $subrows = array();
+    if (count($node->translations) > 1) {
+      foreach ($node->translations as $lang => $node) {
+        $row = array();
+        $row['bulk']['data'] = array(
+          '#type' => 'checkbox',
+          '#name' => 'bulk_nid[]',
+          '#attributes' => array('title' => "Select this content and all it's translations for bulk operations."),
+          '#value' => $nid,
+        );
+        $row['content']['data'] = array(
+          'tset' => array(
+            '#markup' => 'Translation: ' . $node->title,
+          ),
+        );
+        $row['links']['data'] = array(
+          '#theme' => 'links__ctools_dropbutton',
+          '#links' => $links,
+          '#image' => TRUE,
+        );
+        $subrows[] = $row;
+      }
+    }
+    $row = array();
+    $row['bulk']['data'] = array(
+      '#type' => 'checkbox',
+      '#name' => 'bulk_tnid[]',
+      '#attributes' => array('title' => "Select this content and all it's translations for bulk operations."),
+      '#value' => $nid,
+    );
+    $row['content']['data']['tset'] = array(
+      '#markup' => 'Translation set: ' . $node->title,
+    );
+    if (count($subrows)) {
+      $row['content']['data']['nodes'] = array(
+        '#theme' => 'table',
+        '#rows' => $subrows,
+      );
+    }
+    $row['links']['data'] = array(
+      '#theme' => 'links__ctools_dropbutton',
+      '#links' => $links,
+      '#image' => TRUE,
+    );
+    $rows[] = $row;
+  }
+  }
+
+  return array(
+    'listing' => array(
+      '#theme' => 'table',
+      '#rows' => $rows,
+    ),
+    'pager' => array(
       '#theme' => 'pager',
     ),
   );
