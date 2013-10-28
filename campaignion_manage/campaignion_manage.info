@@ -1,0 +1,6 @@
+name = Campaignion Manage Interface
+description = Listings and bulk-operations for content and contacts.
+core = 7.x
+
+dependencies[] = node
+

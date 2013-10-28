@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function campaignion_manage_menu() {
+  $items['campaignion/manage/content'] = array(
+    'title' => 'Manage content and actions',
+    'page callback' => 'campaignion_manage_content_page',
+    'access arguments' => array('administer nodes'),
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function campaignion_manage_admin_paths() {
+  return array(
+    'campaignion/manage/*',
+  );
+}
+
+class CampaignionManageNodeQuery extends EntityFieldQuery {
+  public function finishQuery($select_query, $id_key = 'entity_id') {
+    $select_query->where();
+    return parent::finishQuery($select_query, $id_key);
+  }
+}
+
+/**
+ * Page callback: Manage content and actions page
+ */
+function campaignion_manage_content_page() {
+  $query = db_select('node', 'n');
+  $query->innerJoin('users', 'u', 'u.uid = n.uid');
+  $query = $query->extend('PagerDefault')->limit(20);
+  $query->fields('n', array('nid', 'title', 'type', 'language', 'status', 'uid'))
+    ->fields('u', array('name'))
+    ->where('n.nid = n.tnid OR n.tnid = 0')
+    ->orderBy('n.changed', 'DESC');
+
+  $result = $query->execute();
+  
+  $original_nodes = array();
+  foreach ($result as $row) {
+    $row->translations = array();
+    $original_nodes[$row->nid] = $row;
+  }
+  
+  $sql = <<<SQL
+SELECT n.tnid, n.nid, n.title, n.language, n.status, n.uid, u.name
+FROM {node} n 
+  INNER JOIN {users} u ON u.uid=n.uid
+WHERE n.tnid IN(:nids)
+ORDER BY n.language
+SQL;
+
+  $result = db_query($sql, array(':nids' => array_keys($original_nodes)));
+  
+  foreach($result as $row) {
+    $original_nodes[$row->tnid]->translations[$row->language] = $row;
+  }
+  
+  return array(
+    array(
+    '#theme' => 'campaignion_manage_node_listing',
+    '#nodes' => $original_nodes,
+    ),
+    array(
+      '#theme' => 'pager',
+    ),
+  );
+}
+
+
