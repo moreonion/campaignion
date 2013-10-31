@@ -7,25 +7,30 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
 
   public $sid;
   public $nid;
-  
+
   public static function bySubmission($node, $submission) {
-    $sql = <<<SQL
-SELECT * FROM {campaignion_activity}
-INNER JOIN {campaignion_activity_webform} USING (activity_id)
-WHERE nid=:nid, sid=:sid
-SQL;
-    $result = db_query($sql, array(':nid' => $node->nid, ':sid' => $submission->sid));
-    return $result->fetchObject(get_called_class());
+    $query = static::buildJoins();
+    $query->condition('aw.nid', $node->nid)
+          ->condition('aw.sid', $submission->sid);
+    return $query->execute()->fetchObject(get_called_class());
   }
 
-  public static function fromSubmission($node, $submission) {
+  protected static function buildJoins() {
+    $query = db_select('campaignion_activity', 'a')
+      ->fields('a');
+    $query->innerJoin('campaignion_activity_webform', 'aw', 'aw.activity_id=a.activity_id');
+    $query->fields('aw');
+    return $query;
+  }
+
+  public static function fromSubmission($node, $submission, $data = array()) {
     $contact_id = \Drupal\campaignion\Contact::idFromSubmission($node, $submission, 'contact');
 
     $data = array(
       'contact_id' => $contact_id,
       'nid' => $node->nid,
       'sid' => $submission->sid,
-    );
+    ) + $data;
     return new static($data);
   }
 
@@ -35,7 +40,7 @@ SQL;
       ->fields($this->values(array('activity_id', 'nid', 'sid')))
       ->execute();
   }
-  
+
   protected function update() {
     parent::update();
     db_update('campaignion_activity_webform')

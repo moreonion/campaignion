@@ -82,6 +82,31 @@ function campaignion_activity_schema() {
       ),
     ),
   );
+  $schema['campaignion_activity_payment'] = array(
+    'description' => 'Link an activity to a payment object.',
+    'fields' => array(
+      'activity_id' => array(
+        'description' => 'Foreign key to the activity.',
+      ) + $unsigned_int_not_null,
+      'pid' => array(
+        'description' => 'Foreign key for the payment table.',
+      ) + $unsigned_int_not_null,
+    ),
+    'indexes' => array(
+      'campaignion_activity_payment_activity' => array('activity_id'),
+      'campaignion_activity_payment' => array('pid'),
+    ),
+    'foreign keys' => array(
+      'campaignion_activity_payment_activity' => array(
+        'table' => 'campaignion_activity',
+        'columns' => array('activity_id' => 'activity_id'),
+      ),
+      'campaignion_activity_payment' => array(
+        'table' => 'payment',
+        'columns' => array('pid' => 'pid'),
+      ),
+    ),
+  );
   return $schema;
 }
 
