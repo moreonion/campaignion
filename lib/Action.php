@@ -23,9 +23,13 @@ class Action {
 
   public function applyDefaultTemplate() {
     if ($nid = $this->type->defaultTemplateNid()) {
-      $_SESSION['webform_template'] = $this->type->defaultTemplateNid();
-      _webform_template_attach($this->node, 'update');
-      unset($_SESSION['webform_template']);
+      $this->copyForm($nid);
     }
+  }
+
+  public function copyForm($nid) {
+    $_SESSION['webform_template'] = $nid;
+    _webform_template_attach($this->node, 'update');
+    unset($_SESSION['webform_template']);
   }
 }
