@@ -107,6 +107,39 @@ function campaignion_activity_schema() {
       ),
     ),
   );
+  $schema['campaignion_activity_comment'] = array(
+    'description' => 'Link an activity to a payment object.',
+    'fields' => array(
+      'activity_id' => array(
+        'description' => 'Foreign key to the activity.',
+      ) + $unsigned_int_not_null,
+      'nid' => array(
+        'description' => 'Node ID: The webform node this submission belongs to.',
+      ) + $unsigned_int_not_null,
+      'cid' => array(
+        'description' => 'Comment ID: The comment that was posted.',
+      ) + $unsigned_int_not_null,
+    ),
+    'indexes' => array(
+      'campaignion_activity_comment_activity' => array('activity_id'),
+      'campaignion_activity_comment_node' => array('nid'),
+      'campaignion_activity_comment' => array('cid'),
+    ),
+    'foreign keys' => array(
+      'campaignion_activity_comment_activity' => array(
+        'table' => 'campaignion_activity',
+        'columns' => array('activity_id' => 'activity_id'),
+      ),
+      'campaignion_activity_comment_node' => array(
+        'table' => 'node',
+        'columns' => array('nid' => 'nid'),
+      ),
+      'campaignion_activity_comment' => array(
+        'table' => 'comment',
+        'columns' => array('cid' => 'cid'),
+      ),
+    ),
+  );
   return $schema;
 }
 

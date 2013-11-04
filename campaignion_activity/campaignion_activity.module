@@ -26,3 +26,7 @@ if (module_exists('webform')) {
     require_once dirname(__FILE__) . '/modules/webform_component_paymethod_select.php';
   }
 }
+
+if (module_exists('comment')) {
+  require_once dirname(__FILE__) . '/modules/comment.php';
+}

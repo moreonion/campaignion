@@ -1,7 +1,7 @@
 <?php
 
 function webform_campaignion_activity_type_info() {
-  $info['webform_submission'] = 'Drupal\campaignion\Activity\WebformSubmission';
+  $info['webform_submission'] = 'Drupal\campaignion\Activity\WebformSubmissionType';
 }
 
 /**

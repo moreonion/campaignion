@@ -1,0 +1,7 @@
+name = Campaignion engagement
+description = Engagement tracking for campaignion
+core = 7.x
+project = campaignion
+
+dependencies[] = campaignion_activity
+dependencies[] = redhen_engagement
