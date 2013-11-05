@@ -7,11 +7,16 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
 
   public $sid;
   public $nid;
+  public $confirmed = NULL;
 
   public static function bySubmission($node, $submission) {
+    return static::byNidSid($node->nid, $submission->sid);
+  }
+
+  public static function byNidSid($nid, $sid) {
     $query = static::buildJoins();
-    $query->condition('aw.nid', $node->nid)
-          ->condition('aw.sid', $submission->sid);
+    $query->condition('aw.nid', $nid)
+          ->condition('aw.sid', $sid);
     return $query->execute()->fetchObject(get_called_class());
   }
 
@@ -37,14 +42,14 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
   protected function insert() {
     parent::insert();
     db_insert('campaignion_activity_webform')
-      ->fields($this->values(array('activity_id', 'nid', 'sid')))
+      ->fields($this->values(array('activity_id', 'nid', 'sid', 'confirmed')))
       ->execute();
   }
 
   protected function update() {
     parent::update();
     db_update('campaignion_activity_webform')
-      ->fields($this->values(array('nid', 'sid')))
+      ->fields($this->values(array('nid', 'sid', 'confirmed')))
       ->condition('activity_id', $this->activity_id)
       ->execute();
   }
