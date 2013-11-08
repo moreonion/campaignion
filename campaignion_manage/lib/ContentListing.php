@@ -37,12 +37,14 @@ class ContentListing {
       $row['data']['content']['data'] = array(
         '#markup' => 'Translation set: ' . $tnode->title,
       );
+      $row['data']['content']['class'] = array('content');
       $row['class'][] = $class;
       if (count($tnode->translations) > 1) {
         $row['class'][] = 'node-translation-set';
         $rows[] = $row;
 
         $bigcellrow['data']['bigcell']['colspan'] = $columns;
+        $bigcellrow['class'][] = 'node-translations';
         $bigcellrow['class'][] = $class;
         $innerRows = array();
         foreach ($tnode->translations as $lang => $node) {

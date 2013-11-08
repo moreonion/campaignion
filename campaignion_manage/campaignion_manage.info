@@ -7,3 +7,5 @@ dependencies[] = campaignion
 dependencies[] = ctools
 dependencies[] = node
 dependencies[] = psr0
+
+scripts[] = "js/content_translations.js"
