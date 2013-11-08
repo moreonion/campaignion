@@ -37,124 +37,14 @@ function campaignion_manage_action_list($entity_type) {
  * Page callback: Manage content and actions page
  */
 function campaignion_manage_content_page() {
-  $query = db_select('node', 'n');
-  $query->innerJoin('users', 'u', 'u.uid = n.uid');
-  $query = $query->extend('PagerDefault')->limit(20);
-  $query->fields('n', array('nid', 'title', 'type', 'language', 'status', 'uid'))
-    ->fields('u', array('name'))
-    ->where('n.nid = n.tnid OR n.tnid = 0')
-    ->orderBy('n.changed', 'DESC');
+  $baseQuery = new \Drupal\campaignion_manage\ContentQuery();
+  $baseQuery->page(20);
+  $result = $baseQuery->execute();
 
-  $result = $query->execute();
-  
-  $original_nodes = array();
-  foreach ($result as $row) {
-    $row->translations = array();
-    $original_nodes[$row->nid] = $row;
-  }
-
-  $sql = <<<SQL
-SELECT n.tnid, n.nid, n.title, n.language, n.status, n.uid, u.name
-FROM {node} n 
-  INNER JOIN {users} u ON u.uid=n.uid
-WHERE n.tnid IN(:nids)
-ORDER BY n.language
-SQL;
-
-  $rows = array();
-  if (count($original_nodes)) {
-  $result = db_query($sql, array(':nids' => array_keys($original_nodes)));
-  foreach($result as $row) {
-    $original_nodes[$row->tnid]->translations[$row->language] = $row;
-  }
-
-  $row_default = array(
-    'bulk' => array(
-      'data' => array(
-        '#type' => 'checkbox',
-        '#name' => 'bulk_tnid[]',
-        '#attributes' => array('title' => "Select this content and all it's translations for bulk operations."),
-      ),
-    ),
-    'content' => array(
-      'data' => array(
-        'tset' => array(
-          '#markup' => 'Translation set: ',
-        ),
-      ),
-    ),
-    'links' => array(
-      'data' => array(
-        '#theme' => 'links__ctools_dropbutton',
-        '#links' => array(),
-        '#image' => TRUE,
-      ),
-    ),
-  );
-
-  campaignion_manage_action_list('node');
-
-  foreach ($original_nodes as $nid => $node) {
-    $links = array();
-    foreach (array('edit' => t('Edit'), 'translate' => t('Translate'), 'view' => t('View page'), 'delete' => t('Delete')) as $path => $title) {
-      $links[$path] = array(
-        'href' => "node/$nid/$path",
-        'title' => $title,
-      );
-    }
-    $subrows = array();
-    if (count($node->translations) > 1) {
-      foreach ($node->translations as $lang => $node) {
-        $row = array();
-        $row['bulk']['data'] = array(
-          '#type' => 'checkbox',
-          '#name' => 'bulk_nid[]',
-          '#attributes' => array('title' => "Select this content and all it's translations for bulk operations."),
-          '#value' => $nid,
-        );
-        $row['content']['data'] = array(
-          'tset' => array(
-            '#markup' => 'Translation: ' . $node->title,
-          ),
-        );
-        $row['links']['data'] = array(
-          '#theme' => 'links__ctools_dropbutton',
-          '#links' => $links,
-          '#image' => TRUE,
-        );
-        $subrows[] = $row;
-      }
-    }
-    $row = array();
-    $row['bulk']['data'] = array(
-      '#type' => 'checkbox',
-      '#name' => 'bulk_tnid[]',
-      '#attributes' => array('title' => "Select this content and all it's translations for bulk operations."),
-      '#value' => $nid,
-    );
-    $row['content']['data']['tset'] = array(
-      '#markup' => 'Translation set: ' . $node->title,
-    );
-    if (count($subrows)) {
-      $row['content']['data']['nodes'] = array(
-        '#theme' => 'table',
-        '#rows' => $subrows,
-      );
-    }
-    $row['links']['data'] = array(
-      '#theme' => 'links__ctools_dropbutton',
-      '#links' => $links,
-      '#image' => TRUE,
-    );
-    $rows[] = $row;
-  }
-  }
+  $listing = new \Drupal\campaignion_manage\ContentListing();
 
   return array(
-    'listing' => array(
-      '#theme' => 'table',
-      '#rows' => $rows,
-    ),
+    'listing' => $listing->build($result),
     'pager' => array(
       '#theme' => 'pager',
     ),
