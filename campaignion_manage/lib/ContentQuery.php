@@ -40,7 +40,7 @@ class ContentQuery {
     }
 
     $sql = <<<SQL
-SELECT n.tnid, n.nid, n.title, n.language, n.status, n.uid, u.name
+SELECT n.tnid, n.nid, n.title, n.type, n.language, n.status, n.uid, u.name
 FROM {node} n 
   INNER JOIN {users} u ON u.uid=n.uid
 WHERE n.tnid IN(:nids)

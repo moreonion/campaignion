@@ -22,6 +22,20 @@ function campaignion_manage_admin_paths() {
   );
 }
 
+/**
+ * Implements hook_theme().
+ */
+function campaignion_manage_theme() {
+  $theme['campaignion_manage_node'] = array(
+    'variables' => array(
+      'node' => NULL,
+      'translation_set' => FALSE,
+    ),
+    'file' => 'campaignion_manage.theme.php',
+  );
+  return $theme;
+}
+
 function campaignion_manage_action_list($entity_type) {
   $my_actions = array();
   $actions = actions_list();
@@ -50,5 +64,3 @@ function campaignion_manage_content_page() {
     ),
   );
 }
-
-

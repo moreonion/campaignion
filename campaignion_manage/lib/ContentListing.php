@@ -10,63 +10,30 @@ class ContentListing {
    * @return renderable array for output.
    */
   public function build($result) {
-    $row_default['data']['bulk']['data'] = array(
-      '#type' => 'checkbox',
-    );
-    $row_default['data']['content']['data'] = array();
-    $row_default['data']['links']['data'] = array(
-      '#theme' => 'links__ctools_dropbutton',
-      '#links' => array(),
-      '#image' => TRUE,
-    );
-    $columns = count($row_default['data']);
+    $columns = 3;
 
     $rows = array();
 
     $tnode_count = 1;
     foreach ($result as $tnode) {
       $class = ($tnode_count++ % 2 == 0) ? 'even' : 'odd';
-      $row = $row_default;
-      $row['no_striping'] = TRUE;
-      $row['data']['links']['data']['#links'] = $this->nodeLinks($tnode);
-      $row['data']['bulk']['data'] += array(
-        '#name' => 'bulk_tnid[]',
-        '#attributes' => array('title' => "Select this content and all it's translations for bulk operations."),
-        '#value' => $tnode->nid,
-      );
-      $row['data']['content']['data'] = array(
-        '#markup' => 'Translation set: ' . $tnode->title,
-      );
-      $row['data']['content']['class'] = array('content');
+      $row = $this->nodeRow($tnode, TRUE);
       $row['class'][] = $class;
+      $rows[] = $row;
       if (count($tnode->translations) > 1) {
-        $row['class'][] = 'node-translation-set';
-        $rows[] = $row;
-
         $bigcellrow['data']['bigcell']['colspan'] = $columns;
         $bigcellrow['class'][] = 'node-translations';
         $bigcellrow['class'][] = $class;
-        $innerRows = array();
+
+        $innerrows = array();
         foreach ($tnode->translations as $lang => $node) {
-          $row = $row_default;
-          $row['data']['bulk']['data'] += array(
-            '#name' => 'bulk_nid[]',
-            '#attributes' => array('title' => "Select this content for bulk operations."),
-            '#value' => $node->nid,
-          );
-          $row['data']['content']['data'] = array(
-            '#markup' => 'Translation: ' . $node->title,
-          );
-          $row['data']['links']['data']['#links'] = $this->nodeLinks($node);
-          $innerrows[] = $row;
+          $innerrows[] = $this->nodeRow($node, FALSE);
         }
         $bigcellrow['data']['bigcell']['data'] = array(
           '#theme' => 'table',
           '#rows' => $innerrows,
         );
         $rows[] = $bigcellrow;
-      } else {
-        $rows[] = $row;
       }
     }
 
@@ -77,6 +44,33 @@ class ContentListing {
       ),
       '#rows' => $rows,
     );
+  }
+
+  protected function nodeRow($node, $tset = TRUE) {
+    $row['data']['bulk']['data'] = array(
+      '#type' => 'checkbox',
+      '#name' => 'bulk_' . ($tset ? 'tnid' : 'nid'),
+      '#title' => $tset ? t("Select this content and all it's translations for bulk operations") : t('Select this content for bulk operations.'),
+      '#value' => $node->nid,
+    );
+    $row['data']['content']['class'] = array('content');
+    $row['data']['content']['data'] = array(
+      '#theme' => 'campaignion_manage_node',
+      '#node' => $node,
+      '#translation_set' => $tset,
+    );
+    $row['data']['links']['data'] = array(
+      '#theme' => 'links__ctools_dropbutton',
+      '#links' => $this->nodeLinks($node),
+      '#image' => TRUE,
+    );
+    if ($tset) {
+      $row['no_striping'] = TRUE;
+      if (isset($node->translations) && count($node->translations) > 1) {
+        $row['class'][] = 'node-translation-set';
+      }
+    }
+    return $row;
   }
 
   protected function nodeLinks($node) {
