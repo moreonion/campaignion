@@ -16,8 +16,12 @@ function campaignion_activity_payment_status_change(Payment $payment, PaymentSta
   if (!$statusChangedToSuccess || !$hasContextObj)
     return;
 
-  if (!($activity = Drupal\campaignion\Activity\WebformPayment::byPayment($payment))) { 
-    $activity = Drupal\campaignion\Activity\WebformPayment::fromPayment($payment);
-    $activity->save();
+  if (!($activity = Drupal\campaignion\Activity\WebformPayment::byPayment($payment))) {
+    try {
+      $activity = Drupal\campaignion\Activity\WebformPayment::fromPayment($payment);
+      $activity->save();
+    } catch (Exception $e) {
+      watchdog('campaignion_activity', 'Error when trying to log webform_payment activity: !message -- !trace', array('!message' => $e->getMessage(), '!trace' => $e->getTraceAsString()), WATCHDOG_WARNING);
+    }
   }
 }
