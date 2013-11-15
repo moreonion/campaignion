@@ -47,18 +47,20 @@ class ContentListing {
   }
 
   protected function nodeRow($node, $tset = TRUE) {
+    $row['data']['bulk']['class'] = array('manage-bulk');
     $row['data']['bulk']['data'] = array(
       '#type' => 'checkbox',
       '#name' => 'bulk_' . ($tset ? 'tnid' : 'nid'),
       '#title' => $tset ? t("Select this content and all it's translations for bulk operations") : t('Select this content for bulk operations.'),
       '#value' => $node->nid,
     );
-    $row['data']['content']['class'] = array('content');
+    $row['data']['content']['class'] = array('manage-content');
     $row['data']['content']['data'] = array(
       '#theme' => 'campaignion_manage_node',
       '#node' => $node,
       '#translation_set' => $tset,
     );
+    $row['data']['links']['class'] = array('manage-links');
     $row['data']['links']['data'] = array(
       '#theme' => 'links__ctools_dropbutton',
       '#links' => $this->nodeLinks($node),

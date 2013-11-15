@@ -10,4 +10,5 @@ dependencies[] = psr0
 
 scripts[] = "js/content_translations.js"
 
+stylesheets[all][] = "css/campaignion-manage.css"
 stylesheets[all][] = "css/ctools-dropbutton.css"

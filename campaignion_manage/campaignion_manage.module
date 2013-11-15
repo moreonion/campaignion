@@ -31,7 +31,7 @@ function campaignion_manage_theme() {
       'node' => NULL,
       'translation_set' => FALSE,
     ),
-    'file' => 'campaignion_manage.theme.php',
+    'file' => 'campaignion_manage.theme.inc',
   );
   return $theme;
 }
