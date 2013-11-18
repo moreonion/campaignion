@@ -51,4 +51,11 @@ SQL;
       $rows_by_nid[$row->tnid]->translations[$row->language] = $row;
     }
   }
+
+  public function ensureTable($alias) {
+  }
+
+  public function getQuery() {
+    return $this->query;
+  }
 }
