@@ -1,20 +1,17 @@
-.campaignion-manage-content-listing {
-  margin-bottom: 1em;
-}
-.campaignion-manage-content-listing .odd {
-  background-color: #FFFFFF;
-}
 .campaignion-manage-content-listing .even {
-  background-color: #F6F6F6;
+  background-color: #F9F9F9;
+}
+.campaignion-manage-content-listing {
+  margin-top: 1em;
 }
 
 .manage-content .icon {
-  border: 1px solid #666666;
+  border: 1px solid #AAAAAA;
   display: block;
-  float: left;
+  position: absolute;
   height: 30px;
   width: 30px;
-  margin-right: 1em;
+  margin-left: -40px;
 }
 
 .manage-bulk,
@@ -24,12 +21,15 @@
 }
 
 .manage-bulk {
-  padding: 1em 1em;
+  padding: 1em 0em 0em 1em;
 }
 .manage-bulk .form-item label.option {
   display: none;
 }
 
+.manage-content {
+  padding-left: 40px;
+}
 .manage-content .title {
   margin-right: 0.75em;
   font-size: 1.2em;
