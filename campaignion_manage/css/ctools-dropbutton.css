@@ -1,0 +1,37 @@
+.manage-links .ctools-dropbutton {
+  background-color: #FFFFFF;
+  min-width: 7em;
+  position: absolute;
+  font-weight: bold;
+  border-color: #CACACA;
+}
+.manage-links .ctools-dropbutton a,
+.manage-links .ctools-dropbutton a:hover,
+.manage-links .ctools-dropbutton a:link,
+.manage-links .ctools-dropbutton a:focus,
+.manage-links .ctools-dropbutton a:visited,
+.manage-links .ctools-dropbutton a:active {
+  text-decoration: none;
+  color: #B0ADA6;
+}
+.manage-links .ctools-dropbutton a:hover {
+  color: #F05F28;
+}
+.manage-links .ctools-dropbutton a:active {
+  color: #b03F08;
+}
+.manage-links .open {
+  box-shadow: 0px 0px 5px #CACACA;
+}
+.manage-links .ctools-content li a {
+  padding: 0.5em 1em;
+}
+
+.manage-links .ctools-dropbutton .ctools-link a {
+  top: 1em;
+  padding: 0;
+  border-width: 0.5em;
+}
+.manage-links .open .ctools-link a {
+  top: 0.5em;
+}
