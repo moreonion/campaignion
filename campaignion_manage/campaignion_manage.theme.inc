@@ -10,15 +10,28 @@ function theme_campaignion_manage_node($variables) {
   $user = user_load($node->uid);
   $author = $user->name;
 
+  if (($path = drupal_lookup_path('alias','node/' . $node->nid)) == FALSE) {
+    $path = 'node/' . $node->nid;
+  }
+  $link = l($title, $path);
+  $langcode = $node->language;
+  $language_html = "";
+  if ($langcode) {
+    $languages = language_list();
+    $language = $languages[$langcode];
+    $langcode_uppercase = strtoupper($langcode);
+    $language_html = "<span class=\"language\">".$language->name." (".$langcode_uppercase."),</span>\n";
+  }
+
   $content = <<<EOT
 <span class="icon"></span>
 <div class="heading">
-<span class="title">{$title}</span>
+<span class="title">{$link}</span>
 <span class="status {$status_css}">{$status_translated}</span>
 </div>
 <div class="additional-info">
 <span class="type">{$content_type_name}</span>
-<span class="author">{$author}</span>
+{$language_html}<span class="author">{$author}</span>
 </div>
 EOT;
 

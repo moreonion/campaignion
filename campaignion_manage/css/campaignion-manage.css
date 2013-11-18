@@ -1,3 +1,68 @@
+.campaignion-manage-content-listing {
+  margin-bottom: 1em;
+}
+.campaignion-manage-content-listing .odd {
+  background-color: #FFFFFF;
+}
+.campaignion-manage-content-listing .even {
+  background-color: #F6F6F6;
+}
+
+.manage-content .icon {
+  border: 1px solid #666666;
+  display: block;
+  float: left;
+  height: 30px;
+  width: 30px;
+  margin-right: 1em;
+}
+
+.manage-bulk,
+.manage-content,
+.manage-links {
+  padding: 1em 0.5em;
+}
+
+.manage-bulk {
+  padding: 1em 1em;
+}
 .manage-bulk .form-item label.option {
   display: none;
+}
+
+.manage-content .title {
+  margin-right: 0.75em;
+  font-size: 1.2em;
+}
+.manage-content .title a,
+.manage-content .title a:link,
+.manage-content .title a:hover,
+.manage-content .title a:active,
+.manage-content .title a:focus,
+.manage-content .title a {
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.manage-content .status {
+  font-size: 0.8em;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+.manage-content .status-published {
+  font-color: #498C92;
+  background-color: #6CD0D9;
+}
+.manage-content .status-draft {
+  font-color: #868431;
+  background-color: #D9D54F;
+}
+.manage-content .additional-info {
+  color: #666666;
+}
+.manage-content .additional-info .type {
+  margin-right: 0.75em;
+}
+.manage-links {
+  min-width: 8em;
 }
