@@ -34,7 +34,7 @@ function _campaignion_country_block_languages() {
     $l['title'] = $languages[$code];
   }
 
-  $block['subject'] = t('Other languages');
+  $block['subject'] = NULL;
   $block['content'] = array(
     '#theme' => 'links__country_languages',
     '#links' => $links,
