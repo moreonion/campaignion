@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * @file Allows to set custom themes and logos for specific campaign pages.
+ *
+ * @author    Paul Haerle <phaer@phaer.org>
+ * @copyright Copyright (c) 2013 copyright
+ */
+
+/**
+ * Implements hook_custom_theme().
+ */
+function campaignion_microsites_custom_theme() {
+  $object = menu_get_object();
+  if (!empty($object->nid)) {
+    $reference = field_get_items('node', $object, 'field_reference_to_campaign');
+    if ($reference || $object->type === 'campaign') {
+      $campaign = $reference ? node_load(array_shift($reference[0])) : $object;
+
+      $get_item = function($field) use (&$campaign) {
+        $items = field_get_items('node', $campaign, $field);
+        if (!$items) { return NULL; }
+        return array_shift($items);
+      };
+
+      $microsite = $get_item('field_microsite')['value'];
+      if ($microsite) {
+        $GLOBALS['microsite'] = array(
+          'logo' => $get_item('field_microsite_logo')['uri'],
+          'front_page' => $get_item('field_microsite_frontpage')['nid'],
+          'theme' => $get_item('field_microsite_theme')['value'],
+        );
+        $theme = &$GLOBALS['microsite']['theme'];
+        return ($theme === 'none') ? NULL : $theme;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess().
+ */
+function campaignion_preprocess_page(&$vars) {
+  if (!empty($GLOBALS['microsite'])) {
+    $microsite = &$GLOBALS['microsite'];
+    if (!empty($vars['logo']) && !empty($microsite['logo'])) {
+      $vars['logo'] = file_create_url($microsite['logo']);
+    }
+    if (!empty($vars['front_page']) && !empty($microsite['front_page'])) {
+      $vars['front_page'] = url('node/' . $microsite['front_page']);
+    }
+  }
+}
