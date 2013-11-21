@@ -1,0 +1,27 @@
+<?php
+
+function campaignion_microsites_field_schema() {
+  $schema['columns'] = array(
+    'state' => array(
+      'type' => 'int',
+      'not null' => FALSE,
+      'default' => 0,
+    ),
+    'theme' => array(
+      'description' => 'Active theme in microsite',
+      'type' => 'varchar',
+      'length' => 128,
+    ),
+    'frontpage' => array(
+      'description' => 'Frontpage of the microsite.',
+      'type' => 'varchar',
+      'length' => 255,
+    ),
+    'logo' => array(
+      'description' => 'Logo for the microsite.',
+      'type' => 'varchar',
+      'length' => 255,
+    ),
+  );
+  return $schema;
+}
