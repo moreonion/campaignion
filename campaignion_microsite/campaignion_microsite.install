@@ -1,6 +1,6 @@
 <?php
 
-function campaignion_microsites_field_schema() {
+function campaignion_microsite_field_schema() {
   $schema['columns'] = array(
     'state' => array(
       'type' => 'int',
