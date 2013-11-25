@@ -4,6 +4,7 @@ namespace Drupal\campaignion_manage;
 
 class ContentQuery {
   protected $query;
+  protected $filter;
 
   public function __construct() {
     $this->build();
@@ -19,7 +20,12 @@ class ContentQuery {
     $this->query = $query;
   }
 
+  public function setFilter($filter) {
+    $this->filter = $filter;
+  }
+
   public function execute() {
+    $this->filter->applyFilters($this);
     $rows = $this->query->execute()->fetchAll();
     $this->modifyResult($rows);
     return $rows;

@@ -3,22 +3,28 @@
 namespace Drupal\campaignion_manage;
 
 class FilterForm {
-  protected $query;
   protected $filters;
   protected $values;
-  public function __construct($query, $filters = array()) {
-    $this->query = $query;
+  public function __construct($filters = array()) {
     $this->filters = $filters;
     $this->values = isset($_SESSION['campaignion_manage_content_filter']) ? $_SESSION['campaignion_manage_content_filter'] : NULL;
-  }
-  public function applyFilters() {
     foreach ($this->filters as $filter) {
       $name = $filter->machineName();
-      if ($this->filterIsActive($filter->machineName())) {
-        $filter->apply($this->query, $this->values['filter'][$name]);
+      if (!isset($this->values['filter'][$name])) {
+        $this->values['filter'][$name] = array();
       }
     }
   }
+
+  public function applyFilters($query) {
+    foreach ($this->filters as $filter) {
+      $name = $filter->machineName();
+      if ($this->filterIsActive($filter->machineName())) {
+        $filter->apply($query, $this->values['filter'][$name]);
+      }
+    }
+  }
+
   public function form($form, &$form_state) {
     $form['#tree'] = TRUE;
 
@@ -49,13 +55,6 @@ class FilterForm {
     $form_state['redirect'] = FALSE;
     $this->values = $form_state['values'];
     $_SESSION['campaignion_manage_content_filter'] = $this->values;
-    foreach ($this->filters as $filter) {
-      $name = $filter->machineName();
-      if (!isset($this->values['filter'][$name])) {
-        $this->values['filter'][$name] = array();
-      }
-    }
-    $this->applyFilters();
   }
 
   protected function filterIsActive($name) {
