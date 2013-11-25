@@ -49,7 +49,7 @@ class ContentQuery {
 SELECT n.tnid, n.nid, n.title, n.type, n.language, n.status, n.uid, u.name
 FROM {node} n 
   INNER JOIN {users} u ON u.uid=n.uid
-WHERE n.tnid IN(:nids)
+WHERE n.tnid IN(:nids) AND n.tnid!=n.nid
 ORDER BY n.language
 SQL;
     $result = db_query($sql, array(':nids' => array_keys($rows_by_nid)));
