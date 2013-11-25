@@ -8,6 +8,7 @@ class ContentFilterType {
       '#type' => 'select',
       '#title' => t('Type'),
       '#options' => node_type_get_names(),
+      '#default_value' => isset($values['type']) ? $values['type'] : NULL,
     );
   }
   public function machineName() { return 'type'; }

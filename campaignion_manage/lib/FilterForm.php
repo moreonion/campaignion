@@ -9,6 +9,7 @@ class FilterForm {
   public function __construct($query, $filters = array()) {
     $this->query = $query;
     $this->filters = $filters;
+    $this->values = isset($_SESSION['campaignion_manage_content_filter']) ? $_SESSION['campaignion_manage_content_filter'] : NULL;
   }
   public function applyFilters() {
     foreach ($this->filters as $filter) {
@@ -19,7 +20,6 @@ class FilterForm {
     }
   }
   public function form($form, &$form_state) {
-    $form_state['filterForm'] = $this;
     $form['#tree'] = TRUE;
 
     foreach ($this->filters as $filter) {
@@ -33,6 +33,7 @@ class FilterForm {
         '#type' => 'checkbox',
         '#title' => t('active'),
         '#description' => t('The filter will only be applied if this checkbox is checked.'),
+        '#default_value' => isset($this->values['filter'][$name]) && isset($this->values['filter'][$name]['active']),
       );
       $filter->form($element, $form_state,  $this->values['filter'][$name]);
     }
@@ -45,7 +46,9 @@ class FilterForm {
   }
 
   public function submit(&$form, &$form_state) {
+    $form_state['redirect'] = FALSE;
     $this->values = $form_state['values'];
+    $_SESSION['campaignion_manage_content_filter'] = $this->values;
     foreach ($this->filters as $filter) {
       $name = $filter->machineName();
       if (!isset($this->values['filter'][$name])) {
