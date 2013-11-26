@@ -4,7 +4,9 @@
  * Implements hook_menu().
  */
 function campaignion_manage_menu() {
-  $items['campaignion/manage/content'] = array(
+  $items['admin/manage/content_and_actions'] = array(
+    'tab_parent' => 'admin/manage/content_and_actions',
+    'tab_root' => 'admin/manage/content_and_actions',
     'title' => 'Manage content and actions',
     'page callback' => 'campaignion_manage_content_page',
     'access arguments' => array('administer nodes'),
