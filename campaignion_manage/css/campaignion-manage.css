@@ -22,6 +22,10 @@
 
 .manage-bulk {
   padding: 1em 0em 0em 1em;
+  width: 130px;
+}
+.manage-links {
+  width: 14em;
 }
 .manage-bulk .form-item label.option {
   display: none;
