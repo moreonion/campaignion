@@ -70,3 +70,59 @@
 .manage-links {
   min-width: 8em;
 }
+
+
+/* ------- Filter ------------------ */
+
+#campaignion-manage-filter-form legend {
+  display: none;
+}
+#campaignion-manage-filter-form fieldset {
+  border-radius: 0;
+}
+#campaignion-manage-filter-form .fieldset-content {
+  padding: 0.25em 1em;
+  border-radius: 0;
+}
+#campaignion-manage-filter-form .fieldset-content > .form-type-checkbox{
+  /* position: absolute; */
+  /* left: -100px; */
+  float: left;
+  padding-top: 14px;
+  width: 100px;
+}
+#campaignion-manage-filter-form .fieldset-content > .form-type-checkbox .ilabel {
+  display: none;
+}
+
+#campaignion-manage-filter-form .fieldset-content > .form-type-select .selecter-element {
+  left: -9999px;
+}
+#campaignion-manage-filter-form .fieldset-content > .form-type-select .selecter,
+#campaignion-manage-filter-form .fieldset-content > .form-type-select label {
+  float: left;
+  margin: 0.5em; 
+}
+#campaignion-manage-filter-form .fieldset-content > .form-type-select label {
+  text-transform: none;
+  padding: 14px 0 0 0;
+  font-size: 1em;
+  line-height: 1em;
+}
+#campaignion-manage-filter-form .fieldset-content > .form-type-select .selecter {
+  min-width: 10em;
+  max-width: 30em;
+}
+
+#campaignion-manage-filter-form fieldset > .manage-filter-remove {
+  text-indent: -9999px;
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  float: right;
+  right: 10px;
+  top: 12px;
+  background-image: url(ae_x.png);
+}
+
+

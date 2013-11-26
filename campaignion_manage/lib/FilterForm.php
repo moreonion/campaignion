@@ -33,6 +33,7 @@ class FilterForm {
       $form['filter'][$name] = array(
         '#type' => 'fieldset',
         '#title' => $filter->title(),
+        '#attributes' => array('class' => array('clearfix')),
       );
       $element = &$form['filter'][$name];
       $element['active'] = array(
@@ -40,6 +41,7 @@ class FilterForm {
         '#title' => t('active'),
         '#description' => t('The filter will only be applied if this checkbox is checked.'),
         '#default_value' => isset($this->values['filter'][$name]) && isset($this->values['filter'][$name]['active']),
+        '#attributes' => array('class' => array('filter-active-toggle')),
       );
       $filter->formElement($element, $form_state,  $this->values['filter'][$name]);
     }
