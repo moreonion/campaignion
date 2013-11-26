@@ -1,0 +1,145 @@
+<?php
+
+function campaignion_activity_schema() { 
+  $unsigned_int_not_null = array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'unsigned' => TRUE,
+  );
+  $schema['campaignion_activity'] = array(
+    'description' => 'Logged activities',
+    'fields' => array(
+      'activity_id' => array(
+        'description' => 'Auto-incrementing ID for activities',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'contact_id' => array(
+        'description' => 'Redhen contact_id',
+      ) + $unsigned_int_not_null,
+      'type' => array(
+        'description' => 'Activity Type key',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'Unix-timestamp when the activity was logged',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'campaignion_activity_contact' => array('contact_id'),
+      'campaignion_activity_type' => array('type'),
+      'campaignion_activity_created' => array('created'),
+    ),
+    'foreign keys' => array(
+      'campaignion_activity_contact' => array(
+        'table' => 'redhen_contact',
+        'columns' => array('contact_id' => 'contact_id'),
+      ),
+    ),
+    'primary key' => array('activity_id'),
+  );
+  $schema['campaignion_activity_webform'] = array(
+    'description' => 'Link an activity to a webform submission.',
+    'fields' => array(
+      'activity_id' => array(
+        'description' => 'Foreign key to the activity.',
+      ) + $unsigned_int_not_null,
+      'nid' => array(
+        'description' => 'Node ID: The webform node this submission belongs to.',
+      ) + $unsigned_int_not_null,
+      'sid' => array(
+        'description' => 'Webform submission ID.',
+      ) + $unsigned_int_not_null,
+      'confirmed' => array(
+        'description' => 'Timestamp for when the webform submission was confirmed (or NULL if not).',
+        'type' => 'int',
+        'default' => NULL,
+      ),
+    ),
+    'primary key' => array('activity_id'),
+    'indexes' => array(
+      'campaignion_activity_webform_activity' => array('activity_id'),
+      'campaignion_activity_webform_node' => array('nid'),
+      'campaignion_activity_webform_submission' => array('nid', 'sid'),
+    ),
+    'foreign keys' => array(
+      'campaignion_activity_webform_activity' => array(
+        'table' => 'campaignion_activity',
+        'columns' => array('activity_id' => 'activity_id'),
+      ),
+      'campaignion_activity_webform_node' => array(
+        'table' => 'node',
+        'columns' => array('nid' => 'nid'),
+      ),
+      'campaignion_activity_webform_submission' => array(
+        'table' => 'webform_submission',
+        'columns' => array('nid' => 'nid', 'sid' => 'sid'),
+      ),
+    ),
+  );
+  $schema['campaignion_activity_payment'] = array(
+    'description' => 'Link an activity to a payment object.',
+    'fields' => array(
+      'activity_id' => array(
+        'description' => 'Foreign key to the activity.',
+      ) + $unsigned_int_not_null,
+      'pid' => array(
+        'description' => 'Foreign key for the payment table.',
+      ) + $unsigned_int_not_null,
+    ),
+    'indexes' => array(
+      'campaignion_activity_payment_activity' => array('activity_id'),
+      'campaignion_activity_payment' => array('pid'),
+    ),
+    'foreign keys' => array(
+      'campaignion_activity_payment_activity' => array(
+        'table' => 'campaignion_activity',
+        'columns' => array('activity_id' => 'activity_id'),
+      ),
+      'campaignion_activity_payment' => array(
+        'table' => 'payment',
+        'columns' => array('pid' => 'pid'),
+      ),
+    ),
+  );
+  $schema['campaignion_activity_comment'] = array(
+    'description' => 'Link an activity to a payment object.',
+    'fields' => array(
+      'activity_id' => array(
+        'description' => 'Foreign key to the activity.',
+      ) + $unsigned_int_not_null,
+      'nid' => array(
+        'description' => 'Node ID: The webform node this submission belongs to.',
+      ) + $unsigned_int_not_null,
+      'cid' => array(
+        'description' => 'Comment ID: The comment that was posted.',
+      ) + $unsigned_int_not_null,
+    ),
+    'indexes' => array(
+      'campaignion_activity_comment_activity' => array('activity_id'),
+      'campaignion_activity_comment_node' => array('nid'),
+      'campaignion_activity_comment' => array('cid'),
+    ),
+    'foreign keys' => array(
+      'campaignion_activity_comment_activity' => array(
+        'table' => 'campaignion_activity',
+        'columns' => array('activity_id' => 'activity_id'),
+      ),
+      'campaignion_activity_comment_node' => array(
+        'table' => 'node',
+        'columns' => array('nid' => 'nid'),
+      ),
+      'campaignion_activity_comment' => array(
+        'table' => 'comment',
+        'columns' => array('cid' => 'cid'),
+      ),
+    ),
+  );
+  return $schema;
+}
+

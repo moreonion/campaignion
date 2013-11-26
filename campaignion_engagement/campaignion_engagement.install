@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function campaignion_engagement_install() {
+  $start = array(
+    'webform_submission',
+    'comment',
+  );
+  variable_set('campaignion_engagement_last_cron_activity_id', $start);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function campaignion_engagement_uninstall() {
+  variable_del('campaignion_engagement_last_cron_activity_id');
+}

@@ -1,0 +1,32 @@
+<?php
+
+function campaignion_activity_types() {
+  $info = module_invoke_all('campaignion_activity_type_info');
+}
+
+function campaignion_activity_ctools_plugin_type() {
+  $plugins['campaignion_activity_type'] = array(
+    'cache' => TRUE,
+  );
+  return $plugins;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function campaignion_activity_views_api() {
+  return array(
+    'api'  => 3,
+  );
+}
+
+if (module_exists('webform')) {
+  require_once dirname(__FILE__) . '/modules/webform.php';
+  if (module_exists('webform_component_paymethod_select')) {
+    require_once dirname(__FILE__) . '/modules/webform_component_paymethod_select.php';
+  }
+}
+
+if (module_exists('comment')) {
+  require_once dirname(__FILE__) . '/modules/comment.php';
+}
