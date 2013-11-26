@@ -6,12 +6,12 @@
 }
 
 .manage-content .icon {
-  border: 1px solid #AAAAAA;
   display: block;
   position: absolute;
-  height: 30px;
-  width: 30px;
+  height: 32px;
+  width: 32px;
   margin-left: -40px;
+  background: url(file.png);
 }
 
 .manage-bulk,
