@@ -14,23 +14,39 @@ class BulkOpForm {
   }
   public function form($form, &$form_state) {
     $form['#tree'] = TRUE;
-    $form['operations'] = array(
+    $form['bulk-wrapper'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Bulk edit'),
+    );
+    $form['bulk-wrapper']['operations'] = array(
       '#type' => 'radios',
       '#title' => t('Selected bulk operation'),
       '#options' => array(),
     );
+    $form['bulk-wrapper']['op-wrapper'] = array(
+      '#type' => 'container',
+    );
 
     foreach ($this->ops as $name => $op) {
-      $form['operations']['#options'][$name] = $op->title();
-      $form['op'][$name] = array(
+      $form['bulk-wrapper']['operations']['#options'][$name] = $op->title();
+      $form['bulk-wrapper']['op-wrapper']['op'][$name] = array(
         '#type' => 'fieldset',
         '#title' => $op->title(),
       );
-      $element = &$form['op'][$name];
+      $element = &$form['bulk-wrapper']['op-wrapper']['op'][$name];
+      $op->formElement($element, $form_state);
+
+      $name .= "-2";
+      $form['bulk-wrapper']['operations']['#options'][$name] = $op->title();
+      $form['bulk-wrapper']['op-wrapper']['op'][$name] = array(
+        '#type' => 'fieldset',
+        '#title' => $op->title(),
+      );
+      $element = &$form['bulk-wrapper']['op-wrapper']['op'][$name];
       $op->formElement($element, $form_state);
     }
 
-    $form['submit'] = array(
+    $form['bulk-wrapper']['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Apply'),
     );
@@ -44,7 +60,7 @@ class BulkOpForm {
     $values = &$form_state['values'];
     $nids = $this->listing->selectedNids($form['listing'], $form_state);
 
-    $op_name = $values['operations'];
+    $op_name = $values['bulk-wrapper']['operations'];
     if (!isset($this->ops[$op_name])) {
       return;
     }
