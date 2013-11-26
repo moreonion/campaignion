@@ -41,7 +41,7 @@ class FilterForm {
         '#description' => t('The filter will only be applied if this checkbox is checked.'),
         '#default_value' => isset($this->values['filter'][$name]) && isset($this->values['filter'][$name]['active']),
       );
-      $filter->form($element, $form_state,  $this->values['filter'][$name]);
+      $filter->formElement($element, $form_state,  $this->values['filter'][$name]);
     }
 
     $form['submit'] = array(

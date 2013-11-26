@@ -58,6 +58,8 @@ function campaignion_manage_content_page() {
 
   $filterForm = new \Drupal\campaignion_manage\FilterForm(array(
     new \Drupal\campaignion_manage\ContentFilterType(),
+    new \Drupal\campaignion_manage\ContentFilterLanguage(),
+    new \Drupal\campaignion_manage\ContentFilterStatus(),
   ));
   $baseQuery->setFilter($filterForm);
 
