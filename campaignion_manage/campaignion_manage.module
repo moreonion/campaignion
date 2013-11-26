@@ -63,6 +63,7 @@ function campaignion_manage_content_page() {
 
   $bulkOpForm = new \Drupal\campaignion_manage\BulkOpForm($listing, array(
     new \Drupal\campaignion_manage\PublishBulkOp(),
+    new \Drupal\campaignion_manage\UnpublishBulkOp(),
   ));
 
   // ATTENTION: drupal_get_form() has to be called before $baseQuery->execute()

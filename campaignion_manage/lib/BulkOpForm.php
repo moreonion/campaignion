@@ -34,15 +34,11 @@ class BulkOpForm {
         '#title' => $op->title(),
       );
       $element = &$form['bulk-wrapper']['op-wrapper']['op'][$name];
-      $op->formElement($element, $form_state);
-
-      $name .= "-2";
-      $form['bulk-wrapper']['operations']['#options'][$name] = $op->title();
-      $form['bulk-wrapper']['op-wrapper']['op'][$name] = array(
-        '#type' => 'fieldset',
-        '#title' => $op->title(),
+      $element['helptext'] = array(
+        '#type' => 'container',
+        '#attributes' => array('class' => array('help-text')),
+        'text' => array('#markup' => $op->helpText()),
       );
-      $element = &$form['bulk-wrapper']['op-wrapper']['op'][$name];
       $op->formElement($element, $form_state);
     }
 
