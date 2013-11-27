@@ -1,0 +1,8 @@
+name = Campaignion Microsites
+description = Allows to set custom themes and logos for specific campaign pages.
+package = Campaignion
+core = 7.x
+project = campaignion
+
+dependencies[] = ae_campaign_content_type
+dependencies[] = little_helpers
