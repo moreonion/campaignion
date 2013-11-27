@@ -42,7 +42,11 @@ class BulkOpForm {
       $op->formElement($element, $form_state);
     }
 
-    $form['bulk-wrapper']['submit'] = array(
+    $form['bulk-wrapper']['actions'] = array(
+      '#type' => 'container',
+      '#type' => 'container',
+    );
+    $form['bulk-wrapper']['actions']['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Apply'),
     );
