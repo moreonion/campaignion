@@ -1,12 +1,5 @@
 <?php
 /**
- * @file
- *
- * @author    Matthias Weiss <matthias@more-onion.com>
- * @copyright Copyright (c) 2013 copyright
- */
-
-/**
  * Implements hook_views_data().
  */
 function campaignion_activity_views_data() {
