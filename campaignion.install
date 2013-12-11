@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * Deactivate youtube tab on all file-fields.
+ */
+function campaignion_update_1() {
+  $opts = array('include_inactive' => TRUE);
+  $fields = field_read_fields(array('type' => array('file', 'image')), $opts);
+  foreach ($fields as $field) {
+    $instances = field_read_instances(array('field_name' => $field['field_name']), $opts);
+    foreach ($instances as $instance) {
+      if ($instance['widget']['type'] == 'media_generic') {
+        $instance['widget']['settings']['browser_plugins'] = array(
+          'upload' => 'upload',
+          'media_default--media_browser_1' => 'media_default--media_browser_1',
+          'media_default--media_browser_my_files' => 'media_default--media_browser_my_files',
+          'media_internet' => 'media_internet',
+        );
+        field_update_instance($instance);
+      }
+    }
+  }
+}
