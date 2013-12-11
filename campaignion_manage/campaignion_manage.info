@@ -1,0 +1,14 @@
+name = Campaignion Manage Interface
+description = Listings and bulk-operations for content and contacts.
+core = 7.x
+
+dependencies[] = campaignion
+; for ctools dropbutton
+dependencies[] = ctools
+dependencies[] = node
+dependencies[] = psr0
+
+scripts[] = "js/content_translations.js"
+
+stylesheets[all][] = "css/campaignion-manage.css"
+stylesheets[all][] = "css/ctools-dropbutton.css"
