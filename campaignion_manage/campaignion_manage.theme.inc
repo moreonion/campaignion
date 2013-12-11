@@ -18,9 +18,20 @@ function theme_campaignion_manage_node($variables) {
   $language_html = "";
   if ($langcode) {
     $languages = language_list();
-    $language = $languages[$langcode];
     $langcode_uppercase = strtoupper($langcode);
-    $language_html = "<span class=\"language\">".$language->name." (".$langcode_uppercase."),</span>\n";
+
+    if (isset($languages[$langcode])) {
+      $language = $languages[$langcode];
+      $language_html = "<span class=\"language\">".$language->name." (".$langcode_uppercase.")</span>";
+    } else {
+      $language_html = "<span class=\"language\">" . t('No language') . " (".$langcode_uppercase.")</span>";
+    }
+  }
+
+  $author_html = '';
+  if (!empty($author)) {
+    $author_html .= empty($language_html) ? "\n" : ",\n";
+    $author_html .= '<span class="author">' . $author . '</span>';
   }
 
   $content = <<<EOT
@@ -31,7 +42,7 @@ function theme_campaignion_manage_node($variables) {
 </div>
 <div class="additional-info">
 <span class="type">{$content_type_name}</span>
-{$language_html}<span class="author">{$author}</span>
+{$language_html}{$author_html}
 </div>
 EOT;
 
