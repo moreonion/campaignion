@@ -85,8 +85,8 @@
   border-radius: 0;
 }
 #campaignion-manage-filter-form .fieldset-content > .form-type-checkbox{
-  /* position: absolute; */
-  /* left: -100px; */
+  position: absolute;
+  left: -9999px;
   float: left;
   padding-top: 14px;
   width: auto;
