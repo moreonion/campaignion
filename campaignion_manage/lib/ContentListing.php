@@ -100,7 +100,15 @@ class ContentListing {
 
   protected function nodeLinks($node) {
     $links = array();
-    foreach (array('edit' => t('Edit'), 'translate' => t('Translate'), 'view' => t('View page'), 'delete' => t('Delete')) as $path => $title) {
+    $edit_path_part = 'edit';
+
+    // set path to wizard for action content types
+    if (module_exists('ae_wizard')) {
+      if (\Drupal\campaignion\ActionType::isAction($node->type)) {
+        $edit_path_part = 'wizard';
+      }
+    }
+    foreach (array($edit_path_part => t('Edit'), 'translate' => t('Translate'), 'view' => t('View page'), 'delete' => t('Delete')) as $path => $title) {
       $links[$path] = array(
         'href' => "node/{$node->nid}/$path",
         'title' => $title,
