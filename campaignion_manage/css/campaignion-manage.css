@@ -125,5 +125,8 @@
   top: 12px;
   background-image: url(ae_x.png);
 }
+#campaignion-manage-filter-form fieldset > .manage-filter-remove:hover {
+  cursor: pointer;
+}
 
 
