@@ -129,4 +129,15 @@
   cursor: pointer;
 }
 
+table.campaignion-manage-content-listing table {
+  border: 0px;
+}
 
+table.campaignion-manage-content-listing tr.node-translations > td {
+  border: 0px;
+  padding: 0 2%;
+}
+
+table.campaignion-manage-content-listing table td, table.campaignion-manage-content-listing table tr {
+  border: 0px;
+}
