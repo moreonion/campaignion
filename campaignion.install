@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * action.module -> campaignion_action.module
+ */
+function campaignion_update_2() {
+  module_disable(array('action'));
+  drupal_uninstall_modules(array('action'));
+  module_enable('campaignion_action');
+}
+
+/**
  * Deactivate youtube tab on all file-fields.
  */
 function campaignion_update_1() {
