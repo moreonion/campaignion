@@ -1,0 +1,90 @@
+<?php
+/**
+ * @file
+ * Campaignion newsletter install file.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function campaignion_newsletters_schema() {
+  return array(
+    'campaignion_newsletters_lists' => array(
+      'description' => 'Table for newsletter lists',
+      'fields' => array(
+        'identifier' => array(
+          'description' => 'The identifier of this newsletter.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'title' => array(
+          'description' => 'The title of this newsletter.',
+          'type' => 'varchar',
+          'length' => 512,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'language' => array(
+          'description' => 'The {languages}.language of this newsletter.',
+          'type' => 'varchar',
+          'length' => 12,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'source' => array(
+          'description' => 'The source of this newsletter.',
+          'type' => 'varchar',
+          'length' => 512,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+      ),
+      'primary key' => array('identifier'),
+    ),
+    'campaignion_newsletters_subscriptions' => array(
+      'description' => 'Table for joining users to newsletter lists',
+      'fields' => array(
+        'subscription_id' => array(
+          'description' => 'The primary identifier for a subscription.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'email' => array(
+          'description' => 'The email address of the subscribed user.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'identifier' => array(
+          'description' => 'The identifier of this newsletter.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+      ),
+      'primary key' => array('subscription_id'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_install().
+ */
+function campaignion_newsletters_install() {
+  // We need to run after redhen_contact.
+  $weight = db_select('system', 's')
+    ->fields('s', array('weight'))
+    ->condition('name', 'redhen_contact', '=')
+    ->execute()
+    ->fetchField();
+
+  db_update('system')
+    ->fields(array('weight' => $weight + 1))
+    ->condition('name', 'campaignion_newsletters', '=')
+    ->execute();
+}
