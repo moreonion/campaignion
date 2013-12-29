@@ -4,7 +4,7 @@ namespace Drupal\campaignion\Wizard;
 
 class PetitionWizard extends NodeWizard {
   public $steps = array(
-    'content' => 'PetitionContentStep',
+    'content' => 'ContentStep',
     'form'    => 'PetitionWebformStep',
     'emails'  => 'EmailStep',
     'thank'   => 'ThankyouStep',

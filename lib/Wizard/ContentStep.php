@@ -75,4 +75,11 @@ class ContentStep extends WizardStep {
     $form_state['form_info']['path'] = 'node/' . $form_state['node']->nid . '/wizard/%step';
     $form['#submit'] = $submit_handlers; unset($submit_handlers);
   }
+
+  public function status() {
+    return array(
+      'caption' => t('Your copy is great'),
+      'message' => t('You have added content, a nice picture and a convincing title.'),
+    );
+  }
 }

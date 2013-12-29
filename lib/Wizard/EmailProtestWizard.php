@@ -4,7 +4,7 @@ namespace Drupal\campaignion\Wizard;
 
 class EmailProtestWizard extends NodeWizard {
   public $steps = array(
-    'content' => 'EmailProtestContentStep',
+    'content' => 'ContentStep',
     'target'  => 'EmailProtestTargetStep',
     'form'    => 'WebformStep',
     'emails'  => 'EmailProtestEmailStep',

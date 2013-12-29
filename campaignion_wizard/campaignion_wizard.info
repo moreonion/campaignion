@@ -7,7 +7,6 @@ project = campaignion
 dependencies[] = ae_form_builder
 dependencies[] = ae_thankyou_page_content_type
 dependencies[] = campaignion_action
-dependencies[] = pgbar
 dependencies[] = webform_confirm_email
 dependencies[] = webform_custom_buttons
 dependencies[] = wizard

@@ -4,7 +4,7 @@ namespace Drupal\campaignion\Wizard;
 
 class WebformWizard extends NodeWizard {
   public $steps = array(
-    'content' => 'WebformContentStep',
+    'content' => 'ContentStep',
     'form'    => 'WebformStep',
     'emails'  => 'EmailStep',
     'thank'   => 'ThankyouStep',

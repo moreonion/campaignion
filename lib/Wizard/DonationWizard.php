@@ -4,7 +4,7 @@ namespace Drupal\campaignion\Wizard;
 
 class DonationWizard extends NodeWizard {
   public $steps = array(
-    'content' => 'DonationContentStep',
+    'content' => 'ContentStep',
     'form'    => 'WebformStep',
     'emails'  => 'DonationEmailStep',
     'thank'   => 'ThankyouStep',
