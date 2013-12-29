@@ -4,7 +4,7 @@
  * Implements hook_node_insert()
  */
 function campaignion_action_node_insert($node) {
-  if (isset($node->action) || Drupal\campaignion\ActionType::isAction($node->type)) {
+  if (isset($node->action) || Drupal\campaignion\Action\TypeBase::isAction($node->type)) {
     $action = Drupal\campaignion\Action::fromNode($node);
     if (isset($node->translation_source)) {
       $action->copyForm($node->translation_source->nid);

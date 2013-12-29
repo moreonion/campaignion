@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\campaignion\Donation;
+namespace Drupal\campaignion\Action;
 
-use Drupal\campaignion\ActionType as BaseActionType;
+use \Drupal\campaignion\Wizard\DonationWizard;
 
-class ActionType extends BaseActionType {
+class Donation extends TypeBase {
   public function defaultTemplateNid() {
     $query = new \EntityFieldQuery();
 
@@ -15,5 +15,9 @@ class ActionType extends BaseActionType {
 
     $nids = isset($result['node']) ? array_keys($result['node']) : array(NULL);
     return $nids[0];
+  }
+
+  public function wizard($node = NULL) {
+    return new DonationWizard($node, $this->type);
   }
 }

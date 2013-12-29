@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * ae_wizard.module -> campaignion_wizard.module
+ */
+function campaignion_update_3() {
+  module_disable(array('ae_wizard'));
+  drupal_uninstall_modules(array('ae_wizard'));
+  module_enable('campaignion_wizard');
+}
+
+/**
  * action.module -> campaignion_action.module
  */
 function campaignion_update_2() {
