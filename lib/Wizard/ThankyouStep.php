@@ -11,37 +11,6 @@ class ThankyouStep extends WizardStep {
     module_load_include('inc', 'webform', 'includes/webform.components');
   }
 
-  protected function getDefaulThankPageURL() {
-
-    $template_nids = array_keys($this->getThankPageTemplates());
-    if (isset($template_nids[0])) {
-      return ('node/' . $template_nids[0]);
-    }
-    return '';
-  }
-
-  protected function getThankPageTemplates() {
-
-    require_once drupal_get_path('module', 'mo_utilities') . '/mo_node.inc';
-
-    $nids = \MO\Nodes\get_nids_from_types(array('thank_you_page'));
-    sort($nids);
-
-    $nodes = node_load_multiple($nids);
-    $list = array();
-
-    foreach($nodes as $node) {
-      $is_template = field_get_items('node', $node, 'field_is_template');
-      if ($is_template[0]['value'] == 0) {
-        unset($nodes[$node->nid]);
-      }
-      else {
-        $list[$node->nid] = $node->title;
-      }
-    }
-    return $list;
-  }
-
   protected function pageForm(&$form_state, $index, $title, $prefix) {
 
     $action = $this->wizard->node;
@@ -56,19 +25,13 @@ class ThankyouStep extends WizardStep {
     if (isset($thank_you_pages[$index]['node_reference_nid'])) {
       $type = 'node';
       $node = node_load($thank_you_pages[$index]['node_reference_nid']);
-      $old['redirect_url'] = $this->getDefaulThankPageURL();
-    }
-    elseif (isset($thank_you_pages[$index]['template_nid'])) {
-      $type = 'template';
-      $node = $this->wizard->prepareNode('thank_you_page');
-      $template_default[$thank_you_pages[$index]['template_nid']] = $thank_you_pages[$index]['template_nid'];
-      $old['redirect_url'] = $this->getDefaulThankPageURL();
+      $old['redirect_url'] = '';
     }
     else {
       $type = 'redirect';
       $node = $this->wizard->prepareNode('thank_you_page');
       if (isset($thank_you_pages[$index]['redirect_url']) == FALSE) {
-        $old['redirect_url'] = $this->getDefaulThankPageURL();
+        $old['redirect_url'] = '';
       }
       else {
         $old['redirect_url'] = $thank_you_pages[$index]['redirect_url'];
@@ -91,28 +54,6 @@ class ThankyouStep extends WizardStep {
       '#title'         => t('Redirect URL'),
       '#states'        => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'redirect'))),
       '#default_value' => $old['redirect_url'],
-    );
-    $form['or'] = array(
-      '#type'   => 'markup',
-      '#markup' => '<div class="thank-you-outer-or"><span class="thank-you-line-or"><span class="thank-you-text-or">' . t('or') . '</span></span></div>',
-    );
-    $form['type2'] = array(
-      '#type'          => 'radio',
-      '#title'         => t('Select one of the template thank you pages'),
-      '#return_value'  => 'template',
-      '#default_value' => $type == 'template' ? 'template' : NULL,
-      '#parents'       => $form['type']['#parents'],
-    );
-
-    $options = $this->getThankPageTemplates();
-    $form['template'] = array(
-      '#type'          => 'select',
-      '#title'         => t('Template thank you pages'),
-      '#states'        => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'template'))),
-      '#options'       => $options,
-      '#default_value' => $template_default,
-      '#multiple'      => FALSE,
-      '#size'          => 1,
     );
     $form['or2'] = array(
       '#type'   => 'markup',
@@ -196,7 +137,7 @@ class ThankyouStep extends WizardStep {
       $thank_you_pages[] = 'submission_node';
     }
     foreach ($thank_you_pages as $page) {
-      if (in_array($values[$page]['type'], array('node', 'redirect', 'template')) == FALSE) {
+      if (in_array($values[$page]['type'], array('node', 'redirect')) == FALSE) {
         form_set_error('type', t('You have to create either a thank you page or provide a redirect.'));
       }
       if ($values[$page]['type'] == 'node') {
@@ -227,7 +168,6 @@ class ThankyouStep extends WizardStep {
 
     foreach(array(0,1) as $index) {
       $action->field_thank_you_pages[LANGUAGE_NONE][$index]['node_reference_nid'] = NULL;
-      $action->field_thank_you_pages[LANGUAGE_NONE][$index]['template_nid'] = NULL;
       $action->field_thank_you_pages[LANGUAGE_NONE][$index]['redirect_url'] = NULL;
     }
 
@@ -243,7 +183,6 @@ class ThankyouStep extends WizardStep {
         unset($submit_handlers);
 
         $action->field_thank_you_pages[LANGUAGE_NONE][$index]['node_reference_nid'] = $form_state['values']['nid'];
-        $action->field_thank_you_pages[LANGUAGE_NONE][$index]['template_nid']       = NULL;
         $action->field_thank_you_pages[LANGUAGE_NONE][$index]['redirect_url']       = NULL;
         $path = 'node/' . $form_state['values']['nid'];
         if (count($thank_you_pages) == 1) {
@@ -258,27 +197,8 @@ class ThankyouStep extends WizardStep {
           }
         }
       }
-      elseif ($values[$page]['type'] == 'template') {
-        $action->field_thank_you_pages[LANGUAGE_NONE][$index]['node_reference_nid'] = NULL;
-        $action->field_thank_you_pages[LANGUAGE_NONE][$index]['template_nid']       = $values[$page]['template'];
-        $action->field_thank_you_pages[LANGUAGE_NONE][$index]['redirect_url']       = NULL;
-        $path = 'node/' . $values[$page]['template'];
-        if (count($thank_you_pages) == 1) {
-          $action->webform['redirect_url'] = $path;
-        }
-        else {
-          if ($page == 'thank_you_node') {
-            campaignion_wizard_set_confirmation_redirect_url($this->wizard->node->nid, $path);
-          }
-          else {
-            $action->webform['redirect_url'] = $path;
-          }
-        }
-
-      }
       else {
         $action->field_thank_you_pages[LANGUAGE_NONE][$index]['node_reference_nid'] = NULL;
-        $action->field_thank_you_pages[LANGUAGE_NONE][$index]['template_nid']       = NULL;
         $action->field_thank_you_pages[LANGUAGE_NONE][$index]['redirect_url']       = $values[$page]['redirect_url'];
 
         if (count($thank_you_pages) == 1) {
@@ -306,7 +226,6 @@ class ThankyouStep extends WizardStep {
     $msg = t("After your supporters submitted their filled out form ");
 
     if (   isset($thank_you_pages[0]['redirect_url'])       == TRUE
-        || isset($thank_you_pages[0]['template_nid'])       == TRUE
         || isset($thank_you_pages[0]['node_reference_nid']) == TRUE) {
 
       if (isset($thank_you_pages[0]['redirect_url']) == TRUE) {
@@ -319,10 +238,6 @@ class ThankyouStep extends WizardStep {
             )
           )
         );
-      }
-      elseif (isset($thank_you_pages[0]['template_nid']) == TRUE) {
-        $node = node_load($thank_you_pages[0]['template_nid']);
-        $msg .= t('they\'ll see the template page !node.', array('!node' => l($node->title, 'node/' . $node->nid)));
       }
       else {
         $node = node_load($thank_you_pages[0]['node_reference_nid']);
@@ -341,10 +256,6 @@ class ThankyouStep extends WizardStep {
           )
         )
       );
-    }
-    elseif (isset($thank_you_pages[1]['template_nid']) == TRUE) {
-      $node = node_load($thank_you_pages[1]['template_nid']);
-      $msg .= t('they\'ll see the template page !node.', array('!node' => l($node->title, 'node/' . $node->nid)));
     }
     else {
       $node = node_load($thank_you_pages[1]['node_reference_nid']);
