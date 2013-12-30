@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion\Wizard;
 
-abstract class WizardStep extends \Drupal\wizard\WizardStep {
+abstract class WizardStep extends \Drupal\oowizard\WizardStep {
   public function stepForm($form, &$form_state) {
     $form['wizard_head'] = array(
       '#type' => 'container',

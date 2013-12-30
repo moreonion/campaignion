@@ -11,7 +11,7 @@ interface TypeInterface {
    *
    * @param object $node The node to edit. Create a new one if NULL.
    *
-   * @return \Drupal\wizard\Wizard
+   * @return \Drupal\oowizard\Wizard
    *  The wizard responsible for changing/adding actions of this type.
    */
   public function wizard($node = NULL);

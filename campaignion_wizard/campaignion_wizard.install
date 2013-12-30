@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Migrate wizard.module -> oowizard.module.
+ */
+function campaignion_wizard_update_1() {
+  module_disable(array('wizard'), FALSE);
+  drupal_uninstall_modules(array('wizard'), FALSE);
+  module_enable(array('oowizard'));
+}
