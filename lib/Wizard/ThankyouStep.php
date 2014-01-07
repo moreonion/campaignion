@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion\Wizard;
 
+use \Drupal\campaignion\Forms\EmbeddedNodeForm;
+
 class ThankyouStep extends WizardStep {
   protected $step = 'thank';
   protected $title = 'Thank you';
@@ -14,10 +16,6 @@ class ThankyouStep extends WizardStep {
   protected function pageForm(&$form_state, $index, $title, $prefix) {
 
     $action = $this->wizard->node;
-
-    if (isset($form_state['node']) == TRUE) {
-      unset($form_state['node']);
-    }
 
     $template_default = array();
     $thank_you_pages =& $action->field_thank_you_pages['und'];
@@ -66,12 +64,12 @@ class ThankyouStep extends WizardStep {
       '#default_value' => $type == 'node' ? 'node' : NULL,
       '#parents'       => $form['type']['#parents'],
     );
+    $formObj = new EmbeddedNodeForm($node, $form_state, array($prefix, 'node_form'));
     $node_form = array(
       '#type'    => 'container',
       '#states'  => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'node'))),
       '#tree'    => TRUE,
-      '#parents' => array('node_form'),
-    ) + node_form(array(), $form_state, $node);
+    ) + $formObj->formArray();
 
     $node_form['title']['#required'] = FALSE;
     // don't publish per default
@@ -94,13 +92,11 @@ class ThankyouStep extends WizardStep {
     $node_form['field_share_light']['#weight'] = -10;
     $node_form['field_main_image']['#attributes']['class'][] = 'sidebar-narrow-right';
     $node_form['#tree'] = TRUE;
-    unset($node_form['#parents']);
 
     $form['node_form'] =& $node_form;
     $form['#attributes']['class'][] = 'thank-you-node-wrapper';
 
     $form['#tree'] = TRUE;
-
     return $form;
   }
 
@@ -121,7 +117,6 @@ class ThankyouStep extends WizardStep {
 
     $form['#tree'] = TRUE;
     $form['wizard_head']['#tree'] = FALSE;
-
     return $form;
   }
 
@@ -131,7 +126,6 @@ class ThankyouStep extends WizardStep {
 
   public function validateStep($form, &$form_state) {
     $values =& $form_state['values'];
-    unset($form_state['values']);
     $thank_you_pages = array('thank_you_node');
     if (campaignion_wizard_has_double_optin($this->wizard->node->nid) != FALSE) {
       $thank_you_pages[] = 'submission_node';
@@ -141,8 +135,7 @@ class ThankyouStep extends WizardStep {
         form_set_error('type', t('You have to create either a thank you page or provide a redirect.'));
       }
       if ($values[$page]['type'] == 'node') {
-        $form_state['values'] =& $values[$page]['node_form'];
-        node_form_validate($form, $form_state);
+        $form_state['embedded'][$page]['node_form']['formObject']->validate($form, $form_state);
         if (empty($values[$page]['node_form']['title'])) {
           form_set_error("$page][node_form][title", t('!name field is required.', array('!name' => 'Title')));
         }
@@ -153,7 +146,6 @@ class ThankyouStep extends WizardStep {
         }
       }
     }
-    $form_state['values'] =& $values;
   }
 
   public function submitStep($form, &$form_state) {
@@ -175,14 +167,10 @@ class ThankyouStep extends WizardStep {
       if ($values[$page]['type'] == 'node') {
         $form_state['values'] =& $values[$page]['node_form'];
 
-        $submit_handlers = $form['#submit'];
-        unset($form['#submit']);
-        node_form_submit($form, $form_state);
+        $formObj = $form_state['embedded'][$page]['node_form']['formObject'];
+        $formObj->submit($form, $form_state);
 
-        $form['#submit'] = $submit_handlers;
-        unset($submit_handlers);
-
-        $action->field_thank_you_pages[LANGUAGE_NONE][$index]['node_reference_nid'] = $form_state['values']['nid'];
+        $action->field_thank_you_pages[LANGUAGE_NONE][$index]['node_reference_nid'] = $formObj->node()->nid;
         $action->field_thank_you_pages[LANGUAGE_NONE][$index]['redirect_url']       = NULL;
         $path = 'node/' . $form_state['values']['nid'];
         if (count($thank_you_pages) == 1) {

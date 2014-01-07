@@ -43,6 +43,8 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
     $node->uid  = $this->user->uid;
     $node->name = $this->user->name;
     $node->language = LANGUAGE_NONE;
+    $node->title = '';
+    node_object_prepare($node);
     return $node;
   }
 

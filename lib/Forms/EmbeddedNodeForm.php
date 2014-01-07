@@ -5,17 +5,22 @@ namespace Drupal\campaignion\Forms;
 class EmbeddedNodeForm {
   protected $embed_state;
   protected $form;
+  protected $parents;
   public function __construct($node, &$form_state, $parents = array()) {
     form_load_include($form_state, 'inc', 'node', 'node.pages');
-    $form_state += array('embedded' => array());
-    drupal_array_set_nested_value($form_state['embedded'], $parents);
+    $form_state += array('embedded' => array(), 'field' => array());
+    drupal_array_set_nested_value($form_state['embedded'], $parents, array());
     $this->embed_state = &drupal_array_get_nested_value($form_state['embedded'], $parents);
+    $this->embed_state['formObject'] = $this;
     $this->embed_state['node'] = $node;
     $this->embed_state['build_info'] = array(
       'form_id' => $node->type . '_node_form',
       'base_form_id' => 'node_form',
     );
+    $this->embed_state['field'] = &$form_state['field'];
     $this->parents = $parents;
+
+    $node->revision = FALSE;
   }
 
   /**
@@ -46,7 +51,8 @@ class EmbeddedNodeForm {
   }
 
   public function formArray() {
-    $form = node_form(array(), $this->embed_state, $this->form_state['node']);
+    $form['#parents'] = $this->parents;
+    $form = node_form($form, $this->embed_state, $this->embed_state['node']);
     $this->alterForm($form, $this->embed_state);
     $this->embedFieldGroups($form);
     return $form;
@@ -54,6 +60,14 @@ class EmbeddedNodeForm {
 
   public function validate($form, &$form_state) {
     $form = &drupal_array_get_nested_value($form, $this->parents);
+    // field_attach_submit() needs the values properly nested while
+    // entity_form_submit_build_entity() needs top-level node form values
+    // therefore we have to provide both.
+    $this->embed_state['values'] =& drupal_array_get_nested_value($form_state['values'], $this->parents);
+    if (count($this->parents) > 0) {
+      $parent = $this->parents[0];
+      $this->embed_state['values'][$parent] = &$form_state['values'][$parent];
+    }
     node_form_validate($form, $this->embed_state);
   }
 
@@ -67,5 +81,9 @@ class EmbeddedNodeForm {
     if ($submit_handlers) {
       $form['#submit'] = $submit_handlers; unset($submit_handlers);
     }
+  }
+
+  public function node() {
+    return $this->embed_state['node'];
   }
 }
