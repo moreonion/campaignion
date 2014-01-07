@@ -2,15 +2,18 @@
 
 namespace Drupal\campaignion\Wizard;
 
+use \Drupal\campaignion\Forms\EmbeddedNodeForm;
+
 class ContentStep extends WizardStep {
   protected $step = 'content';
   protected $title = 'Content';
+  protected $nodeForm;
 
   public function stepForm($form, &$form_state) {
     $form = parent::stepForm($form, $form_state);
     // load original node form
-    form_load_include($form_state, 'inc', 'node', 'node.pages');
-    $form = node_form($form, $form_state, $this->wizard->node);
+    $this->nodeForm = new EmbeddedNodeForm($this->wizard->node, $form_state);
+    $form += $this->nodeForm->formArray();
 
     $form['field_thank_you_pages']['#access'] = FALSE;
 
@@ -23,10 +26,6 @@ class ContentStep extends WizardStep {
       $form['options']['status']['#default_value'] = 0;
       $form['options']['promote']['#default_value'] = 0;
     }
-
-    // call path and path_auto form_alter functions as they do not get called automatically
-    // (they expect form_id 'node_form' but 'wizard_step_form' is provided)
-    drupal_alter('node_form', $form, $form_state);
 
     // secondary container
     $form['wizard_secondary'] = array(
@@ -66,14 +65,12 @@ class ContentStep extends WizardStep {
   }
 
   public function validateStep($form, &$form_state) {
-    node_form_validate($form, $form_state);
+    $this->nodeForm->validate($form, $form_state);
   }
 
   public function submitStep($form, &$form_state) {
-    $submit_handlers = $form['#submit']; unset($form['#submit']);
-    node_form_submit($form, $form_state);
+    $this->nodeForm->submit($form, $form_state);
     $form_state['form_info']['path'] = 'node/' . $form_state['node']->nid . '/wizard/%step';
-    $form['#submit'] = $submit_handlers; unset($submit_handlers);
   }
 
   public function status() {
