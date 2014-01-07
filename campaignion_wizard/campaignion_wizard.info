@@ -1,0 +1,12 @@
+name = Campaignion Wizard
+description = Wizards for creating actions
+core = 7.x
+package = Campaignion
+project = campaignion
+
+dependencies[] = ae_form_builder
+dependencies[] = ae_thankyou_page_content_type
+dependencies[] = campaignion_action
+dependencies[] = webform_confirm_email
+dependencies[] = webform_custom_buttons
+dependencies[] = oowizard

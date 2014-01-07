@@ -7,10 +7,10 @@
  */
 
 /**
- * @return array of class names indexed by
- *         (machine readable) content-type names
+ * @return array
+ *   class names indexed by (machine readable) content-type names
  */
-function hook_action_type_info() {
+function hook_campaignion_action_info() {
   $types['webform'] = 'Drupal\\campaignion\\Action\\FlexibleForm';
   return $types;
 }

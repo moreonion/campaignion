@@ -1,0 +1,16 @@
+name = Display recent supporters for campaignion
+core = 7.x
+project = campaignion_recent_supporters
+
+dependencies[] = campaignion_activity
+dependencies[] = webform_tracking
+dependencies[] = redhen_contact
+dependencies[] = addressfield
+
+stylesheets[all][] = recent-supporters.css
+stylesheets[all][] = flags.css
+
+scripts[] = jquery.easing.1.3.js
+scripts[] = jquery.timeago.js
+scripts[] = jquery.recent-supporters.js
+scripts[] = recent-supporters.js
