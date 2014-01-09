@@ -15,6 +15,9 @@ class ContentStep extends WizardStep {
     $this->nodeForm = new EmbeddedNodeForm($this->wizard->node, $form_state);
     $form += $this->nodeForm->formArray();
 
+    // we don't want the webform_template selector to show up here.
+    unset($form['webform_template']);
+
     $form['field_thank_you_pages']['#access'] = FALSE;
 
     $form['actions']['#access'] = FALSE;
