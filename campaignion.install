@@ -6,7 +6,7 @@
 function campaignion_update_3() {
   module_disable(array('ae_wizard'));
   drupal_uninstall_modules(array('ae_wizard'));
-  module_enable('campaignion_wizard');
+  module_enable(array('campaignion_wizard'));
 }
 
 /**
@@ -15,7 +15,7 @@ function campaignion_update_3() {
 function campaignion_update_2() {
   module_disable(array('action'));
   drupal_uninstall_modules(array('action'));
-  module_enable('campaignion_action');
+  module_enable(array('campaignion_action'));
 }
 
 /**
