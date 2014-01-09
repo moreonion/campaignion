@@ -7,6 +7,7 @@ class EmbeddedNodeForm {
   protected $form;
   protected $parents;
   public function __construct($node, &$form_state, $parents = array()) {
+    node_object_prepare($node);
     form_load_include($form_state, 'inc', 'node', 'node.pages');
     $form_state += array('embedded' => array(), 'field' => array());
     drupal_array_set_nested_value($form_state['embedded'], $parents, array());
