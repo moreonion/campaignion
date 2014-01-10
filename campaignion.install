@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * Enable campaignion_node_ux().
+ */
+function campaignion_update_4() {
+  module_enable(array('campaignion_node_ux'));
+}
+
+/**
  * ae_wizard.module -> campaignion_wizard.module
  */
 function campaignion_update_3() {
