@@ -34,7 +34,7 @@ class Address extends Field {
     return TRUE;
   }
 
-  public function import(SourceInterface $source, $entity, $override) {
+  public function import(SourceInterface $source, \EntityMetadataWrapper $entity, $override) {
     try {
       if (!$override && $entity->{$this->field}->value()) {
         return FALSE;
@@ -53,7 +53,7 @@ class Address extends Field {
     return FALSE;
   }
 
-  public function setValue($entity, $new_address) {
+  public function setValue(\EntityMetadataWrapper $entity, $new_address) {
     $stored_multiple_addresses = $entity->{$this->field}->value();
 
     $changed = FALSE;
