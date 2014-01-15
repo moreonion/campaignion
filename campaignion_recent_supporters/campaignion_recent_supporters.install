@@ -80,7 +80,7 @@ function _campaignion_recent_supporters_define_fields() {
 function _campaignion_recent_supporters_create_instances($bundle) {
   $instance = array (
     'bundle' => $bundle,
-    'label' => 'Display recent supporters box.',
+    'label' => 'Display a recent supporters box.',
     'widget' => array (
       'weight' => '7',
       'type' => 'recent_supporters',
