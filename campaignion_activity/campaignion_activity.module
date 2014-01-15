@@ -1,14 +1,9 @@
 <?php
 
+use \Drupal\campaignion\Activity;
+
 function campaignion_activity_types() {
   $info = module_invoke_all('campaignion_activity_type_info');
-}
-
-function campaignion_activity_ctools_plugin_type() {
-  $plugins['campaignion_activity_type'] = array(
-    'cache' => TRUE,
-  );
-  return $plugins;
 }
 
 /**
@@ -29,4 +24,40 @@ if (module_exists('webform')) {
 
 if (module_exists('comment')) {
   require_once dirname(__FILE__) . '/modules/comment.php';
+}
+
+/**
+ * Implements hook_campaignion_activity_type_info().
+ *
+ * … on behalf of redhen_contact().
+ */
+function redhen_contact_campaignion_activity_type_info() {
+  $info['redhen_contact_create'] = '\Drupal\campaignion\ActivityType';
+  $info['redhen_contact_edit'] = '\Drupal\campaignion\ActivityType';
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function campaignion_activity_entity_insert($entity, $entity_type) {
+  if ($entity_type == 'redhen_contact') {
+    $activity = new Activity(array(
+      'type' => 'redhen_contact_create',
+      'contact_id' => $entity->contact_id,
+    ));
+    $activity->save();
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function campaignion_activity_entity_update($entity, $entity_type) {
+  if ($entity_type == 'redhen_contact') {
+    $activity = new Activity(array(
+      'type' => 'redhen_contact_edit',
+      'contact_id' => $entity->contact_id,
+    ));
+    $activity->save();
+  }
 }

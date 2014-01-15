@@ -50,20 +50,6 @@ class ContentStep extends WizardStep {
     if ($wizard_secondary_used) {
       $form['#attributes']['class'][] = 'wizard-secondary-container';
     }
-
-    $form['additional_settings']['#weight'] = 1000;
-    $form['wizard_advanced']['additional_settings'] = $form['additional_settings'];
-    unset($form['additional_settings']);
-
-    // toggle display state for wizard_advanced vertical tabs
-    $form['toggle_wizard_advanced'] = array(
-      '#type' => 'checkbox',
-      '#weight' => 1001,
-      '#title' => t('Show advanced settings'),
-    );
-    $form['wizard_advanced']['#states'] = array(
-      'invisible' => array("#edit-toggle-wizard-advanced" => array('checked' => FALSE)),
-    );
     $form['field_reference_to_campaign']['#weight'] = 1;
 
     return $form;

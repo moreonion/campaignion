@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_node_form_alter().
+ *
+ * Hide some settings behind a "advanced settings" checkbox.
+ */
+function campaignion_node_ux_form_node_form_alter(&$form, &$form_state) {
+  // toggle visibility of advanced settings
+  $form['settings_advanced'] = array(
+    '#type' => 'container',
+    '#weight' => 2000,
+  );
+
+  $form['additional_settings']['#weight'] = 1000;
+  $form['settings_advanced']['additional_settings'] = $form['additional_settings'];
+  unset($form['additional_settings']);
+
+  if (isset($form['opengraph_meta'])) {
+    $form['settings_advanced']['opengraph_meta'] = $form['opengraph_meta'];
+    unset($form['opengraph_meta']);
+  }
+
+  // toggle display state for wizard_advanced vertical tabs
+  $form['toggle_settings_advanced'] = array(
+    '#type' => 'checkbox',
+    '#weight' => 1001,
+    '#title' => t('Show advanced settings'),
+  );
+  $form['settings_advanced']['#states'] = array(
+    'invisible' => array("#edit-toggle-settings-advanced" => array('checked' => FALSE)),
+  );
+}
+
