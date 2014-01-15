@@ -12,7 +12,7 @@ class EmailProtestTargetStep extends WizardStep {
     $form = parent::stepForm($form, $form_state);
 
     module_load_include('inc', 'mo_utilities', 'mo_form');
-    $form += \MO\Form\get_entity_field_form('node', $this->wizard->node, array('field_protest_target_options', 'field_protest_target'));
+    $form += \MO\Form\get_entity_field_form('node', $this->wizard->node, array('field_protest_target_options', 'field_protest_target'), $form_state);
 
     return $form;
   }

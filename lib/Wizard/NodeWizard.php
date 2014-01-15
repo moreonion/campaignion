@@ -3,6 +3,7 @@
 namespace Drupal\campaignion\Wizard;
 
 abstract class NodeWizard extends \Drupal\oowizard\Wizard {
+  public $node;
 
   public function __construct($node = NULL, $type = NULL, $user = NULL) {
     foreach ($this->steps as &$class) {
