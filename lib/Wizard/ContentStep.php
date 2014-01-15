@@ -11,7 +11,9 @@ class ContentStep extends WizardStep {
 
   public function stepForm($form, &$form_state) {
     $form = parent::stepForm($form, $form_state);
+
     // load original node form
+    $form_state['embedded']['#wizard'] = TRUE;
     $this->nodeForm = new EmbeddedNodeForm($this->wizard->node, $form_state);
     $form += $this->nodeForm->formArray();
 

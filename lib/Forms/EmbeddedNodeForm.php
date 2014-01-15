@@ -10,7 +10,13 @@ class EmbeddedNodeForm {
     node_object_prepare($node);
     form_load_include($form_state, 'inc', 'node', 'node.pages');
     $form_state += array('embedded' => array(), 'field' => array());
-    drupal_array_set_nested_value($form_state['embedded'], $parents, array());
+    $a = &$form_state['embedded'];
+    foreach ($parents as $k) {
+      if (!isset($a[$k])) {
+	$a[$k] = array();
+      }
+      $a = &$a[$k];
+    }
     $this->embed_state = &drupal_array_get_nested_value($form_state['embedded'], $parents);
     $this->embed_state['formObject'] = $this;
     $this->embed_state['node'] = $node;
