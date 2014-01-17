@@ -33,7 +33,7 @@ class EmailProtestEmailStep extends EmailStep {
 
     $email_data['eid']  = self::WIZARD_PROTEST_EID;
     $email_data['nid']  = $this->wizard->node->nid;
-    $email_data['html'] = TRUE;
+    $email_data['html'] = FALSE;
 
     $email = new Email($this->wizard->node, 'protest_email', self::WIZARD_PROTEST_EID);
     $type = ($form_state['values']['confirmation_request_email']['confirmation_request_check'] == 1) ? 2 : 0;
