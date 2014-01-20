@@ -4,27 +4,43 @@
  * Implements hook_custom_theme().
  */
 function campaignion_microsite_custom_theme() {
-  $node = menu_get_object();
-  if (empty($node->nid)) {
-    return;
-  }
-  if ($node->type === 'campaign' || $node->type === 'blog') {
-    $campaign = $node;
-  } elseif($reference = field_get_items('node', $node, 'field_reference_to_campaign')) {
-    $campaign = node_load(array_shift($reference[0]));
+  // We can't use menu_get_object() here since it may trigger
+  // drupal_theme_initialize().
+  $parts = explode('/', current_path());
+  if ($parts[0] == 'node' && (string)(int)$parts[1] == $parts[1]) {
+    $nid = (int) $parts[1];
   } else {
     return;
   }
 
-  $items = field_get_items('node', $campaign, 'field_microsite');
-  if (count($items) > 0 && $items[0]['state']) {
-    $GLOBALS['microsite'] = array(
-      'logo' => $items[0]['logo'],
-      'front_page' => $items[0]['frontpage'],
-      'theme' => $items[0]['theme'],
-    );
-    $theme = &$GLOBALS['microsite']['theme'];
-    return ($theme === 'none') ? NULL : $theme;
+  $sql = <<<SQL
+SELECT
+  n.nid,
+  r.field_reference_to_campaign_nid AS rnid,
+  m.field_microsite_state AS state,
+  m.field_microsite_theme AS theme,
+  m.field_microsite_frontpage AS frontpage,
+  m.field_microsite_logo AS logo
+FROM {node} n
+LEFT OUTER JOIN {field_data_field_microsite} m ON m.entity_id=n.nid AND m.entity_type='node' AND m.delta=0
+LEFT OUTER JOIN {field_data_field_reference_to_campaign} r ON r.entity_id=n.nid AND r.entity_type='node' AND r.delta=0
+WHERE n.nid=:nid
+SQL;
+
+  // Loop as long as we have a $nid and we can fetch it's data
+  while ($nid && ($row = db_query($sql, array(':nid' => $nid))->fetch())) {
+    // This node has a non-empty microsite field.
+    if (!empty($row->state)) {
+      $GLOBALS['microsite'] = array(
+        'logo' => $row->logo,
+        'front_page' => $row->frontpage,
+        'theme' => $row->theme,
+      );
+      $theme = &$GLOBALS['microsite']['theme'];
+      return ($theme === 'none') ? NULL : $theme;
+    }
+    // Follow the reference to the next node or give up.
+    $nid = !empty($row->rnid) ? $row->rnid : FALSE;
   }
 }
 
