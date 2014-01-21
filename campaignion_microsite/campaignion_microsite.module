@@ -4,6 +4,15 @@
  * Implements hook_custom_theme().
  */
 function campaignion_microsite_custom_theme() {
+  // compensate for a drupal core bug that denies access to the theme
+  // if the anonymous page cache is active.
+  // @see ajax_base_page_theme().
+  // @see drupal_valid_token().
+  // https://drupal.org/node/2177975
+  if ($GLOBALS['user']->uid == 0 && !empty($_POST['ajax_page_state']['theme']) && drupal_theme_access($_POST['ajax_page_state']['theme'])) {
+    return $_POST['ajax_page_state']['theme'];
+  }
+
   // We can't use menu_get_object() here since it may trigger
   // drupal_theme_initialize().
   $parts = explode('/', current_path());
