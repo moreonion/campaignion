@@ -16,7 +16,7 @@ class EmailBulk extends Field {
     if (!$value['value']) {
       return;
     }
-    $value['bulk'] = (bool) self::valueFromSource($source, $this->bulkSource);
+    $value['bulk'] = (int) self::valueFromSource($source, $this->bulkSource);
     return $value;
   }
 

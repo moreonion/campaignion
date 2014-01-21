@@ -67,7 +67,8 @@ class Address extends Field {
       }
       if ($found) {
         // Do nothing if there is no new data in the new address.
-        if (empty(array_diff($new_address, $stored_address))) {
+        $diff = array_diff($new_address, $stored_address);
+        if (empty($diff)) {
           return FALSE;
         }
         $changed = TRUE;
