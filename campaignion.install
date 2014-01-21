@@ -23,6 +23,7 @@ function campaignion_update_3() {
   module_disable(array('action'));
   drupal_uninstall_modules(array('action'));
   module_enable(array('campaignion_action'));
+}
  
 /**
  * Fixup overridden contexts broken by pgbar rename.
