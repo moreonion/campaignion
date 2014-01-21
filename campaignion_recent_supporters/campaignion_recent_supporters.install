@@ -1,8 +1,8 @@
 <?php
 
-function campaignion_recent_supporters_install() {
+function campaignion_recent_supporters_enable() {
   // create field type if not already defined
-  if (!field_info_field_types('recent_supporters')) {
+  if (!field_read_field('recent_supporters')) {
     // deal with field cache
     _field_info_collate_types(TRUE);
     // create field

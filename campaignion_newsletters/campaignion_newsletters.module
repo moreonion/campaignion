@@ -229,3 +229,30 @@ function campaignion_newsletters_email_confirmed($node, $submission) {
     );
   }
 }
+
+/**
+ * Implements hook_form_builder_types().
+ */
+function campaignion_newsletters_form_builder_types() {
+  require_once dirname(__FILE__) . '/campaignion_newsletters.component.inc';
+  $map = _form_builder_webform_property_map('newsletter');
+  unset($map['properties']['default_value']);
+  unset($map['properties']['title_display']);
+  $fields['newsletter'] = array(
+    'title' => t('Newsletter'),
+    'palette_group' => 'advocacy_engine',
+    'properties' => array_keys($map['properties']),
+    'default' =>  array(
+      '#form_builder' => array('element_type' => 'newsletter', 'test' => 1),
+    ) + _form_builder_webform_default('newsletter'),
+    'unique' => TRUE,
+  );
+  return array('webform' => $fields);
+}
+
+/**
+ * Implements hook_form_builder_types_alter().
+ */
+function campaignion_newsletters_form_builder_types_alter(&$fields) {
+  unset($fields['webform']['email_newsletter']);
+}

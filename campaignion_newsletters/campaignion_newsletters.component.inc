@@ -45,12 +45,13 @@ function _webform_edit_newsletter($component) {
     ->execute()
     ->fetchAllKeyed();
 
-  $form['title'] = array(
+  $form['name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Text'),
-    '#default_value' => t('Subscribe me to the newsletter.'),
-    '#description' => t('Label for the subscription newsletters.'),
+    '#title' => t('Label'),
+    '#default_value' => !empty($component['name']) ? $component['name'] : t('Subscribe me to the newsletter.'),
+    '#description' => t('This text is displayed next to the opt-in checkbox.'),
     '#weight' => 0,
+    '#required' => TRUE,
   );
 
   $form['value'] = array(
@@ -59,7 +60,7 @@ function _webform_edit_newsletter($component) {
     '#default_value' => $component['value'],
     '#description' => t('Which newsletter should the user be subscribed to?'),
     '#options' => $newsletters,
-    '#weight' => 0,
+    '#weight' => 1,
   );
 
   return $form;
@@ -78,14 +79,9 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
     // Needed to disable double-wrapping of radios and checkboxes.
     '#pre_render' => array(),
     '#translatable' => array('title', 'description', 'options'),
+    '#title' => $component['name'],
+    '#description' => $component['extra']['description'],
   );
-
-  if (empty($component['extra']['description'])) {
-    $element['#title'] = t('Subscribe me to the newsletter @newsletter', array('@newsletter' => $component['value']));
-  }
-  else {
-    $element['#title'] = $component['extra']['description'];
-  }
 
   return $element;
 }
@@ -103,4 +99,55 @@ function _webform_display_newsletter($component, $value, $format = 'html') {
     return array(
       '#markup' => t('User did not subscribe to @l', array('@l' => $list)));
   }
+}
+
+function campaignion_newsletters_form_builder_property_newsletter_form(&$form_state, $form_type, $element, $property) {
+  $form['options'] = array(
+    '#form_builder' => array('property_group' => 'options'),
+    '#tree' => TRUE,
+  );
+  // we need to redo the mapping here because storage_parents arent resolved until
+  // the form is saved for good.
+  if (isset($element['#newsletter'])) {
+    $element['#webform_component']['value'] = $element['#newsletter'];
+  }
+  $form['options'] += _webform_edit_newsletter($element['#webform_component']);
+  $form['title'] = $form['options']['name'];
+  unset($form['options']['name']);
+  return $form;
+}
+
+function campaignion_newsletters_form_builder_property_newsletter_form_submit(&$form, &$form_state) {
+  $form_state['values']['newsletter'] = $form_state['values']['options']['value'];
+}
+
+
+/**
+ * Implements _webform_form_builder_properties_component().
+ */
+function _webform_form_builder_properties_newsletter() {
+  return array(
+    'newsletter' => array(
+      'form' => 'campaignion_newsletters_form_builder_property_newsletter_form',
+      'submit' => array('campaignion_newsletters_form_builder_property_newsletter_form_submit'),
+    ),
+    'title' => array(
+      'form' => NULL,
+    ),
+  );
+}
+
+/**
+ * Implements _webform_CALLBACK_TYPE().
+ * Implements _webform_form_builder_map_TYPE().
+ */
+function _webform_form_builder_map_newsletter() {
+  $map['form_builder_type'] = 'newsletter';
+  $map['properties'] = array(
+    'newsletter' => array(
+      'form_parents' => array('options', 'value'),
+      'storage_parents' => array('value'),
+    ),
+  );
+  return $map;
 }

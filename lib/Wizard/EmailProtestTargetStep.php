@@ -108,3 +108,4 @@ class EmailProtestTargetStep extends WizardStep {
   }
 
 }
+
