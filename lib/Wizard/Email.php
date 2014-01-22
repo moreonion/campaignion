@@ -65,7 +65,7 @@ class Email {
     $email_form['template']['#tree'] = TRUE;
     $email_form['template']['template']['#base_type']    = 'textarea';
     $email_form['template']['template']['#type']         = 'text_format';
-    $email_form['template']['template']['#format']       = 'full_html_with_editor';
+    $email_form['template']['template']['#format']       = $email['html'] ? 'full_html_with_editor' : 'plain_text';
     $email_form['template']['template']['#wysiwyg']      = TRUE;
     $email_form['template']['template']['#pre_render'][] = 'wysiwyg_pre_render_text_format';
     // needed for ['template']['tokens'] which does not load js via #collapsible
