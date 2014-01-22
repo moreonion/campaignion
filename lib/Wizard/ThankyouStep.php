@@ -75,13 +75,6 @@ class ThankyouStep extends WizardStep {
     // don't publish per default
     $node_form['options']['status']['#default_value'] = 0;
     $node_form['options']['promote']['#default_value'] = 0;
-    foreach ($node_form as $key => &$element) {
-      if (    $key[0] != '#'
-           && $element['#type'] == 'fieldset'
-           && isset($element['#group'])) {
-        $element['#group'] = 'node_form][' . $element['#group'];
-      }
-    }
 
     foreach (array('actions', 'options', 'revision_information', 'author', 'redirect', 'additional_settings', 'field_flexible', 'field_intro') as $key) {
       $node_form[$key]['#access'] = FALSE;

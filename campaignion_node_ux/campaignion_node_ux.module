@@ -17,19 +17,27 @@ function campaignion_node_ux_form_node_form_alter(&$form, &$form_state) {
   $form['settings_advanced']['additional_settings'] = $form['additional_settings'];
   unset($form['additional_settings']);
 
+  foreach ($form as $key => &$element) {
+    if ($key[0] != '#' && $element['#type'] == 'fieldset' && isset($element['#group']) && $element['#group'] == 'additional_settings') {
+      $element['#group'] = 'settings_advanced][' . $element['#group'];
+    }
+  }
+
   if (isset($form['opengraph_meta'])) {
     $form['settings_advanced']['opengraph_meta'] = $form['opengraph_meta'];
     unset($form['opengraph_meta']);
   }
 
   // toggle display state for wizard_advanced vertical tabs
+  $id = drupal_html_id('toggle-advanced-settings');
   $form['toggle_settings_advanced'] = array(
     '#type' => 'checkbox',
     '#weight' => 1001,
+    '#attributes' => array('id' => $id),
     '#title' => t('Show advanced settings'),
   );
   $form['settings_advanced']['#states'] = array(
-    'invisible' => array("#edit-toggle-settings-advanced" => array('checked' => FALSE)),
+    'invisible' => array("#$id" => array('checked' => FALSE)),
   );
 }
 
