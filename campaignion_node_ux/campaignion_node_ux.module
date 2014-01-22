@@ -11,6 +11,7 @@ function campaignion_node_ux_form_node_form_alter(&$form, &$form_state) {
   $form['settings_advanced'] = array(
     '#type' => 'container',
     '#weight' => 2000,
+    '#tree' => TRUE,
   );
 
   $form['additional_settings']['#weight'] = 1000;
@@ -40,4 +41,3 @@ function campaignion_node_ux_form_node_form_alter(&$form, &$form_state) {
     'invisible' => array("#$id" => array('checked' => FALSE)),
   );
 }
-
