@@ -9,7 +9,7 @@
  */
 function _webform_defaults_newsletter() {
   return array(
-    'name' => 'Newsletter Subscription',
+    'name' => t('Newsletter Subscription'),
     'form_key' => 'newsletter',
     'mandatory' => 0,
     'pid' => 0,
@@ -19,7 +19,7 @@ function _webform_defaults_newsletter() {
       'items' => '',
       'multiple' => NULL,
       'aslist' => NULL,
-      'description' => '',
+      'description' => t('Subscribe me to the newsletter.'),
       'private' => FALSE,
     ),
   );
@@ -70,17 +70,17 @@ function _webform_edit_newsletter($component) {
  * Implements _webform_render_component().
  */
 function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
+  $options['subscribed'] = $component['extra']['description'];
   $element = array(
-    '#type' => 'checkbox',
-    '#default_value' => $value,
+    '#type' => 'checkboxes',
+    '#default_value' => array(),
     '#required' => $component['mandatory'],
     '#weight' => $component['weight'],
     '#theme_wrappers' => array('webform_element'),
-    // Needed to disable double-wrapping of radios and checkboxes.
     '#pre_render' => array(),
-    '#translatable' => array('title', 'description', 'options'),
     '#title' => $component['name'],
-    '#description' => $component['extra']['description'],
+    '#options' => $options,
+    '#translatable' => array('title', 'description', 'options'),
   );
 
   return $element;

@@ -221,12 +221,10 @@ function campaignion_newsletters_webform_component_info() {
  */
 function campaignion_newsletters_email_confirmed($node, $submission) {
   $s = new \Drupal\little_helpers\WebformSubmission($node, $submission);
-  if ($s->valueByKey('newsletter')) {
+  $lists = $s->valuesByKey('newsletter');
+  if ($lists['subscribe'] != '0') {
     $component = $s->componentByKey('newsletter');
-    _campaignion_newsletters_subscribe(
-      $component['value'],
-      $s->valueByKey('email')
-    );
+    _campaignion_newsletters_subscribe($component['value'], $s->valueByKey('email'));
   }
 }
 
