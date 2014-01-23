@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * Rerun update fixed update 2: pgbar fixup.
+ */
+function campaignion_update_3() {
+  campaignion_update_2();
+}
+
+/**
  * Fixup overridden contexts broken by pgbar rename.
  */
 function campaignion_update_2() {
@@ -18,6 +25,7 @@ function campaignion_update_2() {
       foreach ($reactions['block']['blocks'] as $block) {
         if ($block['module'] == 'cck_blocks' && (strpos($block['delta'], 'pgbar') !== FALSE)) {
           $block['delta'] = 'pgbar_default';
+	  $block['title'] = '<none>';
           $changed = TRUE;
         }
         $new_block[$block['module'] . '-' . $block['delta']] = $block;
@@ -25,10 +33,10 @@ function campaignion_update_2() {
       $reactions['block']['blocks'] = $new_block;
     }
     if ($changed) {
-      var_export($context);
       context_save($context);
     }
   }
+  variable_set('cck_blocks_pgbar_default_block_availability', 2);
 }
 
 /**
