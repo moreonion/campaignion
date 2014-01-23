@@ -26,6 +26,12 @@ class Email {
       $email = webform_email_load('new', $this->node->nid);
       $email['html'] = TRUE;
     }
+
+    $formats = array(
+      'plain' => variable_get('campaignion_wizard_text_format_plain', 'plain_text'),
+      'html'  => variable_get('campaignion_wizard_text_format_html', 'full_html_with_editor'),
+    );
+
     $email_form = webform_email_edit_form(array(), $form_state, $this->node, $email);
     $email_form['#theme'] = 'campaignion_wizard_email_form';
     unset($email_form['submit']);
@@ -65,12 +71,19 @@ class Email {
     $email_form['template']['#tree'] = TRUE;
     $email_form['template']['template']['#base_type']    = 'textarea';
     $email_form['template']['template']['#type']         = 'text_format';
-    $email_form['template']['template']['#format']       = $email['html'] ? 'full_html_with_editor' : 'plain_text';
+    $email_form['template']['template']['#format']       = $email['html'] ? $formats['html'] : $formats['plain'];
     $email_form['template']['template']['#wysiwyg']      = TRUE;
     $email_form['template']['template']['#pre_render'][] = 'wysiwyg_pre_render_text_format';
     // needed for ['template']['tokens'] which does not load js via #collapsible
     // tokens it is only html markup
     drupal_add_library("system", "drupal.collapse");
+    
+    $settings['webform']['textFormat'] = $formats;
+    $email_form['#attached']['js'][] = array(
+      'type' => 'setting',
+      'data' => $settings,
+    );
+    $email_form['#attached']['js'][] = drupal_get_path('module', 'campaignion_wizard') . '/js/email-text-format.js';
 
     return $email_form;
   }
