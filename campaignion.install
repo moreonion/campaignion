@@ -3,14 +3,14 @@
 /**
  * Enable campaignion_node_ux().
  */
-function campaignion_update_5() {
+function campaignion_update_6() {
   module_enable(array('campaignion_node_ux'));
 }
 
 /**
  * ae_wizard.module -> campaignion_wizard.module
  */
-function campaignion_update_4() {
+function campaignion_update_5() {
   module_disable(array('ae_wizard'));
   drupal_uninstall_modules(array('ae_wizard'));
   module_enable(array('campaignion_wizard'));
@@ -19,12 +19,19 @@ function campaignion_update_4() {
 /**
  * action.module -> campaignion_action.module
  */
-function campaignion_update_3() {
+function campaignion_update_4() {
   module_disable(array('action'));
   drupal_uninstall_modules(array('action'));
   module_enable(array('campaignion_action'));
 }
  
+/**
+ * Rerun update fixed update 2: pgbar fixup.
+ */
+function campaignion_update_3() {
+  campaignion_update_2();
+}
+
 /**
  * Fixup overridden contexts broken by pgbar rename.
  */
@@ -43,6 +50,7 @@ function campaignion_update_2() {
       foreach ($reactions['block']['blocks'] as $block) {
         if ($block['module'] == 'cck_blocks' && (strpos($block['delta'], 'pgbar') !== FALSE)) {
           $block['delta'] = 'pgbar_default';
+	  $block['title'] = '<none>';
           $changed = TRUE;
         }
         $new_block[$block['module'] . '-' . $block['delta']] = $block;
@@ -50,10 +58,10 @@ function campaignion_update_2() {
       $reactions['block']['blocks'] = $new_block;
     }
     if ($changed) {
-      var_export($context);
       context_save($context);
     }
   }
+  variable_set('cck_blocks_pgbar_default_block_availability', 2);
 }
 
 /**
