@@ -230,18 +230,32 @@ function campaignion_newsletters_email_confirmed($node, $submission) {
 
 /**
  * Implements hook_form_builder_types().
+ *
+ * Defines a new form_builder field:
+ * - 'title'
+ * - in which ['palette_group'] it appears. @see hook_form_builder_palette_groups().
+ * - it's ['default'] representation (is used when dragging it into the preview area) including:
+ *   - ['#webform_component'] the component array for webform (most important it's ['#webform_component']['type'].
+ *     @see hook_webform_component_info().
+ *   - ['#type'] the form-API type is used as the default form_builder element_type.
+ *     @see hook_element_info().
+ *   - ['#form_builder'] the form_builder type (again).
+ *     @see hook_form_builder_types().
+ * - whether or not the field is ['unique'].
+ *
+ * Fields are defined per form_type (so far only 'webform' is relevant for us).
  */
 function campaignion_newsletters_form_builder_types() {
   require_once dirname(__FILE__) . '/campaignion_newsletters.component.inc';
   $map = _form_builder_webform_property_map('newsletter');
+  // default value is handled by the newsletter property.
   unset($map['properties']['default_value']);
-  unset($map['properties']['title_display']);
   $fields['newsletter'] = array(
     'title' => t('Newsletter'),
     'palette_group' => 'advocacy_engine',
     'properties' => array_keys($map['properties']),
     'default' =>  array(
-      '#form_builder' => array('element_type' => 'newsletter', 'test' => 1),
+      '#form_builder' => array('element_type' => 'newsletter'),
     ) + _form_builder_webform_default('newsletter'),
     'unique' => TRUE,
   );
@@ -250,6 +264,8 @@ function campaignion_newsletters_form_builder_types() {
 
 /**
  * Implements hook_form_builder_types_alter().
+ *
+ * Remove the email_newsletter field from ae_form_builder.
  */
 function campaignion_newsletters_form_builder_types_alter(&$fields) {
   unset($fields['webform']['email_newsletter']);

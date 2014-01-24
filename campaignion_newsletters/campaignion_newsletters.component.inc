@@ -101,6 +101,11 @@ function _webform_display_newsletter($component, $value, $format = 'html') {
   }
 }
 
+/**
+ * Form callback for the newsletter property.
+ *
+ * @see _webform_form_builder_map_newsletter().
+ */
 function campaignion_newsletters_form_builder_property_newsletter_form(&$form_state, $form_type, $element, $property) {
   $form['options'] = array(
     '#form_builder' => array('property_group' => 'options'),
@@ -116,6 +121,11 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
   return $form;
 }
 
+/**
+ * Submit handler for the newsletter property.
+ *
+ * @see _webform_form_builder_map_newsletter().
+ */
 function campaignion_newsletters_form_builder_property_newsletter_form_submit(&$form, &$form_state) {
   $form_state['values']['newsletter'] = $form_state['values']['options']['value'];
 }
@@ -123,6 +133,13 @@ function campaignion_newsletters_form_builder_property_newsletter_form_submit(&$
 
 /**
  * Implements _webform_form_builder_properties_component().
+ *
+ * Component specific properties.
+ * This is currently broken as the component specific properties are merged into
+ * the global property list. That makes it behave the same way as an implementation
+ * of hook_form_builder_properties().
+ *
+ * @see form_builder_webform_form_builder_properties().
  */
 function _webform_form_builder_properties_newsletter() {
   return array(
@@ -136,12 +153,18 @@ function _webform_form_builder_properties_newsletter() {
 /**
  * Implements _webform_CALLBACK_TYPE().
  * Implements _webform_form_builder_map_TYPE().
+ *
+ * Defines mapping from webform component to form_builder element type.
+ * Tell form_builder_webform how to store properties:
+ * $form_state['values']['newsletter'] -> $component['value'].
+ *
+ * This hook allows us to extend the list of properties defined in
+ * hook_form_builder_types() specific for form_builder_webform.
  */
 function _webform_form_builder_map_newsletter() {
   $map['form_builder_type'] = 'newsletter';
   $map['properties'] = array(
     'newsletter' => array(
-      'form_parents' => array('options', 'value'),
       'storage_parents' => array('value'),
     ),
   );
