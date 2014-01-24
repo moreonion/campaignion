@@ -112,7 +112,6 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
     $element['#webform_component']['value'] = $element['#newsletter'];
   }
   $form['options'] += _webform_edit_newsletter($element['#webform_component']);
-  $form['title'] = $form['options']['name'];
   unset($form['options']['name']);
   return $form;
 }
@@ -130,9 +129,6 @@ function _webform_form_builder_properties_newsletter() {
     'newsletter' => array(
       'form' => 'campaignion_newsletters_form_builder_property_newsletter_form',
       'submit' => array('campaignion_newsletters_form_builder_property_newsletter_form_submit'),
-    ),
-    'title' => array(
-      'form' => NULL,
     ),
   );
 }
