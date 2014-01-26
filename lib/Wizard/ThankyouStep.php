@@ -95,8 +95,6 @@ class ThankyouStep extends WizardStep {
     }
 
     // order the form fields
-    $node_form['field_main_image']['#weight'] = -15;
-    $node_form['field_share_light']['#weight'] = -10;
     $node_form['field_main_image']['#attributes']['class'][] = 'sidebar-narrow-right';
     $node_form['#tree'] = TRUE;
 
