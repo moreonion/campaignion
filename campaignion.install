@@ -1,5 +1,9 @@
 <?php
 
+function campaignion_uninstall() {
+  variable_del('campaignion_contact_type_supporter');
+}
+
 /**
  * Enable campaignion_node_ux().
  */

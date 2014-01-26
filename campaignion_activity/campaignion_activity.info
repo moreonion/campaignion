@@ -3,7 +3,6 @@ description = Activity logging for CRM contacts
 package = campaignion
 core = 7.x
 
-dependencies[] = ae_contact_type
 dependencies[] = campaignion
 dependencies[] = little_helpers
 

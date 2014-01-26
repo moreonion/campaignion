@@ -3,13 +3,14 @@
 namespace Drupal\campaignion;
 
 class Contact extends \RedhenContact {
-  public $type = 'contact';
-
   public function __construct($values = array()) {
     $objValues = array();
     if (is_object($values)) {
       $objValues = $values;
       $values = array();
+    }
+    if (!isset($values['type'])) {
+      $values['type'] = variable_get('campaignion_contact_type_supporter', 'contact');
     }
     parent::__construct($values);
     foreach ($objValues as $key => $value) {

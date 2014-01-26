@@ -29,7 +29,7 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
   }
 
   public static function fromSubmission($node, $submission, $data = array()) {
-    $contact_id = \Drupal\campaignion\Contact::idFromSubmission($node, $submission, 'contact');
+    $contact_id = \Drupal\campaignion\Contact::idFromSubmission($node, $submission);
 
     $data = array(
       'contact_id' => $contact_id,
