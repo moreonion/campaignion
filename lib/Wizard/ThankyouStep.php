@@ -7,6 +7,24 @@ use \Drupal\campaignion\Forms\EmbeddedNodeForm;
 class ThankyouStep extends WizardStep {
   protected $step = 'thank';
   protected $title = 'Thank you';
+  protected $contentType;
+  protected $referenceField;
+  protected $doubleOptIn;
+
+  public function __construct($wizard) {
+    parent::__construct($wizard);
+    $parameters = drupal_array_merge_deep(array(
+      'thank_you_page' => array(
+        'type' => 'thank_you_page',
+        'reference' => 'field_thank_you_pages',
+      ),
+    ), $wizard->parameters);
+    $parameters =& $parameters['thank_you_page'];
+    $this->contentType = $parameters['type'];
+    $this->referenceField = &$wizard->node->{$parameters['reference']};
+    $this->doubleOptIn = campaignion_wizard_has_double_optin($wizard->node->nid);
+  }
+
   protected function loadIncludes() {
     module_load_include('pages.inc', 'node');
     module_load_include('inc', 'webform', 'includes/webform.emails');
@@ -14,27 +32,21 @@ class ThankyouStep extends WizardStep {
   }
 
   protected function pageForm(&$form_state, $index, $title, $prefix) {
+    $field = &$this->referenceField['und'][$index];
 
-    $action = $this->wizard->node;
-    $parameters = $this->wizard->parameters;
-
-    $template_default = array();
-    $tyField = $parameters['thank_you_page']['reference'];
-    $thank_you_pages =& $action->$tyField['und'];
-
-    if (isset($thank_you_pages[$index]['node_reference_nid'])) {
+    if (isset($field['node_reference_nid'])) {
       $type = 'node';
-      $node = node_load($thank_you_pages[$index]['node_reference_nid']);
+      $node = node_load($field['node_reference_nid']);
       $old['redirect_url'] = '';
     }
     else {
       $type = 'redirect';
-      $node = $this->wizard->prepareNode($parameters['thank_you_page']['type']);
-      if (isset($thank_you_pages[$index]['redirect_url']) == FALSE) {
+      $node = $this->wizard->prepareNode($this->contentType);
+      if (isset($field['redirect_url']) == FALSE) {
         $old['redirect_url'] = '';
       }
       else {
-        $old['redirect_url'] = $thank_you_pages[$index]['redirect_url'];
+        $old['redirect_url'] = $field['redirect_url'];
       }
     }
 
@@ -122,7 +134,7 @@ class ThankyouStep extends WizardStep {
   public function validateStep($form, &$form_state) {
     $values =& $form_state['values'];
     $thank_you_pages = array('thank_you_node');
-    if (campaignion_wizard_has_double_optin($this->wizard->node->nid) != FALSE) {
+    if ($this->doubleOptIn) {
       $thank_you_pages[] = 'submission_node';
     }
     foreach ($thank_you_pages as $page) {
@@ -147,27 +159,28 @@ class ThankyouStep extends WizardStep {
     $values =& $form_state['values'];
     unset($form_state['values']);
     $action = $this->wizard->node;
-    $tyField = $this->wizard->parameters['thank_you_page']['reference'];
 
     $thank_you_pages = array('thank_you_node' => 1);
-    if (campaignion_wizard_has_double_optin($this->wizard->node->nid) != FALSE) {
+    if ($this->doubleOptIn) {
       $thank_you_pages['submission_node'] = 0;
     }
 
     foreach(array(0,1) as $index) {
-      $action->$tyField[LANGUAGE_NONE][$index]['node_reference_nid'] = NULL;
-      $action->$tyField[LANGUAGE_NONE][$index]['redirect_url'] = NULL;
+      $field = &$this->referenceField[LANGUAGE_NONE][$index];
+      $field['node_reference_nid'] = NULL;
+      $field['redirect_url'] = NULL;
     }
 
     foreach($thank_you_pages as $page => $index) {
+      $field = &$this->referenceField[LANGUAGE_NONE][$index];
       if ($values[$page]['type'] == 'node') {
         $form_state['values'] =& $values[$page]['node_form'];
 
         $formObj = $form_state['embedded'][$page]['node_form']['formObject'];
         $formObj->submit($form, $form_state);
 
-        $action->$tyField[LANGUAGE_NONE][$index]['node_reference_nid'] = $formObj->node()->nid;
-        $action->$tyField[LANGUAGE_NONE][$index]['redirect_url']       = NULL;
+        $field['node_reference_nid'] = $formObj->node()->nid;
+        $field['redirect_url']       = NULL;
         $path = 'node/' . $form_state['values']['nid'];
         if (count($thank_you_pages) == 1) {
           $action->webform['redirect_url'] = $path;
@@ -182,8 +195,8 @@ class ThankyouStep extends WizardStep {
         }
       }
       else {
-        $action->$tyField[LANGUAGE_NONE][$index]['node_reference_nid'] = NULL;
-        $action->$tyField[LANGUAGE_NONE][$index]['redirect_url']       = $values[$page]['redirect_url'];
+        $field['node_reference_nid'] = NULL;
+        $field['redirect_url']       = $values[$page]['redirect_url'];
 
         if (count($thank_you_pages) == 1) {
           $action->webform['redirect_url'] = $values[$page]['redirect_url'];
@@ -205,7 +218,7 @@ class ThankyouStep extends WizardStep {
   }
 
   public function status() {
-    $thank_you_pages = field_get_items('node', $this->wizard->node, $this->wizard->parameters['thank_you_page']['reference']);
+    $thank_you_pages = $this->referenceField[LANGUAGE_NONE];
 
     $msg = t("After your supporters submitted their filled out form ");
 
