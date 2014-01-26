@@ -1,0 +1,12 @@
+<?php
+
+function campaignion_uninstall() {
+  variable_del('campaignion_contact_type_supporter');
+}
+
+/**
+ * Stub to keep legacy schema_version.
+ */
+function campaignion_update_6() {
+}
+
