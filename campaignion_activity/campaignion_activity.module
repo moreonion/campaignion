@@ -4,6 +4,7 @@ use \Drupal\campaignion\Activity;
 
 function campaignion_activity_types() {
   $info = module_invoke_all('campaignion_activity_type_info');
+  return $info;
 }
 
 /**
