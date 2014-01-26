@@ -4,8 +4,10 @@ namespace Drupal\campaignion\Wizard;
 
 abstract class NodeWizard extends \Drupal\oowizard\Wizard {
   public $node;
+  public $parameters;
 
-  public function __construct($node = NULL, $type = NULL, $user = NULL) {
+  public function __construct($parameters = array(), $node = NULL, $type = NULL, $user = NULL) {
+    $this->parameters = $parameters;
     foreach ($this->steps as &$class) {
       if ($class[0] != '\\') {
         $class = '\\' . __NAMESPACE__ . '\\' . $class;

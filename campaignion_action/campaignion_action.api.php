@@ -11,6 +11,14 @@
  *   class names indexed by (machine readable) content-type names
  */
 function hook_campaignion_action_info() {
-  $types['webform'] = 'Drupal\\campaignion\\Action\\FlexibleForm';
+  $types['webform'] = array(
+    'class' => 'Drupal\\campaignion\\Action\\FlexibleForm',
+    'parameters' => array(
+      'thank_you_page' => array(
+        'type' => 'thank_you_page',
+        'reference' => 'field_thank_you_pages',
+      ),
+    ),
+  );
   return $types;
 }

@@ -18,6 +18,6 @@ class Petition extends TypeBase {
   }
 
   public function wizard($node = NULL) {
-    return new PetitionWizard($node, $this->type);
+    return new PetitionWizard($this->parameters, $node, $this->type);
   }
 }

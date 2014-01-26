@@ -18,6 +18,6 @@ class Donation extends TypeBase {
   }
 
   public function wizard($node = NULL) {
-    return new DonationWizard($node, $this->type);
+    return new DonationWizard($this->parameters, $node, $this->type);
   }
 }

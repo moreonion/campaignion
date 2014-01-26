@@ -20,7 +20,7 @@ class ContentStep extends WizardStep {
     // we don't want the webform_template selector to show up here.
     unset($form['webform_template']);
 
-    $form['field_thank_you_pages']['#access'] = FALSE;
+    $form[$this->wizard->parameters['thank_you_page']['reference']]['#access'] = FALSE;
 
     $form['actions']['#access'] = FALSE;
     $form['options']['#access'] = TRUE;

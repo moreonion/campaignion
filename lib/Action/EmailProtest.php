@@ -18,6 +18,6 @@ class EmailProtest extends TypeBase {
   }
 
   public function wizard($node = NULL) {
-    return new EmailProtestWizard($node, $this->type);
+    return new EmailProtestWizard($this->parameters, $node, $this->type);
   }
 }
