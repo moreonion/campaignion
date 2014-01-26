@@ -7,9 +7,14 @@ abstract class TypeBase implements TypeInterface {
    * Content-type
    */
   protected $type;
+  /**
+   * Parameters
+   */
+  protected $parameters;
 
-  public function __construct($type) {
+  public function __construct($type, array $parameters = array()) {
     $this->type = $type;
+    $this->parameters = $parameters;
   }
 
   public function defaultTemplateNid() {
@@ -37,8 +42,12 @@ abstract class TypeBase implements TypeInterface {
   public static function fromContentType($type) {
     $action_types = self::types();
     if (isset($action_types[$type])) {
-      $class = $action_types[$type];
-      return new $class($type);
+      $info = &$action_types[$type];
+      $info += array(
+      	'parameters' => array(),
+      );
+      $class = $info['class'];
+      return new $class($type, $info['parameters']);
     } else {
       throw new \Exception('Trying to get ActionType for unregistered bundle.');
     }
