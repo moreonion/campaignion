@@ -146,9 +146,8 @@ function _campaignion_recent_supporters_recent_supporters($node, $limit = 10) {
                                    INNER JOIN redhen_contact rc USING (contact_id)
                                    INNER JOIN campaignion_activity_webform caw USING (activity_id)
                                    INNER JOIN webform_tracking wt USING (nid,sid)
-                                   INNER JOIN field_data_field_address fdfa ON fdfa.entity_id=rc.contact_id
+                                   LEFT OUTER JOIN field_data_field_address fdfa ON fdfa.entity_id=rc.contact_id
                                    WHERE ca.type='webform_submission' AND caw.nid=:nid
-                                   AND fdfa.deleted=0 AND fdfa.entity_type='redhen_contact' AND fdfa.delta=0 AND fdfa.language='und'
                                    ORDER BY ca.created DESC",
                                    0, $limit - 1, array(':nid' => $node->nid));
   $all = $result->fetchAll();
