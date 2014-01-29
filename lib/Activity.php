@@ -31,6 +31,8 @@ class Activity implements Interfaces\Activity {
     } else {
       $this->insert();
     }
+    // Let other modules react on saving an new activity.
+    module_invoke_all('campaignion_activity_save', $this);
   }
 
   public function delete() {
