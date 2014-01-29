@@ -60,4 +60,8 @@ class Activity implements Interfaces\Activity {
       ->fields($this->values(array('contact_id', 'type', 'created')))
       ->execute();
   }
+
+  public function contact() {
+    return \Drupal\campaignion\Contact::load($this->contact_id);
+  }
 }

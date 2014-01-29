@@ -53,4 +53,13 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
       ->condition('activity_id', $this->activity_id)
       ->execute();
   }
+
+  // @TODO: Use full objects instead of nid/sid by default instead of always loading them.
+  public function node() {
+    return node_load($this->nid);
+  }
+
+  public function submission() {
+    return \Drupal\little_helpers\WebformSubmission::load($this->nid, $this->sid);
+  }
 }

@@ -18,6 +18,11 @@ class Contact extends \RedhenContact {
     }
   }
 
+  public static function load($id) {
+    $contact = \redhen_contact_load($id);
+    return new static($contact);
+  }
+
   public static function idFromSubmission($node, $submission) {
     $s = new \Drupal\little_helpers\WebformSubmission($node, $submission);
     if ($email = $s->valueByKey('email')) {
