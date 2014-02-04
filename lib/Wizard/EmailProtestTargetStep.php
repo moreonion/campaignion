@@ -29,10 +29,6 @@ class EmailProtestTargetStep extends WizardStep {
     $this->fieldForm->submit($form, $form_state);
   }
 
-  public function validateStep($form, &$form_state) {
-    $this->fieldForm->validate($form, $form_state);
-  }
-
   public function checkDependencies() {
     return isset($this->wizard->node->nid);
   }
