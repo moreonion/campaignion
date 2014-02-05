@@ -4,7 +4,6 @@
  * Campaignion newsletter module.
  */
 
-
 /**
  * Subscribe an email address to the given newsletter.
  */
@@ -220,7 +219,7 @@ function campaignion_newsletters_webform_component_info() {
  * Implements hook_email_confirmed().
  */
 function campaignion_newsletters_email_confirmed($node, $submission) {
-  $s = new \Drupal\little_helpers\WebformSubmission($node, $submission);
+  $s = new \Drupal\little_helpers\Webform\Submission($node, $submission);
   $lists = $s->valuesByKey('newsletter');
   if ($lists['subscribe'] != '0') {
     $component = $s->componentByKey('newsletter');

@@ -24,7 +24,7 @@ class Contact extends \RedhenContact {
   }
 
   public static function idFromSubmission($node, $submission) {
-    $s = new \Drupal\little_helpers\WebformSubmission($node, $submission);
+    $s = new \Drupal\little_helpers\Webform\Submission($node, $submission);
     if ($email = $s->valueByKey('email')) {
       $first_name = $s->valueByKey('first_name');
       $last_name  = $s->valueByKey('last_name');
