@@ -22,7 +22,7 @@ class ThankyouStep extends WizardStep {
     $parameters =& $parameters['thank_you_page'];
     $this->contentType = $parameters['type'];
     $this->referenceField = &$wizard->node->{$parameters['reference']};
-    $this->doubleOptIn = campaignion_wizard_has_double_optin($wizard->node->nid);
+    $this->doubleOptIn = !empty($wizard->node->nid) && campaignion_wizard_has_double_optin($wizard->node->nid);
   }
 
   protected function loadIncludes() {

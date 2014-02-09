@@ -18,7 +18,7 @@ class EntityFieldForm {
 
     $this->instances = array();
     foreach ($field_names as $field_name) {
-      $instance = field_info_instance($entity_type, $entity, $field_name);
+      $instance = field_info_instance($entity_type, $field_name, $this->bundle);
       $this->instances[$field_name] = &$instance;
       $field = field_info_field_by_id($instance['field_id']);
       $instance['field'] = &$field;
@@ -90,5 +90,6 @@ class EntityFieldForm {
         }
       }
     }
+    return $return;
   }
 }
