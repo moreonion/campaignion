@@ -19,13 +19,14 @@ class EntityFieldForm {
     $this->instances = array();
     foreach ($field_names as $field_name) {
       $instance = field_info_instance($entity_type, $field_name, $this->bundle);
-      $this->instances[$field_name] = &$instance;
       $field = field_info_field_by_id($instance['field_id']);
-      $instance['field'] = &$field;
+      $instance['field'] = $field;
       $available_languages = field_available_languages($entity_type, $field);
       $instance['languages'] = _field_language_suggestion($available_languages, $language, $field_name);
+      $this->instances[$field_name] = $instance;
     }
   }
+
   public function formArray(&$form_state) {
     $field_forms = array('#parents' => array());
 
