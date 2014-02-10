@@ -24,11 +24,6 @@ function campaignion_node_ux_form_node_form_alter(&$form, &$form_state) {
     }
   }
 
-  if (isset($form['opengraph_meta'])) {
-    $form['settings_advanced']['opengraph_meta'] = $form['opengraph_meta'];
-    unset($form['opengraph_meta']);
-  }
-
   // toggle display state for wizard_advanced vertical tabs
   $id = drupal_html_id('toggle-advanced-settings');
   $form['toggle_settings_advanced'] = array(
