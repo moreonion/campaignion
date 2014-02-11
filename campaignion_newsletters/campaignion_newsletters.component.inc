@@ -14,13 +14,14 @@ function _webform_defaults_newsletter() {
     'mandatory' => 0,
     'pid' => 0,
     'weight' => 0,
-    'value' => '',
+    'value' => serialize(array('subscribed' => 'subscribed')),
     'extra' => array(
       'items' => '',
       'multiple' => NULL,
       'aslist' => NULL,
       'description' => t('Subscribe me to the newsletter.'),
       'private' => FALSE,
+      'lists' => array(),
     ),
   );
 }
@@ -40,25 +41,34 @@ function _webform_theme_newsletter() {
  * Implements _webform_edit_component().
  */
 function _webform_edit_newsletter($component) {
+  $component['value'] = unserialize($component['value']);
   $newsletters = db_select('campaignion_newsletters_lists', 'l')
     ->fields('l', array('identifier', 'title'))
     ->execute()
     ->fetchAllKeyed();
 
-  $form['name'] = array(
+  $form['extra']['description'] = array(
     '#type' => 'textfield',
-    '#title' => t('Label'),
-    '#default_value' => !empty($component['name']) ? $component['name'] : t('Subscribe me to the newsletter.'),
+    '#title' => t('Description'),
+    '#default_value' => !empty($component['extra']['description']) ? $component['extra']['description'] : t('Subscribe me to the newsletter.'),
     '#description' => t('This text is displayed next to the opt-in checkbox.'),
     '#weight' => 0,
     '#required' => TRUE,
   );
 
   $form['value'] = array(
-    '#type' => 'radios',
-    '#title' => t('Newsletters'),
+    '#type' => 'checkboxes',
+    '#title' => t('Default state'),
+    '#options' => array('subscribed' => t('The newsletter checkbox is checked by default.')),
     '#default_value' => $component['value'],
-    '#description' => t('Which newsletter should the user be subscribed to?'),
+    '#element_validate' => array('_webform_value_validate_newsletter'),
+  );
+
+  $form['extra']['lists'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Newsletter'),
+    '#default_value' => $component['extra']['lists'],
+    '#description' => t('Which lists should the user be subscribed to?'),
     '#options' => $newsletters,
     '#weight' => 1,
   );
@@ -66,12 +76,26 @@ function _webform_edit_newsletter($component) {
   return $form;
 }
 
+function _webform_value_validate_newsletter(&$element, &$form_state) {
+  $values = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  $values = serialize($values);
+}
+
 /**
  * Implements _webform_render_component().
  */
 function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
-  $options['subscribed'] = $component['extra']['description'];
+  // This is needed to correctly save components if they are just
+  // drag-n-dropped and never edited.
   $element = array(
+    '#newsletter_value' => $component['value'],
+    '#newsletter_lists' => $component['extra']['lists'],
+    '#newsletter_title' => $component['extra']['description'],
+  );
+  $component['value'] = unserialize($component['value']);
+
+  $options['subscribed'] = $component['extra']['description'];
+  $element += array(
     '#type' => 'checkboxes',
     '#default_value' => array(),
     '#required' => $component['mandatory'],
@@ -80,6 +104,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
     '#pre_render' => array(),
     '#title' => $component['name'],
     '#options' => $options,
+    '#default_value' => $component['value'],
     '#translatable' => array('title', 'description', 'options'),
   );
 
@@ -90,14 +115,11 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
  * Implements _webform_display_component().
  */
 function _webform_display_newsletter($component, $value, $format = 'html') {
-  $list = $component['value'];
-  $value = array_shift($value);
-  if ($value) {
-    return array('#markup' => t('User subscribed to @l', array('@l' => $list)));
+  if (!empty($component['value']['subscribed'])) {
+    return array('#markup' => t('subscribed'));
   }
   else {
-    return array(
-      '#markup' => t('User did not subscribe to @l', array('@l' => $list)));
+    return array('#markup' => t('not subscribed'));
   }
 }
 
@@ -113,11 +135,19 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
   );
   // we need to redo the mapping here because storage_parents arent resolved until
   // the form is saved for good.
-  if (isset($element['#newsletter'])) {
-    $element['#webform_component']['value'] = $element['#newsletter'];
+  if (isset($element['#newsletter_lists'])) {
+    $element['#webform_component']['extra']['lists'] = $element['#newsletter_lists'];
   }
-  $form['options'] += _webform_edit_newsletter($element['#webform_component']);
-  unset($form['options']['name']);
+  if (isset($element['#newsletter_title'])) {
+    $element['#webform_component']['extra']['description'] = $element['#newsletter_title'];
+  }
+  if (isset($element['#newsletter_value'])) {
+    $element['#webform_component']['value'] = $element['#newsletter_value'];
+  }
+  $edit = _webform_edit_newsletter($element['#webform_component']);
+  $form['options']['lists'] = $edit['extra']['lists'];
+  $form['newsletter_title'] = $edit['extra']['description'];
+  $form['newsletter_value'] = $edit['value'];
   return $form;
 }
 
@@ -127,7 +157,7 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
  * @see _webform_form_builder_map_newsletter().
  */
 function campaignion_newsletters_form_builder_property_newsletter_form_submit(&$form, &$form_state) {
-  $form_state['values']['newsletter'] = $form_state['values']['options']['value'];
+  $form_state['values']['newsletter_lists'] = $form_state['values']['options']['lists'];
 }
 
 
@@ -143,10 +173,11 @@ function campaignion_newsletters_form_builder_property_newsletter_form_submit(&$
  */
 function _webform_form_builder_properties_newsletter() {
   return array(
-    'newsletter' => array(
+    'newsletter_lists' => array(
       'form' => 'campaignion_newsletters_form_builder_property_newsletter_form',
       'submit' => array('campaignion_newsletters_form_builder_property_newsletter_form_submit'),
     ),
+    'newsletter_title' => array(),
   );
 }
 
@@ -164,7 +195,13 @@ function _webform_form_builder_properties_newsletter() {
 function _webform_form_builder_map_newsletter() {
   $map['form_builder_type'] = 'newsletter';
   $map['properties'] = array(
-    'newsletter' => array(
+    'newsletter_lists' => array(
+      'storage_parents' => array('extra', 'lists'),
+    ),
+    'newsletter_title' => array(
+      'storage_parents' => array('extra', 'description'),
+    ),
+    'newsletter_value' => array(
       'storage_parents' => array('value'),
     ),
   );

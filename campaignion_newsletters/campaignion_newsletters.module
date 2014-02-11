@@ -4,7 +4,6 @@
  * Campaignion newsletter module.
  */
 
-
 /**
  * Subscribe an email address to the given newsletter.
  */
@@ -210,6 +209,7 @@ function campaignion_newsletters_webform_component_info() {
       'description' => t('Offers a user to subscribe to a given newsletter.'),
       'features' => array(
         'conditional' => FALSE,
+        'description' => FALSE,
       ),
       'file' => 'campaignion_newsletters.component.inc',
     ),
@@ -217,14 +217,36 @@ function campaignion_newsletters_webform_component_info() {
 }
 
 /**
+ * Implements hook_webform_submission_insert().
+ *
+ * If the webform doesn't need confirmation invoke our hook_email_confirmed()
+ * immediately.
+ */
+function campaignion_newsletters_webform_submission_insert($node, $submission) {
+  $webform = new \Drupal\little_helpers\Webform\Webform($node);
+  if (!$webform->needsConfirmation()) {
+    campaignion_newsletters_email_confirmed($node, $submission);
+  }
+}
+
+/**
  * Implements hook_email_confirmed().
  */
 function campaignion_newsletters_email_confirmed($node, $submission) {
-  $s = new \Drupal\little_helpers\WebformSubmission($node, $submission);
-  $lists = $s->valuesByKey('newsletter');
-  if ($lists['subscribe'] != '0') {
-    $component = $s->componentByKey('newsletter');
-    _campaignion_newsletters_subscribe($component['value'], $s->valueByKey('email'));
+  $s = new \Drupal\little_helpers\Webform\Submission($node, $submission);
+  // use value of the component with key 'email' as email address
+  if (!($email = $s->valueByKey('email'))) {
+    return;
+  }
+  foreach ($s->webform->componentsByType('newsletter') as $component) {
+    $value = $s->valuesByCid($component['cid']);
+    if (!empty($value['subscribed'])) {
+      foreach ($component['extra']['lists'] as $newsletter => $value) {
+        if (!empty($value)) {
+          _campaignion_newsletters_subscribe($newsletter, $email);
+        }
+      }
+    }
   }
 }
 
@@ -250,14 +272,13 @@ function campaignion_newsletters_form_builder_types() {
   $map = _form_builder_webform_property_map('newsletter');
   // default value is handled by the newsletter property.
   unset($map['properties']['default_value']);
+  unset($map['properties']['description']);
   $fields['newsletter'] = array(
     'title' => t('Newsletter'),
-    'palette_group' => 'advocacy_engine',
     'properties' => array_keys($map['properties']),
     'default' =>  array(
       '#form_builder' => array('element_type' => 'newsletter'),
     ) + _form_builder_webform_default('newsletter'),
-    'unique' => TRUE,
   );
   return array('webform' => $fields);
 }

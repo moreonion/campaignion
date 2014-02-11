@@ -60,6 +60,6 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
   }
 
   public function submission() {
-    return \Drupal\little_helpers\WebformSubmission::load($this->nid, $this->sid);
+    return \Drupal\little_helpers\Webform\Submission::load($this->nid, $this->sid);
   }
 }
