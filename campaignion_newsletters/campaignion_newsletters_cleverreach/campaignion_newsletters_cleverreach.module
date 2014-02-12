@@ -4,7 +4,7 @@
  * Campaignion newsletter CleverReach integration module.
  */
 
-module_load_include('php', 'campaignion_newsletters_cleverreach', 'cleverreach.api');
+use \Drupal\campaignion_newsletters_cleverreach\CleverReach;
 
 /**
  * Implements hook_campaignion_newsletters_provider_info().

@@ -8,8 +8,6 @@
 
 namespace Drupal\campaignion_newsletters_cleverreach;
 
-module_load_include('php', 'campaignion_newsletters', 'NewsletterProvider.api');
-
 class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderInterface {
 
   /**
