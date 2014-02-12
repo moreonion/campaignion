@@ -154,6 +154,10 @@ function campaignion_activity_uninstall() {
  * Replace redhen_activity and deactivate redhen_engagement.
  */
 function campaignion_activity_update_1() {
+  class NoCacheEntityController extends EntityAPIController {
+    protected $cache = FALSE;
+  }
+
   $sql = <<<SQL
 INSERT INTO {campaignion_activity} (contact_id, type, created)
 SELECT message_redhen_contact_target_id AS contact_id, :type AS type, m.timestamp AS created
@@ -179,8 +183,4 @@ SQL;
 
   field_delete_field('message_redhen_contact');
   field_delete_field('message_redhen_org');
-}
-
-class NoCacheEntityController extends EntityAPIController {
-  protected $cache = FALSE;
 }
