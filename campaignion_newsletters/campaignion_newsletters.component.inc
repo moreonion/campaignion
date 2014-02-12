@@ -135,75 +135,77 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
   );
   // we need to redo the mapping here because storage_parents arent resolved until
   // the form is saved for good.
-  if (isset($element['#newsletter_lists'])) {
-    $element['#webform_component']['extra']['lists'] = $element['#newsletter_lists'];
+  if (isset($element['#newsletter'])) {
+    $element['#webform_component']['value'] = $element['#newsletter'];
   }
-  if (isset($element['#newsletter_title'])) {
-    $element['#webform_component']['extra']['description'] = $element['#newsletter_title'];
-  }
-  if (isset($element['#newsletter_value'])) {
-    $element['#webform_component']['value'] = $element['#newsletter_value'];
-  }
-  $edit = _webform_edit_newsletter($element['#webform_component']);
-  $form['options']['lists'] = $edit['extra']['lists'];
-  $form['newsletter_title'] = $edit['extra']['description'];
-  $form['newsletter_value'] = $edit['value'];
+  $form['options'] += _webform_edit_newsletter($element['#webform_component']);
+  unset($form['options']['name']);
   return $form;
 }
 
-/**
- * Submit handler for the newsletter property.
- *
- * @see _webform_form_builder_map_newsletter().
- */
 function campaignion_newsletters_form_builder_property_newsletter_form_submit(&$form, &$form_state) {
-  $form_state['values']['newsletter_lists'] = $form_state['values']['options']['lists'];
+  $form_state['values']['newsletter'] = $form_state['values']['options']['value'];
 }
 
 
 /**
  * Implements _webform_form_builder_properties_component().
- *
- * Component specific properties.
- * This is currently broken as the component specific properties are merged into
- * the global property list. That makes it behave the same way as an implementation
- * of hook_form_builder_properties().
- *
- * @see form_builder_webform_form_builder_properties().
  */
 function _webform_form_builder_properties_newsletter() {
   return array(
-    'newsletter_lists' => array(
+    'newsletter' => array(
       'form' => 'campaignion_newsletters_form_builder_property_newsletter_form',
       'submit' => array('campaignion_newsletters_form_builder_property_newsletter_form_submit'),
     ),
-    'newsletter_title' => array(),
   );
 }
 
 /**
  * Implements _webform_CALLBACK_TYPE().
  * Implements _webform_form_builder_map_TYPE().
- *
- * Defines mapping from webform component to form_builder element type.
- * Tell form_builder_webform how to store properties:
- * $form_state['values']['newsletter'] -> $component['value'].
- *
- * This hook allows us to extend the list of properties defined in
- * hook_form_builder_types() specific for form_builder_webform.
  */
 function _webform_form_builder_map_newsletter() {
   $map['form_builder_type'] = 'newsletter';
   $map['properties'] = array(
-    'newsletter_lists' => array(
-      'storage_parents' => array('extra', 'lists'),
-    ),
-    'newsletter_title' => array(
-      'storage_parents' => array('extra', 'description'),
-    ),
-    'newsletter_value' => array(
+    'newsletter' => array(
+      'form_parents' => array('options', 'value'),
       'storage_parents' => array('value'),
     ),
   );
   return $map;
 }
+
+/**
+ * Implements _webform_table_component().
+ */
+function _webform_table_newsletter($component, $value) {
+  $v = t('not subscribed');
+  if (!empty($value[0]) && $value[0]) {
+    $v = t('subscribed');
+  }
+  return $v;
+}
+
+
+/**
+ * Implements _webform_csv_headers_component().
+ */
+function _webform_csv_headers_newsletter($component, $export_options) {
+  $header = array();
+  $header[0] = '';
+  $header[1] = '';
+  $header[2] = $component['name'];
+  return $header;
+}
+
+/**
+ * Implements _webform_csv_data_component().
+ */
+function _webform_csv_data_newsletter($component, $export_options, $value) {
+  $v = t('not subscribed');
+  if (!empty($value[0]) && $value[0]) {
+    $v = t('subscribed');
+  }
+  return $v;
+}
+
