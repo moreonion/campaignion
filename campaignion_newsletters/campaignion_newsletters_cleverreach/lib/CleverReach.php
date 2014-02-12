@@ -9,32 +9,20 @@
 namespace Drupal\campaignion_newsletters_cleverreach;
 
 class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderInterface {
-
-  /**
-   * Returns the *Singleton* instance of this class.
-   */
-  public static function getInstance() {
-    static $instance = NULL;
-    if ($instance === NULL) {
-      $instance = new static();
-    }
-    return $instance;
-  }
-
+  protected $account;
+  protected $key;
+  protected $url;
+  protected $api;
+  protected $groups;
   /**
    * Constructor. Gets settings and fetches intial group list.
    */
-  protected function __construct() {
-    $this->key = variable_get('cleverreach_api_key');
-    $this->url = variable_get('cleverreach_wsdl_url');
+  public function __construct($account, $key) {
+    $this->account = $account;
+    $this->key = $key;
 
-    if (empty($this->key) || empty($this->url)) {
-      watchdog('CleverReach', 'You need to set your CleverReach API key.',
-        array(),
-        WATCHDOG_CRITICAL);
-    }
-
-    $this->api = new \SoapClient($this->url);
+    $url = variable_get('cleverreach_wsdl_url');
+    $this->api = new \SoapClient($url);
 
     $this->groups = $this->listGroups();
   }
@@ -54,7 +42,7 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
       $lists[] = array(
         'identifier' => $id,
         'title'      => $details->name,
-        'source'     => 'CleverReach',
+        'source'     => 'CleverReach-' . $this->account,
         // @TODO: find a way to get an actual list specific language.
         'language'   => language_default('language'),
       );

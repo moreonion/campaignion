@@ -18,5 +18,6 @@ function campaignion_newsletters_cleverreach_update_1() {
     'default' => variable_get('cleverreach_api_key'),
   ));
   variable_del('cleverreach_api_key');
-}
 
+  db_query("UPDATE {campaignion_newsletters_lists} SET source=CONCAT(source, '-default') WHERE source='CleverReach'");
+}

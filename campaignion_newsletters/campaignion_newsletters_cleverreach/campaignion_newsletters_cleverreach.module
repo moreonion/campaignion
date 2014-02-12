@@ -10,7 +10,12 @@ use \Drupal\campaignion_newsletters_cleverreach\CleverReach;
  * Implements hook_campaignion_newsletters_provider_info().
  */
 function campaignion_newsletters_cleverreach_campaignion_newsletters_provider_info() {
-  return \Drupal\campaignion_newsletters_cleverreach\CleverReach::getInstance();
+  $keys = variable_get('cleverreach_api_keys', array());
+  $providers = array();
+  foreach ($keys as $name => $key) {
+    $providers[] = new CleverReach($name, $key);
+  }
+  return $providers;
 }
 
 /**
