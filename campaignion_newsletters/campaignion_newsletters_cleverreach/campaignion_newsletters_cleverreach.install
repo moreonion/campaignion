@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function campaignion_newsletters_cleverreach_uninstall() {
+  variable_del(array(
+    'cleverreach_api_keys',
+    'cleverreach_wsdl_url',
+  ));
+}
+
+/**
+ * Change variable to store more than one key.
+ */
+function campaignion_newsletters_cleverreach_update_1() {
+  variable_set('cleverreach_api_keys', array(
+    'default' => variable_get('cleverreach_api_key'),
+  ));
+  variable_del('cleverreach_api_key');
+}
+
