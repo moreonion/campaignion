@@ -46,6 +46,11 @@ function campaignion_newsletters_schema() {
           'not null' => TRUE,
           'default' => '',
         ),
+        'data' => array(
+          'description' => 'Store for extra data given by the newsletter provider.',
+          'type' => 'blob',
+          'size' => 'big',
+        ),
       ),
       'primary key' => array('list_id'),
     ),
@@ -96,6 +101,17 @@ function campaignion_newsletters_install() {
     ->fields(array('weight' => $weight + 1))
     ->condition('name', 'campaignion_newsletters', '=')
     ->execute();
+}
+
+/**
+ * Add data column to newsletter lists.
+ */
+function campaignion_newsletters_update_2() {
+  db_add_field('campaignion_newsletters_lists', 'data', array(
+    'description' => 'Store for extra data given by the newsletter provider.',
+    'type' => 'blob',
+    'size' => 'big',
+  ));
 }
 
 /**

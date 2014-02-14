@@ -45,6 +45,7 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
         'identifier' => $id,
         'title'      => $details->name,
         'source'     => 'CleverReach-' . $this->account,
+        'data'       => $details,
         // @TODO: find a way to get an actual list specific language.
       ));
     }

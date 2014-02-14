@@ -8,11 +8,13 @@ class NewsletterList {
   public $identifier;
   public $language;
   public $title;
+  public $data;
 
   protected static $table = 'campaignion_newsletters_lists';
   protected static $key = array('list_id');
-  protected static $values = array('source', 'identifier', 'title', 'language');
+  protected static $values = array('source', 'identifier', 'title', 'language', 'data');
   protected static $serial = TRUE;
+  protected static $serialize = array('data' => TRUE);
 
   public static function listAll() {
     $result = db_query('SELECT * FROM {campaignion_newsletters_lists} ORDER BY title');
@@ -56,7 +58,7 @@ class NewsletterList {
 
   public function __construct($data = array()) {
     foreach ($data as $k => $v) {
-      $this->$k = $v;
+      $this->$k = (is_string($v) && !empty(self::$serialize[$k])) ? unserialize($v) : $v;
     }
     if (!isset($this->language)) {
       $this->language = language_default('language');
@@ -143,7 +145,7 @@ class NewsletterList {
   protected function values($keys) {
     $data = array();
     foreach ($keys as $k) {
-      $data[$k] = isset($this->{$k}) ? $this->{$k} : NULL;
+      $data[$k] = isset($this->{$k}) ? (empty(self::$serialize[$k]) ? $this->{$k} : serialize($this->{$k})) : NULL;
     }
     return $data;
   }
