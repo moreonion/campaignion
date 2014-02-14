@@ -13,7 +13,10 @@ function campaignion_newsletters_cleverreach_campaignion_newsletters_provider_in
   $keys = variable_get('cleverreach_api_keys', array());
   $providers = array();
   foreach ($keys as $name => $key) {
-    $providers[] = new CleverReach($name, $key);
+    $providers['CleverReach-' . $name] = array(
+      'class' => '\\Drupal\\campaignion_newsletters_cleverreach\\CleverReach',
+      'params' => array('name' => $name, 'key' => $key),
+    );
   }
   return $providers;
 }
@@ -22,7 +25,8 @@ function campaignion_newsletters_cleverreach_campaignion_newsletters_provider_in
  * Implements hook_campaignion_newsletters_subscribed().
  */
 function campaignion_newsletters_cleverreach_campaignion_newsletters_subscribed($newsletter, $email) {
-  $api = \Drupal\campaignion_newsletters_cleverreach\CleverReach::getInstance();
+  
+  $api = new CleverReach($name, $key);
   if ($api->hasList($newsletter)) {
     $api->subscribe($newsletter, $email);
   }

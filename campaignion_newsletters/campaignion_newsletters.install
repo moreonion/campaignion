@@ -12,6 +12,12 @@ function campaignion_newsletters_schema() {
     'campaignion_newsletters_lists' => array(
       'description' => 'Table for newsletter lists',
       'fields' => array(
+        'list_id' => array(
+          'description' => 'Primary identifier for newsletter lists.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
         'identifier' => array(
           'description' => 'The identifier of this newsletter.',
           'type' => 'varchar',
@@ -36,12 +42,12 @@ function campaignion_newsletters_schema() {
         'source' => array(
           'description' => 'The source of this newsletter.',
           'type' => 'varchar',
-          'length' => 512,
+          'length' => 64,
           'not null' => TRUE,
           'default' => '',
         ),
       ),
-      'primary key' => array('identifier'),
+      'primary key' => array('list_id'),
     ),
     'campaignion_newsletters_subscriptions' => array(
       'description' => 'Table for joining users to newsletter lists',
@@ -59,15 +65,18 @@ function campaignion_newsletters_schema() {
           'not null' => TRUE,
           'default' => '',
         ),
-        'identifier' => array(
-          'description' => 'The identifier of this newsletter.',
-          'type' => 'varchar',
-          'length' => 255,
+        'list_id' => array(
+          'description' => 'Reference to newsletter lists.',
+          'type' => 'int',
+          'unsigned' => TRUE,
           'not null' => TRUE,
-          'default' => '',
         ),
       ),
       'primary key' => array('subscription_id'),
+      'indexes' => array(
+        'campaignion_newsletters_subscriptions_list' => array('list_id'),
+        'campaignion_newsletters_subscriptions_email' => array('email'),
+      ),
     ),
   );
 }
@@ -87,4 +96,48 @@ function campaignion_newsletters_install() {
     ->fields(array('weight' => $weight + 1))
     ->condition('name', 'campaignion_newsletters', '=')
     ->execute();
+}
+
+/**
+ * Restructure tables for multi-source compatibility.
+ */
+function campaignion_newsletters_update_1() {
+  $pfx = 'campaignion_newsletters_';
+  $lists = "${pfx}lists";
+  db_change_field($lists, 'source', 'source', array(
+    'description' => 'The source of this newsletter.',
+    'type' => 'varchar',
+    'length' => 64,
+    'not null' => TRUE,
+    'default' => '',
+  ));
+  db_drop_primary_key($lists);
+  db_add_field($lists, 'list_id', array(
+    'description' => 'Primary identifier for newsletter lists.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  db_query("UPDATE {$lists} o INNER JOIN (SELECT identifier, @n := @n + 1 AS list_id FROM {$lists}, (select @n:=0) x) n USING (identifier) SET o.list_id=n.list_id");
+  db_add_primary_key($lists, array('list_id'));
+  db_change_field($lists, 'list_id', 'list_id', array(
+    'description' => 'Primary identifier for newsletter lists.',
+    'type' => 'serial',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+  ));
+
+  $sub = "${pfx}subscriptions";
+  db_add_field($sub, 'list_id', array(
+    'description' => 'Reference to newsletter lists.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  db_query("UPDATE {$sub} s INNER JOIN {$lists} l USING(identifier) SET s.list_id=l.list_id");
+  db_drop_field($sub, 'identifier');
+  db_add_index($sub, $sub . '_list', array('list_id'));
+  db_add_index($sub, $sub . '_email', array('email'));
 }

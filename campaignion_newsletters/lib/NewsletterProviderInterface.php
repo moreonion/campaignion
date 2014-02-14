@@ -7,12 +7,12 @@
 namespace Drupal\campaignion_newsletters;
 
 interface NewsletterProviderInterface {
+  public function __construct(array $params);
   /**
    * Fetches current lists from the provider.
    *
    * @return array
-   *   An array of associative array
-   *   (properties: identifier, title, source, language).
+   *   An array of Drupal\campaignion_newsletters\NewsletterList objects
    */
   public function getLists();
 

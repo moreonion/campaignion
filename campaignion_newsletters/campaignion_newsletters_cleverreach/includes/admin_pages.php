@@ -23,16 +23,20 @@ function _campaignion_newsletters_cleverreach_form_campaignion_newsletters_admin
   if (empty($form_state['cleverreach_new_keys'])) {
     $form_state['cleverreach_new_keys'] = count($keys) ? 0 : 1;
   }
+
+  $machine_name = array(
+    '#type' => 'machine_name',
+    '#title' => t('Machine name'),
+    '#machine_name' => array(
+      'exists' => 'campaignion_newsletters_cleverreach_get_key',
+    ),
+    '#maxlength' => 31,
+  );
   foreach ($keys as $name => $key) {
     $fs[$name]['name'] = array(
-      '#type' => 'machine_name',
-      '#machine_name' => array(
-        'exists' => 'campaignion_newsletters_cleverreach_get_key',
-      ),
-      '#title' => t('Machine name'),
       '#default_value' => $name,
       '#disabled' => TRUE,
-    );
+    ) + $machine_name;
     $fs[$name]['key'] = array(
       '#type' => 'textfield',
       '#default_value' => $key,
@@ -43,14 +47,9 @@ function _campaignion_newsletters_cleverreach_form_campaignion_newsletters_admin
     for ($i = 1; $i <= $form_state['cleverreach_new_keys']; $i++) {
       $name = 'new_' . $i;
       $fs[$name]['name'] = array(
-        '#type' => 'machine_name',
-        '#machine_name' => array(
-          'exists' => 'campaignion_newsletters_cleverreach_get_key',
-        ),
-        '#title' => t('Machine name'),
         '#default_value' => '',
         '#required' => FALSE,
-      );
+      ) + $machine_name;
       $fs[$name]['key'] = array(
         '#type' => 'textfield',
         '#default_value' => '',

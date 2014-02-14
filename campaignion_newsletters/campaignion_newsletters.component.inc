@@ -43,7 +43,7 @@ function _webform_theme_newsletter() {
 function _webform_edit_newsletter($component) {
   $component['value'] = unserialize($component['value']);
   $newsletters = db_select('campaignion_newsletters_lists', 'l')
-    ->fields('l', array('identifier', 'title'))
+    ->fields('l', array('list_id', 'title'))
     ->execute()
     ->fetchAllKeyed();
 
