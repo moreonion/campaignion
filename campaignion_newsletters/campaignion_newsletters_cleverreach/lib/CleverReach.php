@@ -8,6 +8,7 @@
 
 namespace Drupal\campaignion_newsletters_cleverreach;
 
+use \Drupal\campaignion\Contact;
 use \Drupal\campaignion_newsletters\NewsletterList;
 
 class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderInterface {
@@ -99,9 +100,23 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
    * @return: True on success.
    */
   public function subscribe($list, $mail) {
+    $attributes = array();
+    if ($contact = Contact::byEmail($mail)) {
+      $exporter = new CampaignionContactExporter($contact);
+      $listAttributes = array_merge($list->data->attributes, $list->data->globalAttributes);
+      foreach ($listAttributes as $attribute) {
+        if ($value = $exporter->value($attribute->key)) {
+          $attributes[] = array(
+            'key' => $attribute->key,
+            'value' => $value,
+          );
+        }
+      }
+    }
     $user = array(
       'email'  => $mail,
       'active' => TRUE,
+      'attributes' => $attributes,
     );
     $group_id = $this->groups[$list->identifier]->id;
     $result = $this->api->receiverGetByEmail($this->key, $group_id, $mail, 0);
