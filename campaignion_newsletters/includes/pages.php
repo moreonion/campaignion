@@ -1,6 +1,7 @@
 <?php
 
 use \Drupal\campaignion_newsletters\NewsletterList;
+use \Drupal\campaignion_newsletters\Subscriptions;
 
 /**
  * Administration form.
@@ -42,21 +43,10 @@ function _campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form,
     return;
   }
 
-  $options = array();
-  $lists = NewsletterList::listAll();
-  foreach ($lists as $list) {
-    $options[$list->list_id] = $list->title;
-  }
-  $form_state['newsletter_lists'] = &$lists;
+  $subscriptions = Subscriptions::byContact($form_state['redhen_contact']);
+  $form_state['redhen_contact']->newsletters = $subscriptions;
 
-  $result = db_select('campaignion_newsletters_subscriptions', 's')
-    ->fields('s', array('list_id', 'email'))
-    ->condition('email', $mails, 'IN')
-    ->execute();
-  $subscriptions = array();
-  foreach ($result as $row) {
-    $subscriptions[$row->email][] = $row->list_id;
-  }
+  $options = $subscriptions->optionsArray();
 
   $fieldset = array(
     '#type' => 'fieldset',
@@ -71,7 +61,7 @@ function _campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form,
       '#type' => 'checkboxes',
       '#title' => $mail,
       '#options' => $options,
-      '#default_value' => isset($subscriptions[$mail]) ? $subscriptions[$mail] : array(),
+      '#default_value' => $subscriptions->values($mail),
     );
   }
 
@@ -83,22 +73,19 @@ function _campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form,
 /**
  * Submit handler for redhen_contact_contact_form.
  *
- * Update subscriptions in the database.
+ * Store all subscriptions in the $contact to be updated on entity_save().
  */
 function campaignion_newsletters_redhen_contact_submit($form, &$form_state) {
-  foreach ($form_state['redhen_contact']->allEmail() as $mail) {
-    $id = drupal_clean_css_identifier($mail['value']);
+  $contact = $form_state['redhen_contact'];
+
+  $subscriptions = array();
+  foreach ($contact->allEmail() as $mail) {
+    $email = $mail['value'];
+    $id = drupal_clean_css_identifier($email);
+    $subscriptions[$email] = array();
     if (!empty($form_state['values'][$id])) {
-      $newsletters = $form_state['values'][$id];
-      foreach ($newsletters as $list_id => $subscribed) {
-        $list = $form_state['newsletter_lists'][$list_id];
-        if ($subscribed) {
-          $list->subscribe($mail['value']);
-        }
-        else {
-          $list->unsubscribe($mail['value']);
-        }
-      }
+      $subscriptions[$email] = $form_state['values'][$id];
     }
   }
+  $contact->newsletters->update($subscriptions);
 }

@@ -6,6 +6,7 @@
 
 use \Drupal\campaignion_newsletters\ProviderFactory;
 use \Drupal\campaignion_newsletters\NewsletterList;
+use \Drupal\campaignion_newsletters\Subscriptions;
 
 /**
  * Implements hook_cron().
@@ -159,4 +160,44 @@ function campaignion_newsletters_form_builder_types() {
  */
 function campaignion_newsletters_form_builder_types_alter(&$fields) {
   unset($fields['webform']['email_newsletter']);
+}
+
+/**
+ * Implements hook_entity_insert().
+ *
+ * Save all subscriptions for the redhen_contact.
+ */
+function campaignion_newsletters_entity_insert($entity, $entity_type) {
+  campaignion_newsletters_entity_update($entity, $entity_type);
+}
+
+/**
+ * Implements hook_entity_update().
+ *
+ * Save all subscriptions for the redhen_contact.
+ */
+function campaignion_newsletters_entity_update($entity, $entity_type) {
+  if ($entity_type != 'redhen_contact') {
+    return;
+  }
+  if (empty($entity->newsletters)) {
+    $entity->newsletters = Subscriptions::byContact($entity);
+  }
+  $entity->newsletters->save();
+}
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * Unsubscribe from all newsletters.
+ */
+function campaignion_newsletters_entity_delete($entity, $entity_type) {
+  if ($entity_type != 'redhen_contact') {
+    return;
+  }
+  if (empty($entity->newsletters)) {
+    $entity->newsletters = Subscriptions::byContact($entity);
+  }
+  $entity->newsletters->unsubscribeAll();
+  $entity->newsletters->save();
 }
