@@ -17,6 +17,9 @@ function campaignion_newsletters_update_dependencies() {
   $deps['campaignion_newsletters_cleverreach'][1] = array(
     'campaignion_newsletters' => 1,
   );
+  $deps['campaignion_newsletters'][2] = array(
+    'campaignion_newsletters_cleverreach' => 1,
+  );
   return $deps;
 }
 

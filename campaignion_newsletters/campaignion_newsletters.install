@@ -146,9 +146,19 @@ function campaignion_newsletters_uninstall() {
 }
 
 /**
+ * Submit additional data for all existing contacts.
+ */
+function campaignion_newsletters_update_4() {
+  foreach (db_query('SELECT contact_id FROM {redhen_contact}')->fetchCol() as $contact_id) {
+    $contact = \Drupal\campaignion\Contact::load($contact_id);
+    campaignion_newsletters_entity_update($contact, 'redhen_contact');
+  }
+}
+
+/**
  * Enable sending in cron.
  */
-function campaignion_newsletters_cleverreach_update_2() {
+function campaignion_newsletters_update_3() {
   module_enable(array('elysia_cron'));
   db_create_table('campaignion_newsletters_queue', array(
     'description' => 'Send queue for newsletter subscriptions.',
@@ -196,6 +206,7 @@ function campaignion_newsletters_update_2() {
     'type' => 'blob',
     'size' => 'big',
   ));
+  _campaignion_newsletters_poll();
 }
 
 /**
