@@ -83,6 +83,41 @@ function campaignion_newsletters_schema() {
         'campaignion_newsletters_subscriptions_email' => array('email'),
       ),
     ),
+    'campaignion_newsletters_queue' => array(
+      'description' => 'Send queue for newsletter subscriptions.',
+      'fields' => array(
+        'list_id' => array(
+          'description' => 'Reference to newsletter lists.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'email' => array(
+          'description' => 'The email address of the subscribed user.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+        ),
+        'created' => array(
+          'description' => 'The Unix timestamp when the node was created.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'action' => array(
+          'description' => 'Subscribe / unsubscribe flag.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'data' => array(
+          'description' => 'Random data used by the newsletter provider.',
+          'type' => 'blob',
+          'size' => 'big',
+        ),
+      ),
+      'primary key' => array('list_id', 'email'),
+    ),
   );
 }
 
@@ -101,6 +136,55 @@ function campaignion_newsletters_install() {
     ->fields(array('weight' => $weight + 1))
     ->condition('name', 'campaignion_newsletters', '=')
     ->execute();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function campaignion_newsletters_uninstall() {
+  variable_del('campaignion_newsletters_cleverreach_batch_size');
+}
+
+/**
+ * Enable sending in cron.
+ */
+function campaignion_newsletters_cleverreach_update_2() {
+  module_enable(array('elysia_cron'));
+  db_create_table('campaignion_newsletters_queue', array(
+    'description' => 'Send queue for newsletter subscriptions.',
+    'fields' => array(
+      'list_id' => array(
+        'description' => 'Reference to newsletter lists.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'email' => array(
+        'description' => 'The email address of the subscribed user.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the node was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'action' => array(
+        'description' => 'Subscribe / unsubscribe flag.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'data' => array(
+        'description' => 'Random data used by the newsletter provider.',
+        'type' => 'blob',
+        'size' => 'big',
+      ),
+    ),
+    'primary key' => array('list_id', 'email'),
+  ));
 }
 
 /**

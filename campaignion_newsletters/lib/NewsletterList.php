@@ -65,6 +65,10 @@ class NewsletterList {
     }
   }
 
+  public function provider() {
+    return ProviderFactory::getInstance()->providerByKey($this->source);
+  }
+
   /**
    * Subscribe a single email-address to this newsletter.
    */
@@ -81,10 +85,11 @@ class NewsletterList {
       ->execute();
 
     if (!$fromProvider) {
-      $provider = ProviderFactory::getInstance()->providerByKey($this->source);
-      if ($provider) {
-        $provider->subscribe($this, $email);
-      }
+      QueueItem::byData(array(
+        'list_id' => $this->list_id,
+        'email' => $email,
+        'action' => QueueItem::SUBSCRIBE,
+      ))->save();
     }
   }
 
@@ -95,10 +100,11 @@ class NewsletterList {
       ->execute();
 
     if (!$fromProvider) {
-      $provider = ProviderFactory::getInstance()->providerByKey($this->source);
-      if ($provider) {
-        $provider->unsubscribe($this, $email);
-      }
+      QueueItem::byData(array(
+        'list_id' => $this->list_id,
+        'email' => $email,
+        'action' => QueueItem::UNSUBSCRIBE,
+      ))->save();
     }
   }
 

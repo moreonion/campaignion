@@ -82,7 +82,6 @@ function campaignion_newsletters_redhen_contact_submit($form, &$form_state) {
   foreach ($contact->allEmail() as $mail) {
     $email = $mail['value'];
     $id = drupal_clean_css_identifier($email);
-    $subscriptions[$email] = array();
     if (!empty($form_state['values'][$id])) {
       $subscriptions[$email] = $form_state['values'][$id];
     }

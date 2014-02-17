@@ -6,6 +6,7 @@ version = 7.x-1.0
 project = campaignion
 
 dependencies[] = campaignion_newsletters
+dependencies[] = elysia_cron
 dependencies[] = psr0
 
 

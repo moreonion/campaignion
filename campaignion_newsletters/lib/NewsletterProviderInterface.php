@@ -17,11 +17,6 @@ interface NewsletterProviderInterface {
   public function getLists();
 
   /**
-   * Returns TRUE if the current providers manages the given list.
-   */
-  public function hasList($list);
-
-  /**
    * Fetches current lists of subscribers from the provider.
    *
    * @return array

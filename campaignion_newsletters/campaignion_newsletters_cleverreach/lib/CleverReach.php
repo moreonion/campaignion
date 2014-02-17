@@ -16,7 +16,6 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
   protected $key;
   protected $url;
   protected $api;
-  protected $groups;
   /**
    * Constructor. Gets settings and fetches intial group list.
    */
@@ -26,8 +25,6 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
 
     $url = variable_get('cleverreach_wsdl_url');
     $this->api = new \SoapClient($url);
-
-    $this->groups = $this->listGroups();
   }
 
   /**
@@ -39,7 +36,8 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
    */
   public function getLists() {
     $lists = array();
-    foreach ($this->groups as $group) {
+    $groups = $this->listGroups();
+    foreach ($groups as $group) {
       $details = $this->getGroupDetails($group);
       $id = $this->toIdentifier($details->name);
       $lists[] = NewsletterList::fromData(array(
@@ -54,13 +52,6 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
   }
 
   /**
-   * Returns TRUE if the current providers manages the given list.
-   */
-  public function hasList($list) {
-    return array_key_exists($list, $this->groups);
-  }
-
-  /**
    * Fetches current lists of subscribers from the provider.
    *
    * @return array
@@ -70,10 +61,7 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
     $page = 0;
     $receivers = array();
 
-    if (empty($this->groups[$list->identifier])) {
-      return $receivers;
-    }
-    $group_id = $this->groups[$list->identifier]->id;
+    $group_id = $list->data->id;
 
     do {
       $result = $this->api->receiverGetPage($this->key, $group_id,
@@ -118,7 +106,7 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
       'active' => TRUE,
       'attributes' => $attributes,
     );
-    $group_id = $this->groups[$list->identifier]->id;
+    $group_id = $list->data->id;
     $result = $this->api->receiverGetByEmail($this->key, $group_id, $mail, 0);
     if ($result->message === 'data not found') {
       $result = $this->api->receiverAdd($this->key, $group_id, $user);
@@ -130,15 +118,14 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
   }
 
   /**
-   * Subscribe a user, given a newsletter identifier and email address.
+   * Unsubscribe a user, given a newsletter identifier and email address.
    *
    * Should ignore the request if there is no such subscription.
    *
    * @return: True on success.
    */
   public function unsubscribe($list, $mail) {
-    $group_id = $this->groups[$list->identifier]->id;
-    $result = $this->api->receiverDelete($this->key, $group_id, $mail);
+    $result = $this->api->receiverDelete($this->key, $list->data->id, $mail);
     return (bool) $this->handleResult($result);
   }
 

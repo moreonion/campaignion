@@ -22,38 +22,6 @@ function campaignion_newsletters_cleverreach_campaignion_newsletters_provider_in
 }
 
 /**
- * Implements hook_campaignion_newsletters_subscribed().
- */
-function campaignion_newsletters_cleverreach_campaignion_newsletters_subscribed($newsletter, $email) {
-  
-  $api = new CleverReach($name, $key);
-  if ($api->hasList($newsletter)) {
-    $api->subscribe($newsletter, $email);
-  }
-}
-
-/**
- * Implements hook_campaignion_newsletters_unsubscribed().
- */
-function campaignion_newsletters_cleverreach_campaignion_newsletters_unsubscribed($newsletter, $email) {
-  $api = \Drupal\campaignion_newsletters_cleverreach\CleverReach::getInstance();
-  if ($api->hasList($newsletter)) {
-    $api->unsubscribe($newsletter, $email);
-  }
-}
-
-
-/**
- * Get the API key for a machine_name.
- */
-function campaignion_newsletters_cleverreach_get_key($machine_name) {
-  $keys = variable_get('cleverreach_api_keys', array());
-  if (isset($keys[$machine_name])) {
-    return $keys[$machine_name];
-  }
-}
-
-/**
  * Implements hook_form_FORM_ID_alter().
  * Implements hook_form_campaignion_newsletters_admin_settings_alter().
  */

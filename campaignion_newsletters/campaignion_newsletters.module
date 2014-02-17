@@ -201,3 +201,17 @@ function campaignion_newsletters_entity_delete($entity, $entity_type) {
   $entity->newsletters->unsubscribeAll();
   $entity->newsletters->save();
 }
+
+/**
+ * Implements hook_cronapi().
+ */
+function campaignion_newsletters_cronapi($op, $job = NULL) {
+  $items['campaignion_newsletters_send_queue'] = array(
+    'description' => 'Send queue data to newsletter providers',
+    'rule' => '*/2 * * * *',
+    'weight' => 100,
+    'file' => 'includes/cron.php',
+    'callback' => 'campaignion_newsletters_send_queue',
+  );
+  return $items;
+}
