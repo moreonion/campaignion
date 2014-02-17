@@ -9,12 +9,13 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
   public $list_id;
   public $email;
   public $created;
+  public $locked = 0;
   public $action;
   public $data;
 
   protected static $table = 'campaignion_newsletters_queue';
   protected static $key = array('list_id', 'email');
-  protected static $values = array('created', 'action', 'data');
+  protected static $values = array('created', 'locked', 'action', 'data');
   protected static $serialize = array('data' => TRUE);
   protected static $serial = FALSE;
 
@@ -37,16 +38,19 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     return $item;
   }
 
-  public static function oldest($limit) {
+  public static function claimOldest($limit, $time = 600) {
     $table = static::$table;
     $result = db_select(static::$table, 'i')
       ->fields('i')
       ->orderBy('created')
+      ->condition('locked', time(), '<')
       ->range(0, $limit)
       ->execute();
     $items = array();
     foreach ($result as $row) {
-      $items[] = new static($row, FALSE);
+      $item = new static($row, FALSE);
+      $item->claim($time);
+      $items[] = $item;
     }
     return $items;
   }
@@ -56,5 +60,24 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     if (!isset($this->created)) {
       $this->created = time();
     }
+  }
+
+  /**
+   * Lock this item for $time seconds.
+   *
+   * @param int $time
+   *   Seconds to lock this item for.
+   */
+  public function claim($time = 600) {
+    $this->locked = time() + $time;
+    $this->save();
+  }
+
+  /**
+   * Release the lock on this item.
+   */
+  public function release() {
+    $this->locked = 0;
+    $this->save();
   }
 }

@@ -104,6 +104,12 @@ function campaignion_newsletters_schema() {
           'not null' => TRUE,
           'default' => 0,
         ),
+        'locked' => array(
+          'description' => 'This queue item is locked until this time.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
         'action' => array(
           'description' => 'Subscribe / unsubscribe flag.',
           'type' => 'int',
@@ -177,6 +183,12 @@ function campaignion_newsletters_update_3() {
       ),
       'created' => array(
         'description' => 'The Unix timestamp when the node was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'locked' => array(
+        'description' => 'This queue item is locked until this time.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,

@@ -9,7 +9,7 @@ use \Drupal\campaignion_newsletters\QueueItem;
 function campaignion_newsletters_send_queue() {
   $lists = NewsletterList::listAll();
   $batchSize = variable_get('campaignion_newsletters_batch_size', 50);
-  $items = QueueItem::oldest($batchSize);
+  $items = QueueItem::claimOldest($batchSize);
 
   foreach ($items as $item) {
     $list = $lists[$item->list_id];
