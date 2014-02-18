@@ -219,7 +219,6 @@ function _webform_table_newsletter($component, $value) {
   return $v;
 }
 
-
 /**
  * Implements _webform_csv_headers_component().
  */

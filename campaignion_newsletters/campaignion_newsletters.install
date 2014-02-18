@@ -76,6 +76,14 @@ function campaignion_newsletters_schema() {
           'unsigned' => TRUE,
           'not null' => TRUE,
         ),
+        'fingerprint' => array(
+          'description' => 'A unique hash of this subscription to check if it has changed',
+          'type' => 'char',
+          'length' => 40,
+          'not null' => TRUE,
+          // some impossible hash so that newly added values always need update.
+          'default' => '123456789x123456789x123456789x123456789x',
+        ),
       ),
       'primary key' => array('subscription_id'),
       'indexes' => array(
@@ -149,6 +157,19 @@ function campaignion_newsletters_install() {
  */
 function campaignion_newsletters_uninstall() {
   variable_del('campaignion_newsletters_cleverreach_batch_size');
+}
+
+/**
+ * Add fingerprint column to subscriptions.
+ */
+function campaignion_newsletters_update_6() {
+  db_add_field('campaignion_newsletters_subscriptions', 'fingerprint', array(
+    'description' => 'A unique hash of this subscription to check if it has changed',
+    'type' => 'char',
+    'length' => 40,
+    // some impossible hash so that newly added values always need update.
+    'default' => '123456789x123456789x123456789x123456789x',
+  ));
 }
 
 /**

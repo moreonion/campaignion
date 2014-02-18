@@ -29,3 +29,13 @@ function campaignion_newsletters_cleverreach_form_campaignion_newsletters_admin_
   form_load_include($form_state, 'php', 'campaignion_newsletters_cleverreach', 'includes/admin_pages');
   _campaignion_newsletters_cleverreach_form_campaignion_newsletters_admin_settings_alter($form, $form_state);
 }
+
+/**
+ * Get API-key by machine name.
+ */
+function campaignion_newsletters_cleverreach_get_key($name) {
+  $keys = variable_get('cleverreach_api_keys', array());
+  if (isset($keys[$name])) {
+    return $keys[$name];
+  }
+}

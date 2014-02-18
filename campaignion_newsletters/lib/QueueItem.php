@@ -12,6 +12,7 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
   public $locked = 0;
   public $action;
   public $data;
+  public $fingerprint;
 
   protected static $table = 'campaignion_newsletters_queue';
   protected static $key = array('list_id', 'email');

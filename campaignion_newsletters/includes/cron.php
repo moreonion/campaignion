@@ -17,7 +17,7 @@ function campaignion_newsletters_send_queue() {
 
     $success = FALSE;
     if ($item->action == QueueItem::SUBSCRIBE) {
-      $success = $provider->subscribe($list, $item->email);
+      $success = $provider->subscribe($list, $item->email, $item->data);
     }
     elseif ($item->action == QueueItem::UNSUBSCRIBE) {
       $success = $provider->unsubscribe($list, $item->email);

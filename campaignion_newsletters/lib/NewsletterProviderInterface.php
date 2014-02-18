@@ -29,7 +29,7 @@ interface NewsletterProviderInterface {
    *
    * @return: True on success.
    */
-  public function subscribe($newsletter, $mail);
+  public function subscribe($newsletter, $mail, $data);
 
   /**
    * Subscribe a user, given a newsletter identifier and email address.
@@ -39,4 +39,20 @@ interface NewsletterProviderInterface {
    * @return: True on success.
    */
   public function unsubscribe($newsletter, $mail);
+
+  /**
+   * Get additional data for this subscription and a unique fingerprint.
+   *
+   * @param Subscription $subscription
+   *   The subscription object.
+   *
+   * @return array
+   *   An array containing some data object and a fingerprint:
+   *   array($data, $fingerprint).
+   *   - The $data is passed as $data parameter of subscribe() during
+   *     cron runs.
+   *   - The $fingerprint must be an sha1-hash. Usually it's a hash
+   *     of some subset of $data.
+   */
+  public function data(Subscription $subscription);
 }

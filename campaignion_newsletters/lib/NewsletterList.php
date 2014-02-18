@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_newsletters;
 
-class NewsletterList {
+class NewsletterList extends \Drupal\little_helpers\DB\Model {
   public $list_id;
   public $source;
   public $identifier;
@@ -20,7 +20,7 @@ class NewsletterList {
     $result = db_query('SELECT * FROM {campaignion_newsletters_lists} ORDER BY title');
     $lists = array();
     foreach ($result as $row) {
-      $lists[$row->list_id] = new static($row);
+      $lists[$row->list_id] = new static($row, FALSE);
     }
     return $lists;
   }
@@ -28,7 +28,7 @@ class NewsletterList {
   public static function load($id) {
     $result = db_query('SELECT * FROM {campaignion_newsletters_lists} WHERE list_id=:id', array(':id' => $id));
     if ($row = $result->fetch()) {
-      return new static($row);
+      return new static($row, FALSE);
     }
   }
 
@@ -38,7 +38,7 @@ class NewsletterList {
       ':identifier' => $identifier,
     ));
     if ($row = $result->fetch()) {
-      return new static($row);
+      return new static($row, FALSE);
     }
   }
 
@@ -49,14 +49,15 @@ class NewsletterList {
     }
     if ($item = self::byIdentifier($data['source'], $data['identifier'])) {
       unset($adata['list_id']);
-      $item->__construct($adata);
+      $item->__construct($adata, FALSE);
       return $item;
     } else {
       return new static($data);
     }
   }
 
-  public function __construct($data = array()) {
+  public function __construct($data = array(), $new = TRUE) {
+    parent::__construct($data, $new);
     foreach ($data as $k => $v) {
       $this->$k = (is_string($v) && !empty(self::$serialize[$k])) ? unserialize($v) : $v;
     }
@@ -107,53 +108,4 @@ class NewsletterList {
       ))->save();
     }
   }
-
-  public function isNew() {
-    foreach (self::$key as $key) {
-      if (isset($this->{$key})) {
-        return FALSE;
-      }
-    }
-    return TRUE;
-  }
-
-  public function save() {
-    $new = TRUE;
-    if ($this->isNew()) {
-      $this->insert();
-    } else {
-      $this->update();
-    }
-  }
-
-  protected function update() {
-    $stmt = db_update(self::$table);
-    foreach (self::$key as $key) {
-      $stmt->condition($key, $this->{$key});
-    }
-    $stmt->fields($this->values(self::$values))
-      ->execute();
-  }
-
-  protected function insert() {
-    $cols = self::$values;
-    if (!self::$serial) {
-      $cols = array_merge($cols, self::$key);
-    }
-    $ret = db_insert(self::$table)
-      ->fields($this->values($cols))
-      ->execute();
-    if (self::$serial) {
-      $this->{self::$key[0]} = $ret;
-    }
-  }
-
-  protected function values($keys) {
-    $data = array();
-    foreach ($keys as $k) {
-      $data[$k] = isset($this->{$k}) ? (empty(self::$serialize[$k]) ? $this->{$k} : serialize($this->{$k})) : NULL;
-    }
-    return $data;
-  }
-
 }

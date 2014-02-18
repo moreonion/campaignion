@@ -9,13 +9,19 @@ class Subscriptions {
 
   public static function byContact($contact) {
     $subscriptions = array();
+    $lists = NewsletterList::listAll();
+
     foreach ($contact->allEmail() as $address) {
-      $subscriptions[$address['value']] = array();
+      $email = $address['value'];
+      $subscriptions[$email] = array();
+      foreach ($lists as $list_id => $list) {
+        $subscriptions[$email][$list_id] = Subscription::fromData($list_id, $email);
+      }
     }
 
-    $sql = 'SELECT * FROM {campaignion_newsletters_subscriptions} WHERE email IN(:emails)';
-    foreach (db_query($sql, array(':emails' => array_keys($subscriptions))) as $row) {
-      $subscriptions[$row->email][$row->list_id] = $row->list_id;
+    $storedSubscriptions = Subscription::byEmail(array_keys($subscriptions));
+    foreach ($storedSubscriptions as $s) {
+      $subscriptions[$s->email][$s->list_id] = $s;
     }
     return new static($subscriptions);
   }
@@ -31,25 +37,27 @@ class Subscriptions {
     return static::$lists;
   }
 
-  public function update($subscriptions) {
-    $this->subscriptions = $subscriptions;
-  }
-
-  public function unsubscribeAll() {
-    foreach ($this->subscriptions as $email => $lists) {
-      $this->subscriptions[$email] = array();
+  public function update($values) {
+    foreach ($values as $email => $lists) {
+      foreach ($lists as $list_id => $subscribed) {
+        $subscription =  $this->subscriptions[$email][$list_id];
+        $subscription->delete = !$subscribed;
+      }
     }
   }
 
   public function save() {
-    $lists = static::lists();
-    foreach ($lists as $list_id => $list) {
-      foreach ($this->subscriptions as $email => $subscriptions) {
-        if (!empty($subscriptions[$list_id])) {
-          $list->subscribe($email);
-        } else {
-          $list->unsubscribe($email);
-        }
+    foreach ($this->subscriptions as $email => $lists) {
+      foreach ($lists as $list_id => $subscription) {
+        $subscription->save();
+      }
+    }
+  }
+
+  public function unsubscribeAll() {
+    foreach ($this->subscriptions as $email => $lists) {
+      foreach ($lists as $list_id => $subscription) {
+        $subscription->delete = TRUE;
       }
     }
   }
@@ -64,8 +72,8 @@ class Subscriptions {
 
   public function values($email) {
     $values = array();
-    foreach ($this->subscriptions[$email] as $list_id => $subscribed) {
-      $values[$list_id] = $subscribed ? $list_id : 0;
+    foreach ($this->subscriptions[$email] as $list_id => $subscription) {
+      $values[$list_id] = !$subscription->delete ? $list_id : 0;
     }
     return $values;
   }

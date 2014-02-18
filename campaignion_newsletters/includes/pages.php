@@ -1,6 +1,5 @@
 <?php
 
-use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\Subscriptions;
 
 /**
@@ -78,13 +77,13 @@ function _campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form,
 function campaignion_newsletters_redhen_contact_submit($form, &$form_state) {
   $contact = $form_state['redhen_contact'];
 
-  $subscriptions = array();
+  $values = array();
   foreach ($contact->allEmail() as $mail) {
     $email = $mail['value'];
     $id = drupal_clean_css_identifier($email);
     if (!empty($form_state['values'][$id])) {
-      $subscriptions[$email] = $form_state['values'][$id];
+      $values[$email] = $form_state['values'][$id];
     }
   }
-  $contact->newsletters->update($subscriptions);
+  $contact->newsletters->update($values);
 }

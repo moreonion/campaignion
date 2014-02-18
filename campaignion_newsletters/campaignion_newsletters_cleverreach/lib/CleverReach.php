@@ -10,6 +10,7 @@ namespace Drupal\campaignion_newsletters_cleverreach;
 
 use \Drupal\campaignion\Contact;
 use \Drupal\campaignion_newsletters\NewsletterList;
+use \Drupal\campaignion_newsletters\Subscription;
 
 class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderInterface {
   protected $account;
@@ -82,14 +83,10 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
     return $receivers;
   }
 
-  /**
-   * Subscribe a user, given a newsletter identifier and email address.
-   *
-   * @return: True on success.
-   */
-  public function subscribe($list, $mail) {
+  protected function attributeData(Subscription $subscription) {
+    $list = $subscription->newsletterList();
     $attributes = array();
-    if ($contact = Contact::byEmail($mail)) {
+    if ($contact = Contact::byEmail($subscription->email)) {
       $exporter = new CampaignionContactExporter($contact);
       $listAttributes = array_merge($list->data->attributes, $list->data->globalAttributes);
       foreach ($listAttributes as $attribute) {
@@ -101,10 +98,27 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
         }
       }
     }
+    return $attributes;
+  }
+
+  public function data(Subscription $subscription) {
+    $data = $this->attributeData($subscription);
+    $attr = $data;
+    unset($attr['updated']);
+    $fingerprint = sha1(serialize($attr));
+    return array($data, $fingerprint);
+  }
+
+  /**
+   * Subscribe a user, given a newsletter identifier and email address.
+   *
+   * @return: True on success.
+   */
+  public function subscribe($list, $mail, $data) {
     $user = array(
       'email'  => $mail,
       'active' => TRUE,
-      'attributes' => $attributes,
+      'attributes' => $data,
     );
     $group_id = $list->data->id;
     $result = $this->api->receiverGetByEmail($this->key, $group_id, $mail, 0);

@@ -5,6 +5,7 @@ core = 7.x
 version = 7.x-1.0
 project = campaignion
 
+dependencies[] = elysia_cron
 dependencies[] = little_helpers
 dependencies[] = psr0
 dependencies[] = redhen_contact
