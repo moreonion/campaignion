@@ -152,6 +152,32 @@ function campaignion_newsletters_uninstall() {
 }
 
 /**
+ * Migrate old webform components.
+ */
+function campaignion_newsletters_update_5() {
+  $result = db_query("SELECT c.*, l.list_id FROM {webform_component} c LEFT OUTER JOIN {campaignion_newsletters_lists} l ON c.value=l.identifier WHERE c.type='newsletter'");
+
+  foreach ($result as $component) {
+    $component->extra = unserialize($component->extra);
+    if ($component->list_id) {
+      $component->extra['lists'][$component->list_id] = $component->list_id;
+    }
+    else {
+      $component->extra['lists'] = array();
+    }
+    $component->value = serialize(array('subscribed' => 'subscribed'));
+
+    unset($component->list_id);
+    $component->extra = serialize($component->extra);
+    db_update('webform_component')
+      ->condition('nid', $component->nid)
+      ->condition('cid', $component->cid)
+      ->fields($component)
+      ->execute();
+  }
+}
+
+/**
  * Submit additional data for all existing contacts.
  */
 function campaignion_newsletters_update_4() {
