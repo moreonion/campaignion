@@ -165,6 +165,7 @@ function campaignion_newsletters_update_5() {
     else {
       $component->extra['lists'] = array();
     }
+    $component->extra['title_display'] = 'none';
     $component->value = serialize(array('subscribed' => 'subscribed'));
 
     unset($component->list_id);
