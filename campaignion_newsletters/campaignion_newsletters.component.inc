@@ -43,7 +43,7 @@ function _webform_theme_newsletter() {
 function _webform_edit_newsletter($component) {
   $component['value'] = unserialize($component['value']);
   $newsletters = db_select('campaignion_newsletters_lists', 'l')
-    ->fields('l', array('identifier', 'title'))
+    ->fields('l', array('list_id', 'title'))
     ->execute()
     ->fetchAllKeyed();
 
@@ -207,3 +207,38 @@ function _webform_form_builder_map_newsletter() {
   );
   return $map;
 }
+
+/**
+ * Implements _webform_table_component().
+ */
+function _webform_table_newsletter($component, $value) {
+  $v = t('not subscribed');
+  if (!empty($value[0]) && $value[0]) {
+    $v = t('subscribed');
+  }
+  return $v;
+}
+
+
+/**
+ * Implements _webform_csv_headers_component().
+ */
+function _webform_csv_headers_newsletter($component, $export_options) {
+  $header = array();
+  $header[0] = '';
+  $header[1] = '';
+  $header[2] = $component['name'];
+  return $header;
+}
+
+/**
+ * Implements _webform_csv_data_component().
+ */
+function _webform_csv_data_newsletter($component, $export_options, $value) {
+  $v = t('not subscribed');
+  if (!empty($value[0]) && $value[0]) {
+    $v = t('subscribed');
+  }
+  return $v;
+}
+

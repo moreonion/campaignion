@@ -4,70 +4,28 @@
  * Campaignion newsletter CleverReach integration module.
  */
 
-module_load_include('php', 'campaignion_newsletters_cleverreach', 'cleverreach.api');
+use \Drupal\campaignion_newsletters_cleverreach\CleverReach;
 
 /**
  * Implements hook_campaignion_newsletters_provider_info().
  */
 function campaignion_newsletters_cleverreach_campaignion_newsletters_provider_info() {
-  return \Drupal\campaignion_newsletters_cleverreach\CleverReach::getInstance();
-}
-
-/**
- * Implements hook_campaignion_newsletters_subscribed().
- */
-function campaignion_newsletters_cleverreach_campaignion_newsletters_subscribed($newsletter, $email) {
-  $api = \Drupal\campaignion_newsletters_cleverreach\CleverReach::getInstance();
-  if ($api->hasList($newsletter)) {
-    $api->subscribe($newsletter, $email);
-  }
-}
-
-/**
- * Implements hook_campaignion_newsletters_unsubscribed().
- */
-function campaignion_newsletters_cleverreach_campaignion_newsletters_unsubscribed($newsletter, $email) {
-  $api = \Drupal\campaignion_newsletters_cleverreach\CleverReach::getInstance();
-  if ($api->hasList($newsletter)) {
-    $api->unsubscribe($newsletter, $email);
-  }
-}
-
-
-/**
- * Implements hook_form_alter().
- */
-function campaignion_newsletters_cleverreach_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id === 'campaignion_newsletters_admin_settings') {
-    $form['cleverreach'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('CleverReach'),
-      '#weight' => 1,
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
-    );
-    $form['cleverreach']['api_key'] = array(
-      '#type' => 'textfield',
-      '#default_value' => variable_get('cleverreach_api_key', ''),
-      '#title' => t('API-Key'),
-    );
-    $form['cleverreach']['wsdl_url'] = array(
-      '#type' => 'textfield',
-      '#default_value' => variable_get('cleverreach_wsdl_url', 'http://api.cleverreach.com/soap/interface_v5.1.php?wsdl'),
-      '#title' => t('WSDL-URL'),
-    );
-
-    array_unshift(
-      $form['#submit'],
-      'campaignion_newsletters_cleverreach_admin_submit'
+  $keys = variable_get('cleverreach_api_keys', array());
+  $providers = array();
+  foreach ($keys as $name => $key) {
+    $providers['CleverReach-' . $name] = array(
+      'class' => '\\Drupal\\campaignion_newsletters_cleverreach\\CleverReach',
+      'params' => array('name' => $name, 'key' => $key),
     );
   }
+  return $providers;
 }
 
 /**
- * Submit callback for the admin form.
+ * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_campaignion_newsletters_admin_settings_alter().
  */
-function campaignion_newsletters_cleverreach_admin_submit($form, $form_state) {
-  variable_set('cleverreach_api_key', $form_state['values']['api_key']);
-  variable_set('cleverreach_wsdl_url', $form_state['values']['wsdl_url']);
+function campaignion_newsletters_cleverreach_form_campaignion_newsletters_admin_settings_alter(&$form, &$form_state) {
+  form_load_include($form_state, 'php', 'campaignion_newsletters_cleverreach', 'includes/admin_pages');
+  _campaignion_newsletters_cleverreach_form_campaignion_newsletters_admin_settings_alter($form, $form_state);
 }

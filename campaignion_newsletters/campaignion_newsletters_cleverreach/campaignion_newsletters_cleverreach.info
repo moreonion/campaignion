@@ -3,7 +3,10 @@ description = CleverReach Integration for Campaignion Newsletters
 package = Campaignion
 core = 7.x
 version = 7.x-1.0
-project = campaignion_newsletters_cleverreach
-dependencies[] = campaignion_newsletters
+project = campaignion
 
-files[] = campaignion_newsletters_cleverreach.module
+dependencies[] = campaignion_newsletters
+dependencies[] = elysia_cron
+dependencies[] = psr0
+
+

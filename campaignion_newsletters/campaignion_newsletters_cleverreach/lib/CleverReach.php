@@ -8,37 +8,23 @@
 
 namespace Drupal\campaignion_newsletters_cleverreach;
 
-module_load_include('php', 'campaignion_newsletters', 'NewsletterProvider.api');
+use \Drupal\campaignion\Contact;
+use \Drupal\campaignion_newsletters\NewsletterList;
 
 class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderInterface {
-
-  /**
-   * Returns the *Singleton* instance of this class.
-   */
-  public static function getInstance() {
-    static $instance = NULL;
-    if ($instance === NULL) {
-      $instance = new static();
-    }
-    return $instance;
-  }
-
+  protected $account;
+  protected $key;
+  protected $url;
+  protected $api;
   /**
    * Constructor. Gets settings and fetches intial group list.
    */
-  protected function __construct() {
-    $this->key = variable_get('cleverreach_api_key');
-    $this->url = variable_get('cleverreach_wsdl_url');
+  public function __construct(array $params) {
+    $this->account = $params['name'];
+    $this->key = $params['key'];
 
-    if (empty($this->key) || empty($this->url)) {
-      watchdog('CleverReach', 'You need to set your CleverReach API key.',
-        array(),
-        WATCHDOG_CRITICAL);
-    }
-
-    $this->api = new \SoapClient($this->url);
-
-    $this->groups = $this->listGroups();
+    $url = variable_get('cleverreach_wsdl_url');
+    $this->api = new \SoapClient($url);
   }
 
   /**
@@ -50,25 +36,19 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
    */
   public function getLists() {
     $lists = array();
-    foreach ($this->groups as $group) {
+    $groups = $this->listGroups();
+    foreach ($groups as $group) {
       $details = $this->getGroupDetails($group);
       $id = $this->toIdentifier($details->name);
-      $lists[] = array(
+      $lists[] = NewsletterList::fromData(array(
         'identifier' => $id,
         'title'      => $details->name,
-        'source'     => 'CleverReach',
+        'source'     => 'CleverReach-' . $this->account,
+        'data'       => $details,
         // @TODO: find a way to get an actual list specific language.
-        'language'   => language_default('language'),
-      );
+      ));
     }
     return $lists;
-  }
-
-  /**
-   * Returns TRUE if the current providers manages the given list.
-   */
-  public function hasList($list) {
-    return array_key_exists($list, $this->groups);
   }
 
   /**
@@ -81,10 +61,7 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
     $page = 0;
     $receivers = array();
 
-    if (empty($this->groups[$list])) {
-      return $receivers;
-    }
-    $group_id = $this->groups[$list]->id;
+    $group_id = $list->data->id;
 
     do {
       $result = $this->api->receiverGetPage($this->key, $group_id,
@@ -110,12 +87,26 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
    *
    * @return: True on success.
    */
-  public function subscribe($newsletter, $mail) {
+  public function subscribe($list, $mail) {
+    $attributes = array();
+    if ($contact = Contact::byEmail($mail)) {
+      $exporter = new CampaignionContactExporter($contact);
+      $listAttributes = array_merge($list->data->attributes, $list->data->globalAttributes);
+      foreach ($listAttributes as $attribute) {
+        if ($value = $exporter->value($attribute->key)) {
+          $attributes[] = array(
+            'key' => $attribute->key,
+            'value' => $value,
+          );
+        }
+      }
+    }
     $user = array(
       'email'  => $mail,
       'active' => TRUE,
+      'attributes' => $attributes,
     );
-    $group_id = $this->groups[$newsletter]->id;
+    $group_id = $list->data->id;
     $result = $this->api->receiverGetByEmail($this->key, $group_id, $mail, 0);
     if ($result->message === 'data not found') {
       $result = $this->api->receiverAdd($this->key, $group_id, $user);
@@ -127,15 +118,14 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
   }
 
   /**
-   * Subscribe a user, given a newsletter identifier and email address.
+   * Unsubscribe a user, given a newsletter identifier and email address.
    *
    * Should ignore the request if there is no such subscription.
    *
    * @return: True on success.
    */
-  public function unsubscribe($newsletter, $mail) {
-    $group_id = $this->groups[$newsletter]->id;
-    $result = $this->api->receiverDelete($this->key, $group_id, $mail);
+  public function unsubscribe($list, $mail) {
+    $result = $this->api->receiverDelete($this->key, $list->data->id, $mail);
     return (bool) $this->handleResult($result);
   }
 

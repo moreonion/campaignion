@@ -4,41 +4,9 @@
  * Campaignion newsletter module.
  */
 
-/**
- * Subscribe an email address to the given newsletter.
- */
-function _campaignion_newsletters_subscribe($newsletter, $email) {
-  $identifier = strtolower(drupal_clean_css_identifier($newsletter));
-  $email = check_plain($email);
-
-  $fields = array(
-    'identifier' => $identifier,
-    'email' => $email,
-  );
-  db_merge('campaignion_newsletters_subscriptions')
-    ->key($fields)
-    ->fields($fields)
-    ->execute();
-
-  module_invoke_all('campaignion_newsletters_subscribed',
-    $identifier, $email);
-}
-
-/**
- * Unsubscribe an email address from the given newsletter.
- */
-function _campaignion_newsletters_unsubscribe($newsletter, $email) {
-  $identifier = strtolower(drupal_clean_css_identifier($newsletter));
-  $email = check_plain($email);
-
-  db_delete('campaignion_newsletters_subscriptions')
-    ->condition('identifier', $identifier)
-    ->condition('email', $email)
-    ->execute();
-
-  module_invoke_all('campaignion_newsletters_unsubscribed',
-    $identifier, $email);
-}
+use \Drupal\campaignion_newsletters\ProviderFactory;
+use \Drupal\campaignion_newsletters\NewsletterList;
+use \Drupal\campaignion_newsletters\Subscriptions;
 
 /**
  * Implements hook_cron().
@@ -51,26 +19,14 @@ function campaignion_newsletters_cron() {
  * Polling function.
  */
 function _campaignion_newsletters_poll() {
-  $providers = module_invoke_all('campaignion_newsletters_provider_info');
-  foreach ($providers as $provider) {
+  $factory = ProviderFactory::getInstance();
+  foreach ($factory->providers() as $source) {
+    $provider = $factory->providerByKey($source);
     foreach ($provider->getLists() as $list) {
+      $list->save();
 
-      db_merge('campaignion_newsletters_lists')
-        ->key(array('identifier' => $list['identifier']))
-        ->fields($list)
-        ->execute();
-
-      foreach ($provider->getSubscribers($list['identifier']) as $subscriber) {
-        $fields = array(
-          'identifier' => $list['identifier'],
-          'email' => $subscriber,
-        );
-        // MySQL supports multi-value merge queries, drupal does not so far,
-        // so we could replace the following by a direct call to db_query().
-        db_merge('campaignion_newsletters_subscriptions')
-          ->key($fields)
-          ->fields($fields)
-          ->execute();
+      foreach ($provider->getSubscribers($list) as $subscriber) {
+        $list->subscribe($subscriber, TRUE);
       }
     }
   }
@@ -92,111 +48,25 @@ function campaignion_newsletters_permission() {
  */
 function campaignion_newsletters_menu() {
   $items['admin/config/services/campaignion_newsletters'] = array(
+    'title' => t('Newsletter settings'),
+    'description' => t('Configure newsletter API behavior'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('campaignion_newsletters_admin_settings'),
     'access arguments' => array('administer newsletters'),
+    'file' => 'includes/pages.php',
+    'type' => MENU_NORMAL_ITEM,
   );
   return $items;
 }
 
-/**
- * Administration form.
- */
-function campaignion_newsletters_admin_settings() {
-  $form = array();
-
-  $form['poll'] = array(
-    '#type' => 'button',
-    '#value' => t('Update Lists and Subscribers from all external sources now!'),
-    '#description' => t('Updates run automatically around every hour in the background'),
-    '#weight' => 20,
-    '#executes_submit_callback' => TRUE,
-    '#submit' => array('campaignion_newsletters_admin_poll'),
-  );
-
-  // Leave actual implementation to submodules for now.
-  return system_settings_form($form);
-}
 
 /**
- * Submit callback for the polling button in the admin interface.
+ * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_redhen_contact_contact_form_alter().
  */
-function campaignion_newsletters_admin_poll() {
-  drupal_set_message(t('Updating newsletter data...'));
-  _campaignion_newsletters_poll();
-}
-
-/**
- * Implements hook_form_alter().
- */
-function campaignion_newsletters_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id === 'redhen_contact_contact_form') {
-    $mails = array();
-    foreach ($form_state['redhen_contact']->allEmail() as $entry) {
-      array_push($mails, $entry['value']);
-    }
-
-    $newsletters = db_select('campaignion_newsletters_lists', 'l')
-      ->fields('l', array('title'))
-      ->execute()
-      ->fetchCol('title');
-
-    $subscriptions = db_select('campaignion_newsletters_subscriptions', 's')
-      ->fields('s', array('identifier'))
-      ->condition('email', $mails, 'IN')
-      ->execute()
-      ->fetchCol('identifier');
-
-    $fieldset = array(
-      '#type' => 'fieldset',
-      '#title' => t('Subscriptions'),
-      '#collapsible' => FALSE,
-      '#weight' => 10,
-    );
-
-    foreach ($mails as $mail) {
-      $id = drupal_clean_css_identifier($mail);
-      $fieldset[$id] = array(
-        '#type' => 'checkboxes',
-        '#title' => $mail,
-        '#options' => drupal_map_assoc($newsletters),
-        '#default_value' => $subscriptions,
-      );
-    }
-
-    $form['newsletters_subscriptions'] = $fieldset;
-
-    array_unshift($form['actions']['submit']['#submit'],
-                  'campaignion_newsletters_redhen_contact_submit');
-  }
-}
-
-/**
- * Submit handler for redhen_contact_contact_form.
- *
- * Update subscriptions in the database.
- */
-function campaignion_newsletters_redhen_contact_submit($form, &$form_state) {
-  foreach ($form_state['redhen_contact']->allEmail() as $mail) {
-    $id = drupal_clean_css_identifier($mail['value']);
-    if (!empty($form_state['input'][$id])) {
-      $newsletters = $form_state['input'][$id];
-      foreach ($newsletters as $key => $newsletter) {
-        if ($newsletter) {
-          _campaignion_newsletters_subscribe(
-            $mail['value'],
-            $newsletter
-          );
-        }
-        else {
-          _campaignion_newsletters_unsubscribe(
-            $mail['value'],
-            $newsletter
-          );
-        }
-      }
-    }
-  }
+function campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form, &$form_state) {
+  form_load_include($form_state, 'php', 'campaignion_newsletters', 'includes/pages');
+  _campaignion_newsletters_form_redhen_contact_contact_form_alter($form, $form_state);
 }
 
 /**
@@ -241,9 +111,9 @@ function campaignion_newsletters_email_confirmed($node, $submission) {
   foreach ($s->webform->componentsByType('newsletter') as $component) {
     $value = $s->valuesByCid($component['cid']);
     if (!empty($value['subscribed'])) {
-      foreach ($component['extra']['lists'] as $newsletter => $value) {
+      foreach ($component['extra']['lists'] as $list_id => $value) {
         if (!empty($value)) {
-          _campaignion_newsletters_subscribe($newsletter, $email);
+          NewsletterList::load($list_id)->subscribe($email);
         }
       }
     }
@@ -290,4 +160,58 @@ function campaignion_newsletters_form_builder_types() {
  */
 function campaignion_newsletters_form_builder_types_alter(&$fields) {
   unset($fields['webform']['email_newsletter']);
+}
+
+/**
+ * Implements hook_entity_insert().
+ *
+ * Save all subscriptions for the redhen_contact.
+ */
+function campaignion_newsletters_entity_insert($entity, $entity_type) {
+  campaignion_newsletters_entity_update($entity, $entity_type);
+}
+
+/**
+ * Implements hook_entity_update().
+ *
+ * Save all subscriptions for the redhen_contact.
+ */
+function campaignion_newsletters_entity_update($entity, $entity_type) {
+  if ($entity_type != 'redhen_contact') {
+    return;
+  }
+  if (empty($entity->newsletters)) {
+    $entity->newsletters = Subscriptions::byContact($entity);
+  }
+  $entity->newsletters->save();
+}
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * Unsubscribe from all newsletters.
+ */
+function campaignion_newsletters_entity_delete($entity, $entity_type) {
+  if ($entity_type != 'redhen_contact') {
+    return;
+  }
+  if (empty($entity->newsletters)) {
+    $entity->newsletters = Subscriptions::byContact($entity);
+  }
+  $entity->newsletters->unsubscribeAll();
+  $entity->newsletters->save();
+}
+
+/**
+ * Implements hook_cronapi().
+ */
+function campaignion_newsletters_cronapi($op, $job = NULL) {
+  $items['campaignion_newsletters_send_queue'] = array(
+    'description' => 'Send queue data to newsletter providers',
+    'rule' => '*/2 * * * *',
+    'weight' => 100,
+    'file' => 'includes/cron.php',
+    'callback' => 'campaignion_newsletters_send_queue',
+  );
+  return $items;
 }
