@@ -115,7 +115,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
  * Implements _webform_display_component().
  */
 function _webform_display_newsletter($component, $value, $format = 'html') {
-  if (!empty($component['value']['subscribed'])) {
+  if (!empty($value['subscribed'])) {
     return array('#markup' => t('subscribed'));
   }
   else {
