@@ -19,7 +19,8 @@ function campaignion_node_ux_form_node_form_alter(&$form, &$form_state) {
   unset($form['additional_settings']);
 
   foreach ($form as $key => &$element) {
-    if ($key[0] != '#' && $element['#type'] == 'fieldset' && isset($element['#group']) && $element['#group'] == 'additional_settings') {
+    $isFieldSet = $key[0] != '#' && isset($element['#type']) && $element['#type'] == 'fieldset'; 
+    if ($isFieldSet && isset($element['#group']) && $element['#group'] == 'additional_settings') {
       $element['#group'] = 'settings_advanced][' . $element['#group'];
     }
   }

@@ -13,6 +13,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
         $class = '\\' . __NAMESPACE__ . '\\' . $class;
       }
     }
+    $this->user = $user ? $user : $GLOBALS['user'];
     if ($node == NULL) {
       $this->node             = $this->prepareNode($type);
       $this->formInfo['path'] = 'wizard/' . $this->node->type;

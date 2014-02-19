@@ -47,7 +47,7 @@ class WebformStep extends WizardStep {
   public function stepForm($form, &$form_state) {
     $form = parent::stepForm($form, $form_state);
     $form = \form_builder_webform_save_form($form, $form_state, $this->wizard->node->nid);
-    webform_custom_buttons_form_form_builder_webform_save_form_alter($form, $form_state, NULL);
+    $form_state['build_info']['base_form_id'] = 'form_builder_webform_save_form';
     return $form;
   }
 
