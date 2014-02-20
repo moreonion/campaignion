@@ -18,8 +18,8 @@ function campaignion_activity_views_api() {
 
 if (module_exists('webform')) {
   require_once dirname(__FILE__) . '/modules/webform.php';
-  if (module_exists('webform_component_paymethod_select')) {
-    require_once dirname(__FILE__) . '/modules/webform_component_paymethod_select.php';
+  if (module_exists('webform_paymethod_select')) {
+    require_once dirname(__FILE__) . '/modules/webform_paymethod_select.php';
   }
 }
 
