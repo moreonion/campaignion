@@ -13,15 +13,11 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
         $class = '\\' . __NAMESPACE__ . '\\' . $class;
       }
     }
+
     $this->user = $user ? $user : $GLOBALS['user'];
-    if ($node == NULL) {
-      $this->node             = $this->prepareNode($type);
-      $this->formInfo['path'] = 'wizard/' . $this->node->type;
-    } else {
-      $this->node             = $node;
-      $this->formInfo['path'] = 'node/' . $this->node->nid . '/wizard/%step';
-    }
+    $this->node = $node ? $node : $this->prepareNode($type);
     parent::__construct($user);
+    $this->formInfo['path'] = $node ? "node/{$node->nid}/wizard/%step" : "wizard/{$node->type}";
 
     drupal_set_title(t('Create ' . node_type_get_name($this->node)));
     if (isset($this->node->nid) && $this->node->status) {
