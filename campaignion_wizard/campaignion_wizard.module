@@ -156,9 +156,7 @@ function campaignion_wizard_menu_local_tasks_alter(&$data, &$router_item, $root_
       }
     }
 
-    if (!TypeBase::isAction($router_item['page_arguments'][1]->type)) {
-      unset($tabs[$wizard]);
-    } else {
+    if (($node = menu_get_object()) && TypeBase::isAction($node->type)) {
       if ($edit) unset($tabs[$edit]);
       $tabs[$wizard]['#link']['title'] = 'Edit content';
       if ($webform) {
@@ -169,6 +167,9 @@ function campaignion_wizard_menu_local_tasks_alter(&$data, &$router_item, $root_
           'href' => $tabs[$webform]['#link']['href'] . '/form'
         ) + $tabs[$webform]['#link'];
       }
+    }
+    else {
+      unset($tabs[$wizard]);
     }
   }
 }
