@@ -17,7 +17,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
     $this->user = $user ? $user : $GLOBALS['user'];
     $this->node = $node ? $node : $this->prepareNode($type);
     parent::__construct($user);
-    $this->formInfo['path'] = $node ? "node/{$node->nid}/wizard/%step" : "wizard/{$node->type}";
+    $this->formInfo['path'] = $node ? "node/{$node->nid}/wizard/%step" : "wizard/{$this->node->type}";
 
     drupal_set_title(t('Create ' . node_type_get_name($this->node)));
     if (isset($this->node->nid) && $this->node->status) {
