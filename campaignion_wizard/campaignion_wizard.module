@@ -156,7 +156,7 @@ function campaignion_wizard_menu_local_tasks_alter(&$data, &$router_item, $root_
       }
     }
 
-    if (!TypeBase::isAction($router_item['page_arguments'][0]->type)) {
+    if (!TypeBase::isAction($router_item['page_arguments'][1]->type)) {
       unset($tabs[$wizard]);
     } else {
       if ($edit) unset($tabs[$edit]);
