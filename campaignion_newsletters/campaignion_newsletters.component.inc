@@ -212,10 +212,7 @@ function _webform_form_builder_map_newsletter() {
  * Implements _webform_table_component().
  */
 function _webform_table_newsletter($component, $value) {
-  $v = t('not subscribed');
-  if (!empty($value[0]) && $value[0]) {
-    $v = t('subscribed');
-  }
+  $v = empty($value['subscribed']) ? t('not subscribed') : t('subscribed');
   return $v;
 }
 
