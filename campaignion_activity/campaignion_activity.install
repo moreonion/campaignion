@@ -143,3 +143,44 @@ function campaignion_activity_schema() {
   return $schema;
 }
 
+/**
+ * Delete all variables that were used.
+ */
+function campaignion_activity_uninstall() {
+  variable_del('campaignion_activity_log_contact_save');
+}
+
+/**
+ * Replace redhen_activity and deactivate redhen_engagement.
+ */
+function campaignion_activity_update_1() {
+  class NoCacheEntityController extends EntityAPIController {
+    protected $cache = FALSE;
+  }
+
+  $sql = <<<SQL
+INSERT INTO {campaignion_activity} (contact_id, type, created)
+SELECT message_redhen_contact_target_id AS contact_id, :type AS type, m.timestamp AS created
+FROM {message} m
+  INNER JOIN {field_data_message_redhen_contact} f ON f.entity_id=m.mid
+WHERE type='redhen_contact' AND arguments LIKE :op
+SQL;
+  db_query($sql, array(':type' => 'redhen_contact_create', ':op' => '%"!op";s:7:"created";%'));
+  db_query($sql, array(':type' => 'redhen_contact_edite', ':op' => '%"!op";s:7:"updated";%'));
+
+  // Delete all messages of type redhen_contact in batches of 100.
+  $controller = new NoCacheEntityController('message');
+  $sql = "SELECT mid FROM {message} WHERE type='redhen_contact' LIMIT 100";
+  $mids = db_query($sql)->fetchCol();
+  while (count($mids)) {
+    $controller->delete($mids);
+    $mids = db_query($sql)->fetchCol();
+    drupal_static_reset();
+  }
+  
+  module_disable(array('ae_engagement_scores', 'redhen_activity', 'redhen_engagement', 'message'));
+  drupal_uninstall_modules(array('ae_engagement_scores', 'redhen_activity', 'redhen_engagement', 'message'));
+
+  field_delete_field('message_redhen_contact');
+  field_delete_field('message_redhen_org');
+}

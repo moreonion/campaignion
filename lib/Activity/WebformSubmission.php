@@ -29,7 +29,7 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
   }
 
   public static function fromSubmission($node, $submission, $data = array()) {
-    $contact_id = \Drupal\campaignion\Contact::idFromSubmission($node, $submission, 'contact');
+    $contact_id = \Drupal\campaignion\Contact::idFromSubmission($node, $submission);
 
     $data = array(
       'contact_id' => $contact_id,
@@ -52,5 +52,14 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
       ->fields($this->values(array('nid', 'sid', 'confirmed')))
       ->condition('activity_id', $this->activity_id)
       ->execute();
+  }
+
+  // @TODO: Use full objects instead of nid/sid by default instead of always loading them.
+  public function node() {
+    return node_load($this->nid);
+  }
+
+  public function submission() {
+    return \Drupal\little_helpers\Webform\Submission::load($this->nid, $this->sid);
   }
 }

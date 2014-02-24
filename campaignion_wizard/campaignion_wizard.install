@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Migrate wizard.module -> oowizard.module.
+ */
+function campaignion_wizard_update_1() {
+  module_disable(array('wizard'), FALSE);
+  drupal_uninstall_modules(array('wizard'), FALSE);
+  module_enable(array('oowizard'));
+}
+
+function campaignion_wizard_uninstall() {
+  variable_del(array(
+    'campaignion_wizard_text_format_plain',
+    'campaignion_wizard_text_format_html',
+  ));
+}

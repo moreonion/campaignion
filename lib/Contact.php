@@ -3,13 +3,14 @@
 namespace Drupal\campaignion;
 
 class Contact extends \RedhenContact {
-  public $type = 'contact';
-
   public function __construct($values = array()) {
     $objValues = array();
     if (is_object($values)) {
       $objValues = $values;
       $values = array();
+    }
+    if (!isset($values['type'])) {
+      $values['type'] = variable_get('campaignion_contact_type_supporter', 'contact');
     }
     parent::__construct($values);
     foreach ($objValues as $key => $value) {
@@ -17,8 +18,13 @@ class Contact extends \RedhenContact {
     }
   }
 
+  public static function load($id) {
+    $contact = \redhen_contact_load($id);
+    return new static($contact);
+  }
+
   public static function idFromSubmission($node, $submission) {
-    $s = new \Drupal\little_helpers\WebformSubmission($node, $submission);
+    $s = new \Drupal\little_helpers\Webform\Submission($node, $submission);
     if ($email = $s->valueByKey('email')) {
       $first_name = $s->valueByKey('first_name');
       $last_name  = $s->valueByKey('last_name');

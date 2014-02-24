@@ -1,0 +1,346 @@
+<?php
+
+define ('CAMPAIGNION_RECENT_SUPPORTERS_NODE_URL_PART', 'recent-supporters');
+
+/**
+ * Implements hook_block_info().
+ */
+function campaignion_recent_supporters_block_info() {
+  $info = array(
+    'recent_supporters' => array(
+      'info' => t('Recent supporters'),
+      'region' => 'sidebar_second',
+    ),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function campaignion_recent_supporters_block_view($delta = '') {
+  $block = NULL;
+
+  if (($node = menu_get_object()) == FALSE || isset($node->nid) == FALSE) {
+    return NULL;
+  }
+
+  /* thank_you_page integration */
+  if (   $node->type == "thank_you_page"
+      && isset( $_GET['share']) == TRUE
+      && preg_match('@node/(\d+)@', $_GET['share'], $get_nid) == 1) {
+    $nid = $get_nid[1];
+    $node = node_load($nid);
+  }
+  if ($node === FALSE) {
+    return NULL;
+  }
+
+  $fields = campaignion_recent_supporters_field_instances('node', $node, 'recent_supporters');
+  // we use the first field only
+  $field = array_shift($fields);
+  $show = isset($field['toggle']) ? $field['toggle'] : 0;
+  if ($show) {
+    // save values for polling
+    global $base_url;
+    $polling_url = $base_url . '/node/' . $node->nid . '/' . CAMPAIGNION_RECENT_SUPPORTERS_NODE_URL_PART;
+    $cycle = isset($field['options']['cycle_toggle']) ? $field['options']['cycle_toggle'] : 0;
+    $visible_count = isset($field['options']['visible_count']) ? $field['options']['visible_count'] : 6;
+    $country = isset($field['options']['country_toggle']) ? $field['options']['country_toggle'] : 0;
+
+    $block['subject'] = t('Recent supporters');
+    $supporters = _campaignion_recent_supporters_recent_supporters($node);
+    $block['content'] = theme('recent_supporters', array(
+      'supporters' => $supporters,
+      'show_country' => ($country == '1') ? TRUE : FALSE,
+    ));
+    drupal_add_js(array('recentSupporters' => array(
+      'cycleSupporters' => $cycle,
+      'showCountry' => $country,
+      'visibleCount' => $visible_count,
+      'pollingURL' => $polling_url,
+      'nodeID' => $node->nid
+    )), 'setting');
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function campaignion_recent_supporters_theme() {
+  $theme['recent_supporters'] = array(
+    'variables' => array('supporters' => array(), 'show_country' => FALSE),
+  );
+  return $theme;
+}
+
+/**
+ * theme function for theme('recent_supporters', $variables).
+ */
+function theme_recent_supporters($variables) {
+  $supporters = $variables['supporters'];
+  $show_country = $variables['show_country'];
+  $output = '';
+
+  if (count($supporters) < 1) {
+    $output = '<div class="no-activity-yet">'.t('No activity yet.').'</div>';
+    return $output;
+  }
+  else {
+    $output .= "<ul class=\"recent-supporters\">\n";
+    foreach($supporters as $supporter) {
+      $output .= "<li class=\"supporter\">\n";
+      if ($show_country && isset($supporter['country'])) {
+        $classes = empty($supporter['country']) ? 'no-cc' : "flag-".strtolower(drupal_clean_css_identifier($supporter['country']));
+        $country_name = (isset($supporter['country_name']) && !empty($supporter['country_name'])) ? $supporter['country_name'] : '';
+        $output .= "<span title=\"".t($country_name)
+          ."\" class=\"country flag " . $classes ."\">";
+        $output .= $supporter['country'];
+        $output .= "</span>\n";
+      }
+      $output .= "<span class=\"name\">";
+      $output .= implode(" ", array($supporter['first_name'], $supporter['last_name']));
+      $output .= "</span>\n";
+      $output .= "<span class=\"time\" data-timestamp=\"".$supporter['timestamp']."\" title=\"".$supporter['rfc8601']."\">";
+      $output .= date('d.m.Y H:i', $supporter['timestamp']);
+      $output .= "</span>\n";
+      $output .= "</li>\n";
+    }
+    $output .= "</ul>\n";
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function campaignion_recent_supporters_menu() {
+  $items = array();
+  $items['node/%node/' . CAMPAIGNION_RECENT_SUPPORTERS_NODE_URL_PART] = array(
+    'title' => 'Recent supporters polling end point',
+    'page callback' => 'campaignion_recent_supporters_json',
+    'page arguments' => array(1),
+    'access callback' => 'node_access',
+    'access arguments' => array('view', 1),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * callback function for campaignion_recent_supporters_menu()
+ */
+function campaignion_recent_supporters_json($node) {
+  $supporters = _campaignion_recent_supporters_recent_supporters($node);
+  drupal_add_http_header("Access-Control-Allow-Origin", "*");
+  drupal_add_http_header("Access-Control-Allow-Headers", "Content-Type");
+  drupal_json_output(array($node->nid => $supporters));
+}
+
+/**
+ * callback funtion
+ */
+function _campaignion_recent_supporters_strip_callback($value) {
+  return mb_substr($value, 0, 1);
+};
+/**
+ * helper function: query the activities for a specific nid
+ */
+function _campaignion_recent_supporters_recent_supporters($node, $limit = 10) {
+  // get "parent" node, i.e. the parent of any translations
+  // used in query below
+  $nid = !empty($node->tnid) ? $node->tnid : $node->nid;
+  $result = db_query_range("SELECT rc.first_name,rc.last_name,ca.created as timestamp,wt.country,fdfa.field_address_country,n.tnid FROM campaignion_activity ca
+                                   INNER JOIN redhen_contact rc USING (contact_id)
+                                   INNER JOIN campaignion_activity_webform caw USING (activity_id)
+                                   INNER JOIN webform_tracking wt USING (nid,sid)
+                                   INNER JOIN node n USING (nid)
+                                   LEFT OUTER JOIN field_data_field_address fdfa ON fdfa.entity_id=rc.contact_id
+                                   WHERE ca.type='webform_submission'
+                                   AND (caw.nid=:nid OR n.tnid=:nid)
+                                   ORDER BY ca.created DESC",
+                                   0, $limit - 1, array(':nid' => $nid));
+  $all = $result->fetchAll();
+  $supporters = array();
+  $countries = country_get_list();
+  foreach ($all as $item) {
+    $supporter = array();
+    $supporter['first_name'] = $item->first_name;
+    $supporter['last_name']  = $item->last_name;
+    // TODO no variable, use drupal field recent_supporters instead
+    $show_full_name = variable_get('recent_supporters_show_full_name', '1');
+    if ($show_full_name == '1') {
+      $strip_lastname = FALSE;
+    } else {
+      $strip_lastname = TRUE;
+    }
+    // convert every component of last_name to it's first letter
+    // also last names with van, von, de, ... and those consisting
+    // of two words
+    // TODO with hyphens Last-Name
+    if ($strip_lastname && !empty($supporter['last_name'])) {
+      $ln_array = preg_split("/ +/", $supporter['last_name']);
+      $supporter['last_name'] = implode(' ', array_map('_campaignion_recent_supporters_strip_callback', $ln_array));
+    }
+    $supporter['timestamp']  = $item->timestamp;
+    $supporter['rfc8601']  = date('c', $item->timestamp);
+    $supporter['country']  = empty($item->field_address_country) ? $item->country : $item->field_address_country;
+    $supporter['country_name']  = empty($supporter['country']) ? '' : $countries[$supporter['country']];
+    $supporters[] = $supporter;
+  }
+
+  return $supporters;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function campaignion_recent_supporters_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $item = isset($items[$delta]) ? $items[$delta] : array();
+  if (isset($instance['default_value'][$delta]) && !isset($items[$delta])) {
+    $item = $instance['default_value'][$delta];
+  }
+
+  $defaults = array(
+    'toggle' => 0,
+    'options' => array(
+      'visible_count' => 6,
+      'cycle_toggle' => 0,
+      'country_toggle' => 1,
+    ),
+  );
+
+  $item = drupal_array_merge_deep($defaults, $item);
+
+
+  $element['toggle'] = array(
+    '#title' => t('Display a recent supporters block.'),
+    '#description' => t('Display a recent supporters block.'),
+    '#type' => 'checkbox',
+    '#default_value' => $item['toggle'],
+  );
+  $element['options'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Recent supporters adavanced settings.'),
+    '#states' => array(
+      'visible' => array(
+        '#edit-'.strtr($field['field_name'], '_', '-').'-'.$langcode.'-'.$delta.'-toggle' => array('checked' => TRUE),
+      ),
+    ),
+  );
+  $element['options']['visible_count'] = array(
+    '#title' => t('Number of max. visible supporters.'),
+    '#description' => t('Number of max. visible supporters.'),
+    '#type' => 'textfield',
+    '#size' => 12,
+    '#maxlength' => 10,
+    '#attributes' => array(),
+    '#default_value' => $item['options']['visible_count'],
+  );
+  $element['options']['cycle_toggle'] = array(
+    '#title' => t('Cycle supporters.'),
+    '#description' => t('Cycle supporters.'),
+    '#type' => 'checkbox',
+    '#default_value' => $item['options']['cycle_toggle'],
+  );
+  $element['options']['country_toggle'] = array(
+    '#title' => t('Show country of supporters.'),
+    '#description' => t('Show country of supporters.'),
+    '#type' => 'checkbox',
+    '#default_value' => $item['options']['country_toggle'],
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_info().
+ */
+function campaignion_recent_supporters_field_info() {
+  $info['recent_supporters'] = array(
+    'label' => t('Recent supporters'),
+    'description' => t('Allows you to display a recent supporters block.'),
+    'settings' => array('style' => NULL),
+    'default_widget' => 'recent_supporters',
+    'default_formatter' => 'recent_supporters',
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function campaignion_recent_supporters_field_widget_info() {
+  $info['recent_supporters'] = array(
+    'label' => t('Recent supporters'),
+    'field types' => array('recent_supporters'),
+    'settings' => array('size' => 60),
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+      'default values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function campaignion_recent_supporters_field_formatter_info() {
+  $info['recent_supporters'] = array(
+    'label' => 'Recent supporters',
+    'field types' => array('recent_supporters'),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_field_presave().
+ */
+function campaignion_recent_supporters_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if ($field['type'] == 'recent_supporters') {
+    foreach ($items as &$item) {
+      $item['options'] = serialize($item['options']);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_load().
+ */
+function campaignion_recent_supporters_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  if ($field['type'] == 'recent_supporters') {
+    foreach ($entities as $id => $entity) {
+      foreach ($items[$id] as &$item) {
+        $item['options'] = unserialize($item['options']);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function campaignion_recent_supporters_field_is_empty($item, $field) {
+  return FALSE;
+}
+
+/**
+ * utility function: returns all field items by field type in array
+ * (indexed by field name)
+ */
+function campaignion_recent_supporters_field_instances($entity_type, $node, $field_type) {
+  $instances = field_info_instances($entity_type, $node->type);
+  $recent_supporter_fields = array();
+  foreach ($instances as $instance) {
+    $field_info = field_info_field($instance['field_name']);
+    if ($field_info['type'] == $field_type) {
+      $item = field_get_items($entity_type, $node, $instance['field_name']);
+      if ($item) {
+        $recent_supporter_fields[$instance['field_name']] = $item[0];
+      }
+    }
+  }
+  return $recent_supporter_fields;
+}

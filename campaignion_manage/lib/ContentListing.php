@@ -103,8 +103,8 @@ class ContentListing {
     $edit_path_part = 'edit';
 
     // set path to wizard for action content types
-    if (module_exists('ae_wizard')) {
-      if (\Drupal\campaignion\ActionType::isAction($node->type)) {
+    if (module_exists('campaignion_wizard')) {
+      if (\Drupal\campaignion\Action\TypeBase::isAction($node->type)) {
         $edit_path_part = 'wizard';
       }
     }

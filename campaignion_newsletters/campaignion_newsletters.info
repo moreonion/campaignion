@@ -1,0 +1,13 @@
+name = Campaignion Newsletters
+description = Allow to manage newsletters from external sources (CleverReach, etc.) and their subscriptions
+package = Campaignion
+core = 7.x
+version = 7.x-1.0
+project = campaignion
+
+dependencies[] = elysia_cron
+dependencies[] = little_helpers
+dependencies[] = psr0
+dependencies[] = redhen_contact
+dependencies[] = webform
+dependencies[] = webform_confirm_email

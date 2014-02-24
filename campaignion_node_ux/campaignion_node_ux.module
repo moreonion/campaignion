@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_node_form_alter().
+ *
+ * Hide some settings behind a "advanced settings" checkbox.
+ */
+function campaignion_node_ux_form_node_form_alter(&$form, &$form_state) {
+  // toggle visibility of advanced settings
+  $form['settings_advanced'] = array(
+    '#type' => 'container',
+    '#weight' => 2000,
+    '#tree' => TRUE,
+  );
+
+  $form['additional_settings']['#weight'] = 1000;
+  $form['settings_advanced']['additional_settings'] = $form['additional_settings'];
+  unset($form['additional_settings']);
+
+  foreach ($form as $key => &$element) {
+    $isFieldSet = $key[0] != '#' && isset($element['#type']) && $element['#type'] == 'fieldset'; 
+    if ($isFieldSet && isset($element['#group']) && $element['#group'] == 'additional_settings') {
+      $element['#group'] = 'settings_advanced][' . $element['#group'];
+    }
+  }
+
+  // toggle display state for wizard_advanced vertical tabs
+  $id = drupal_html_id('toggle-advanced-settings');
+  $form['toggle_settings_advanced'] = array(
+    '#type' => 'checkbox',
+    '#weight' => 1001,
+    '#attributes' => array('id' => $id),
+    '#title' => t('Show advanced settings'),
+  );
+  $form['settings_advanced']['#states'] = array(
+    'invisible' => array("#$id" => array('checked' => FALSE)),
+  );
+}

@@ -31,6 +31,8 @@ class Activity implements Interfaces\Activity {
     } else {
       $this->insert();
     }
+    // Let other modules react on saving an new activity.
+    module_invoke_all('campaignion_activity_save', $this);
   }
 
   public function delete() {
@@ -57,5 +59,9 @@ class Activity implements Interfaces\Activity {
     $this->activity_id = db_insert('campaignion_activity')
       ->fields($this->values(array('contact_id', 'type', 'created')))
       ->execute();
+  }
+
+  public function contact() {
+    return \Drupal\campaignion\Contact::load($this->contact_id);
   }
 }

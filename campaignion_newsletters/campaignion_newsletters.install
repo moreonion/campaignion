@@ -1,0 +1,314 @@
+<?php
+/**
+ * @file
+ * Campaignion newsletter install file.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function campaignion_newsletters_schema() {
+  return array(
+    'campaignion_newsletters_lists' => array(
+      'description' => 'Table for newsletter lists',
+      'fields' => array(
+        'list_id' => array(
+          'description' => 'Primary identifier for newsletter lists.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'identifier' => array(
+          'description' => 'The identifier of this newsletter.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'title' => array(
+          'description' => 'The title of this newsletter.',
+          'type' => 'varchar',
+          'length' => 512,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'language' => array(
+          'description' => 'The {languages}.language of this newsletter.',
+          'type' => 'varchar',
+          'length' => 12,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'source' => array(
+          'description' => 'The source of this newsletter.',
+          'type' => 'varchar',
+          'length' => 64,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'data' => array(
+          'description' => 'Store for extra data given by the newsletter provider.',
+          'type' => 'blob',
+          'size' => 'big',
+        ),
+      ),
+      'primary key' => array('list_id'),
+    ),
+    'campaignion_newsletters_subscriptions' => array(
+      'description' => 'Table for joining users to newsletter lists',
+      'fields' => array(
+        'subscription_id' => array(
+          'description' => 'The primary identifier for a subscription.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'email' => array(
+          'description' => 'The email address of the subscribed user.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'list_id' => array(
+          'description' => 'Reference to newsletter lists.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'fingerprint' => array(
+          'description' => 'A unique hash of this subscription to check if it has changed',
+          'type' => 'char',
+          'length' => 40,
+          'not null' => TRUE,
+          // some impossible hash so that newly added values always need update.
+          'default' => '123456789x123456789x123456789x123456789x',
+        ),
+      ),
+      'primary key' => array('subscription_id'),
+      'indexes' => array(
+        'campaignion_newsletters_subscriptions_list' => array('list_id'),
+        'campaignion_newsletters_subscriptions_email' => array('email'),
+      ),
+    ),
+    'campaignion_newsletters_queue' => array(
+      'description' => 'Send queue for newsletter subscriptions.',
+      'fields' => array(
+        'list_id' => array(
+          'description' => 'Reference to newsletter lists.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'email' => array(
+          'description' => 'The email address of the subscribed user.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+        ),
+        'created' => array(
+          'description' => 'The Unix timestamp when the node was created.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'locked' => array(
+          'description' => 'This queue item is locked until this time.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'action' => array(
+          'description' => 'Subscribe / unsubscribe flag.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'data' => array(
+          'description' => 'Random data used by the newsletter provider.',
+          'type' => 'blob',
+          'size' => 'big',
+        ),
+      ),
+      'primary key' => array('list_id', 'email'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_install().
+ */
+function campaignion_newsletters_install() {
+  // We need to run after redhen_contact.
+  $weight = db_select('system', 's')
+    ->fields('s', array('weight'))
+    ->condition('name', 'redhen_contact', '=')
+    ->execute()
+    ->fetchField();
+
+  db_update('system')
+    ->fields(array('weight' => $weight + 1))
+    ->condition('name', 'campaignion_newsletters', '=')
+    ->execute();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function campaignion_newsletters_uninstall() {
+  variable_del('campaignion_newsletters_cleverreach_batch_size');
+}
+
+/**
+ * Add fingerprint column to subscriptions.
+ */
+function campaignion_newsletters_update_6() {
+  db_add_field('campaignion_newsletters_subscriptions', 'fingerprint', array(
+    'description' => 'A unique hash of this subscription to check if it has changed',
+    'type' => 'char',
+    'length' => 40,
+    // some impossible hash so that newly added values always need update.
+    'default' => '123456789x123456789x123456789x123456789x',
+  ));
+}
+
+/**
+ * Migrate old webform components.
+ */
+function campaignion_newsletters_update_5() {
+  $result = db_query("SELECT c.*, l.list_id FROM {webform_component} c LEFT OUTER JOIN {campaignion_newsletters_lists} l ON c.value=l.identifier WHERE c.type='newsletter'");
+
+  foreach ($result as $component) {
+    $component->extra = unserialize($component->extra);
+    if ($component->list_id) {
+      $component->extra['lists'][$component->list_id] = $component->list_id;
+    }
+    else {
+      $component->extra['lists'] = array();
+    }
+    $component->extra['title_display'] = 'none';
+    $component->value = serialize(array('subscribed' => 'subscribed'));
+
+    unset($component->list_id);
+    $component->extra = serialize($component->extra);
+    db_update('webform_component')
+      ->condition('nid', $component->nid)
+      ->condition('cid', $component->cid)
+      ->fields($component)
+      ->execute();
+  }
+}
+
+/**
+ * Submit additional data for all existing contacts.
+ */
+function campaignion_newsletters_update_4() {
+  foreach (db_query('SELECT contact_id FROM {redhen_contact}')->fetchCol() as $contact_id) {
+    $contact = \Drupal\campaignion\Contact::load($contact_id);
+    campaignion_newsletters_entity_update($contact, 'redhen_contact');
+  }
+}
+
+/**
+ * Enable sending in cron.
+ */
+function campaignion_newsletters_update_3() {
+  module_enable(array('elysia_cron'));
+  db_create_table('campaignion_newsletters_queue', array(
+    'description' => 'Send queue for newsletter subscriptions.',
+    'fields' => array(
+      'list_id' => array(
+        'description' => 'Reference to newsletter lists.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'email' => array(
+        'description' => 'The email address of the subscribed user.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the node was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'locked' => array(
+        'description' => 'This queue item is locked until this time.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'action' => array(
+        'description' => 'Subscribe / unsubscribe flag.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'data' => array(
+        'description' => 'Random data used by the newsletter provider.',
+        'type' => 'blob',
+        'size' => 'big',
+      ),
+    ),
+    'primary key' => array('list_id', 'email'),
+  ));
+}
+
+/**
+ * Add data column to newsletter lists.
+ */
+function campaignion_newsletters_update_2() {
+  db_add_field('campaignion_newsletters_lists', 'data', array(
+    'description' => 'Store for extra data given by the newsletter provider.',
+    'type' => 'blob',
+    'size' => 'big',
+  ));
+  _campaignion_newsletters_poll();
+}
+
+/**
+ * Restructure tables for multi-source compatibility.
+ */
+function campaignion_newsletters_update_1() {
+  $pfx = 'campaignion_newsletters_';
+  $lists = "${pfx}lists";
+  db_change_field($lists, 'source', 'source', array(
+    'description' => 'The source of this newsletter.',
+    'type' => 'varchar',
+    'length' => 64,
+    'not null' => TRUE,
+    'default' => '',
+  ));
+  db_drop_primary_key($lists);
+  db_add_field($lists, 'list_id', array(
+    'description' => 'Primary identifier for newsletter lists.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  db_query("UPDATE {$lists} o INNER JOIN (SELECT identifier, @n := @n + 1 AS list_id FROM {$lists}, (select @n:=0) x) n USING (identifier) SET o.list_id=n.list_id");
+  db_add_primary_key($lists, array('list_id'));
+  db_change_field($lists, 'list_id', 'list_id', array(
+    'description' => 'Primary identifier for newsletter lists.',
+    'type' => 'serial',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+  ));
+
+  $sub = "${pfx}subscriptions";
+  db_add_field($sub, 'list_id', array(
+    'description' => 'Reference to newsletter lists.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  db_query("UPDATE {$sub} s INNER JOIN {$lists} l USING(identifier) SET s.list_id=l.list_id");
+  db_drop_field($sub, 'identifier');
+  db_add_index($sub, $sub . '_list', array('list_id'));
+  db_add_index($sub, $sub . '_email', array('email'));
+}

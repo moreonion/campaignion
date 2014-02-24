@@ -60,7 +60,8 @@ class Address extends Field {
     foreach($stored_multiple_addresses as &$stored_address) {
       $found = TRUE;
       foreach ($new_address as $key => $value) {
-        if (isset($stored_address[$key]) && $stored_address[$key] != $value) {
+        if (!isset($stored_address[$key]) ||
+            $stored_address[$key] != $value) {
           $found = FALSE;
           break;
         }

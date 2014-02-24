@@ -14,10 +14,7 @@ class views_handler_filter_activity_type extends views_handler_filter_equality {
     parent::value_form($form, $form_state);
 
     $options_list = array('All' => '- Any -');
-    $options_list += db_query(
-      'SELECT DISTINCT(type) ' .
-      '  FROM {campaignion_activity} '
-    )->fetchAllKeyed(0, 0);
+    $options_list += array_keys(campaignion_activity_types());
 
     $form['value'] = array(
       '#type'          => 'select',

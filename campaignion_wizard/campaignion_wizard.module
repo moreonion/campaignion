@@ -1,0 +1,216 @@
+<?php
+
+use \Drupal\campaignion\Action\TypeBase;
+
+/**
+ * Implements hook_menu().
+ */
+function campaignion_wizard_menu() {
+  $wizards = TypeBase::types();
+  foreach ($wizards as $id => $wizard) {
+    $info['wizard/' . str_replace('_', '-', $id)] = array(
+      'title'            => 'Wizard',
+      'page callback'    => 'campaignion_wizard_new',
+      'page arguments'   => array($id),
+      'access arguments' => array('administer nodes'),
+      'type' => MENU_CALLBACK,
+    );
+  }
+  $info['node/%node/wizard/%'] = array(
+    'title'            => 'Wizard',
+    'page callback'    => 'campaignion_wizard',
+    'page arguments'   => array(1, 3),
+    'access arguments' => array('administer nodes'),
+    'type' => MENU_CALLBACK,
+  );
+  $info['node/%node/wizard'] = array(
+    'title'          => 'Wizard',
+    'page arguments' => array(1, 'content'),
+    'type' => MENU_LOCAL_TASK,
+  ) + $info['node/%node/wizard/%'];
+  return $info;
+}
+
+function campaignion_wizard_new($type) {
+  $type = str_replace('-', '_', $type);
+  try {
+    $actionType = TypeBase::fromContentType($type);
+  }
+  catch (\Exception $e) {
+    return drupal_not_found();
+  }
+  return $actionType->wizard()->run('content');
+}
+
+function campaignion_wizard($node = NULL, $step = 'content') {
+  $type = $node->type;
+  try {
+    $actionType = TypeBase::fromContentType($type);
+  }
+  catch (\Exception $e) {
+    return drupal_not_found();
+  }
+  return $actionType->wizard($node)->run($step);
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function campaignion_wizard_admin_paths() {
+  $paths = array();
+  $paths['node/*/wizard/*'] = TRUE;
+  $paths['node/*/wizard'] = TRUE;
+  $paths['wizard/*'] = TRUE;
+  return $paths;
+}
+
+function campaignion_wizard_webform_template_selector($form, &$unused_form_state, $type, $nid) {
+
+  $tpl_src  = array_filter(variable_get('webform_template_src', array()));
+  $tpl_dest = array_filter(variable_get('webform_template_dest', array()));
+
+  if (    isset($tpl_dest[$type]) == TRUE
+       && empty($tpl_src) == FALSE) {
+    $show_lang = variable_get('webform_template_lang');
+    $result = db_query('SELECT nid,title,language FROM {node} WHERE type IN (:types) AND status = 1 ORDER BY tnid', array(':types' => $tpl_src));
+
+    $templates[] = '- ' . t('none') . ' -';
+
+    foreach ($result as $row) {
+      $templates[$row->nid] = $row->title;
+
+      if (empty($show_lang) == FALSE) {
+        $templates[$row->nid] .= ' [' . $row->language . ']';
+      }
+    }
+
+    $form['webform_template'] = array(
+      '#type'        => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed'   => FALSE,
+    );
+
+    $form['webform_template']['source'] = array(
+      '#type'          => 'select',
+      '#title'         => t('Available templates'),
+      '#options'       => $templates,
+      '#default_value' => 'none',
+      '#description'   => t('Pick an action template to use pre-defined forms and emails.'),
+    );
+
+    if (empty($nid) == FALSE) {
+      $form['webform_template']['source']['#description'] .= '<br /><strong>' . t('Applying an action template will overwrite the form and email settings for this action!') . '</strong>';
+    }
+
+    // add a submit function before the usual submit
+    $form['#submit'] = array('campaignion_wizard_webform_template_selector_submit');
+    // define the submit button
+    $form['submit'] = array(
+      '#type'  => 'submit',
+      '#value' => t('Apply action template'),
+    );
+  }
+  return $form;
+}
+
+function campaignion_wizard_webform_template_selector_submit($form, &$form_state) {
+
+  if (    isset($form_state['complete form']['webform_template']['source']['#value'])
+       && $form_state['complete form']['webform_template']['source']['#value'] !== '0') {
+    // the webform_template parameter has to be stored into the super global _SESSION array
+    // as the _webform_template_attach function will need it
+    $template_nid = $form_state['complete form']['webform_template']['source']['#value'];
+    $_SESSION['webform_template'] = $template_nid;
+
+    $new_petition_nid = $form_state['build_info']['args'][1];
+    $new_petition = node_load($new_petition_nid);
+    _webform_template_attach($new_petition, 'update');
+
+    // form_builder doesn't realize that the form has changed and would reload the old
+    // form from its own cache; hence we clean the cache for this form (and session)
+    module_load_include('inc', 'form_builder', 'form_builder.cache');
+    form_builder_cache_delete('webform', $form_state['build_info']['args'][1]);
+  }
+}
+
+function campaignion_wizard_menu_local_tasks_alter(&$data, &$router_item, $root_path) {
+  if ($router_item['path'] == 'node/%/wizard')
+    $data['tabs'][0]['output'] = array();
+  if (strpos($router_item['path'], 'node/%') === 0 && isset($data['tabs'][0]['output']))  {
+
+    $tabs = &$data['tabs'][0]['output'];
+
+    // get indexes for all the relevant tab items
+    $edit = $webform = $wizard = NULL;
+    foreach ($tabs as $i => &$tab) {
+      switch ($tab['#link']['path']) {
+        case 'node/%/edit':
+          $edit = $i;
+          break;
+        case 'node/%/webform':
+          $webform = $i;
+          break;
+        case 'node/%/wizard':
+          $wizard = $i;
+          break;
+      }
+    }
+
+    if (($node = menu_get_object()) && TypeBase::isAction($node->type)) {
+      if ($edit) unset($tabs[$edit]);
+      $tabs[$wizard]['#link']['title'] = 'Edit content';
+      if ($webform) {
+        $tabs[$webform] = $tabs[$wizard];
+        $tabs[$webform]['#link'] = array(
+          'title' => 'Edit form',
+          'path' => 'node/%/wizard/%',
+          'href' => $tabs[$webform]['#link']['href'] . '/form'
+        ) + $tabs[$webform]['#link'];
+      }
+    }
+    else {
+      unset($tabs[$wizard]);
+    }
+  }
+}
+
+function campaignion_wizard_has_double_optin($nid) {
+  return db_query(
+    'SELECT TRUE ' .
+    '  FROM {webform_confirm_email} ' .
+    '    WHERE nid        = :nid ' .
+    '    AND   email_type = :conf_request ' ,
+    array(
+      ':nid'          => $nid,
+      ':conf_request' => WEBFORM_CONFIRM_EMAIL_CONFIRMATION_REQUEST,
+    )
+  )->fetchField();
+}
+
+function campaignion_wizard_set_confirmation_redirect_url($nid, $url) {
+  db_query(
+    'UPDATE {webform_confirm_email} ' .
+    '  SET redirect_url = :url ' .
+    '    WHERE nid        = :nid ' .
+    '    AND   email_type = :conf_request ' ,
+    array(
+      ':url'          => $url,
+      ':nid'          => $nid,
+      ':conf_request' => WEBFORM_CONFIRM_EMAIL_CONFIRMATION_REQUEST,
+    )
+  );
+}
+
+/**
+ * Implements hook_theme
+ * Used for better control of webform emails setting form
+ */
+function campaignion_wizard_theme() {
+  $items['campaignion_wizard_email_form'] = array(
+    'render element' => 'form',
+    'file'           => 'campaignion_wizard.theme.php',
+  );
+
+  return $items;
+}
+

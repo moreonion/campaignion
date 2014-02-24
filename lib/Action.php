@@ -10,12 +10,12 @@ class Action {
     if (isset($node->action)) {
       return $node->action;
     }
-    $type = ActionType::fromContentType($node->type);
+    $type = Action\TypeBase::fromContentType($node->type);
     // give type the control over which class is used.
     return $type->actionFromNode($node);
   }
 
-  public function __construct(ActionType $type, $node) {
+  public function __construct(Action\TypeInterface $type, $node) {
     $this->type = $type;
     $this->node = $node;
     $this->node->action = $this;

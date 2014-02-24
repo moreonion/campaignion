@@ -1,5 +1,34 @@
 <?php
 
+function campaignion_uninstall() {
+  variable_del('campaignion_contact_type_supporter');
+}
+
+/**
+ * Enable campaignion_node_ux().
+ */
+function campaignion_update_6() {
+  module_enable(array('campaignion_node_ux'));
+}
+
+/**
+ * ae_wizard.module -> campaignion_wizard.module
+ */
+function campaignion_update_5() {
+  module_disable(array('ae_wizard'));
+  drupal_uninstall_modules(array('ae_wizard'));
+  module_enable(array('campaignion_wizard'));
+}
+
+/**
+ * action.module -> campaignion_action.module
+ */
+function campaignion_update_4() {
+  module_disable(array('action'));
+  drupal_uninstall_modules(array('action'));
+  module_enable(array('campaignion_action'));
+}
+ 
 /**
  * Rerun update fixed update 2: pgbar fixup.
  */

@@ -1,0 +1,5 @@
+name = Campaignion node UX
+description = Usability improvements for drupal core's node interface
+core = 7.x
+
+dependencies[] = node
