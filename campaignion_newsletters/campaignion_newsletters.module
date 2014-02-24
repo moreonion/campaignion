@@ -113,7 +113,9 @@ function campaignion_newsletters_email_confirmed($node, $submission) {
     if (!empty($value['subscribed'])) {
       foreach ($component['extra']['lists'] as $list_id => $value) {
         if (!empty($value)) {
-          Subscription::byData($list_id, $email)->save();
+          $subscription = Subscription::byData($list_id, $email);
+          $subscription->delete = FALSE;
+          $subscription->save();
         }
       }
     }
