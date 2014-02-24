@@ -16,7 +16,8 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
   protected static $serial = FALSE;
 
   public static function byData($list_id, $email) {
-    $result = db_select(static::$table)
+    $result = db_select(static::$table, 's')
+      ->fields('s')
       ->condition('list_id', $list_id)
       ->condition('email', $email)
       ->execute();
