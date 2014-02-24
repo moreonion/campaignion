@@ -19,6 +19,7 @@ function campaignion_recent_supporters_block_info() {
  * Implements hook_block_view().
  */
 function campaignion_recent_supporters_block_view($delta = '') {
+  return NULL;
   $block = NULL;
 
   if (($node = menu_get_object()) == FALSE || isset($node->nid) == FALSE) {
