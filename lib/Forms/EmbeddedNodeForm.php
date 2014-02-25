@@ -50,7 +50,7 @@ class EmbeddedNodeForm {
       $embed_name = implode('][', $this->parents);
       $form['#tree'] = TRUE;
       foreach ($form as $key => &$element) {
-        if ($key[0] != '#' && $element['#type'] == 'fieldset' && isset($element['#group'])) {
+        if ($key[0] != '#' && isset($element['#type']) && $element['#type'] == 'fieldset' && isset($element['#group'])) {
           $element['#group'] = $embed_name . '][' . $element['#group'];
         }
       }
