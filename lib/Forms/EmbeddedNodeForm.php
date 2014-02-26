@@ -13,7 +13,7 @@ class EmbeddedNodeForm {
     $a = &$form_state['embedded'];
     foreach ($parents as $k) {
       if (!isset($a[$k])) {
-	$a[$k] = array();
+        $a[$k] = array();
       }
       $a = &$a[$k];
     }
@@ -43,6 +43,11 @@ class EmbeddedNodeForm {
     $form_id = $form_state['build_info']['form_id'];
     $hooks[] = 'form_' . $form_id;
     drupal_alter($hooks, $form, $form_state, $form_id);
+
+    // Fixup path.module
+    if (isset($form['path'])) {
+      unset($form['path']['#element_validate']);
+    }
   }
 
   protected function embedFieldGroups(&$form) {
@@ -74,6 +79,10 @@ class EmbeddedNodeForm {
     if (count($this->parents) > 0) {
       $parent = $this->parents[0];
       $this->embed_state['values'][$parent] = &$form_state['values'][$parent];
+    }
+    // Fixup for path.module
+    if (isset($form['path']) && function_exists('path_form_element_validate')) {
+      path_form_element_validate($form['path'], $this->embed_state, $form);
     }
     node_form_validate($form, $this->embed_state);
   }
