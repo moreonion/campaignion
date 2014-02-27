@@ -49,7 +49,7 @@ class EntityFieldForm {
     $this->fieldInvoke('validate', $errors, $null, FALSE);
 
     if ($errors) {
-      throw new FieldValidationException($errors);
+      throw new \FieldValidationException($errors);
     }
   }
 
