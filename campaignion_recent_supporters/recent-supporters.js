@@ -34,7 +34,8 @@
         cycleSupporters: (settings.recentSupporters.cycleSupporters == "1") ? true : false,
         showCountry: (settings.recentSupporters.showCountry == "1") ? true : false,
         maxSupportersVisible: parseInt(settings.recentSupporters.visibleCount, 10),
-        cycleEasing: 'easeInQuint'
+        cycleEasing: 'easeInQuint',
+        countries: Drupal.settings.recentSupporters.countries
       });
     }
   };

@@ -3,6 +3,29 @@
 define ('CAMPAIGNION_RECENT_SUPPORTERS_NODE_URL_PART', 'recent-supporters');
 
 /**
+ * Implements hook_menu();
+ */
+function campaignion_recent_supporters_menu() {
+  // Serve a localized ISO -> country-name mapping.
+  // If clean URLs are disabled, it will always be served through the menu system.
+  // If clean URLs are enabled and it already exists, PHP will be bypassed.
+  $dir = _campaignion_recent_supporters_countries_dir();
+  $items[$dir . '/%'] = array(
+    'title' => 'Generate JS country mapping',
+    'page callback' => 'campaignion_recent_supporters_country_json',
+    'page arguments' => array(count(explode('/', $dir))),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function _campaignion_recent_supporters_countries_dir() {
+  $directory_path = file_stream_wrapper_get_instance_by_scheme('public')->getDirectoryPath();
+  return $directory_path . '/countries';
+}
+
+/**
  * Implements hook_block_info().
  */
 function campaignion_recent_supporters_block_info() {
@@ -60,8 +83,38 @@ function campaignion_recent_supporters_block_view($delta = '') {
       'pollingURL' => $polling_url,
       'nodeID' => $node->nid
     )), 'setting');
+    if ($country) {
+      $dir = _campaignion_recent_supporters_countries_dir();
+      drupal_add_js($dir . '/' . $GLOBALS['language']->language . '.js', array('scope' => 'footer'));
+    }
   }
   return $block;
+}
+
+/**
+ * Page callback for country Javascript.
+ */
+function campaignion_recent_supporters_country_json($filename) {
+  $langCode = substr($filename, 0, strlen($filename) - 3);
+  $languages = language_list();
+  if (isset($languages[$langCode])) {
+    $GLOBALS['language'] = $languages[$langCode];
+  }
+  else {
+    return MENU_ACCESS_DENIED;
+  }
+
+  $target = 'public://countries/' . $langCode . '.js';
+  $target_dir = dirname($target);
+  if (!file_prepare_directory(dirname($target), FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
+    watchdog('campaignion_recent_supporters', 'Unable to create directory: !dir.', array('!dir' => $target_dir), WATCHDOG_ERROR);
+    return NULL;
+  }
+
+  $countries = country_get_list();
+  $output = 'Drupal.settings.recentSupporters.countries = ' . drupal_json_encode($countries) . ';';
+  file_put_contents($target, $output);
+  file_transfer($target, array('Content-Type' => 'text/javascript', 'Content-Length' => filesize($target)));
 }
 
 /**
@@ -79,7 +132,9 @@ function campaignion_recent_supporters_theme() {
  */
 function theme_recent_supporters($variables) {
   $supporters = $variables['supporters'];
-  $show_country = $variables['show_country'];
+  if ($show_country = $variables['show_country']) {
+    $countries = country_get_list();
+  }
   $output = '';
 
   if (count($supporters) < 1) {
@@ -92,7 +147,7 @@ function theme_recent_supporters($variables) {
       $output .= "<li class=\"supporter\">\n";
       if ($show_country && isset($supporter['country'])) {
         $classes = empty($supporter['country']) ? 'no-cc' : "flag-".strtolower(drupal_clean_css_identifier($supporter['country']));
-        $country_name = (isset($supporter['country_name']) && !empty($supporter['country_name'])) ? $supporter['country_name'] : '';
+        $country_name = (isset($supporter['country']) && isset($countries[$supporter['country']])) ? $countries[$supporter['country']] : '';
         $output .= "<span title=\"".t($country_name)
           ."\" class=\"country flag " . $classes ."\">";
         $output .= $supporter['country'];
@@ -146,10 +201,9 @@ WHERE tn.nid=:nid
 ORDER BY ca.created DESC
 SQL;
   $result = db_query_range($sql, 0, $limit - 1, array(':nid' => $nid));
-  $all = $result->fetchAll();
+
   $supporters = array();
-  $countries = country_get_list();
-  foreach ($all as $item) {
+  foreach ($result as $item) {
     $supporter = array();
     $supporter['first_name'] = $item->first_name;
     $supporter['last_name']  = $item->last_name;
@@ -171,7 +225,6 @@ SQL;
     $supporter['timestamp']  = $item->timestamp;
     $supporter['rfc8601']  = date('c', $item->timestamp);
     $supporter['country']  = empty($item->field_address_country) ? $item->country : $item->field_address_country;
-    $supporter['country_name']  = empty($supporter['country']) ? '' : $countries[$supporter['country']];
     $supporters[] = $supporter;
   }
 

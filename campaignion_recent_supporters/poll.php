@@ -31,10 +31,6 @@ if (!isset($_GET['nid'])) {
 }
 
 require_once DRUPAL_ROOT . '/includes/common.inc';
-require_once DRUPAL_ROOT . '/includes/cache.inc';
-require_once DRUPAL_ROOT . '/includes/module.inc';
-require_once DRUPAL_ROOT . '/includes/locale.inc';
 require_once dirname(__FILE__) . '/campaignion_recent_supporters.module';
-// needs country_get_list().
 
 campaignion_recent_supporters_json((int) $_GET['nid']);
