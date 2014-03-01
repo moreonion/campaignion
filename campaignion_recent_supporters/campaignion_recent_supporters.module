@@ -19,7 +19,6 @@ function campaignion_recent_supporters_block_info() {
  * Implements hook_block_view().
  */
 function campaignion_recent_supporters_block_view($delta = '') {
-  return NULL;
   $block = NULL;
 
   if (($node = menu_get_object()) == FALSE || isset($node->nid) == FALSE) {
@@ -43,14 +42,13 @@ function campaignion_recent_supporters_block_view($delta = '') {
   $show = isset($field['toggle']) ? $field['toggle'] : 0;
   if ($show) {
     // save values for polling
-    global $base_url;
-    $polling_url = $base_url . '/node/' . $node->nid . '/' . CAMPAIGNION_RECENT_SUPPORTERS_NODE_URL_PART;
+    $polling_url = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'campaignion_recent_supporters') . '/poll.php?nid=' . $node->nid;
     $cycle = isset($field['options']['cycle_toggle']) ? $field['options']['cycle_toggle'] : 0;
     $visible_count = isset($field['options']['visible_count']) ? $field['options']['visible_count'] : 6;
     $country = isset($field['options']['country_toggle']) ? $field['options']['country_toggle'] : 0;
 
     $block['subject'] = t('Recent supporters');
-    $supporters = _campaignion_recent_supporters_recent_supporters($node);
+    $supporters = _campaignion_recent_supporters_recent_supporters($node->nid);
     $block['content'] = theme('recent_supporters', array(
       'supporters' => $supporters,
       'show_country' => ($country == '1') ? TRUE : FALSE,
@@ -114,29 +112,13 @@ function theme_recent_supporters($variables) {
 }
 
 /**
- * Implements hook_menu().
- */
-function campaignion_recent_supporters_menu() {
-  $items = array();
-  $items['node/%node/' . CAMPAIGNION_RECENT_SUPPORTERS_NODE_URL_PART] = array(
-    'title' => 'Recent supporters polling end point',
-    'page callback' => 'campaignion_recent_supporters_json',
-    'page arguments' => array(1),
-    'access callback' => 'node_access',
-    'access arguments' => array('view', 1),
-    'type' => MENU_CALLBACK,
-  );
-  return $items;
-}
-
-/**
  * callback function for campaignion_recent_supporters_menu()
  */
-function campaignion_recent_supporters_json($node) {
-  $supporters = _campaignion_recent_supporters_recent_supporters($node);
+function campaignion_recent_supporters_json($nid) {
+  $supporters = _campaignion_recent_supporters_recent_supporters($nid);
   drupal_add_http_header("Access-Control-Allow-Origin", "*");
   drupal_add_http_header("Access-Control-Allow-Headers", "Content-Type");
-  drupal_json_output(array($node->nid => $supporters));
+  drupal_json_output(array($nid => $supporters));
 }
 
 /**
@@ -148,20 +130,22 @@ function _campaignion_recent_supporters_strip_callback($value) {
 /**
  * helper function: query the activities for a specific nid
  */
-function _campaignion_recent_supporters_recent_supporters($node, $limit = 10) {
+function _campaignion_recent_supporters_recent_supporters($nid, $limit = 10) {
   // get "parent" node, i.e. the parent of any translations
   // used in query below
-  $nid = !empty($node->tnid) ? $node->tnid : $node->nid;
-  $result = db_query_range("SELECT rc.first_name,rc.last_name,ca.created as timestamp,wt.country,fdfa.field_address_country,n.tnid FROM campaignion_activity ca
-                                   INNER JOIN redhen_contact rc USING (contact_id)
-                                   INNER JOIN campaignion_activity_webform caw USING (activity_id)
-                                   INNER JOIN webform_tracking wt USING (nid,sid)
-                                   INNER JOIN node n USING (nid)
-                                   LEFT OUTER JOIN field_data_field_address fdfa ON fdfa.entity_id=rc.contact_id
-                                   WHERE ca.type='webform_submission'
-                                   AND (caw.nid=:nid OR n.tnid=:nid)
-                                   ORDER BY ca.created DESC",
-                                   0, $limit - 1, array(':nid' => $nid));
+  $sql = <<<SQL
+SELECT rc.first_name, rc.last_name, ca.created as timestamp, wt.country, fdfa.field_address_country, n.tnid
+FROM {node} tn
+  INNER JOIN {node} n USING (tnid)
+  INNER JOIN {campaignion_activity_webform} caw ON caw.nid = n.nid
+  INNER JOIN {campaignion_activity} ca ON ca.activity_id=caw.activity_id AND ca.type='webform_submission'
+  INNER JOIN {redhen_contact} rc USING (contact_id)
+  INNER JOIN {webform_tracking} wt ON wt.nid=caw.nid AND wt.sid=caw.sid
+  LEFT OUTER JOIN {field_data_field_address} fdfa ON fdfa.entity_id=rc.contact_id
+WHERE tn.nid=:nid
+ORDER BY ca.created DESC
+SQL;
+  $result = db_query_range($sql, 0, $limit - 1, array(':nid' => $nid));
   $all = $result->fetchAll();
   $supporters = array();
   $countries = country_get_list();
