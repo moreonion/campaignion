@@ -57,7 +57,7 @@
       createListIfMissing: true,
       pollingURL: '',
       pollingInterval: 5000,
-      pollingIntervalMultiplier: 1.01,
+      pollingIntervalMultiplier: 1.07,
       poll: pollSupporters,
       cycleSupporters: true,
       cycleInterval: 4000,
