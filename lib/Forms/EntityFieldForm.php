@@ -43,13 +43,27 @@ class EntityFieldForm {
     $this->fieldInvoke('extract_form_values', $form, $form_state, TRUE);
     $this->fieldInvoke('submit', $form, $form_state, TRUE);
 
-    $errors = array();
-    $null = NULL;
-    $this->fieldInvoke('validate', $errors, $null, TRUE);
-    $this->fieldInvoke('validate', $errors, $null, FALSE);
+    try {
+      $errors = array();
+      $null = NULL;
+      $this->fieldInvoke('validate', $errors, $null, TRUE);
+      $this->fieldInvoke('validate', $errors, $null, FALSE);
 
-    if ($errors) {
-      throw new \FieldValidationException($errors);
+      if ($errors) {
+        throw new \FieldValidationException($errors);
+      }
+    }
+    catch (\FieldValidationException $e) {
+      // Pass field-level validation errors back to widgets for accurate error
+      // flagging.
+      foreach ($e->errors as $field_name => $field_errors) {
+        foreach ($field_errors as $langcode => $errors) {
+          $field_state = field_form_get_state($form['#parents'], $field_name, $langcode, $form_state);
+          $field_state['errors'] = $errors;
+          field_form_set_state($form['#parents'], $field_name, $langcode, $form_state, $field_state);
+        }
+      }
+      $this->fieldInvoke('form_errors', $form, $form_state);
     }
   }
 

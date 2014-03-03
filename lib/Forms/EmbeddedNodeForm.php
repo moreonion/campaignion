@@ -72,6 +72,7 @@ class EmbeddedNodeForm {
 
   public function validate($form, &$form_state) {
     $form = &drupal_array_get_nested_value($form, $this->parents);
+    $this->embed_state['complete form'] = &$form;
     // field_attach_submit() needs the values properly nested while
     // entity_form_submit_build_entity() needs top-level node form values
     // therefore we have to provide both.
@@ -89,6 +90,7 @@ class EmbeddedNodeForm {
 
   public function submit($form, &$form_state) {
     $form = &drupal_array_get_nested_value($form, $this->parents);
+    $this->embed_state['complete form'] = &$form;
     $submit_handlers = isset($form['#submit']) ? $form['#submit'] : FALSE;
     if ($submit_handlers) {
       unset($form['#submit']);
