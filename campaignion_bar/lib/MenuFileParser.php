@@ -118,8 +118,13 @@ class MenuFileParser {
       throw new ParseLineException(t('wrong indentation'));
     }
 
-    $weight = isset($weights[$level]) && !($level > $prev_level) ? $weights[$level] + 1 : 0;
-    $item->weight = $weight;
+    if (isset($details->weight)) {
+      $item->weight = $details->weight;
+    }
+    else {
+      $weight = isset($weights[$level]) && !($level > $prev_level) ? $weights[$level] + 1 : 0;
+      $item->weight = $weight;
+    }
     $item->setParent($parents[$level]);
     $item->setPath($path);
 
@@ -167,8 +172,12 @@ class MenuFileParser {
       $items_by_path[$item->router_path] = &$menu[$item->mlid];
       $router_paths[] = $item->router_path;
     }
-    
-    $query = db_select('menu_router', 'm', array('fetch' => PDO::FETCH_ASSOC));
+
+    if (empty($router_paths)) {
+      return $menu;
+    }
+
+    $query = db_select('menu_router', 'm', array('fetch' => \PDO::FETCH_ASSOC));
     $query->fields('m', array(
       'path',
       'load_functions',

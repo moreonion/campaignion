@@ -26,4 +26,19 @@ class MenuFileParserTest extends \DrupalUnitTestCase {
       }
     }
   }
+
+  public function testEmptyFile_givesEmptyArray() {
+    $menu_name = 'some';
+    $uri = dirname(__FILE__) . '/testfiles/empty.txt';
+    $parser = new MenuFileParser($menu_name);
+    $this->assertEqual(array(), $parser->fileToMenuLinks($uri));
+  }
+
+  public function testSorting() {
+    $menu_name = 'some';
+    $uri = dirname(__FILE__) . '/testfiles/inverse_sort.txt';
+    $parser = new MenuFileParser($menu_name);
+    $result = $parser->fileToMenuLinks($uri);
+    $this->assertGreaterThan($result['some_b']['weight'], $result['some_a']['weight']);
+  }
 }
