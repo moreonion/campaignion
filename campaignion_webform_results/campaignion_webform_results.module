@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function campaignion_webform_results_menu() {
+  $items = array();
+  $common = array(
+    'page callback' => 'campaignion_webform_results_webform_results_download',
+    'access callback' => 'webform_results_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 7,
+  );
+  $items['node/%webform_menu/webform-results/download-delimited'] = array(
+    'title' => 'Download (CSV)',
+    'page arguments' => array(1, 'delimited'),
+  ) + $common;
+  $items['node/%webform_menu/webform-results/download-excel'] = array(
+    'title' => 'Download (XLS)',
+    'page arguments' => array(1, 'excel'),
+  ) + $common;
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function campaignion_webform_results_menu_alter(&$items) {
+  $item = &$items['node/%webform_menu/webform-results/download'];
+  $item['title'] = 'Download (custom)';
+  $item['weight'] = 8;
+  $items['node/%webform_menu/webform-results/clear']['weight'] = 9;
+}
+
+/**
+ * OVERRIDES webform_results_download
+ */
+function campaignion_webform_results_webform_results_download($node, $format = 'delimited') {
+  module_load_include('inc', 'webform', 'includes/webform.report');
+
+  // taken and modified from webform_results_download_form
+  $csv_components = array(
+    'info' => t('Submission information'),
+    'serial' => '-' . t('Submission Number'),
+    'sid' => '-' . t('Submission ID'),
+    'time' => '-' . t('Time'),
+    'draft' => '-' . t('Draft'),
+    'ip_address' => '-' . t('IP Address'),
+    'uid' => '-' . t('User ID'),
+    'username' => '-' . t('Username'),
+  );
+  $csv_components += webform_component_list($node, 'csv', TRUE);
+
+  // taken and modified from webform_results_download_form_submit
+  $options = array(
+    'delimiter' => ',',
+    'components' => array_keys($csv_components),
+    'select_keys' => 0,
+    'select_format' => 'seperate',
+    'range_type' => 'all',
+    'download' => TRUE,
+  );
+
+  $export_info = webform_results_export($node, $format, $options);
+
+  // If webform result file should be downloaded, send the file to the browser,
+  // otherwise save information about the created file in $form_state.
+  if ($options['download']) {
+    webform_results_download($node, $export_info);
+  }
+}

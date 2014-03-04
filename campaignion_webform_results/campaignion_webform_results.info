@@ -1,0 +1,8 @@
+name = Campaignion webform tracking
+description = Display webform tracking information on webform results pages and exports.
+package = Campaignion
+core = 7.x
+project = campaignion
+
+dependencies[] = webform
+dependencies[] = webform_tracking

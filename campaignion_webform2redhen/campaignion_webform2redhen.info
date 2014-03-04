@@ -1,0 +1,7 @@
+name = AE Webform2Redhen
+description = Automatically import data from submitted webforms into the RedHen CRM
+core = 7.x
+package = Advocacy Engine
+project = campaignion_webform2redhen
+
+dependencies[] = campaignion_supporter

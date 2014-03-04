@@ -1,0 +1,6 @@
+name = Webform Widget
+description = Webform Widget for embedding webforms into other sites
+project = campaignion
+core = 7.x
+
+dependencies[] = webform_block

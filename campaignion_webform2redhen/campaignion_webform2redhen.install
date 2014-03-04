@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function campaignion_webform2redhen_install() {
+  campaignion_webform2redhen_update_1();
+}
+
+/**
+ * Create the insertion queue.
+ */
+function campaignion_webform2redhen_update_1() {
+  DrupalQueue::get('campaignion_webform2redhen')->createQueue();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function campaignion_webform2redhen_uninstall() {
+  DrupalQueue::get('campaignion_webform2redhen')->deleteQueue();
+}

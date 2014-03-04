@@ -32,7 +32,7 @@ class Phone extends Field {
         }
       }
     } catch (\EntityMetadataWrapperException $e) {
-      watchdog('ae_webform2redhen', 'Searched data in a non-existing field "!field".', array('!field' => $this->field), WATCHDOG_WARNING);
+      watchdog('campaignion_webform2redhen', 'Searched data in a non-existing field "!field".', array('!field' => $this->field), WATCHDOG_WARNING);
       return TRUE;
     }
 

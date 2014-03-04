@@ -1,0 +1,195 @@
+<?php
+
+require_once dirname(__FILE__) . '/campaignion_form_builder.type_select.inc';
+require_once dirname(__FILE__) . '/campaignion_form_builder.type_textarea.inc';
+require_once dirname(__FILE__) . '/campaignion_form_builder.type_textfield.inc';
+
+
+function _campaignion_form_builder_get_node(&$form = NULL) {
+  static $node = NULL;
+
+  if ($node == NULL) {
+    if (!empty($form['#node'])) {
+      $node = $form['#node'];
+    }
+    elseif (!empty($form['nid']['#value'])) {
+      $node = node_load($form['nid']['#value']);
+    }
+    else {
+      if (($node = menu_get_object()) == NULL) {
+        $get = NULL;
+        if (isset($_GET['destination']) == TRUE) {
+          $get = $_GET['destination'];
+        }
+        elseif (isset($_GET['q']) == TRUE) {
+          $get = $_GET['q'];
+        }
+        if (   $get != NULL
+            && is_numeric(($nid = preg_replace('/^.*node\/(\d+)\/.*$/', '$1', $get))) == TRUE) {
+          $node = node_load($nid);
+        }
+      }
+    }
+  }
+  return $node;
+}
+
+function _campaignion_form_builder_is_email_protest() {
+  $node = _campaignion_form_builder_get_node();
+
+  if (   isset($node->type)
+      && in_array($node->type, array('email_protest'))) {
+    return $node;
+  }
+}
+
+function _campaignion_form_builder_is_donation() {
+  $node = _campaignion_form_builder_get_node();
+
+  if (   isset($node->type)
+      && in_array($node->type, array('donation', 'webform_template_type'))) {
+    return $node;
+  }
+}
+
+/**
+ * Implements hook_form_builder_types_alter().
+ * remove elements from the default palette
+ */
+function campaignion_form_builder_form_builder_types_alter(&$types) {
+
+  if (isset($types['webform']['email']) == TRUE) {
+    $field                              = &$types['webform']['email'];
+    $field['unique']                    = TRUE;
+    $field['palette_group']             = 'advocacy_engine';
+    $field['default']['#title']         = t('Email address');
+    $field['default']['#default_value'] = '%get[p5]';
+    $field['default']['#key']           = $field['default']['#webform_component']['form_key'] = 'email';
+  }
+  if (isset($types['webform']['paymethod_select']) == TRUE) {
+    $field           = &$types['webform']['paymethod_select'];
+    $field['unique'] = TRUE;
+    if (_campaignion_form_builder_is_donation() == TRUE) {
+      $field['palette_group'] = 'donation';
+    }
+    else {
+      $field['in_use'] = TRUE;
+    }
+  }
+}
+
+/**
+ * Implements hook_form_builder_palette_groups().
+ * we want to define our own group of form elements
+ * hence we define our own palette of elements
+ */
+function campaignion_form_builder_form_builder_palette_groups() {
+  $palette = array();
+
+  if (_campaignion_form_builder_is_donation() == TRUE) {
+    $palette['donation'] = array(
+      'weight' => -19,
+      'title'  => t('Donor Data'),
+    );
+  }
+  elseif (_campaignion_form_builder_is_email_protest() == TRUE) {
+    $palette['email_protest'] = array(
+      'weight' => -18,
+      'title'  => t('Email Protest Data'),
+    );
+  }
+
+  $palette['advocacy_engine'] = array(
+    'weight' => -17,
+    'title'  => t('Supporter Data'),
+  );
+
+  return $palette;
+}
+
+/**
+ * Implements hook_form_builder_types().
+ * define all form elements that we want to have at display
+ */
+function campaignion_form_builder_form_builder_types() {
+
+  module_load_include('inc', 'form_builder_webform', 'form_builder_webform.components');
+
+  $fields = array();
+
+  $types = array('textfield', 'textarea', 'select');
+
+  foreach ($types as $type) {
+    $map               = _form_builder_webform_property_map($type);
+    $properties        = array_keys($map['properties']);
+    $function          = '_campaignion_form_builder_form_builder_types_' . $type;
+    $additional_fields = $function();
+    if (   $additional_fields == FALSE
+        || empty($additional_fields) == TRUE) {
+      continue;
+    }
+
+    foreach ($additional_fields as &$field) {
+      $field['properties'] += $properties;
+    }
+    $fields = array_merge($fields, $additional_fields);
+  }
+  return array('webform' => $fields);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_webform_client_form_alter().
+ */
+function campaignion_form_builder_webform_client_form_alter(&$form, &$form_state) {
+  if (isset($form['actions']['previous'])) {
+    $form['actions']['previous']['#value'] = t('Previous');
+  }
+  $form['actions']['previous']['#access'] = FALSE;
+}
+
+/**
+  * Implements hook_menu().
+  */
+function campaignion_form_builder_menu() {
+  $items = array();
+
+  $items['node/%webform_menu/webform-ui'] = array(
+    'title' => 'Webform',
+    'page callback' => 'webform_components_page',
+    'page arguments' => array(1),
+    'access callback' => 'node_access',
+    'access arguments' => array('update', 1),
+    'file' => 'includes/webform.components.inc',
+    'file path' => drupal_get_path('module', 'webform'),
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+  $items['node/%webform_menu/webform-ui/components'] = array(
+    'title' => 'Form components',
+    'page callback' => 'webform_components_page',
+    'page arguments' => array(1),
+    'access callback' => 'node_access',
+    'access arguments' => array('update', 1),
+    'file' => 'includes/webform.components.inc',
+    'file path' => drupal_get_path('module', 'webform'),
+    'weight' => 0,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function campaignion_form_builder_admin_paths() {
+  if (variable_get('node_admin_theme')) {
+    return array(
+      'node/*/webform-ui' => TRUE,
+      'node/*/webform-ui/*' => TRUE,
+    );
+  }
+}
+

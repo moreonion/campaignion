@@ -12,7 +12,7 @@ class Date extends Field {
       $date->setTime(0,0,0);
       return $date->getTimestamp();
     } else {
-      watchdog('ae_webform2redhen', 'Tried to import date with an invalid format "!field".', array('!field' => $value), WATCHDOG_WARNING);
+      watchdog('campaignion_webform2redhen', 'Tried to import date with an invalid format "!field".', array('!field' => $value), WATCHDOG_WARNING);
       return NULL;
     }
   }

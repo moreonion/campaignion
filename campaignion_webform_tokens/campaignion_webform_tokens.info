@@ -1,0 +1,6 @@
+name = "Webform Tokens"
+description = "Enable use of webform tokens on thank you pages."
+core = 7.x
+project = campaignion
+
+dependencies[] = webform

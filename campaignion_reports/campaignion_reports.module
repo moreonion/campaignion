@@ -1,0 +1,68 @@
+<?php
+/**
+ * Implements hook_views_api().
+ */
+function campaignion_reports_views_api()
+{
+  return array('api' => '3.0');
+}
+
+/**
+ * helper function to change a textfield exposed filter into a select box exposed filter
+ */
+function _campaignion_reports_set_select_filter($node_types, &$form)
+{
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', $node_types, 'IN')
+    ->propertyCondition('status', 1); // published nodes
+
+  $result = $query->execute();
+
+  if (isset($result['node'])) {
+    $nids  = array_keys($result['node']);
+    $nodes = node_load_multiple($nids);
+  } else {
+    return;
+  }
+
+  $options = array(
+    '' => '-Any-',
+  );
+
+  foreach($nodes as $node) {
+    $options[$node->title] = $node->title;
+  }
+
+  $form['title']['#type']          = 'select';
+  $form['title']['#options']       = $options;
+  $form['title']['#default_value'] = array();
+  $form['title']['#multiple']      = FALSE;
+  $form['title']['#size']          = 1;
+}
+
+/**
+ * implements hook_form_alter
+ * this is necessary for changing the exposed filters from textfield format into select box and date_popup respectively
+ */
+function campaignion_reports_form_alter(&$form, &$form_state, $form_id) {
+
+  if ($form_id == 'views_exposed_form_action_report_view_page' || $form_id == 'views_exposed_form_campaign_report_view_page') {
+    if ($form_id == 'views_exposed_form_action_report_view_page') {
+      _campaignion_reports_set_select_filter(array('petition', 'webform', 'email_protest'), $form);
+    } else if ($form_id == 'views_exposed_form_campaign_report_view_page') {
+      _campaignion_reports_set_select_filter(array('campaign'), $form);
+    }
+
+    $form['timestamp']['min']['#type']        = 'date_popup';
+    $form['timestamp']['min']['#date_format'] = 'Y-m-d';
+    $form['timestamp']['max']['#type']        = $form['timestamp']['min']['#type'];
+    $form['timestamp']['max']['#date_format'] = $form['timestamp']['min']['#date_format'];
+
+    /*$form['timestamp']['#type']        = 'date_popup';
+    $form['timestamp']['#date_format'] = 'Y-m-d';
+
+    $form_state['view']->filter['timestamp']->options['granularity'] = 'day';*/
+  }
+}
+

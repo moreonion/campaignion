@@ -1,0 +1,17 @@
+name = AE Views Interface (Ye Old Style)
+description = Contains supporter view and similar views (transition module)
+core = 7.x
+package = Advocacy Engine
+version = 7.x-1.0
+project = campaignion_views_interface_ye_olde_style
+dependencies[] = views
+dependencies[] = views_bulk_operations
+dependencies[] = views_data_export
+dependencies[] = views_dataviz
+dependencies[] = campaignion_views_interface
+dependencies[] = campaignion_manage
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = manage_content
+features[views_view][] = manage_content_actions
+features[views_view][] = manage_media

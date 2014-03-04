@@ -1,0 +1,64 @@
+# $Id$
+#
+# LANGUAGE translation of Drupal (modules-campaignion_webform2redhen)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  modules/campaignion_webform2redhen/campaignion_webform2redhen.inc.php: n/a
+#  modules/campaignion_webform2redhen/campaignion_webform2redhen.info: n/a
+#
+# Florian Engel, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2012-12-13 15:20+0100\n"
+"PO-Revision-Date: 2013-01-14 16:23+0100\n"
+"Last-Translator: Florian Engel\n"
+"Language-Team: German <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: de\n"
+"X-Generator: Lokalize 1.4\n"
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.inc.php:27;38;54;75;90;140;228
+msgid "campaignion_webform2redhen"
+msgstr ""
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.inc.php:27
+msgid "Tried to compare data with a non-existing field \"!field\"."
+msgstr ""
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.inc.php:38
+msgid "Tried to import into a non-existing field \"!field\"."
+msgstr ""
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.inc.php:54
+msgid "Tried to import date of birth with an invalid format \"!field\"."
+msgstr ""
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.inc.php:75
+msgid "Failed retrieving RedHen contact email data."
+msgstr ""
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.inc.php:90
+msgid "Failed setting RedHen contact email data."
+msgstr ""
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.inc.php:140
+msgid "Tried to get data from a non-existing field \"!field\"."
+msgstr ""
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.inc.php:228
+msgid "Searched data in a non-existing field \"!field\"."
+msgstr ""
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.info:0
+msgid "AE Webform2Redhen"
+msgstr ""
+
+#: modules/campaignion_webform2redhen/campaignion_webform2redhen.info:0
+msgid "Automatically import data from submitted webforms into the RedHen CRM"
+msgstr ""
+
+

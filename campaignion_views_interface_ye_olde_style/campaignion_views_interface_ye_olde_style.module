@@ -1,0 +1,69 @@
+<?php
+/**
+ * @file
+ * Code for the campaignion_views_interface_ye_olde_style feature.
+ */
+
+include_once 'campaignion_views_interface_ye_olde_style.features.inc';
+
+/**
+ * we define the path where we want to group the various views displays into tabs
+ */
+function campaignion_views_interface_ye_olde_style_menu() {
+
+  $item = array(
+    'tab_parent' => 'admin/manage/content_and_actions',
+    'tab_root' => 'admin/manage/content_and_actions',
+    'page callback' => 'views_page',
+    'access callback' => 'views_access',
+    'access arguments' => array(
+      array(
+        'views_check_roles',
+        array(
+          array(
+            3 => '3',
+            4 => '4',
+          ),
+        ),
+      ),
+    ),
+  );
+
+  /**
+   * Listing of all desired view displays as tabs - merging with existing page
+   */
+
+  $items['admin/manage/content_and_actions'] = array(
+    'title' => 'Content and actions',
+    'tab_root' => NULL,
+    'tab_parent' => NULL,
+    'type' => MENU_CALLBACK,
+    'page arguments' => array('manage_content', 'page'),
+  ) + $item;
+  $items['admin/manage/content_and_actions/content'] = array(
+    'title' => 'Content',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'page arguments' => array('manage_content', 'page'),
+  ) + $item;
+  $items['admin/manage/content_and_actions/action_templates'] = array(
+    'title' => 'Action Templates',
+    'weight' => 2,
+    'type' => MENU_LOCAL_TASK,
+    'page arguments' => array('manage_content_actions', 'page_4')
+  ) + $item;
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function campaignion_views_interface_ye_olde_style_menu_alter(&$items) {
+  $items['admin/manage/content_and_actions/block'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'tab_parent' => 'admin/manage/content_and_actions',
+    'tab_root' => 'admin/manage/content_and_actions',
+    'weight' => 4,
+  ) + $items['admin/structure/block'];
+}
+

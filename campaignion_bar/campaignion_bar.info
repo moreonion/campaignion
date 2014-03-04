@@ -1,0 +1,9 @@
+name = Campaignion Toolbar
+description = Add a toolbar to the top of the page.
+package = Campaignion
+core = 7.x
+project = campaignion
+
+dependencies[] = campaignion_wizard
+dependencies[] = menu
+dependencies[] = psr0

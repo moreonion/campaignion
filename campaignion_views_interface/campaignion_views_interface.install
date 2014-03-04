@@ -1,0 +1,13 @@
+<?php
+/**
+ * @file
+ * This file is only used at install
+ */
+
+ /**
+ * this function ensures that our module is loaded after the views module
+ * so we already get the paths views will provide
+ */
+function campaignion_views_interface_enable() {
+  db_query("UPDATE {system} a INNER JOIN {system} b ON a.name='campaignion_views_interface' AND b.name='views' SET a.weight=b.weight+1");
+}

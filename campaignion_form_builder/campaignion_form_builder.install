@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Change form_key for email from address fields from
+ * email_address to email
+ */
+function campaignion_form_builder_update_1() {
+
+  db_query(<<<EOS
+    UPDATE {webform_component}
+      SET   form_key = 'email'
+      WHERE form_key = 'email_address'
+EOS
+  );
+}

@@ -158,7 +158,7 @@ function campaignion_newsletters_form_builder_types() {
 /**
  * Implements hook_form_builder_types_alter().
  *
- * Remove the email_newsletter field from ae_form_builder.
+ * Remove the email_newsletter field from campaignion_form_builder.
  */
 function campaignion_newsletters_form_builder_types_alter(&$fields) {
   unset($fields['webform']['email_newsletter']);
