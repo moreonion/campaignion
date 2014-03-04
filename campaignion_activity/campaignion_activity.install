@@ -154,6 +154,9 @@ function campaignion_activity_uninstall() {
  * Replace redhen_activity and deactivate redhen_engagement.
  */
 function campaignion_activity_update_1() {
+  if (!module_exists('message')) {
+    return;
+  }
   class NoCacheEntityController extends EntityAPIController {
     protected $cache = FALSE;
   }
