@@ -4,6 +4,9 @@ function campaignion_uninstall() {
   variable_del('campaignion_contact_type_supporter');
 }
 
+/**
+ * Increase weight above i18n. -> switch_links_alter()
+ */
 function campaignion_update_7() {
   db_query("UPDATE {system} SET weight=11 WHERE name='campaignion'");
 }
