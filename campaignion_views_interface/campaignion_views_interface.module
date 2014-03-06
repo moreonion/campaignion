@@ -57,8 +57,8 @@ function campaignion_views_interface_form_views_exposed_form_alter(&$form, &$for
       'All' => '-Any-',
     );
 
-    include_once drupal_get_path('module', 'mo_utilities') . '/mo_node.inc';
-    $options += \MO\Nodes\get_titles_from_types(array('petition', 'donation', 'email_protest'));
+    $result = db_query("SELECT nid, title FROM {node} WHERE type IN ('petition', 'donation', 'email_protest')");
+    $options += $result->fetchAllKeyed();
 
     $form['message_ae_action_node_nid']['#options']       = $options;
     $form['message_ae_action_node_nid']['#default_value'] = array();

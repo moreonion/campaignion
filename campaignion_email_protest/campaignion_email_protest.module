@@ -14,7 +14,6 @@ use \Drupal\campaignion\Wizard\EmailProtestEmailStep;
  * We're setting a form submit handler that is called before webform_client_form
  */
 function campaignion_email_protest_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
-
   if ($form['#node']->type == 'email_protest') {
     array_unshift($form['#submit'], 'campaignion_email_protest_pre_webform_client_form');
   }
@@ -29,12 +28,15 @@ function campaignion_email_protest_form_webform_client_form_alter(&$form, &$form
  * 3) webform doesn't support loading the body from a form field
  */
 function campaignion_email_protest_pre_webform_client_form(&$form, &$form_state) {
+  if (empty($form_state['save_draft']) && empty($form_state['webform_completed'])) {
+    return;
+  }
 
-  $email = &$form['#node']->webform['emails'][EmailProtestEmailStep::WIZARD_PROTEST_EID];
+  $node = $form['#node'];
+  $submission = \Drupal\little_helpers\Webform\Submission::fromFormState($node, $form_state);
+  $email = &$node->webform['emails'][EmailProtestEmailStep::WIZARD_PROTEST_EID];
 
-  module_load_include('inc', 'mo_utilities', 'mo_array');
-
-  $target_contact_id = \MO\PHPArray\bfs_key($form_state['values']['submitted'], 'email_protest_target');
+  $target_contact_id = $submission->valueByKey('email_protest_target');
 
   if ($target_contact_id == FALSE) {
     // no protest target is submitted that means we have to get the targets from the node
@@ -62,11 +64,8 @@ function campaignion_email_protest_pre_webform_client_form(&$form, &$form_state)
     }
   }
 
-  $email['from_name'] =
-    \MO\PHPArray\bfs_key($form_state['values']['submitted'],'first_name') .
-    ' ' .
-    \MO\PHPArray\bfs_key($form_state['values']['submitted'], 'last_name');
-  $email['template']  = \MO\PHPArray\bfs_key($form_state['values']['submitted'], 'email_body');
+  $email['from_name'] = $submission->valueByKey('first_name') . ' ' . $submission->valueByKey('last_name');
+  $email['template']  = $submission->valueByKey('email_body');
 }
 
 /**

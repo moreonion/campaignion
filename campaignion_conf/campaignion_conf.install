@@ -35,9 +35,8 @@ function _campaignion_conf_install_roles() {
 }
 
 function _campaignion_conf_install_permissions() {
-  $utils = drupal_get_path('module', 'mo_utilities');
-  require_once($utils . '/lib/MO/c2c/PermissionMatrix.php');
-  \MO\c2c\PermissionMatrix::createFromFile(dirname(__FILE__) . '/permissions.inc.php')
+  $matrix = dirname(__FILE__) . '/permissions.inc.php';
+  \Drupal\little_helpers\c2c\PermissionMatrix::createFromFile($matrix)
     ->enforce();
 }
 
