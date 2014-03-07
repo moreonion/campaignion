@@ -12,10 +12,11 @@
 .manage-links .ctools-dropbutton a:visited,
 .manage-links .ctools-dropbutton a:active {
   text-decoration: none;
-  color: #B0ADA6;
+  color: #a29f98;
 }
 .manage-links .ctools-dropbutton a:hover {
-  color: #F05F28;
+  color: #8b8882;
+	background: #faf7f1;
 }
 .manage-links .ctools-dropbutton a:active {
   color: #b03F08;
