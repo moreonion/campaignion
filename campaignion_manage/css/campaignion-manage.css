@@ -79,19 +79,27 @@
 }
 #campaignion-manage-filter-form fieldset {
   border-radius: 0;
+	border: 1px solid #e3dfd7;
+	background: #fff;
+	margin-bottom: .2em;
 }
 #campaignion-manage-filter-form .fieldset-content {
-  padding: 0.25em 1em;
+  padding: .7em 4.5em .5em 1em;
   border-radius: 0;
+	background: #fff;
 }
 #campaignion-manage-filter-form .fieldset-content > .form-type-checkbox{
   position: absolute;
   left: -9999px;
   float: left;
-  padding-top: 14px;
   width: auto;
   overflow: hidden;
 }
+
+#campaignion-manage-filter-form .fieldset-content .form-item {
+margin-bottom: 0;
+}
+
 #campaignion-manage-filter-form .fieldset-content > .form-type-checkbox .ilabel {
   display: none;
 }
@@ -106,9 +114,12 @@
 }
 #campaignion-manage-filter-form .fieldset-content > .form-type-select label {
   text-transform: none;
-  padding: 14px 0 0 0;
   font-size: 1em;
   line-height: 1em;
+	font-weight: normal;
+	color: #98958f;
+	padding-top: 3px;
+	margin-right: 10px;
 }
 #campaignion-manage-filter-form .fieldset-content > .form-type-select .selecter {
   min-width: 10em;
@@ -118,15 +129,18 @@
 #campaignion-manage-filter-form fieldset > .manage-filter-remove {
   text-indent: -9999px;
   position: absolute;
-  width: 32px;
-  height: 32px;
+  width: 35px;
+  height: 35px;
   float: right;
-  right: 10px;
-  top: 12px;
-  background-image: url(ae_x.png);
+  right: 7px;
+  top: 10px;
+	z-index: 50;
+  background: url(../img/x_beige.png) no-repeat center center transparent;
+	border-radius: 50%;
 }
-#campaignion-manage-filter-form fieldset > .manage-filter-remove:hover {
+#campaignion-manage-filter-form fieldset > .manage-filter-remove:hover, #campaignion-manage-filter-form fieldset > .manage-filter-remove:focus {
   cursor: pointer;
+	background-color: #f5f1e8;
 }
 
 table.campaignion-manage-content-listing table {
