@@ -13,7 +13,7 @@ function _campaignion_form_builder_form_builder_types_select() {
       'multiple',
     ),
     'default'       => _form_builder_webform_default('select', array('aslist' => TRUE, 'multiple' => FALSE)),
-    'palette_group' => 'advocacy_engine',
+    'palette_group' => 'supporter_data',
     'unique'        => TRUE,
   );
 

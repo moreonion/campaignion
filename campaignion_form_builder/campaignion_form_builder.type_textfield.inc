@@ -7,7 +7,7 @@ function _campaignion_form_builder_form_builder_types_textfield() {
   $fields = array();
 
   $unique_ae = array(
-    'palette_group' => 'advocacy_engine',
+    'palette_group' => 'supporter_data',
     'unique'        => TRUE,
     'properties'    => array('default_value'),
     'default'       => _form_builder_webform_default('textfield'),
