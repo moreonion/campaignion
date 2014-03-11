@@ -67,8 +67,7 @@ function campaignion_form_builder_form_builder_types_alter(&$types) {
     $field['default']['#key']           = $field['default']['#webform_component']['form_key'] = 'email';
   }
   if (isset($types['webform']['paymethod_select']) == TRUE) {
-    $field           = &$types['webform']['paymethod_select'];
-    $field['unique'] = TRUE;
+    $field = &$types['webform']['paymethod_select'];
     if (_campaignion_form_builder_is_donation() == TRUE) {
       $field['palette_group'] = 'donation';
     }
@@ -76,6 +75,38 @@ function campaignion_form_builder_form_builder_types_alter(&$types) {
       $field['in_use'] = TRUE;
     }
   }
+}
+
+/**
+ * Implements hook_form_builder_palette_fields_alter().
+ *
+ * This is a hack to get unique to work with reused webform components.
+ */
+function campaignion_form_builder_form_builder_palette_fields_alter(&$fields, $form_type, &$form) {
+  if ($form_type == 'webform') {
+    $active_keys = campaignion_form_builder_get_element_keys($form);
+    foreach ($active_keys as $key) {
+      if (isset($fields[$key]) && $fields[$key]['unique']) {
+        $fields[$key]['in_use'] = TRUE;
+      }
+    }
+  }
+}
+
+/**
+ * Recursive function to get the types of all element within a form.
+ */
+function campaignion_form_builder_get_element_keys(&$form) {
+  $keys = array();
+  foreach (element_children($form) as $key) {
+    if (isset($form[$key]['#key'])) {
+      $keys[] = $form[$key]['#key'];
+    }
+    $child_keys = campaignion_form_builder_get_element_keys($form[$key]);
+    $keys = array_merge($keys, $child_keys);
+  }
+
+  return $keys;
 }
 
 /**
