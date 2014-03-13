@@ -38,7 +38,7 @@ function _campaignion_form_builder_is_email_protest() {
   $node = _campaignion_form_builder_get_node();
 
   if (   isset($node->type)
-      && in_array($node->type, array('email_protest'))) {
+      && in_array($node->type, array('email_protest', 'webform_template_type'))) {
     return $node;
   }
 }
