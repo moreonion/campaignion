@@ -6,12 +6,14 @@ use \Drupal\campaignion_bar\MenuFileParser;
  * Implements hook_menu_links_alter().
  */
 function campaignion_bar_menu_links_alter(&$links, &$menu, &$parameters) {
-  if ($menu != 'ae-menu') {
+  if ($menu != 'ae-menu' || !($uri = variable_get('campaignion_bar_file'))) {
     return;
   }
-  $menu_name = 'ae-menu';
-  $uri = DRUPAL_ROOT . '/' . drupal_get_path('module', 'campaignion_bar') . '/' . $menu_name . '.txt';
-  $parser = new MenuFileParser($menu_name);
+
+  if (substr($uri, 0, 1) != '/') {
+    $uri = DRUPAL_ROOT . '/' . $uri;
+  }
+  $parser = new MenuFileParser('ae-menu');
   $menu_generated = $parser->fileToMenuLinks($uri);
   foreach ($menu_generated as $mlid => &$item) {
     $links[$mlid] = &$item;
@@ -24,8 +26,8 @@ function campaignion_bar_menu_links_alter(&$links, &$menu, &$parameters) {
 function campaignion_bar_permission() {
   return array(
     'access ae bar' => array(
-      'title' => t('Access AE bar'),
-      'description' => t('Permission to access and see the AE bar.'),
+      'title' => t('Access the campaignion menu bar'),
+      'description' => t('Users with this permission will see the campaignion bar at the top of each page.'),
     ),
   );
 }
@@ -108,6 +110,7 @@ function campaignion_bar_menu() {
     'page callback' => 'not_implemented_view',
     'access callback' => TRUE,
     'title' => 'This feature is not implemented yet. Soon to come!',
+    'type' => MENU_CALLBACK,
   );
   return $items;
 }
