@@ -35,6 +35,11 @@ abstract class TypeBase implements TypeInterface {
     if (!isset($static_fast)) {
       $static_fast = &drupal_static(__CLASS__, array());
       $static_fast = \module_invoke_all('campaignion_action_info');
+      foreach ($static_fast as $type => &$info) {
+        $info += array(
+          'parameters' => array(),
+        );
+      }
     }
     return $static_fast;
   }
