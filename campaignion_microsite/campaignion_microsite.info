@@ -4,5 +4,4 @@ package = Campaignion
 core = 7.x
 project = campaignion
 
-dependencies[] = campaignion_campaign
 dependencies[] = little_helpers

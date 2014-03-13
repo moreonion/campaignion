@@ -30,7 +30,4 @@ function campaignion_microsite_install() {
   _field_info_collate_types(TRUE);
   $field = \Drupal\little_helpers\Field\Field::fromType('microsite', 'field_microsite');
   $field->save();
-  $bundle = new \Drupal\little_helpers\Field\Bundle('node', 'campaign');
-  $instance = \Drupal\little_helpers\Field\Instance::fromField($field, $bundle);
-  $instance->save();
 }

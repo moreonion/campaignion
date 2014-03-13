@@ -22,6 +22,9 @@ function campaignion_microsite_custom_theme() {
     return;
   }
 
+  // @TODO Set $config_field automatically by looping over all fields of type microsite.
+  $reference_field = variable_get('campaignion_microsite_node_reference_field', 'field_reference_to_campaign');
+  $config_field = variable_get('campaignion_microsite_config_field', 'field_microsite');
   $sql = <<<SQL
 SELECT
   n.nid,
@@ -31,8 +34,8 @@ SELECT
   m.field_microsite_frontpage AS frontpage,
   m.field_microsite_logo AS logo
 FROM {node} n
-LEFT OUTER JOIN {field_data_field_microsite} m ON m.entity_id=n.nid AND m.entity_type='node' AND m.delta=0
-LEFT OUTER JOIN {field_data_field_reference_to_campaign} r ON r.entity_id=n.nid AND r.entity_type='node' AND r.delta=0
+LEFT OUTER JOIN {field_data_$config_field} m ON m.entity_id=n.nid AND m.entity_type='node' AND m.delta=0
+LEFT OUTER JOIN {field_data_$reference_field} r ON r.entity_id=n.nid AND r.entity_type='node' AND r.delta=0
 WHERE n.nid=:nid
 SQL;
 
