@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * Code for the Campaignion webform widget feature.
+ */
+
+include_once 'campaignion_webform_widget.features.inc';
 
 /**
  * helper function: returns TRUE if context $cname is active
