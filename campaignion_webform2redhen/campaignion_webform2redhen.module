@@ -13,7 +13,8 @@ function _campaignion_webform2redhen_import_submission($node, $submission) {
 function _campaignion_webform2redhen_webform_tracking_tags($contact, $action_node, $submission) {
   $contact_tids = array();
   $wrapped_contact = $contact->wrap();
-  $contact_terms = $wrapped_contact->field_tags->value();
+  $tagsfield = variable_get('campaignion_webform2redhen_tags_field', 'field_tags');
+  $contact_terms = $wrapped_contact->$tagsfield->value();
   foreach ($contact_terms as $term) {
     $contact_tids[$term->tid] = $term->tid;
   }
@@ -22,8 +23,7 @@ function _campaignion_webform2redhen_webform_tracking_tags($contact, $action_nod
   $tags = db_query_range('SELECT tags FROM {webform_tracking} WHERE nid = :nid AND sid = :sid', 0, 1,
     array(':nid' => $action_node->nid, ':sid' => $submission->sid))->fetchField();
 
-  // find terms an save them in the activity message
-  // and in the corresponding user/redhen contact
+  // find terms an save them in the corresponding user/redhen contact
   if ($tags) {
     $tids = array();
     $voc_name = 'ae_contact_tags_taxonomy';
@@ -39,8 +39,8 @@ function _campaignion_webform2redhen_webform_tracking_tags($contact, $action_nod
     }
   }
 
-  if (!empty($action_node->field_tags)) {
-    foreach ($action_node->field_tags[LANGUAGE_NONE] as $tag) {
+  if (!empty($action_node->$tagsfield)) {
+    foreach ($action_node->$tagsfield[LANGUAGE_NONE] as $tag) {
       $tid = $tag['tid'];
       $contact_tids[$tid] = $tid;
     }
@@ -48,7 +48,7 @@ function _campaignion_webform2redhen_webform_tracking_tags($contact, $action_nod
 
   if ($original_contact_tids != $contact_tids) {
     try {
-      $wrapped_contact->field_tags->set($contact_tids);
+      $wrapped_contact->$tagsfield->set($contact_tids);
     } catch (EntityMetadataWrapperException $e) {
       watchdog_exception('campaignion_webform2redhen', $e);
     }
