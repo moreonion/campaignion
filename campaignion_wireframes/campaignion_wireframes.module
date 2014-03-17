@@ -38,7 +38,7 @@ function _campaignion_wireframes_block($content) {
  * every region gets a specific block content here
  */
  function campaignion_wireframes_view() {
-  Request::i()->set_flag('ae_wireframe');
+  $GLOBALS['campaignion_wireframe_mode'] = TRUE;
   
   $page = array(
     '#type' => 'page',
