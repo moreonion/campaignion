@@ -197,7 +197,7 @@ function campaignion_form_builder_menu() {
     'file' => 'includes/webform.components.inc',
     'file path' => drupal_get_path('module', 'webform'),
     'weight' => 1,
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_CALLBACK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
   $items['node/%webform_menu/webform-ui/components'] = array(

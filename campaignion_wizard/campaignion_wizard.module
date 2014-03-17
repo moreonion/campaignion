@@ -158,14 +158,9 @@ function campaignion_wizard_menu_local_tasks_alter(&$data, &$router_item, $root_
 
     if (($node = menu_get_object()) && TypeBase::isAction($node->type)) {
       if ($edit) unset($tabs[$edit]);
-      $tabs[$wizard]['#link']['title'] = 'Edit content';
+      $tabs[$wizard]['#link']['title'] = t('Edit');
       if ($webform) {
-        $tabs[$webform] = $tabs[$wizard];
-        $tabs[$webform]['#link'] = array(
-          'title' => 'Edit form',
-          'path' => 'node/%/wizard/%',
-          'href' => $tabs[$webform]['#link']['href'] . '/form'
-        ) + $tabs[$webform]['#link'];
+        unset($tabs[$webform]);
       }
     }
     else {
