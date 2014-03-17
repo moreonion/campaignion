@@ -75,6 +75,9 @@ function campaignion_form_builder_form_builder_types_alter(&$types) {
       $field['in_use'] = TRUE;
     }
   }
+  if (_campaignion_form_builder_is_email_protest()) {
+    $types['webform']['protest_target']['palette_group'] = 'email_protest';
+  }
 }
 
 /**
