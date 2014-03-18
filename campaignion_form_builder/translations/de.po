@@ -26,7 +26,7 @@ msgid "Supporter Data"
 msgstr "Unterstützer/innen-Daten"
 
 #: modules/campaignion_form_builder/campaignion_form_builder.module:50
-msgid "Form of address"
+msgid "Salutation"
 msgstr "Anrede"
 
 #: modules/campaignion_form_builder/campaignion_form_builder.module:55
