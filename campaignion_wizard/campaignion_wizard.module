@@ -63,13 +63,14 @@ function campaignion_wizard_new($type) {
 
 function campaignion_wizard($node = NULL, $step = 'content') {
   $type = $node->type;
-  try {
+  if (TypeBase::isAction($type)) {
     $actionType = TypeBase::fromContentType($type);
+    return $actionType->wizard($node)->run($step);
   }
-  catch (\Exception $e) {
-    return drupal_not_found();
+  else {
+    require_once drupal_get_path('module', 'node') . '/node.pages.inc';
+    return node_page_edit($node);
   }
-  return $actionType->wizard($node)->run($step);
 }
 
 /**
