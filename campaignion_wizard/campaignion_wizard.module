@@ -41,8 +41,13 @@ function campaignion_wizard_menu_alter(&$info) {
   $local  = array('type' => MENU_LOCAL_TASK);
   foreach ($wizards as $id => $wizard) {
     $type = str_replace('_', '-', $id);
-    $info['node/core-add/' . $type] = $hidden + $info['node/add/' . $type];
-    $info['node/add/' . $type] = $local + $info['wizard/' . $type];
+    $old = $info['node/add/' . $type];
+    $info['node/core-add/' . $type] = $hidden + $old;
+    $info['node/add/' . $type] = array(
+      'type' => MENU_NORMAL_ITEM,
+      'title' => $old['title'],
+      'description' => $old['description'],
+    ) + $info['wizard/' . $type];
   }
 
   $info['node/%node/core-edit'] = $hidden + $info['node/%node/edit'];
