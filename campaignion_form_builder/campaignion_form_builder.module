@@ -1,63 +1,13 @@
 <?php
 
 require_once dirname(__FILE__) . '/campaignion_form_builder.type_select.inc';
-require_once dirname(__FILE__) . '/campaignion_form_builder.type_textarea.inc';
 require_once dirname(__FILE__) . '/campaignion_form_builder.type_textfield.inc';
-
-
-function _campaignion_form_builder_get_node(&$form = NULL) {
-  static $node = NULL;
-
-  if ($node == NULL) {
-    if (!empty($form['#node'])) {
-      $node = $form['#node'];
-    }
-    elseif (!empty($form['nid']['#value'])) {
-      $node = node_load($form['nid']['#value']);
-    }
-    else {
-      if (($node = menu_get_object()) == NULL) {
-        $get = NULL;
-        if (isset($_GET['destination']) == TRUE) {
-          $get = $_GET['destination'];
-        }
-        elseif (isset($_GET['q']) == TRUE) {
-          $get = $_GET['q'];
-        }
-        if (   $get != NULL
-            && is_numeric(($nid = preg_replace('/^.*node\/(\d+)\/.*$/', '$1', $get))) == TRUE) {
-          $node = node_load($nid);
-        }
-      }
-    }
-  }
-  return $node;
-}
-
-function _campaignion_form_builder_is_email_protest() {
-  $node = _campaignion_form_builder_get_node();
-
-  if (   isset($node->type)
-      && in_array($node->type, array('email_protest', 'webform_template_type'))) {
-    return $node;
-  }
-}
-
-function _campaignion_form_builder_is_donation() {
-  $node = _campaignion_form_builder_get_node();
-
-  if (   isset($node->type)
-      && in_array($node->type, array('donation', 'webform_template_type'))) {
-    return $node;
-  }
-}
 
 /**
  * Implements hook_form_builder_types_alter().
  * remove elements from the default palette
  */
 function campaignion_form_builder_form_builder_types_alter(&$types) {
-
   if (isset($types['webform']['email']) == TRUE) {
     $field                              = &$types['webform']['email'];
     $field['unique']                    = TRUE;
@@ -65,18 +15,6 @@ function campaignion_form_builder_form_builder_types_alter(&$types) {
     $field['default']['#title']         = t('Email address');
     $field['default']['#default_value'] = '%get[p5]';
     $field['default']['#key']           = $field['default']['#webform_component']['form_key'] = 'email';
-  }
-  if (isset($types['webform']['paymethod_select']) == TRUE) {
-    $field = &$types['webform']['paymethod_select'];
-    if (_campaignion_form_builder_is_donation() == TRUE) {
-      $field['palette_group'] = 'donation';
-    }
-    else {
-      $field['in_use'] = TRUE;
-    }
-  }
-  if (_campaignion_form_builder_is_email_protest()) {
-    $types['webform']['protest_target']['palette_group'] = 'email_protest';
   }
 }
 
@@ -120,19 +58,6 @@ function campaignion_form_builder_get_element_keys(&$form) {
 function campaignion_form_builder_form_builder_palette_groups() {
   $palette = array();
 
-  if (_campaignion_form_builder_is_donation() == TRUE) {
-    $palette['donation'] = array(
-      'weight' => -19,
-      'title'  => t('Donor Data'),
-    );
-  }
-  elseif (_campaignion_form_builder_is_email_protest() == TRUE) {
-    $palette['email_protest'] = array(
-      'weight' => -18,
-      'title'  => t('Email Protest Data'),
-    );
-  }
-
   $palette['supporter_data'] = array(
     'weight' => -17,
     'title'  => t('Supporter Data'),
@@ -151,7 +76,7 @@ function campaignion_form_builder_form_builder_types() {
 
   $fields = array();
 
-  $types = array('textfield', 'textarea', 'select');
+  $types = array('textfield', 'select');
 
   foreach ($types as $type) {
     $map               = _form_builder_webform_property_map($type);

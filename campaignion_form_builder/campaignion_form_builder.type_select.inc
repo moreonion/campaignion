@@ -85,17 +85,5 @@ function _campaignion_form_builder_form_builder_types_select() {
   $fields['state']['default']['#title']         = t('State');
   $fields['state']['default']['#default_value'] = '%get[p10]';
 
-  if (_campaignion_form_builder_is_donation() == TRUE) {
-    $fields['donation_interval'] = array(
-      'title'         => t('Donation interval'),
-      'weight'        => -98,
-    ) + $defaults;
-    $fields['donation_interval']['palette_group'] = 'donation';
-    $fields['donation_interval']['default']['#options']       = array('1' => t('only once'), 'm' => t('monthly'), 'y' => t('yearly'));
-    $fields['donation_interval']['default']['#default_value'] = 'm';
-    $fields['donation_interval']['default']['#title']         = t('Donation interval');
-    $fields['donation_interval']['default']['#required'] = TRUE;
-  }
-
   return $fields;
 }

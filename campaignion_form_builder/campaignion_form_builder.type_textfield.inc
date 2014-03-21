@@ -77,27 +77,5 @@ function _campaignion_form_builder_form_builder_types_textfield() {
   $fields['mobile_number']['default']['#title'] = t('Mobile number');
   $fields['mobile_number']['default']['#default_value'] = '%get[p12]';
 
-  if (_campaignion_form_builder_is_email_protest() != FALSE) {
-    $fields['email_subject'] = array(
-      'title' => t('Email subject'),
-      'weight' => -70,
-    ) + $unique_ae;
-    $fields['email_subject']['default']['#title'] = t('Email subject');
-    $fields['email_subject']['default']['#default_value'] = '';
-    $fields['email_subject']['palette_group'] = 'email_protest';
-  }
-
-  if (_campaignion_form_builder_is_donation() == TRUE) {
-    $unique_ae['palette_group'] = 'donation';
-
-    $fields['donation_amount'] = array(
-      'title'  => t('Donation amount'),
-      'weight' => -99,
-    ) + $unique_ae;
-    $fields['donation_amount']['default']['#title']         = t('Donation amount');
-    $fields['donation_amount']['default']['#default_value'] = '%get[p12]';
-    $fields['donation_amount']['default']['#required'] = TRUE;
-  }
-
   return $fields;
 }
