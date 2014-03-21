@@ -1,0 +1,8 @@
+name = Action templates
+description = Mark actions as templates and use them when creating new actions.
+package = Campaignion
+core = 7.x
+
+dependencies[] = campaignion_form_builder
+
+dependencies[] = little_helpers

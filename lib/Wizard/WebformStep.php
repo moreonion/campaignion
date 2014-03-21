@@ -27,7 +27,7 @@ class WebformStep extends WizardStep {
     $build['#attached']['library'][] = array('system', 'ui.datepicker');
 
     // build form for webform_template select box
-    $build[] = drupal_get_form('campaignion_wizard_webform_template_selector', $this->wizard->node->type, $build[0]['nid']['#value']) +
+    $build[] = drupal_get_form('campaignion_action_template_selector_form', $this->wizard->node) +
       array('#weight' => -99);
 
     // Load all components.
