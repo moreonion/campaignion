@@ -60,3 +60,20 @@ function campaignion_action_template_selector_form_submit($form, &$form_state) {
     form_builder_cache_delete('webform', $form['#node']->nid);
   }
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_node_form_alter().
+ *
+ * Render our field widget under additional settings.
+ */
+function campaignion_action_template_form_node_form_alter(&$form, &$form_state) {
+  $form['campaignion_action_template'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Template settings'),
+    '#group' => 'additional_settings',
+    '#tree' => FALSE,
+  );
+  $form['campaignion_action_template']['action_template'] = $form['action_template'];
+  unset($form['action_template']);
+}
