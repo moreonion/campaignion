@@ -24,7 +24,8 @@ class Address extends Field {
     if (empty($address)) {
       return FALSE;
     }
-    if (!isset($address['country']) || empty($address['country'])) {
+    $countryList = country_get_list();
+    if (empty($address['country']) || !isset($countryList[$address['country']])) {
       $address['country'] = variable_get('site_default_country', 'AT');
     }
     return $address;
