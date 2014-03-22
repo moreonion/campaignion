@@ -22,6 +22,10 @@ class Action {
   }
 
   public function applyDefaultTemplate() {
+    // Only apply defaults if no components are specified.
+    if (!empty($this->node->webform['components'])) {
+      return;
+    }
     if ($nid = $this->type->defaultTemplateNid()) {
       $this->copyForm($nid);
     }
