@@ -1,5 +1,7 @@
 <div id="ae-bar" class="clearfix">
 
+  <a href="#" id="ae-logo" title="Click here to visit the Dashboard"><img src="<?php echo $GLOBALS['base_path'] . path_to_theme(); ?>/theme/aelogo.png"></a>
+
   <?php print theme('ae_menu', array('sidebar' => FALSE, 'links' => menu_tree_all_data('ae-menu'))); ?>
 
   <ul id="ae-sidemenu">
