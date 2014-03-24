@@ -1,9 +1,8 @@
-name = "AE Reports"
-description = "Provides Advocacy Engine reports"
+name = "Campaignion Reports"
+description = "Provides various reports for your campaign"
 core = 7.x
-package = Advocacy Engine
-version = 7.x-1.0-beta
-project = campaignion_reports
+package = Campaignion
+project = campaignion
 
 dependencies[] = campaignion_activity
 dependencies[] = views

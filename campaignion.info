@@ -2,5 +2,6 @@ name = Campaignion
 description = Base module for all campaignion features.
 core = 7.x
 package = Campaignion
+project = campaignion
 
 dependencies[] = psr0

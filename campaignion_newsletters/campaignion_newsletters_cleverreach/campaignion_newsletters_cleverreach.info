@@ -1,8 +1,7 @@
 name = Campaignion Newsletters (CleverReach)
 description = CleverReach Integration for Campaignion Newsletters
-package = Campaignion
 core = 7.x
-version = 7.x-1.0
+package = Campaignion
 project = campaignion
 
 dependencies[] = campaignion_newsletters

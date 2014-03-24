@@ -1,5 +1,5 @@
 name = Campaignion Wireframes
 description = Displays a page with example blocks, so you can easily see the difference of themes
-package = Campaignion
 core = 7.x
+package = Campaignion
 project = campaignion

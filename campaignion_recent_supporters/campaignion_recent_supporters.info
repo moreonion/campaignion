@@ -1,6 +1,8 @@
-name = Display recent supporters for campaignion
+name = Campaignion Resent Supporters
+description = Display recent supporters for campaignion
 core = 7.x
-project = campaignion_recent_supporters
+package = Campaignion
+project = campaignion
 
 dependencies[] = campaignion_activity
 dependencies[] = webform_tracking
