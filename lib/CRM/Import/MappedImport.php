@@ -8,9 +8,9 @@ use \Drupal\campaignion\CRM\Import\Source\SourceInterface;
 class MappedImport {
   public function __construct() {
     $this->mappings = array(
-      new Field\Field('field_gender',          'gender'),
-      new Field\Field('field_form_of_address', 'form_of_address'),
-      new Field\Field('field_title',           'title'),
+      new Field\Field('field_gender',     'gender'),
+      new Field\Field('field_salutation', 'salutation'),
+      new Field\Field('field_title',      'title'),
       new Field\Field('first_name'),
       new Field\Field('last_name'),
       new Field\Date('field_date_of_birth',    'date_of_birth'),

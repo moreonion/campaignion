@@ -18,16 +18,16 @@ function _campaignion_form_builder_form_builder_types_select() {
   );
   $defaults['default']['#form_builder']['element_type'] = 'select';
 
-  $fields['form_of_address'] = array(
+  $fields['salutation'] = array(
     'title'  => t('Salutation'),
     'weight' => -82,
   ) + $defaults;
-  $fields['form_of_address']['properties'][] = 'other_option';
-  $fields['form_of_address']['properties'][] = 'other_text';
-  $fields['form_of_address']['default']['#options']       = array('fam' => t('Family'), 'mrs' => t('Mrs'), 'mr' => t('Mr'));
-  $fields['form_of_address']['default']['#default_value'] = '%get[p1]';
-  $fields['form_of_address']['default']['#title']         = t('Salutation');
-  $fields['form_of_address']['default']['#other_option']  = TRUE;
+  $fields['salutation']['properties'][] = 'other_option';
+  $fields['salutation']['properties'][] = 'other_text';
+  $fields['salutation']['default']['#options']       = array('fam' => t('Family'), 'mrs' => t('Mrs'), 'mr' => t('Mr'));
+  $fields['salutation']['default']['#default_value'] = '%get[p1]';
+  $fields['salutation']['default']['#title']         = t('Salutation');
+  $fields['salutation']['default']['#other_option']  = TRUE;
 
   $fields['gender'] = array(
     'title'  => t('Gender'),

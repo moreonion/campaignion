@@ -16,7 +16,7 @@ class CampaignionContactExporter implements SourceInterface {
     $wrappedContact = $contact->wrap();
     $this->map = array();
     $this->map['email'] = new WrapperField($wrappedContact, 'email');
-    $this->map['salutation'] = new WrapperField($wrappedContact, 'field_form_of_address');
+    $this->map['salutation'] = new WrapperField($wrappedContact, 'field_salutation');
     $this->map['firstname'] = new SingleValueField($contact, 'first_name');
     $this->map['lastname'] = new SingleValueField($contact, 'last_name');
     $this->map['title'] = new WrapperField($wrappedContact, 'field_title');
