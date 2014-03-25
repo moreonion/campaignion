@@ -26,9 +26,17 @@ class WebformStep extends WizardStep {
     $build['#attached']['js'][] = drupal_get_path('module', 'campaignion_wizard') . '/js/form-builder-submit.js';
     $build['#attached']['library'][] = array('system', 'ui.datepicker');
 
-    // build form for webform_template select box
-    $build[] = drupal_get_form('campaignion_action_template_selector_form', $this->wizard->node) +
-      array('#weight' => -99);
+    // Build form for webform_template select box.
+    if (module_exists('campaignion_action_template')) {
+      $build[] = drupal_get_form('campaignion_action_template_selector_form', $this->wizard->node)
+        + array('#weight' => -99);
+    }
+    // Support for a legacy module.
+    elseif (module_exists('campaignion_form_templates')) {
+      $node = $this->wizard->node;
+      $build[] = drupal_get_form('campaignion_form_templates_selector', $node->type, $node->nid)
+        + array('#weight' => -99);
+    }
 
     // Load all components.
     $components = webform_components();
