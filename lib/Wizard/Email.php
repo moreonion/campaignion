@@ -34,7 +34,7 @@ class Email {
 
     $email_form = webform_email_edit_form(array(), $form_state, $this->node, $email);
     $email_form['#theme'] = 'campaignion_wizard_email_form';
-    unset($email_form['submit']);
+    unset($email_form['actions']);
 
     // find email component and force sending email to the form submitter if it exists
     foreach ($this->node->webform['components'] as $key => $component) {
