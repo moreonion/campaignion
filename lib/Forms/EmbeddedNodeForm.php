@@ -6,7 +6,7 @@ class EmbeddedNodeForm {
   protected $embed_state;
   protected $form;
   protected $parents;
-  public function __construct($node, &$form_state, $parents = array()) {
+  public function __construct($node, &$form_state, $parents = array(), $embedState = array()) {
     node_object_prepare($node);
     form_load_include($form_state, 'inc', 'node', 'node.pages');
     $form_state += array('embedded' => array(), 'field' => array());
@@ -18,6 +18,7 @@ class EmbeddedNodeForm {
       $a = &$a[$k];
     }
     $this->embed_state = &drupal_array_get_nested_value($form_state['embedded'], $parents);
+    $this->embed_state += $embedState;
     $this->embed_state['formObject'] = $this;
     $this->embed_state['node'] = $node;
     $this->embed_state['build_info'] = array(

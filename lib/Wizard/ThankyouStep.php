@@ -98,7 +98,12 @@ class ThankyouStep extends WizardStep {
       '#default_value' => $type == 'node' ? 'node' : NULL,
       '#parents'       => $form['type']['#parents'],
     );
-    $formObj = new EmbeddedNodeForm($node, $form_state, array($prefix, 'node_form'));
+    $embedState = array(
+      '#wizard_type' => 'thank_you',
+      '#wizard_node' => $this->wizard->node,
+    );
+    $parents = array($prefix, 'node_form');
+    $formObj = new EmbeddedNodeForm($node, $form_state, $parents, $embedState);
     $node_form = array(
       '#type'    => 'container',
       '#states'  => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'node'))),
