@@ -49,6 +49,7 @@ function campaignion_wizard_menu_alter(&$info) {
  */
 function campaignion_wizard_redirect_edit($op, $node) {
   if (TypeBase::isAction($node->type) && !(isset($_GET['wizard']) && $_GET['wizard'] == 'off')) {
+    unset($_GET['destination']);
     drupal_goto("node/{$node->nid}/wizard", array(), 301);
   }
   return node_access($op, $node);
@@ -59,6 +60,7 @@ function campaignion_wizard_redirect_edit($op, $node) {
  */
 function campaignion_wizard_redirect_add($op, $type) {
   if (!(isset($_GET['wizard']) && $_GET['wizard'] == 'off')) {
+    unset($_GET['destination']);
     drupal_goto("wizard/$type", array(), 301);
   }
   return node_access($op, $type);
