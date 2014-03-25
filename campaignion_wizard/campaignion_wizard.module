@@ -36,25 +36,37 @@ function campaignion_wizard_menu() {
  * Override core node edit pages.
  */
 function campaignion_wizard_menu_alter(&$info) {
-  $wizards = TypeBase::types();
-  $hidden = array('type' => MENU_CALLBACK);
-  $local  = array('type' => MENU_LOCAL_TASK);
-  foreach ($wizards as $id => $wizard) {
+  foreach (TypeBase::types() as $id => $wizard) {
     $type = str_replace('_', '-', $id);
-    $old = $info['node/add/' . $type];
-    $info['node/core-add/' . $type] = $hidden + $old;
-    $info['node/add/' . $type] = array(
-      'type' => MENU_NORMAL_ITEM,
-      'title' => $old['title'],
-      'description' => $old['description'],
-    ) + $info['wizard/' . $type];
+    $info['node/add/' . $type]['access callback'] = 'campaignion_wizard_redirect_add';
   }
-
-  $info['node/%node/core-edit'] = $hidden + $info['node/%node/edit'];
-  $info['node/%node/edit'] = $local + $info['node/%node/wizard'];
+  $info['node/%node/edit']['access callback'] = 'campaignion_wizard_redirect_edit';
   $info['node/%node/webform']['type'] = MENU_LOCAL_TASK;
 }
 
+/**
+ * Access callback for node/%/edit.
+ */
+function campaignion_wizard_redirect_edit($op, $node) {
+  if (TypeBase::isAction($node->type) && !(isset($_GET['wizard']) && $_GET['wizard'] == 'off')) {
+    drupal_goto("node/{$node->nid}/wizard", array(), 301);
+  }
+  return node_access($op, $node);
+}
+
+/**
+ * Access callback for node/add/%type.
+ */
+function campaignion_wizard_redirect_add($op, $type) {
+  if (!(isset($_GET['wizard']) && $_GET['wizard'] == 'off')) {
+    drupal_goto("wizard/$type", array(), 301);
+  }
+  return node_access($op, $type);
+}
+
+/**
+ * Page callback for wizard/$type.
+ */
 function campaignion_wizard_new($type) {
   $type = str_replace('-', '_', $type);
   try {
@@ -66,6 +78,9 @@ function campaignion_wizard_new($type) {
   return $actionType->wizard()->run('content');
 }
 
+/**
+ * Page callback for wizard/%node/%step.
+ */
 function campaignion_wizard($node = NULL, $step = 'content') {
   $type = $node->type;
   if (TypeBase::isAction($type)) {
