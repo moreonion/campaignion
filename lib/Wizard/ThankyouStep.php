@@ -22,7 +22,27 @@ class ThankyouStep extends WizardStep {
     $parameters =& $parameters['thank_you_page'];
     $this->contentType = $parameters['type'];
     $this->referenceField = &$wizard->node->{$parameters['reference']};
-    $this->doubleOptIn = !empty($wizard->node->nid) && campaignion_wizard_has_double_optin($wizard->node->nid);
+    $this->doubleOptIn = !empty($wizard->node->nid) && $this->hasDoubleOptIn();
+  }
+
+  protected function hasDoubleOptIn() {
+    return db_query(
+      'SELECT 1 FROM {webform_confirm_email} WHERE nid=:nid AND email_type = :conf_request',
+      array(
+        ':nid'          => $this->wizard->node->nid,
+        ':conf_request' => WEBFORM_CONFIRM_EMAIL_CONFIRMATION_REQUEST,
+      )
+    )->fetchField();
+  }
+
+  protected function setConfirmationRedirect($url) {
+    $sql = 'UPDATE {webform_confirm_email} SET redirect_url=:url WHERE nid=:nid AND email_type=:conf_request';
+    $args = array(
+      ':url'          => $url,
+      ':nid'          => $this->wizard->node->nid,
+      ':conf_request' => WEBFORM_CONFIRM_EMAIL_CONFIRMATION_REQUEST,
+    );
+    db_query($sql, $args);
   }
 
   protected function loadIncludes() {
@@ -110,7 +130,7 @@ class ThankyouStep extends WizardStep {
 
     // check if double opt in was enabled and if yes provide a 2nd thank you page
     $thank_you_class = 'half-left';
-    if (campaignion_wizard_has_double_optin($this->wizard->node->nid) != FALSE) {
+    if ($this->doubleOptIn) {
       $form['submission_node'] = $this->pageForm($form_state, 0, t('Submission page'), 'submission_node');
       $form['submission_node']['#attributes']['class'][] = 'half-left';
       $thank_you_class = 'half-right';
@@ -185,7 +205,7 @@ class ThankyouStep extends WizardStep {
         }
         else {
           if ($page == 'thank_you_node') {
-            campaignion_wizard_set_confirmation_redirect_url($this->wizard->node->nid, $path);
+            $this->setConfirmationRedirect($path);
           }
           else {
             $action->webform['redirect_url'] = $path;
@@ -201,7 +221,7 @@ class ThankyouStep extends WizardStep {
         }
         else {
           if ($page == 'thank_you_node') {
-            campaignion_wizard_set_confirmation_redirect_url($this->wizard->node->nid, $values[$page]['redirect_url']);
+            $this->setConfirmationRedirect($values[$page]['redirect_url']);
           }
           else {
             $action->webform['redirect_url'] = $values[$page]['redirect_url'];

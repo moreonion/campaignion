@@ -104,33 +104,6 @@ function campaignion_wizard_admin_paths() {
   return $paths;
 }
 
-function campaignion_wizard_has_double_optin($nid) {
-  return db_query(
-    'SELECT TRUE ' .
-    '  FROM {webform_confirm_email} ' .
-    '    WHERE nid        = :nid ' .
-    '    AND   email_type = :conf_request ' ,
-    array(
-      ':nid'          => $nid,
-      ':conf_request' => WEBFORM_CONFIRM_EMAIL_CONFIRMATION_REQUEST,
-    )
-  )->fetchField();
-}
-
-function campaignion_wizard_set_confirmation_redirect_url($nid, $url) {
-  db_query(
-    'UPDATE {webform_confirm_email} ' .
-    '  SET redirect_url = :url ' .
-    '    WHERE nid        = :nid ' .
-    '    AND   email_type = :conf_request ' ,
-    array(
-      ':url'          => $url,
-      ':nid'          => $nid,
-      ':conf_request' => WEBFORM_CONFIRM_EMAIL_CONFIRMATION_REQUEST,
-    )
-  );
-}
-
 /**
  * Implements hook_theme
  * Used for better control of webform emails setting form
