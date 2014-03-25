@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_node_form_alter().
+ *
+ * Render our field widget under additional settings.
+ */
+function campaignion_supporter_tags_form_node_form_alter(&$form, &$form_state) {
+  $node = $form['#node'];
+  if (isset($node) && field_read_instance('node', 'supporter_tags', $node->type)) {
+    $form['segmentation'] = array(
+      '#type'  => 'fieldset',
+      '#title' => t('Auto segmentation'),
+      '#group' => 'additional_settings',
+      '#tree'  => FALSE,
+    );
+    $form['segmentation']['supporter_tags'] = $form['supporter_tags'];
+    unset($form['supporter_tags']);
+  }
+}

@@ -13,8 +13,7 @@ function _campaignion_webform2redhen_import_submission($node, $submission) {
 function _campaignion_webform2redhen_webform_tracking_tags($contact, $action_node, $submission) {
   $contact_tids = array();
   $wrapped_contact = $contact->wrap();
-  $tagsfield = variable_get('campaignion_webform2redhen_tags_field', 'field_tags');
-  $contact_terms = $wrapped_contact->$tagsfield->value();
+  $contact_terms = $wrapped_contact->supporter_tags->value();
   foreach ($contact_terms as $term) {
     $contact_tids[$term->tid] = $term->tid;
   }
@@ -39,8 +38,8 @@ function _campaignion_webform2redhen_webform_tracking_tags($contact, $action_nod
     }
   }
 
-  if (!empty($action_node->$tagsfield)) {
-    foreach ($action_node->$tagsfield[LANGUAGE_NONE] as $tag) {
+  if (!empty($action_node->supporter_tags)) {
+    foreach ($action_node->supporter_tags[LANGUAGE_NONE] as $tag) {
       $tid = $tag['tid'];
       $contact_tids[$tid] = $tid;
     }
@@ -48,7 +47,7 @@ function _campaignion_webform2redhen_webform_tracking_tags($contact, $action_nod
 
   if ($original_contact_tids != $contact_tids) {
     try {
-      $wrapped_contact->$tagsfield->set($contact_tids);
+      $wrapped_contact->supporter_tags->set($contact_tids);
     } catch (EntityMetadataWrapperException $e) {
       watchdog_exception('campaignion_webform2redhen', $e);
     }
