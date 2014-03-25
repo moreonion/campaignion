@@ -85,7 +85,7 @@ function campaignion_recent_supporters_block_view($delta = '') {
     )), 'setting');
     if ($country) {
       $dir = _campaignion_recent_supporters_countries_dir();
-      drupal_add_js($dir . '/' . $GLOBALS['language']->language . '.js', array('scope' => 'footer'));
+      drupal_add_js($dir . '/' . $GLOBALS['language']->language . '.js', array('scope' => 'footer', 'preprocess' => FALSE));
     }
   }
   return $block;
