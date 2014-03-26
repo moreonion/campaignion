@@ -68,6 +68,9 @@ function campaignion_action_template_selector_form_submit($form, &$form_state) {
  * Render our field widget under additional settings.
  */
 function campaignion_action_template_form_node_form_alter(&$form, &$form_state) {
+  if (!isset($form['action_template'])) {
+    return;
+  }
   $form['campaignion_action_template'] = array(
     '#type' => 'fieldset',
     '#title' => t('Template settings'),

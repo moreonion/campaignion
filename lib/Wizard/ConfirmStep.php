@@ -74,18 +74,18 @@ class ConfirmStep extends WizardStep {
     if (isset($this->wizard->node->nid)) {
       if(isset($form_state['clicked_button']['#name'])) {
         $node = $this->wizard->node;
-        $wizard_type_name = node_type_get_name($node);
+        $type_name = node_type_get_name($node);
         switch($form_state['clicked_button']['#name']) {
         case 'finish':
           $node->status = 1;
           node_save($node);
-          drupal_set_message($wizard_type_name . t(' published successfully.'), 'status');
+          drupal_set_message(t('!type published successfully.', array('!type' => $type_name)), 'status');
           $form_state['redirect'] = 'node/' . $node->nid;
           break;
         case 'draft':
           $node->status = 0;
           node_save($node);
-          drupal_set_message($wizard_type_name . t(' saved as draft.'), 'status');
+          drupal_set_message(t('!type saved as draft.', array('!type' => $type_name)), 'status');
           $form_state['redirect'] = 'node/' . $node->nid;
           break;
         case 'schedule':

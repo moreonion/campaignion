@@ -8,7 +8,6 @@ class PetitionWizard extends NodeWizard {
     'form'    => 'PetitionWebformStep',
     'emails'  => 'EmailStep',
     'thank'   => 'ThankyouStep',
-    'confirm' => 'PetitionConfirmStep',
+    'confirm' => 'ConfirmStep',
   );
 }
-
