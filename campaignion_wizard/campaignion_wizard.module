@@ -38,32 +38,32 @@ function campaignion_wizard_menu() {
 function campaignion_wizard_menu_alter(&$info) {
   foreach (TypeBase::types() as $id => $wizard) {
     $type = str_replace('_', '-', $id);
-    $info['node/add/' . $type]['access callback'] = 'campaignion_wizard_redirect_add';
+    $info['node/add/' . $type]['page callback'] = 'campaignion_wizard_redirect_add';
   }
-  $info['node/%node/edit']['access callback'] = 'campaignion_wizard_redirect_edit';
+  $info['node/%node/edit']['page callback'] = 'campaignion_wizard_redirect_edit';
   $info['node/%node/webform']['type'] = MENU_LOCAL_TASK;
 }
 
 /**
- * Access callback for node/%/edit.
+ * Page callback for node/%/edit.
  */
-function campaignion_wizard_redirect_edit($op, $node) {
+function campaignion_wizard_redirect_edit($node) {
   if (TypeBase::isAction($node->type) && !(isset($_GET['wizard']) && $_GET['wizard'] == 'off')) {
     unset($_GET['destination']);
     drupal_goto("node/{$node->nid}/wizard", array(), 301);
   }
-  return node_access($op, $node);
+  return node_page_edit($node);
 }
 
 /**
- * Access callback for node/add/%type.
+ * Page callback for node/add/%type.
  */
-function campaignion_wizard_redirect_add($op, $type) {
+function campaignion_wizard_redirect_add($type) {
   if (!(isset($_GET['wizard']) && $_GET['wizard'] == 'off')) {
     unset($_GET['destination']);
     drupal_goto("wizard/$type", array(), 301);
   }
-  return node_access($op, $type);
+  return node_add($type);
 }
 
 /**
