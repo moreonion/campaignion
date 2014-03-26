@@ -48,9 +48,8 @@ function campaignion_wizard_menu_alter(&$info) {
  * Page callback for node/%/edit.
  */
 function campaignion_wizard_redirect_edit($node) {
-  if (TypeBase::isAction($node->type) && !(isset($_GET['wizard']) && $_GET['wizard'] == 'off')) {
-    unset($_GET['destination']);
-    drupal_goto("node/{$node->nid}/wizard", array(), 301);
+  if (TypeBase::isAction($node->type)) {
+    campaignion_wizard_redirect("node/{$node->nid}/wizard");
   }
   return node_page_edit($node);
 }
@@ -59,11 +58,23 @@ function campaignion_wizard_redirect_edit($node) {
  * Page callback for node/add/%type.
  */
 function campaignion_wizard_redirect_add($type) {
-  if (!(isset($_GET['wizard']) && $_GET['wizard'] == 'off')) {
-    unset($_GET['destination']);
-    drupal_goto("wizard/$type", array(), 301);
-  }
+  campaignion_wizard_redirect("wizard/$type");
   return node_add($type);
+}
+
+/**
+ * Redirect keeping all query parameters.
+ *
+ * Redirect if redirecting is not explicitly deactivated
+ * via $_GET['wizard'] = 'off' .
+ */
+function campaignion_wizard_redirect($path) {
+  if (!(isset($_GET['wizard']) && $_GET['wizard'] == 'off')) {
+    $options = array();
+    $options['query'] = drupal_get_query_parameters();
+    unset($_GET['destination']);
+    drupal_goto($path, $options, 301);
+  }
 }
 
 /**
