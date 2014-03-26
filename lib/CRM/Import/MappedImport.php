@@ -28,23 +28,23 @@ class MappedImport {
     );
   }
 
-  public function import(SourceInterface $source, $contact_type = 'contact') {
+  public function import(SourceInterface $source, $wrapped_contact) {
     if (!($email = $source->value('email'))) {
       return;
     }
 
-    $wrapped_contact = $this->newOrExistingContactByEmail($email, $contact_type);
     $isNewOrUpdated = empty($wrapped_contact->contact_id);
-
     foreach ($this->mappings as $mapper) {
       $isNewOrUpdated = $mapper->import($source, $wrapped_contact, TRUE) || $isNewOrUpdated;
     }
 
-    if ($isNewOrUpdated) {
-      $wrapped_contact->save();
-    }
+    return $isNewOrUpdated;
+  }
 
-    return $wrapped_contact->value();
+  public function getContact(SourceInterface $source) {
+    if ($email = $source->value('email')) {
+      return $this->newOrExistingContactByEmail($email);
+    }
   }
 
   public function newOrExistingContactByEmail($email, $contact_type = 'contact') {
