@@ -58,6 +58,7 @@ function campaignion_wizard_redirect_edit($node) {
  * Page callback for node/add/%type.
  */
 function campaignion_wizard_redirect_add($type) {
+  $type = str_replace('_', '-', $type);
   campaignion_wizard_redirect("wizard/$type");
   return node_add($type);
 }
