@@ -122,7 +122,10 @@ class ThankyouStep extends WizardStep {
     // order the form fields
     $node_form['field_main_image']['#attributes']['class'][] = 'sidebar-narrow-right';
     $node_form['#tree'] = TRUE;
-
+    
+    // change share light block title
+    $node_form['share_light']['und']['0']['options']['subject']['#default_value'] = t('Share this action');
+    
     $form['node_form'] =& $node_form;
     $form['#attributes']['class'][] = 'thank-you-node-wrapper';
 
