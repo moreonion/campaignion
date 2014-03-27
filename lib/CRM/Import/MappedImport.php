@@ -41,9 +41,9 @@ class MappedImport {
     return $isNewOrUpdated;
   }
 
-  public function getContact(SourceInterface $source) {
+  public function getContact(SourceInterface $source, $contact_type = 'contact') {
     if ($email = $source->value('email')) {
-      return $this->newOrExistingContactByEmail($email);
+      return $this->newOrExistingContactByEmail($email, $contact_type);
     }
   }
 
