@@ -28,11 +28,11 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
     }
   }
 
-  public static function fromData($list_id, $email) {
+  public static function fromData($list_id, $email, $delete = TRUE) {
     return new static(array(
       'list_id' => $list_id,
       'email' => $email,
-      'delete' => TRUE,
+      'delete' => $delete,
     ));
   }
 

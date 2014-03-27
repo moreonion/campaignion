@@ -26,7 +26,7 @@ function _campaignion_newsletters_poll() {
       $list->save();
 
       foreach ($provider->getSubscribers($list) as $subscriber) {
-        Subscription::fromData($list->list_id, $subscriber)->save(TRUE);
+        Subscription::fromData($list->list_id, $subscriber, FALSE)->save(TRUE);
       }
     }
   }
