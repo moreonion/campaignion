@@ -31,12 +31,6 @@ class WebformStep extends WizardStep {
       $build[] = drupal_get_form('campaignion_action_template_selector_form', $this->wizard->node)
         + array('#weight' => -99);
     }
-    // Support for a legacy module.
-    elseif (module_exists('campaignion_form_templates')) {
-      $node = $this->wizard->node;
-      $build[] = drupal_get_form('campaignion_form_templates_selector', $node->type, $node->nid)
-        + array('#weight' => -99);
-    }
 
     // Load all components.
     $components = webform_components();
