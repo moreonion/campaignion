@@ -79,15 +79,20 @@ class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInt
   }
 
   protected function attributeData(Subscription $subscription) {
+    static $merge_vars = array();
     $list = $subscription->newsletterList();
     $attributes = array();
 
+    if (!isset($merge_vars[$list->identifier])) {
+      $merge_vars[$list->identifier] = $this->call(
+        'mergeVars',
+        array($list->identifier))[0]['merge_vars'];
+    }
+
     if ($contact = Contact::byEmail($subscription->email)) {
-      $merge_vars = $this->call('mergeVars',
-                    array($list->identifier))[0]['merge_vars'];
       $exporter = new CampaignionContactExporter($contact);
 
-      foreach ($merge_vars as $attribute) {
+      foreach ($merge_vars[$list->identifier] as $attribute) {
         if ($value = $exporter->value($attribute['tag'])) {
           $attributes[$attribute['tag']] = $value;
         }
