@@ -137,17 +137,6 @@
     //setTimeout(Drupal.aeBar.setDimensions, 500);
 
 
-    // generate an mo-dialog
-    // used fo graying out the content while using the "new" action
-    if(!$('.mo-dialog-wrapper').length > 0) {
-      var $moDialog = $('<div class="mo-dialog-wrapper"><div class="mo-dialog-content"></div></div>');
-      $moDialog.appendTo($('body'));
-      $moDialog.bind('click', function(e) {
-        Drupal.aeBar.clearView();
-        $(this).removeClass('visible');
-      });
-    }
-
     // clear new popup active/active-trail if an overlay is opening
     $(document).bind('drupalOverlayOpen', function() {
       Drupal.aeBar.hideWide('all');
@@ -526,8 +515,8 @@
 
       myMenu.show();
 
-      // show the mo-dialog-wrapper as grayed out area
-      $('.mo-dialog-wrapper').addClass('visible');
+      // show the campaignion-dialog-wrapper as grayed out area
+      $('.campaignion-dialog-wrapper').show().addClass('visible');
     }
   };
 
@@ -563,8 +552,8 @@
         myContainer.hide();
       }
 
-      // hide the mo-dialog-wrapper again
-      $('.mo-dialog-wrapper').removeClass('visible');
+      // hide the campaignion-dialog-wrapper again
+      $('.campaignion-dialog-wrapper').hide().removeClass('visible');
     }
   };
 }(jQuery));

@@ -4,6 +4,7 @@ core = 7.x
 package = Campaignion
 project = campaignion
 
+dependencies[] = campaignion_ux
 dependencies[] = campaignion_wizard
 dependencies[] = less
 dependencies[] = menu
