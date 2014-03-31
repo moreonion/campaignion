@@ -53,6 +53,11 @@ function campaignion_manage_action_list($entity_type) {
  * Page callback: Manage content and actions page
  */
 function campaignion_manage_content_page() {
+  // add style + js for interface
+  drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_bulk.js');
+  drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_filter.js');
+  drupal_add_css(drupal_get_path('module', 'campaignion_manage') . '/css/manage_bulk.css');
+
   $baseQuery = new \Drupal\campaignion_manage\ContentQuery();
   $baseQuery->page(20);
 
