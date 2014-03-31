@@ -63,11 +63,16 @@ function campaignion_manage_content_page() {
 
   $listing = new \Drupal\campaignion_manage\ContentListing($baseQuery);
 
-  $filterForm = new \Drupal\campaignion_manage\FilterForm(array(
-    new \Drupal\campaignion_manage\ContentFilterType(),
-    new \Drupal\campaignion_manage\ContentFilterLanguage(),
-    new \Drupal\campaignion_manage\ContentFilterStatus(),
-  ));
+  $filters = array();
+  foreach (array('ContentFilterTitle' => TRUE, 'ContentFilterType' => FALSE, 'ContentFilterLanguage' => FALSE, 'ContentFilterStatus' => FALSE) as $filter_class => $active) {
+    $filter_class = '\Drupal\campaignion_manage\\' . $filter_class;
+    $filter_object = new $filter_class();
+    $filters[$filter_object->machineName()] = array(
+      'active' => $active,
+      'filter' => $filter_object,
+      );
+  }
+  $filterForm = new \Drupal\campaignion_manage\FilterForm($filters);
   $baseQuery->setFilter($filterForm);
 
   $bulkOpForm = new \Drupal\campaignion_manage\BulkOpForm($listing, array(

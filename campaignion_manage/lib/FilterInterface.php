@@ -30,4 +30,6 @@ interface FilterInterface {
    * @param array Array of values from previous form submissions.
    */
   public function apply($query, array $values);
+  
+  public function nrOfInstances();
 }

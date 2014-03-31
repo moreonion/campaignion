@@ -8,12 +8,15 @@ class ContentFilterType implements FilterInterface {
       '#type' => 'select',
       '#title' => t('Type'),
       '#options' => node_type_get_names(),
-      '#default_value' => isset($values['type']) ? $values['type'] : NULL,
+      '#default_value' => isset($values) ? $values : NULL,
     );
   }
   public function machineName() { return 'type'; }
   public function title() { return t('Content type'); }
   public function apply($query, array $values) {
     $query->getQuery()->condition('n.type', $values['type']);
+  }
+  public function nrOfInstances() {
+    return 1;
   }
 }

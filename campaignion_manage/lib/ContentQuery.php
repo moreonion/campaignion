@@ -17,6 +17,7 @@ class ContentQuery {
       ->fields('u', array('name'))
       ->where('n.nid = n.tnid OR n.tnid = 0')
       ->orderBy('n.changed', 'DESC');
+
     $this->query = $query;
   }
 
@@ -32,7 +33,7 @@ class ContentQuery {
   }
 
   public function page($size) {
-    $this->query = $this->query->extend('PagerDefault')->limit($size);
+    //$this->query = $this->query->extend('PagerDefault')->limit($size);
   }
 
   public function modifyResult(&$rows) {
