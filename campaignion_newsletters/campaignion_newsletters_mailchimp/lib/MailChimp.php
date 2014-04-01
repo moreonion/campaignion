@@ -38,7 +38,7 @@ class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInt
    *   (properties: identifier, title, source, language).
    */
   public function getLists() {
-    $mc_lists = $this->call('getList', array('list_id'=>'067333f224'));
+    $mc_lists = $this->call('getList', array());
     $this->merge_vars = array();
     $lists = array();
     foreach ($mc_lists as $list) {
