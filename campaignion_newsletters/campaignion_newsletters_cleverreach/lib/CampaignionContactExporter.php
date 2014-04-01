@@ -31,7 +31,7 @@ class CampaignionContactExporter implements SourceInterface {
     //$this->map['language'] = new WrapperField($wrappedContact, 'field_preferred_language');
     $this->map['created'] = new DateField($wrappedContact, 'created', '%Y-%m-%d');
     $this->map['updated'] = new DateField($wrappedContact, 'updated', '%Y-%m-%d');
-    $this->map['tags'] = new TagExporter($wrappedContact, 'field_tags');
+    $this->map['tags'] = new TagExporter($wrappedContact, 'supporter_tags');
   }
 
   public function value($key) {

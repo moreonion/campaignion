@@ -332,7 +332,7 @@ function campaignion_views_interface_views_default_views() {
     'last_name' => 'last_name',
     'field_address' => 'field_address',
     'redhen_contact_email' => 'redhen_contact_email',
-    'field_tags' => 'field_tags',
+    'supporter_tags' => 'supporter_tags',
   );
   $handler->display->display_options['style_options']['default'] = '-1';
   $handler->display->display_options['style_options']['info'] = array(
@@ -365,7 +365,7 @@ function campaignion_views_interface_views_default_views() {
       'separator' => '',
       'empty_column' => 0,
     ),
-    'field_tags' => array(
+    'supporter_tags' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
@@ -422,7 +422,7 @@ function campaignion_views_interface_views_default_views() {
       'settings' => array(
         'show_all_tokens' => 1,
         'display_values' => array(
-          'contact::field_tags' => 'contact::field_tags',
+          'contact::supporter_tags' => 'contact::supporter_tags',
         ),
       ),
       'postpone_processing' => 0,
@@ -513,10 +513,10 @@ function campaignion_views_interface_views_default_views() {
   );
   $handler->display->display_options['fields']['redhen_contact_email']['delta_offset'] = '0';
   /* Field: Field: Tags */
-  $handler->display->display_options['fields']['field_tags']['id'] = 'field_tags';
-  $handler->display->display_options['fields']['field_tags']['table'] = 'field_data_field_tags';
-  $handler->display->display_options['fields']['field_tags']['field'] = 'field_tags';
-  $handler->display->display_options['fields']['field_tags']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['supporter_tags']['id'] = 'supporter_tags';
+  $handler->display->display_options['fields']['supporter_tags']['table'] = 'field_data_supporter_tags';
+  $handler->display->display_options['fields']['supporter_tags']['field'] = 'supporter_tags';
+  $handler->display->display_options['fields']['supporter_tags']['delta_offset'] = '0';
   /* Field: Message: Action Node */
   $handler->display->display_options['fields']['message_ae_action_node']['id'] = 'message_ae_action_node';
   $handler->display->display_options['fields']['message_ae_action_node']['table'] = 'field_data_message_ae_action_node';
@@ -555,34 +555,34 @@ function campaignion_views_interface_views_default_views() {
     'field_address' => 'field_address',
     'redhen_contact_email' => 'redhen_contact_email',
   );
-  /* Filter criterion: Field: Tags (field_tags) */
-  $handler->display->display_options['filters']['field_tags_tid']['id'] = 'field_tags_tid';
-  $handler->display->display_options['filters']['field_tags_tid']['table'] = 'field_data_field_tags';
-  $handler->display->display_options['filters']['field_tags_tid']['field'] = 'field_tags_tid';
-  $handler->display->display_options['filters']['field_tags_tid']['group'] = 1;
-  $handler->display->display_options['filters']['field_tags_tid']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_tags_tid']['expose']['operator_id'] = 'field_tags_tid_op';
-  $handler->display->display_options['filters']['field_tags_tid']['expose']['label'] = 'Tag';
-  $handler->display->display_options['filters']['field_tags_tid']['expose']['operator'] = 'field_tags_tid_op';
-  $handler->display->display_options['filters']['field_tags_tid']['expose']['identifier'] = 'field_tags_tid';
-  $handler->display->display_options['filters']['field_tags_tid']['expose']['remember_roles'] = array(
+  /* Filter criterion: Field: Tags (supporter_tags) */
+  $handler->display->display_options['filters']['supporter_tags_tid']['id'] = 'supporter_tags_tid';
+  $handler->display->display_options['filters']['supporter_tags_tid']['table'] = 'field_data_supporter_tags';
+  $handler->display->display_options['filters']['supporter_tags_tid']['field'] = 'supporter_tags_tid';
+  $handler->display->display_options['filters']['supporter_tags_tid']['group'] = 1;
+  $handler->display->display_options['filters']['supporter_tags_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['supporter_tags_tid']['expose']['operator_id'] = 'supporter_tags_tid_op';
+  $handler->display->display_options['filters']['supporter_tags_tid']['expose']['label'] = 'Tag';
+  $handler->display->display_options['filters']['supporter_tags_tid']['expose']['operator'] = 'supporter_tags_tid_op';
+  $handler->display->display_options['filters']['supporter_tags_tid']['expose']['identifier'] = 'supporter_tags_tid';
+  $handler->display->display_options['filters']['supporter_tags_tid']['expose']['remember_roles'] = array(
     2 => '2',
     1 => 0,
     3 => 0,
     4 => 0,
     5 => 0,
   );
-  $handler->display->display_options['filters']['field_tags_tid']['group_info']['label'] = 'Tags (field_tags)';
-  $handler->display->display_options['filters']['field_tags_tid']['group_info']['identifier'] = 'field_tags_tid';
-  $handler->display->display_options['filters']['field_tags_tid']['group_info']['remember'] = FALSE;
-  $handler->display->display_options['filters']['field_tags_tid']['group_info']['group_items'] = array(
+  $handler->display->display_options['filters']['supporter_tags_tid']['group_info']['label'] = 'Tags (supporter_tags)';
+  $handler->display->display_options['filters']['supporter_tags_tid']['group_info']['identifier'] = 'supporter_tags_tid';
+  $handler->display->display_options['filters']['supporter_tags_tid']['group_info']['remember'] = FALSE;
+  $handler->display->display_options['filters']['supporter_tags_tid']['group_info']['group_items'] = array(
     1 => array(),
     2 => array(),
     3 => array(),
   );
-  $handler->display->display_options['filters']['field_tags_tid']['reduce_duplicates'] = TRUE;
-  $handler->display->display_options['filters']['field_tags_tid']['type'] = 'select';
-  $handler->display->display_options['filters']['field_tags_tid']['vocabulary'] = 'ae_contact_tags_taxonomy';
+  $handler->display->display_options['filters']['supporter_tags_tid']['reduce_duplicates'] = TRUE;
+  $handler->display->display_options['filters']['supporter_tags_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['supporter_tags_tid']['vocabulary'] = 'supporter_tags';
   /* Filter criterion: Contact: Adresse (field_address:country) */
   $handler->display->display_options['filters']['field_address_country']['id'] = 'field_address_country';
   $handler->display->display_options['filters']['field_address_country']['table'] = 'field_data_field_address';
@@ -662,7 +662,7 @@ function campaignion_views_interface_views_default_views() {
     t('Tags'),
     t('Search'),
     t('Tag'),
-    t('Tags (field_tags)'),
+    t('Tags (supporter_tags)'),
     t('Country'),
     t('Action'),
     t('Page'),
