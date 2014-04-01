@@ -4,9 +4,20 @@ namespace Drupal\campaignion_manage;
 
 class ContentFilterLanguage implements FilterInterface {
   public function formElement(array &$form, array &$form_state, array &$values) {
+    $langs_in_use = db_query(
+      'SELECT DISTINCT(language) ' .
+      '  FROM {node} ' .
+      '    WHERE nid  = tnid ' .
+      '    OR    tnid = 0 ')->fetchCol();
     $options = array();
-    foreach (language_list() as $code => $language) {
-      $options[$code] = $language->native;
+    if (in_array('', $langs_in_use)) {
+      $options[''] = t('Language neutral');
+    }
+    $lang_list = language_list();
+    foreach ($langs_in_use as $lang) {
+      if (isset($lang_list[$lang])) {
+        $options[$lang] = $lang_list[$lang]->native;
+      }
     }
     $form['language'] = array(
       '#type' => 'select',
