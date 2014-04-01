@@ -12,7 +12,7 @@ class WrapperField {
 
   public function value() {
     $value = $this->wrappedContact->{$this->key}->value();
-    if (is_array($value)) {
+    if (is_array($value) && isset($value[0]) && count($value) == 1) {
       return $value[0];
     }
     return $value;
