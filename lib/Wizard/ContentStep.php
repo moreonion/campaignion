@@ -50,7 +50,6 @@ class ContentStep extends WizardStep {
     if ($wizard_secondary_used) {
       $form['#attributes']['class'][] = 'wizard-secondary-container';
     }
-    $form['field_reference_to_campaign']['#weight'] = 1;
 
     return $form;
   }
