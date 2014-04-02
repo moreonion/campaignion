@@ -25,14 +25,14 @@ SQL;
 
   $form['webform_template']['source'] = array(
     '#type'          => 'select',
-    '#title'         => t('Available templates'),
+    '#title'         => t('Available action-templates'),
     '#options'       => $templates,
     '#default_value' => 'none',
     '#description'   => t('Pick an action template to use pre-defined forms and emails.'),
   );
 
   if (empty($nid) == FALSE) {
-    $form['webform_template']['source']['#description'] .= '<br /><strong>' . t('Applying an action template will overwrite the form and email settings for this action!') . '</strong>';
+    $form['webform_template']['source']['#description'] .= '<br /><strong>' . t('Applying an action-template will overwrite the form and email settings for this action!') . '</strong>';
   }
 
   // add a submit function before the usual submit
@@ -73,7 +73,7 @@ function campaignion_action_template_form_node_form_alter(&$form, &$form_state) 
   }
   $form['campaignion_action_template'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Template settings'),
+    '#title' => t('Action-Template settings'),
     '#group' => 'additional_settings',
     '#tree' => FALSE,
   );
