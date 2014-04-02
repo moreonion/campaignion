@@ -82,6 +82,7 @@
 	border: 1px solid #e3dfd7;
 	background: #fff;
 	margin-bottom: .2em;
+  clear: both;
 }
 #campaignion-manage-filter-form .fieldset-content {
   padding: .7em 4.5em .5em 1em;
@@ -142,6 +143,58 @@ margin-bottom: 0;
   cursor: pointer;
 	background-color: #f5f1e8;
 }
+
+/* search bar */
+#campaignion-manage-filter-form #edit-filter-title-0, #campaignion-manage-filter-form #edit-filter-title-0 .fieldset-content {
+  background: none transparent;
+  border: 0px solid transparent;
+  padding: 0px;
+  min-height: none;
+  clear: none;
+}
+
+#campaignion-manage-filter-form #edit-filter-title-0 {
+  max-width: 30em;
+  float: left;
+  margin-right: 1em;
+  margin-left: 1em;
+  margin-top: .5em;
+}
+
+#campaignion-manage-filter-form #edit-filter-title-0:after  {
+  content: ".";
+  text-indent: -50000000px;
+  display: block;
+  height: 0px;
+  width: 0px;
+  clear: both;
+}
+
+#campaignion-manage-filter-form #edit-filter-title-0 label {
+  visibility: hidden;
+  display: block;
+  height: 0px;
+}
+
+#campaignion-manage-filter-form #edit-filter-title-0 .form-text {
+  font-size: 130%;
+  padding: .6em .5em .5em 45px;
+  background: url('../img/search.png') no-repeat 5px center #fff;
+}
+
+
+#campaignion-manage-filter-form #edit-submit {
+  clear: both;
+}
+
+/* bulk operations */
+ 
+#campaignion-manage-bulkops-form {
+  clear: both;
+  
+}
+
+/* table listing*/
 
 table.campaignion-manage-content-listing table {
   border: 0px;
