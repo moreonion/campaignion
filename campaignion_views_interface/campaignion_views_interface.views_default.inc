@@ -284,6 +284,7 @@ function campaignion_views_interface_views_default_views() {
     t('There is nothing to display. Change your search filters or add more content!'),
     t('User who uploaded'),
     t('Content'),
+    t('- Choose an operation -'),
     t('File name'),
     t('Upload date'),
     t('Author'),
@@ -378,7 +379,7 @@ function campaignion_views_interface_views_default_views() {
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'There is nothing to display. Change your search filters or add more supporters!';
   $handler->display->display_options['empty']['area']['format'] = 'full_html_with_editor';
-  /* Relationship: Activity Message referencing Contact */
+  /* Relationship: Broken/missing handler */
   $handler->display->display_options['relationships']['reverse_message_redhen_contact_message']['id'] = 'reverse_message_redhen_contact_message';
   $handler->display->display_options['relationships']['reverse_message_redhen_contact_message']['table'] = 'redhen_contact';
   $handler->display->display_options['relationships']['reverse_message_redhen_contact_message']['field'] = 'reverse_message_redhen_contact_message';
@@ -512,12 +513,12 @@ function campaignion_views_interface_views_default_views() {
     'label_id' => 'label_id',
   );
   $handler->display->display_options['fields']['redhen_contact_email']['delta_offset'] = '0';
-  /* Field: Field: Tags */
+  /* Field: Field: Tag supporters */
   $handler->display->display_options['fields']['supporter_tags']['id'] = 'supporter_tags';
   $handler->display->display_options['fields']['supporter_tags']['table'] = 'field_data_supporter_tags';
   $handler->display->display_options['fields']['supporter_tags']['field'] = 'supporter_tags';
   $handler->display->display_options['fields']['supporter_tags']['delta_offset'] = '0';
-  /* Field: Message: Action Node */
+  /* Field: Broken/missing handler */
   $handler->display->display_options['fields']['message_ae_action_node']['id'] = 'message_ae_action_node';
   $handler->display->display_options['fields']['message_ae_action_node']['table'] = 'field_data_message_ae_action_node';
   $handler->display->display_options['fields']['message_ae_action_node']['field'] = 'message_ae_action_node';
@@ -525,8 +526,6 @@ function campaignion_views_interface_views_default_views() {
   $handler->display->display_options['fields']['message_ae_action_node']['label'] = '';
   $handler->display->display_options['fields']['message_ae_action_node']['exclude'] = TRUE;
   $handler->display->display_options['fields']['message_ae_action_node']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['message_ae_action_node']['type'] = 'node_reference_plain';
-  $handler->display->display_options['fields']['message_ae_action_node']['group_column'] = 'entity_id';
   /* Sort criterion: Contact: Last name */
   $handler->display->display_options['sorts']['last_name']['id'] = 'last_name';
   $handler->display->display_options['sorts']['last_name']['table'] = 'redhen_contact';
@@ -555,7 +554,7 @@ function campaignion_views_interface_views_default_views() {
     'field_address' => 'field_address',
     'redhen_contact_email' => 'redhen_contact_email',
   );
-  /* Filter criterion: Field: Tags (supporter_tags) */
+  /* Filter criterion: Field: Tag supporters (supporter_tags) */
   $handler->display->display_options['filters']['supporter_tags_tid']['id'] = 'supporter_tags_tid';
   $handler->display->display_options['filters']['supporter_tags_tid']['table'] = 'field_data_supporter_tags';
   $handler->display->display_options['filters']['supporter_tags_tid']['field'] = 'supporter_tags_tid';
@@ -583,7 +582,7 @@ function campaignion_views_interface_views_default_views() {
   $handler->display->display_options['filters']['supporter_tags_tid']['reduce_duplicates'] = TRUE;
   $handler->display->display_options['filters']['supporter_tags_tid']['type'] = 'select';
   $handler->display->display_options['filters']['supporter_tags_tid']['vocabulary'] = 'supporter_tags';
-  /* Filter criterion: Contact: Adresse (field_address:country) */
+  /* Filter criterion: Contact: Adresse - Country */
   $handler->display->display_options['filters']['field_address_country']['id'] = 'field_address_country';
   $handler->display->display_options['filters']['field_address_country']['table'] = 'field_data_field_address';
   $handler->display->display_options['filters']['field_address_country']['field'] = 'field_address_country';
@@ -600,7 +599,7 @@ function campaignion_views_interface_views_default_views() {
     4 => 0,
     5 => 0,
   );
-  /* Filter criterion: Message: Action Node (message_ae_action_node) */
+  /* Filter criterion: Broken/missing handler */
   $handler->display->display_options['filters']['message_ae_action_node_nid']['id'] = 'message_ae_action_node_nid';
   $handler->display->display_options['filters']['message_ae_action_node_nid']['table'] = 'field_data_message_ae_action_node';
   $handler->display->display_options['filters']['message_ae_action_node_nid']['field'] = 'message_ae_action_node_nid';
@@ -652,6 +651,10 @@ function campaignion_views_interface_views_default_views() {
     t('There is nothing to display. Change your search filters or add more supporters!'),
     t('Activity Message referencing Contact'),
     t('Contact'),
+    t('- Choose an operation -'),
+    t('Delete contact'),
+    t('Add tag'),
+    t('Send Email'),
     t('.'),
     t(','),
     t('First name'),
@@ -659,7 +662,7 @@ function campaignion_views_interface_views_default_views() {
     t('Adresse'),
     t('E-Mail'),
     t('[redhen_contact_email-value] '),
-    t('Tags'),
+    t('Tag supporters'),
     t('Search'),
     t('Tag'),
     t('Tags (supporter_tags)'),
