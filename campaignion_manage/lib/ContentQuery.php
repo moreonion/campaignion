@@ -7,15 +7,12 @@ class ContentQuery {
   protected $filter;
 
   public function __construct() {
-    $this->build();
-  }
-
-  public function build() {
     $query = db_select('node', 'n');
     $query->innerJoin('users', 'u', 'u.uid = n.uid');
     $query->fields('n', array('nid', 'title', 'type', 'language', 'status', 'uid'))
-      ->fields('u', array('name'))
       ->where('n.nid = n.tnid OR n.tnid = 0')
+      ->condition('n.type', 'thank_you_page', '!=')
+      ->fields('u', array('name'))
       ->orderBy('n.changed', 'DESC');
 
     $this->query = $query;

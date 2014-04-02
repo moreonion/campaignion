@@ -4,14 +4,26 @@
  * Implements hook_menu().
  */
 function campaignion_manage_menu() {
-  $items['admin/manage/content_and_actions'] = array(
-    'tab_parent' => 'admin/manage/content_and_actions',
-    'tab_root' => 'admin/manage/content_and_actions',
-    'title' => 'Manage content and actions',
-    'page callback' => 'campaignion_manage_content_page',
+  $items['admin/manage'] = array(
+    'title'            => t('Manage Campaignion'),
+    'page callback'    => 'campaignion_manage_content_page',
     'access arguments' => array('administer nodes'),
-    'type' => MENU_SUGGESTED_ITEM,
+    'type'             => MENU_NORMAL_ITEM,
   );
+
+  $items['admin/manage/content_and_actions'] = array(
+    'title'  => t('Manage Content & Actions'),
+    'type'   => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+  );
+
+  $items['admin/manage/action_templates'] = array(
+    'title'            => t('Action Templates'),
+    'page callback'    => 'campaignion_manage_action_templates',
+    'access arguments' => array('administer nodes'),
+    'type'             => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 
@@ -50,29 +62,31 @@ function campaignion_manage_action_list($entity_type) {
 }
 
 /**
- * Page callback: Manage content and actions page
+ * helper function for page callbacks
  */
-function campaignion_manage_content_page() {
+function campaignion_manage_build_page(\Drupal\campaignion_manage\ContentQuery $baseQuery) {
   // add style + js for interface
   drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_bulk.js');
   drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_filter.js');
   drupal_add_css(drupal_get_path('module', 'campaignion_manage') . '/css/manage_bulk.css');
 
-  $baseQuery = new \Drupal\campaignion_manage\ContentQuery();
   $baseQuery->page(20);
 
   $listing = new \Drupal\campaignion_manage\ContentListing($baseQuery);
 
-  $filters = array();
-  foreach (array('ContentFilterTitle' => TRUE, 'ContentFilterType' => FALSE, 'ContentFilterLanguage' => FALSE, 'ContentFilterStatus' => FALSE) as $filter_class => $active) {
+  $filter_object = new \Drupal\campaignion_manage\ContentFilterTitle();
+  $filters       = array($filter_object->machineName() => $filter_object);
+  $defaultActive = array($filter_object->machineName());
+  $filter_object = new \Drupal\campaignion_manage\ContentFilterLanguage($baseQuery->getQuery());
+  $filters[$filter_object->machineName()] = $filter_object;
+
+  foreach (array('ContentFilterType', 'ContentFilterStatus') as $filter_class) {
     $filter_class = '\Drupal\campaignion_manage\\' . $filter_class;
     $filter_object = new $filter_class();
-    $filters[$filter_object->machineName()] = array(
-      'active' => $active,
-      'filter' => $filter_object,
-      );
+    $filters[$filter_object->machineName()] = $filter_object;
   }
-  $filterForm = new \Drupal\campaignion_manage\FilterForm($filters);
+
+  $filterForm = new \Drupal\campaignion_manage\FilterForm($filters, $defaultActive);
   $baseQuery->setFilter($filterForm);
 
   $bulkOpForm = new \Drupal\campaignion_manage\BulkOpForm($listing, array(
@@ -90,6 +104,28 @@ function campaignion_manage_content_page() {
     ),
   );
   return $output;
+}
+
+/**
+ * Page callback: Manage Content & Actions page
+ */
+function campaignion_manage_content_page() {
+  drupal_set_title(t('Manage Content & Actions'), PASS_THROUGH);
+
+  $baseQuery = new \Drupal\campaignion_manage\ContentQuery();
+
+  return campaignion_manage_build_page($baseQuery);
+}
+
+/**
+ * Page callback: Action Templates page
+ */
+function campaignion_manage_action_templates() {
+  drupal_set_title(t('Action Templates'), PASS_THROUGH);
+
+  $baseQuery = new \Drupal\campaignion_manage\TemplateQuery();
+
+  return campaignion_manage_build_page($baseQuery);
 }
 
 function campaignion_manage_forms() {

@@ -9,30 +9,32 @@ class FilterForm {
   /**
    * @param $filters array of filters with the structure
    *   $filters = array(
-   *     'machineName' => array(
-   *       'active' => FALSE,
-   *       'filter' => filterObject
-   *     ),
+   *     machineName => filterObject,
    *   )
    *   machineName      is the machine name of the filter
-   *   active           specifies if the filter is applied by default
-   *   filter           specifies the filter object
+   *   filterObject     instance of a filter object
    */
-  public function __construct($filters = array()) {
+  public function __construct($filters = array(), $defaultActive = array()) {
     $this->values = isset($_SESSION['campaignion_manage_content_filter']) ? $_SESSION['campaignion_manage_content_filter'] : NULL;
 
-    foreach ($filters as $name => $filter_settings) {
-      $filter = $filter_settings['filter'];
-      $active = $filter_settings['active'];
-      $this->filters[$name] = $filter;
-      for($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
+    $this->filters = $filters;
+
+    foreach ($filters as $name => $filter) {
+      for ($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
         if (!isset($this->values['filter'][$name][$delta]['active'])) {
-          $this->values['filter'][$name][$delta] = array('active' => $active);
+          if (($index = array_search($name, $defaultActive)) !== FALSE) {
+            $this->values['filter'][$name][$delta]['active'] = TRUE;
+            // only set the first instance of the filter active
+            unset($defaultActive[$index]);
+          }
+          else {
+            $this->values['filter'][$name][$delta]['active'] = FALSE;
+          }
         }
       }
     }
   }
-  
+
   public function applyFilters($query) {
     foreach ($this->filters as $filter) {
       $name = $filter->machineName();
@@ -62,6 +64,7 @@ class FilterForm {
           '#default_value' => !empty($this->values['filter'][$name][$delta]['active']),
           '#attributes'    => array('class' => array('filter-active-toggle')),
         );
+
         $filter->formElement($element, $form_state, $this->values['filter'][$name][$delta]);
       }
     }

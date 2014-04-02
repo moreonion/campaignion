@@ -3,12 +3,24 @@
 namespace Drupal\campaignion_manage;
 
 class ContentFilterLanguage implements FilterInterface {
+  protected $query;
+
+  public function __construct(\SelectQuery $query) {
+    $this->query = $query;
+  }
+
   public function formElement(array &$form, array &$form_state, array &$values) {
-    $langs_in_use = db_query(
-      'SELECT DISTINCT(language) ' .
-      '  FROM {node} ' .
-      '    WHERE nid  = tnid ' .
-      '    OR    tnid = 0 ')->fetchCol();
+    $query = clone $this->query;
+    $fields =& $query->getFields();
+    $fields = array(
+      'language' => array(
+        'field' => 'language',
+        'table' => 'n',
+        'alias' => 'language',
+      ),
+    );
+    $query->groupBy('n.language');
+    $langs_in_use = $query->execute()->fetchCol();
     $options = array();
     if (in_array('', $langs_in_use)) {
       $options[''] = t('Language neutral');
