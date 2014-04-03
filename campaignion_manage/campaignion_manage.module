@@ -66,13 +66,11 @@ function campaignion_manage_action_list($entity_type) {
 /**
  * helper function for page callbacks
  */
-function campaignion_manage_build_page(cm\ContentQuery $baseQuery) {
+function campaignion_manage_build_page(cm\Query\Content $baseQuery) {
   // add style + js for interface
   drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_bulk.js');
   drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_filter.js');
   drupal_add_css(drupal_get_path('module', 'campaignion_manage') . '/css/manage_bulk.css');
-
-  $baseQuery->page(20);
 
   $listing = new cm\ContentListing($baseQuery);
   // filter for node title created separately because it has to be enabled
@@ -91,6 +89,8 @@ function campaignion_manage_build_page(cm\ContentQuery $baseQuery) {
 
   $filterForm = new cm\FilterForm($filters, $defaultActive);
   $baseQuery->setFilter($filterForm);
+
+  $baseQuery->page(20);
 
   $bulkOpForm = new cm\BulkOpForm($listing, array(
     new cm\PublishBulkOp(),
@@ -115,7 +115,7 @@ function campaignion_manage_build_page(cm\ContentQuery $baseQuery) {
 function campaignion_manage_content_page() {
   drupal_set_title(t('Manage Content & Actions'), PASS_THROUGH);
 
-  $baseQuery = new \Drupal\campaignion_manage\ContentQuery();
+  $baseQuery = new \Drupal\campaignion_manage\Query\Content();
 
   return campaignion_manage_build_page($baseQuery);
 }
@@ -126,7 +126,7 @@ function campaignion_manage_content_page() {
 function campaignion_manage_action_templates() {
   drupal_set_title(t('Action Templates'), PASS_THROUGH);
 
-  $baseQuery = new \Drupal\campaignion_manage\TemplateQuery();
+  $baseQuery = new \Drupal\campaignion_manage\Query\Template();
 
   return campaignion_manage_build_page($baseQuery);
 }

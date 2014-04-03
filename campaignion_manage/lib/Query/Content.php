@@ -1,11 +1,8 @@
 <?php
 
-namespace Drupal\campaignion_manage;
+namespace Drupal\campaignion_manage\Query;
 
-class ContentQuery {
-  protected $query;
-  protected $filter;
-
+class Content extends Base {
   public function __construct() {
     $query = db_select('node', 'n');
     $query->innerJoin('users', 'u', 'u.uid = n.uid');
@@ -16,21 +13,6 @@ class ContentQuery {
       ->orderBy('n.changed', 'DESC');
 
     $this->query = $query;
-  }
-
-  public function setFilter($filter) {
-    $this->filter = $filter;
-  }
-
-  public function execute() {
-    $this->filter->applyFilters($this);
-    $rows = $this->query->execute()->fetchAll();
-    $this->modifyResult($rows);
-    return $rows;
-  }
-
-  public function page($size) {
-    //$this->query = $this->query->extend('PagerDefault')->limit($size);
   }
 
   public function modifyResult(&$rows) {
@@ -54,12 +36,5 @@ SQL;
     foreach ($result as $row) {
       $rows_by_nid[$row->tnid]->translations[$row->language] = $row;
     }
-  }
-
-  public function ensureTable($alias) {
-  }
-
-  public function getQuery() {
-    return $this->query;
   }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion_manage;
+namespace Drupal\campaignion_manage\Query;
 
-class TemplateQuery extends ContentQuery {
+class Template extends Content {
 
   public function __construct() {
     parent::__construct();

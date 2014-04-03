@@ -7,7 +7,7 @@ class ContentFilterNodeReference implements FilterInterface {
   protected $referenceField;
   protected $referenceColumn;
 
-  public function __construct(\SelectQuery $query, $reference_field, $reference_column) {
+  public function __construct(\SelectQueryInterface $query, $reference_field, $reference_column) {
     $this->query           = $query;
     $this->referenceField  = $reference_field;
     $this->referenceColumn = $reference_column;

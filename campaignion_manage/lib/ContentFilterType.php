@@ -5,7 +5,7 @@ namespace Drupal\campaignion_manage;
 class ContentFilterType implements FilterInterface {
   protected $query;
 
-  public function __construct(\SelectQuery $query) {
+  public function __construct(\SelectQueryInterface $query) {
     $this->query = $query;
   }
 
