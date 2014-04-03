@@ -12,7 +12,7 @@ function campaignion_manage_menu() {
   );
 
   $items['admin/manage/content_and_actions'] = array(
-    'title'  => t('Manage Content & Actions'),
+    'title'  => t('Content'),
     'type'   => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -1,
   );
@@ -73,16 +73,26 @@ function campaignion_manage_build_page(\Drupal\campaignion_manage\ContentQuery $
   $baseQuery->page(20);
 
   $listing = new \Drupal\campaignion_manage\ContentListing($baseQuery);
-
-  $filter_object = new \Drupal\campaignion_manage\ContentFilterTitle();
-  $filters       = array($filter_object->machineName() => $filter_object);
-  $defaultActive = array($filter_object->machineName());
-  $filter_object = new \Drupal\campaignion_manage\ContentFilterLanguage($baseQuery->getQuery());
-  $filters[$filter_object->machineName()] = $filter_object;
-
-  foreach (array('ContentFilterType', 'ContentFilterStatus') as $filter_class) {
+  // filter for node title created separately because it has to be enabled
+  // by default and we need the machine name for the filter
+  $filter_object     = new \Drupal\campaignion_manage\ContentFilterTitle();
+  $filters           = array($filter_object->machineName() => $filter_object);
+  $defaultActive     = array($filter_object->machineName());
+  $filter_class_list = array('ContentFilterLanguage', 'ContentFilterType', 'ContentFilterStatus');
+  if (module_exists('campaignion_microsite')) {
+    $filter_class_list[] = 'ContentFilterMicrosite';
+  }
+  if (module_exists('campaignion_campaign')) {
+    $filter_class_list[] = 'ContentFilterCampaign';
+  }
+  foreach ($filter_class_list as $filter_class) {
     $filter_class = '\Drupal\campaignion_manage\\' . $filter_class;
-    $filter_object = new $filter_class();
+    if (strpos($filter_class, 'ContentFilterStatus') !== FALSE) {
+      $filter_object = new $filter_class();
+    }
+    else {
+      $filter_object = new $filter_class($baseQuery->getQuery());
+    }
     $filters[$filter_object->machineName()] = $filter_object;
   }
 

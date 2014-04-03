@@ -30,6 +30,18 @@ interface FilterInterface {
    * @param array Array of values from previous form submissions.
    */
   public function apply($query, array $values);
-  
+
+  /**
+   * Get the number of instances that are possible for this filter
+   *
+   * @return number of instances
+   */
   public function nrOfInstances();
+
+  /**
+   * Provide information if the filter is currently applicable
+   *
+   * @return TRUE if the filter is currently applicable, FALSE otherwise
+   */
+  public function isApplicable();
 }

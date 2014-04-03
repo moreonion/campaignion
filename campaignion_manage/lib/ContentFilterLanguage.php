@@ -9,7 +9,7 @@ class ContentFilterLanguage implements FilterInterface {
     $this->query = $query;
   }
 
-  public function formElement(array &$form, array &$form_state, array &$values) {
+  protected function getOptions() {
     $query = clone $this->query;
     $fields =& $query->getFields();
     $fields = array(
@@ -31,19 +31,25 @@ class ContentFilterLanguage implements FilterInterface {
         $options[$lang] = $lang_list[$lang]->native;
       }
     }
+
+    return $options;
+  }
+
+  public function formElement(array &$form, array &$form_state, array &$values) {
     $form['language'] = array(
-      '#type' => 'select',
-      '#title' => t('Language'),
-      '#options' => $options,
+      '#type'          => 'select',
+      '#title'         => t('Language'),
+      '#options'       => $this->getOptions(),
       '#default_value' => isset($values) ? $values : NULL,
     );
+    $form['#attributes']['class'][] = 'campaignion-manage-filter-language';
   }
   public function machineName() { return 'language'; }
   public function title() { return t('Language'); }
   public function apply($query, array $values) {
     $query->getQuery()->condition('n.language', $values['language']);
   }
-  public function nrOfInstances() {
-    return 1;
-  }
+  public function nrOfInstances() { return 1; }
+
+  public function isApplicable() { return !empty($this->getOptions()); }
 }

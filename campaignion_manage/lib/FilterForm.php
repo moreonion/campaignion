@@ -49,28 +49,30 @@ class FilterForm {
   public function form($form, &$form_state) {
     $form['#tree'] = TRUE;
     foreach ($this->filters as $filter) {
-      $name = $filter->machineName();
-      for($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
-        $form['filter'][$name][$delta] = array(
-          '#type'       => 'fieldset',
-          '#title'      => $filter->title(),
-          '#attributes' => array('class' => array('clearfix')),
-        );
-        $element = &$form['filter'][$name][$delta];
-        $element['active'] = array(
-          '#type'          => 'checkbox',
-          '#title'         => t('active'),
-          '#description'   => t('The filter will only be applied if this checkbox is checked.'),
-          '#default_value' => !empty($this->values['filter'][$name][$delta]['active']),
-          '#attributes'    => array('class' => array('filter-active-toggle')),
-        );
+      if ($filter->isApplicable()) {
+        $name = $filter->machineName();
+        for($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
+          $form['filter'][$name][$delta] = array(
+            '#type'       => 'fieldset',
+            '#title'      => $filter->title(),
+            '#attributes' => array('class' => array('clearfix')),
+          );
+          $element = &$form['filter'][$name][$delta];
+          $element['active'] = array(
+            '#type'          => 'checkbox',
+            '#title'         => t('active'),
+            '#description'   => t('The filter will only be applied if this checkbox is checked.'),
+            '#default_value' => !empty($this->values['filter'][$name][$delta]['active']),
+            '#attributes'    => array('class' => array('filter-active-toggle')),
+          );
 
-        $filter->formElement($element, $form_state, $this->values['filter'][$name][$delta]);
+          $filter->formElement($element, $form_state, $this->values['filter'][$name][$delta]);
+        }
       }
     }
 
     $form['submit'] = array(
-      '#type' => 'submit',
+      '#type'  => 'submit',
       '#value' => t('Filter'),
     );
     return $form;
