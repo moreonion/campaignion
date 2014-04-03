@@ -58,7 +58,7 @@ class BulkOpForm {
   }
   public function submit(&$form, &$form_state) {
     $values = &$form_state['values'];
-    $nids = $this->listing->selectedNids($form['listing'], $form_state);
+    $nids = $this->listing->selectedIds($form['listing'], $form_state);
 
     $op_name = $values['bulk-wrapper']['operations'];
     if (!isset($this->ops[$op_name])) {

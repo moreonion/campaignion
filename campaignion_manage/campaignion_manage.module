@@ -26,6 +26,12 @@ function campaignion_manage_menu() {
     'type'             => MENU_LOCAL_TASK,
   );
 
+  $items['admin/supporters'] = array(
+    'title' => t('Manage Supporters'),
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('manage redhen contacts'),
+    'page callback' => 'campaignion_manage_supporters_page',
+  );
   return $items;
 }
 
@@ -46,6 +52,12 @@ function campaignion_manage_theme() {
     'variables' => array(
       'node' => NULL,
       'translation_set' => FALSE,
+    ),
+    'file' => 'campaignion_manage.theme.inc',
+  );
+  $theme['campaignion_manage_contact'] = array(
+    'variables' => array(
+      'contact' => NULL,
     ),
     'file' => 'campaignion_manage.theme.inc',
   );
@@ -131,6 +143,41 @@ function campaignion_manage_action_templates() {
   return campaignion_manage_build_page($baseQuery);
 }
 
+/**
+ * Page callback: Manage your supporters page
+ */
+function campaignion_manage_supporters_page() {
+  // add style + js for interface
+  drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_bulk.js');
+  drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_filter.js');
+  drupal_add_css(drupal_get_path('module', 'campaignion_manage') . '/css/manage_bulk.css');
+
+  drupal_set_title(t('Manage your supporters'), PASS_THROUGH);
+
+  $baseQuery = new cm\Query\Supporter();
+  
+  $listing = new cm\SupporterListing($baseQuery);
+
+  $filters = array();
+  $defaultActive = array();
+  if (module_exists('campaignion_supporter_tags')) {
+    $filters['tags'] = new cm\SupporterFilterTag($baseQuery->getQuery());
+  }
+  $filterForm = new cm\FilterForm($filters, $defaultActive);
+  $baseQuery->setFilter($filterForm);
+  $baseQuery->page(20);
+  $bulkOpForm = new cm\BulkOpForm($listing, array());
+  
+  $output = array(
+    'filter' => drupal_get_form('campaignion_manage_filter_form', $filterForm),
+    'bulkop_listing' => drupal_get_form('campaignion_manage_bulkops_form', $bulkOpForm),
+    'pager' => array(
+      '#theme' => 'pager',
+    ),
+  );
+  return $output;
+}
+
 function campaignion_manage_forms() {
   $forms['campaignion_manage_filter_form'] = array(
     'callback' => 'campaignion_manage_form',
@@ -156,7 +203,7 @@ function campaignion_manage_form_submit($form, &$form_state) {
 }
 
 function campaignion_manage_element_info() {
-  $types['campaignion_manage_content_listing'] = array(
+  $types['campaignion_manage_listing'] = array(
     '#theme' => 'table',
     '#process' => array('campaignion_manage_form_process'),
   );

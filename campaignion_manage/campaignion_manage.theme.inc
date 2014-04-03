@@ -48,3 +48,21 @@ EOT;
 
   return $content;
 }
+
+function theme_campaignion_manage_contact($variables) {
+  $contact = $variables['contact'];
+  $contactObj = new \Drupal\campaignion\Contact($contact);
+  $wrappedContact = $contactObj->wrap();
+  $link = l($wrappedContact->full_name->value(), "redhen/contact/{$contact->contact_id}/view");
+  $email = $contact->redhen_contact_email_value;
+  $content = <<<EOT
+<span class="icon"></span>
+<div class="heading">
+<span class="title">{$link}</span>
+</div>
+<div class="additional-info">
+<span class="email">{$email}</span>
+</div>
+EOT;
+  return $content;
+}

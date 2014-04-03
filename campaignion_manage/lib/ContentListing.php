@@ -15,7 +15,7 @@ class ContentListing {
    */
   public function build(&$element, &$form_state) {
     $element += array(
-      '#type' => 'campaignion_manage_content_listing',
+      '#type' => 'campaignion_manage_listing',
       '#attributes' => array(
         'class' => array('campaignion-manage-content-listing'),
       ),
@@ -117,7 +117,7 @@ class ContentListing {
     return $links;
   }
 
-  public function selectedNids(&$element, &$form_state) {
+  public function selectedIds(&$element, &$form_state) {
     $values = &drupal_array_get_nested_value($form_state['values'], $element['#array_parents']);
     $nids = array();
     foreach ($values['bulk_nid'] as $nid => $selected) {
