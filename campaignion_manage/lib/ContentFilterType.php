@@ -36,7 +36,6 @@ class ContentFilterType implements FilterInterface {
     );
     $form['#attributes']['class'][] = 'campaignion-manage-filter-type';
   }
-  public function machineName() { return 'type'; }
   public function title() { return t('Type of page'); }
   public function apply($query, array $values) {
     $query->getQuery()->condition('n.type', $values['type']);

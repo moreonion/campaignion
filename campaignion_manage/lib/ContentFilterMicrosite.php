@@ -18,6 +18,5 @@ class ContentFilterMicrosite extends ContentFilterNodeReference {
     );
     $form['#attributes']['class'][] = 'campaignion-manage-filter-microsite';
   }
-  public function machineName() { return 'microsite'; }
   public function title() { return t('Micro-Site'); }
 }

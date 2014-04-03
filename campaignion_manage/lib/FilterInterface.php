@@ -12,12 +12,6 @@ interface FilterInterface {
    */
   public function formElement(array &$element, array &$form_state, array &$values);
   /**
-   * Get the a unique machineName for this kind of filter.
-   *
-   * @return a unique name for this kind of filter - should be form-key save.
-   */
-  public function machineName();
-  /**
    * A human readable title for this filter. „Filter by …“
    *
    * @return string

@@ -1,5 +1,7 @@
 <?php
 
+use \Drupal\campaignion_manage as cm;
+
 /**
  * Implements hook_menu().
  */
@@ -64,7 +66,7 @@ function campaignion_manage_action_list($entity_type) {
 /**
  * helper function for page callbacks
  */
-function campaignion_manage_build_page(\Drupal\campaignion_manage\ContentQuery $baseQuery) {
+function campaignion_manage_build_page(cm\ContentQuery $baseQuery) {
   // add style + js for interface
   drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_bulk.js');
   drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_filter.js');
@@ -72,36 +74,27 @@ function campaignion_manage_build_page(\Drupal\campaignion_manage\ContentQuery $
 
   $baseQuery->page(20);
 
-  $listing = new \Drupal\campaignion_manage\ContentListing($baseQuery);
+  $listing = new cm\ContentListing($baseQuery);
   // filter for node title created separately because it has to be enabled
   // by default and we need the machine name for the filter
-  $filter_object     = new \Drupal\campaignion_manage\ContentFilterTitle();
-  $filters           = array($filter_object->machineName() => $filter_object);
-  $defaultActive     = array($filter_object->machineName());
-  $filter_class_list = array('ContentFilterLanguage', 'ContentFilterType', 'ContentFilterStatus');
+  $filters['title'] = new cm\ContentFilterTitle();
+  $defaultActive = array('title');
   if (module_exists('campaignion_microsite')) {
-    $filter_class_list[] = 'ContentFilterMicrosite';
+    $filters['microsite'] = new cm\ContentFilterMicrosite($baseQuery->getQuery());
   }
   if (module_exists('campaignion_campaign')) {
-    $filter_class_list[] = 'ContentFilterCampaign';
+    $filters['campaign'] = new cm\ContentFilterCampaign($baseQuery->getQuery());
   }
-  foreach ($filter_class_list as $filter_class) {
-    $filter_class = '\Drupal\campaignion_manage\\' . $filter_class;
-    if (strpos($filter_class, 'ContentFilterStatus') !== FALSE) {
-      $filter_object = new $filter_class();
-    }
-    else {
-      $filter_object = new $filter_class($baseQuery->getQuery());
-    }
-    $filters[$filter_object->machineName()] = $filter_object;
-  }
+  $filters['language'] = new cm\ContentFilterLanguage($baseQuery->getQuery());
+  $filters['type'] = new cm\ContentFilterType($baseQuery->getQuery());
+  $filters['status'] = new cm\ContentFilterStatus();
 
-  $filterForm = new \Drupal\campaignion_manage\FilterForm($filters, $defaultActive);
+  $filterForm = new cm\FilterForm($filters, $defaultActive);
   $baseQuery->setFilter($filterForm);
 
-  $bulkOpForm = new \Drupal\campaignion_manage\BulkOpForm($listing, array(
-    new \Drupal\campaignion_manage\PublishBulkOp(),
-    new \Drupal\campaignion_manage\UnpublishBulkOp(),
+  $bulkOpForm = new cm\BulkOpForm($listing, array(
+    new cm\PublishBulkOp(),
+    new cm\UnpublishBulkOp(),
   ));
 
   // ATTENTION: drupal_get_form() has to be called before $baseQuery->execute()

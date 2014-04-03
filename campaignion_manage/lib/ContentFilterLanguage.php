@@ -44,7 +44,6 @@ class ContentFilterLanguage implements FilterInterface {
     );
     $form['#attributes']['class'][] = 'campaignion-manage-filter-language';
   }
-  public function machineName() { return 'language'; }
   public function title() { return t('Language'); }
   public function apply($query, array $values) {
     $query->getQuery()->condition('n.language', $values['language']);

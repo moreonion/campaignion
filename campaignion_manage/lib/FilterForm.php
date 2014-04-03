@@ -36,8 +36,7 @@ class FilterForm {
   }
 
   public function applyFilters($query) {
-    foreach ($this->filters as $filter) {
-      $name = $filter->machineName();
+    foreach ($this->filters as $name => $filter) {
       for($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
         if ($this->filterIsActive($name, $delta)) {
           $filter->apply($query, $this->values['filter'][$name][$delta]);
@@ -48,9 +47,8 @@ class FilterForm {
 
   public function form($form, &$form_state) {
     $form['#tree'] = TRUE;
-    foreach ($this->filters as $filter) {
+    foreach ($this->filters as $name => $filter) {
       if ($filter->isApplicable()) {
-        $name = $filter->machineName();
         for($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
           $form['filter'][$name][$delta] = array(
             '#type'       => 'fieldset',

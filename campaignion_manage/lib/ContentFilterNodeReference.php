@@ -44,7 +44,6 @@ class ContentFilterNodeReference implements FilterInterface {
     );
     $form['#attributes']['class'][] = 'campaignion-manage-filter-node-reference';
   }
-  public function machineName() { return 'node_reference'; }
   public function title() { return t('Node Reference'); }
   public function apply($query, array $values) {
     $query->getQuery()->innerJoin('field_data_' . $this->referenceField, 'ref', 'ref.entity_id = n.nid');

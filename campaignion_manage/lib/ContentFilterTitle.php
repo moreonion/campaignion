@@ -14,7 +14,6 @@ class ContentFilterTitle implements FilterInterface {
     );
     $form['#attributes']['class'][] = 'campaignion-manage-filter-title';
   }
-  public function machineName() { return 'title'; }
 
   public function title() { return t('Filter by typing the title'); }
 

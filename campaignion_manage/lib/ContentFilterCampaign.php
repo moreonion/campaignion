@@ -18,6 +18,5 @@ class ContentFilterCampaign extends ContentFilterNodeReference {
     );
     $form['#attributes']['class'][] = 'campaignion-manage-filter-campaign';
   }
-  public function machineName() { return 'campaign'; }
   public function title() { return t('Campaign'); }
 }

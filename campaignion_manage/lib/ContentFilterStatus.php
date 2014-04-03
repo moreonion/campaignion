@@ -12,7 +12,6 @@ class ContentFilterStatus implements FilterInterface {
     );
     $form['#attributes']['class'][] = 'campaignion-manage-filter-status';
   }
-  public function machineName() { return 'status'; }
   public function title() { return t('Publishing state'); }
   public function apply($query, array $values) {
     $query->getQuery()->condition('n.status', $values['status']);
