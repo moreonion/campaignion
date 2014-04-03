@@ -77,7 +77,7 @@ class ContentListing {
     );
     $element[$pfx][$node->nid] = &$row['data']['bulk']['data'];
     $element[$pfx]['#options'][$node->nid] = $node->nid;
-    $row['data']['content']['class'] = array('manage-content');
+    $row['data']['content']['class'] = array('campaignion-manage');
     $row['data']['content']['data'] = array(
       '#theme' => 'campaignion_manage_node',
       '#node' => $node,

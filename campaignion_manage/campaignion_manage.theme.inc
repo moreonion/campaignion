@@ -55,10 +55,20 @@ function theme_campaignion_manage_contact($variables) {
   $wrappedContact = $contactObj->wrap();
   $link = l($wrappedContact->full_name->value(), "redhen/contact/{$contact->contact_id}/view");
   $email = $contact->redhen_contact_email_value;
+
+  $tags = '';
+  foreach ($contact->tags as $tag) {
+    $tags .= "<span class=\"tag\">$tag</span>";
+  }  
+
+  $hold = ($contact->redhen_contact_email_hold === '1') ? '<span class="hold">Hold!</span>' : '';
+
   $content = <<<EOT
 <span class="icon"></span>
 <div class="heading">
 <span class="title">{$link}</span>
+{$tags}
+{$hold}
 </div>
 <div class="additional-info">
 <span class="email">{$email}</span>

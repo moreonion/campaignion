@@ -25,7 +25,6 @@ class SupporterListing {
 
   public function process(&$element, &$form_state) {
     $result = $this->query->execute();
-    $columns = 3;
 
     $rows = array();
 
@@ -58,7 +57,7 @@ class SupporterListing {
     );
     $element[$pfx][$contact->contact_id] = &$row['data']['bulk']['data'];
     $element[$pfx]['#options'][$contact->contact_id] = $contact->contact_id;
-    $row['data']['content']['class'] = array('manage-content');
+    $row['data']['content']['class'] = array('campaignion-manage');
     $row['data']['content']['data'] = array(
       '#theme' => 'campaignion_manage_contact',
       '#contact' => $contact,
@@ -74,7 +73,7 @@ class SupporterListing {
 
   protected function renderLinks($contact) {
     $links = array();
-    foreach (array('edit' => t('Edit'), 'view' => t('View page'), 'delete' => t('Delete')) as $path => $title) {
+    foreach (array('edit' => t('Edit'), 'view' => t('View contact'), 'delete' => t('Delete')) as $path => $title) {
       $links[$path] = array(
         'href' => "redhen/contact/{$contact->contact_id}/view/$path",
         'title' => $title,
