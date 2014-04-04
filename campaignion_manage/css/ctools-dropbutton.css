@@ -36,17 +36,3 @@
 .manage-links .open .ctools-link a {
   top: 0.5em;
 }
-
-/* with selecter */
-.fs-selecter .manage-links .selecter {
-  max-width: 100%;
-  margin: 0;
-}
-.fs-selecter .manage-links .ctools-link {
-  display: none;
-}
-.fs-selecter .manage-links .ctools-dropbutton {
-  border: none;
-  padding: 0;
-}
-
