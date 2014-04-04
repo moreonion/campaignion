@@ -50,5 +50,5 @@ class ContentFilterLanguage implements FilterInterface {
   }
   public function nrOfInstances() { return 1; }
 
-  public function isApplicable() { return !empty($this->getOptions()); }
+  public function isApplicable() { return count($this->getOptions()) > 1; }
 }
