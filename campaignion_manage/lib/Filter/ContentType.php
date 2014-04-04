@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion_manage;
+namespace Drupal\campaignion_manage\Filter;
 
-class ContentFilterType implements FilterInterface {
+class ContentType implements FilterInterface {
   protected $query;
 
   public function __construct(\SelectQueryInterface $query) {

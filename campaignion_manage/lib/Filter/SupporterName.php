@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion_manage;
+namespace Drupal\campaignion_manage\Filter;
 
-class SupporterFilterName implements FilterInterface {
+class SupporterName implements FilterInterface {
 
   public function formElement(array &$form, array &$form_state, array &$values) {
     $form['name'] = array(

@@ -87,17 +87,17 @@ function campaignion_manage_build_page(cm\Query\Content $baseQuery) {
   $listing = new cm\ContentListing($baseQuery);
   // filter for node title created separately because it has to be enabled
   // by default and we need the machine name for the filter
-  $filters['title'] = new cm\ContentFilterTitle();
+  $filters['title'] = new cm\Filter\ContentTitle();
   $defaultActive = array('title');
   if (module_exists('campaignion_microsite')) {
-    $filters['microsite'] = new cm\ContentFilterMicrosite($baseQuery->getQuery());
+    $filters['microsite'] = new cm\Filter\ContentMicrosite($baseQuery->getQuery());
   }
   if (module_exists('campaignion_campaign')) {
-    $filters['campaign'] = new cm\ContentFilterCampaign($baseQuery->getQuery());
+    $filters['campaign'] = new cm\Filter\ContentCampaign($baseQuery->getQuery());
   }
-  $filters['language'] = new cm\ContentFilterLanguage($baseQuery->getQuery());
-  $filters['type'] = new cm\ContentFilterType($baseQuery->getQuery());
-  $filters['status'] = new cm\ContentFilterStatus();
+  $filters['language'] = new cm\Filter\ContentLanguage($baseQuery->getQuery());
+  $filters['type'] = new cm\Filter\ContentType($baseQuery->getQuery());
+  $filters['status'] = new cm\Filter\ContentStatus();
 
   $filterForm = new cm\FilterForm($filters, $defaultActive);
   $baseQuery->setFilter($filterForm);
@@ -161,9 +161,9 @@ function campaignion_manage_supporters_page() {
   $filters = array();
   $defaultActive = array();
   if (module_exists('campaignion_supporter_tags')) {
-    $filters['tags'] = new cm\SupporterFilterTag($baseQuery->getQuery());
+    $filters['tags'] = new cm\Filter\SupporterTag($baseQuery->getQuery());
   }
-  $filters['name'] = new cm\SupporterFilterName();
+  $filters['name'] = new cm\Filter\SupporterName();
   $defaultActive    = array('name');
   $filterForm = new cm\FilterForm($filters, $defaultActive);
   $baseQuery->setFilter($filterForm);

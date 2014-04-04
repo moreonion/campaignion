@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion_manage;
+namespace Drupal\campaignion_manage\Filter;
 
-class ContentFilterNodeReference implements FilterInterface {
+class ContentNodeReference implements FilterInterface {
   protected $query;
   protected $referenceField;
   protected $referenceColumn;

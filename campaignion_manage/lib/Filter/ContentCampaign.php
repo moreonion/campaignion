@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion_manage;
+namespace Drupal\campaignion_manage\Filter;
 
-class ContentFilterCampaign extends ContentFilterNodeReference {
+class ContentCampaign extends ContentNodeReference {
   public function __construct(\SelectQueryInterface $query) {
     $reference_field  = 'field_reference_to_campaign';
     $reference_column = 'field_reference_to_campaign_nid';

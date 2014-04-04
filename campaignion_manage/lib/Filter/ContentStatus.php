@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion_manage;
+namespace Drupal\campaignion_manage\Filter;
 
-class ContentFilterStatus implements FilterInterface {
+class ContentStatus implements FilterInterface {
   public function formElement(array &$form, array &$form_state, array &$values) {
     $form['status'] = array(
       '#type' => 'select',

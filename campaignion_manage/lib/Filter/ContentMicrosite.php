@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion_manage;
+namespace Drupal\campaignion_manage\Filter;
 
-class ContentFilterMicrosite extends ContentFilterNodeReference {
+class ContentMicrosite extends ContentNodeReference {
   public function __construct(\SelectQueryInterface $query) {
     $reference_field  = variable_get('campaignion_microsite_node_reference_field', 'field_reference_to_campaign');
     $reference_column = variable_get('campaignion_microsite_node_reference_column', 'field_reference_to_campaign_nid');
