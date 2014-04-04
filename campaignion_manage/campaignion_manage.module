@@ -163,6 +163,8 @@ function campaignion_manage_supporters_page() {
   if (module_exists('campaignion_supporter_tags')) {
     $filters['tags'] = new cm\SupporterFilterTag($baseQuery->getQuery());
   }
+  $filters['name'] = new cm\SupporterFilterName();
+  $defaultActive    = array('name');
   $filterForm = new cm\FilterForm($filters, $defaultActive);
   $baseQuery->setFilter($filterForm);
   $baseQuery->page(20);

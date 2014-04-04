@@ -6,7 +6,7 @@
 Drupal.behaviors.campaignion_manage_filter = {};
 Drupal.behaviors.campaignion_manage_filter.attach = function(context) {
   var $filterWrapper = $('#campaignion-manage-filter-form');
-  var $filterFieldsets = $('fieldset[id^=edit-filter-]', $filterWrapper).not('fieldset[id^=edit-filter-title-]');
+  var $filterFieldsets = $('fieldset[id^=edit-filter-]', $filterWrapper).not('fieldset[id^=edit-filter-title-]').not('fieldset[id^=edit-filter-name-]');
   console.log($filterFieldsets);
 
   // generate filter list
