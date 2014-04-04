@@ -39,5 +39,5 @@ class SupporterFilterTag implements FilterInterface {
   }
   public function nrOfInstances() { return 4; }
 
-  public function isApplicable() { return !empty($this->getOptions()); }
+  public function isApplicable() { return count($this->getOptions()) > 0; }
 }

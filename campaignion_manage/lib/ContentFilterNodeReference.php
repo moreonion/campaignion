@@ -51,5 +51,5 @@ class ContentFilterNodeReference implements FilterInterface {
   }
   public function nrOfInstances() { return 1; }
 
-  public function isApplicable() { return count($this->getOptions()) > 1; }
+  public function isApplicable() { return count($this->getOptions()) > 0; }
 }
