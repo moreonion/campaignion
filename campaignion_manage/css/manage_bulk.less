@@ -1,12 +1,12 @@
-#edit-bulk-wrapper {
-  &.bulk-dialog {
+.campaignion-manage-bulkops {
+  .bulk-dialog {
     position: fixed;
     top: 100px;
     left: 15%;
     padding: 0;
     width: 70%;
     z-index: 501;
-    #edit-bulk-wrapper-operations {
+    .bulkops-radios {
       input {
         position: absolute;
         left: -9999px;
@@ -26,17 +26,15 @@
       cursor: pointer;
     }
   }
-  #edit-bulk-wrapper-op-wrapper {
+  .bulkops-ops {
     width: 50%;
     float: right;
     fieldset {
       display: none;
     }
   }
-  #edit-bulk-wrapper-operations {
-    // width: 50%;
-    position: relative;
-    label {
+  .bulkops-radios {
+    label.option {
       border: 1px solid #dad5cd;
       padding: 0.5em 2% 0.5em 2%;
       width: 96%;
@@ -74,15 +72,17 @@
       font-weight: bold;
       cursor: pointer;
     }
-    .form-type-radio.form-item-bulk-wrapper-operations {
-      padding-right: 50px;
-    }
   }
-  #edit-bulk-wrapper-actions,
   .form-type-radios.form-item-bulk-wrapper-operations {
+    // width: 50%;
+    position: relative;
     width: 48%;
     float: left;
     clear: left;
+
+    .form-type-radio.form-item-bulk-wrapper-operations {
+      padding-right: 50px;
+    }
   }
   .form-item-bulk-wrapper-operations {
     .popover {

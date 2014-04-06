@@ -47,6 +47,8 @@ class FilterForm {
 
   public function form($form, &$form_state) {
     $form['#tree'] = TRUE;
+    ctools_add_js('auto-submit');
+    $form['#attributes']['class'][] = 'ctools-auto-submit-full-form';
     foreach ($this->filters as $name => $filter) {
       if ($filter->isApplicable()) {
         for($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
@@ -72,6 +74,10 @@ class FilterForm {
     $form['submit'] = array(
       '#type'  => 'submit',
       '#value' => t('Filter'),
+      '#ajax' => array(
+        'callback' => 'campaignion_manage_ajax_filter',
+      ),
+      '#attributes' => array('class' => array('ctools-use-ajax', 'ctools-auto-submit-click')),
     );
     return $form;
   }

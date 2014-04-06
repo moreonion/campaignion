@@ -5,7 +5,7 @@
 (function($) {
 Drupal.behaviors.campaignion_manage_filter = {};
 Drupal.behaviors.campaignion_manage_filter.attach = function(context) {
-  var $filterWrapper = $('#campaignion-manage-filter-form');
+  var $filterWrapper = $('#campaignion-manage-filter-form', context);
   var $filterFieldsets = $('fieldset[id^=edit-filter-]', $filterWrapper).not('fieldset[id^=edit-filter-title-]').not('fieldset[id^=edit-filter-name-]');
   console.log($filterFieldsets);
 
@@ -32,7 +32,7 @@ Drupal.behaviors.campaignion_manage_filter.attach = function(context) {
   });
 
   // close button handler
-  $('.manage-filter-remove').click(function() {
+  $('.manage-filter-remove', $filterWrapper).click(function() {
     var $fieldsetContent = $(this).siblings('.fieldset-content');
     var $filterFieldset = $(this).closest('fieldset');
     var $myCheckbox = $('input.filter-active-toggle', $fieldsetContent);
@@ -55,10 +55,13 @@ Drupal.behaviors.campaignion_manage_filter.attach = function(context) {
 
   });
 
-  $('ul.manage-filter-dropdown').listdropdown({
+  $('ul.manage-filter-dropdown', context).listdropdown({
     defaultText: Drupal.t('Add filter')
   });
 
+  $filterWrapper.find('.ctools-auto-submit-click').click(function() {
+    $(this).mousedown();
+  }).hide();
 };
 
 })(jQuery);

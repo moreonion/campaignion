@@ -16,15 +16,18 @@ class BulkOpForm {
     $form['#tree'] = TRUE;
     $form['bulk-wrapper'] = array(
       '#type' => 'fieldset',
+      '#attributes' => array('class' => array('bulkops')),
       '#title' => t('Bulk edit'),
     );
     $form['bulk-wrapper']['operations'] = array(
       '#type' => 'radios',
       '#title' => t('Selected bulk operation'),
       '#options' => array(),
+      '#attributes' => array('class' => array('bulkops-radios')),
     );
     $form['bulk-wrapper']['op-wrapper'] = array(
       '#type' => 'container',
+      '#attributes' => array('class' => array('bulkops-ops')),
     );
 
     foreach ($this->ops as $name => $op) {
@@ -32,6 +35,7 @@ class BulkOpForm {
       $form['bulk-wrapper']['op-wrapper']['op'][$name] = array(
         '#type' => 'fieldset',
         '#title' => $op->title(),
+        '#attributes' => array('class' => array('bulkops-op', 'bulkops-op-' . $name)),
       );
       $element = &$form['bulk-wrapper']['op-wrapper']['op'][$name];
       $element['helptext'] = array(
@@ -44,7 +48,6 @@ class BulkOpForm {
 
     $form['bulk-wrapper']['actions'] = array(
       '#type' => 'container',
-      '#type' => 'container',
     );
     $form['bulk-wrapper']['actions']['submit'] = array(
       '#type' => 'submit',
@@ -52,8 +55,9 @@ class BulkOpForm {
     );
 
     $form['listing'] = array();
-
     $this->listing->build($form['listing'], $form_state);
+
+    $form['#attributes']['class'][] = 'campaignion-manage-bulkops';
     return $form;
   }
   public function submit(&$form, &$form_state) {

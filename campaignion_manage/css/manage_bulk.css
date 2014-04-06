@@ -1,4 +1,4 @@
-#edit-bulk-wrapper.bulk-dialog {
+.campaignion-manage-bulkops .bulk-dialog {
   position: fixed;
   top: 100px;
   left: 15%;
@@ -6,11 +6,11 @@
   width: 70%;
   z-index: 501;
 }
-#edit-bulk-wrapper.bulk-dialog #edit-bulk-wrapper-operations input {
+.campaignion-manage-bulkops .bulk-dialog .bulkops-radios input {
   position: absolute;
   left: -9999px;
 }
-#edit-bulk-wrapper #bulk-dialog-close {
+.campaignion-manage-bulkops #bulk-dialog-close {
   position: absolute;
   float: right;
   right: 5px;
@@ -20,21 +20,18 @@
   height: 32px;
   background-image: url(../img/x_beige.png);
 }
-#edit-bulk-wrapper #bulk-dialog-close:hover,
-#edit-bulk-wrapper #bulk-dialog-close:active {
+.campaignion-manage-bulkops #bulk-dialog-close:hover,
+.campaignion-manage-bulkops #bulk-dialog-close:active {
   cursor: pointer;
 }
-#edit-bulk-wrapper #edit-bulk-wrapper-op-wrapper {
+.campaignion-manage-bulkops .bulkops-ops {
   width: 50%;
   float: right;
 }
-#edit-bulk-wrapper #edit-bulk-wrapper-op-wrapper fieldset {
+.campaignion-manage-bulkops .bulkops-ops fieldset {
   display: none;
 }
-#edit-bulk-wrapper #edit-bulk-wrapper-operations {
-  position: relative;
-}
-#edit-bulk-wrapper #edit-bulk-wrapper-operations label {
+.campaignion-manage-bulkops .bulkops-radios label.option {
   border: 1px solid #dad5cd;
   padding: 0.5em 2% 0.5em 2%;
   width: 96%;
@@ -45,19 +42,19 @@
   font-size: 1em;
   border-radius: 5px;
 }
-#edit-bulk-wrapper #edit-bulk-wrapper-operations label.active {
+.campaignion-manage-bulkops .bulkops-radios label.option.active {
   background-color: #c3bfb7;
 }
-#edit-bulk-wrapper #edit-bulk-wrapper-operations label.active:hover,
-#edit-bulk-wrapper #edit-bulk-wrapper-operations label.active:active {
+.campaignion-manage-bulkops .bulkops-radios label.option.active:hover,
+.campaignion-manage-bulkops .bulkops-radios label.option.active:active {
   background-color: #D0CCC4;
 }
-#edit-bulk-wrapper #edit-bulk-wrapper-operations label:hover,
-#edit-bulk-wrapper #edit-bulk-wrapper-operations label:active {
+.campaignion-manage-bulkops .bulkops-radios label.option:hover,
+.campaignion-manage-bulkops .bulkops-radios label.option:active {
   cursor: pointer;
   background-color: #f3efe7;
 }
-#edit-bulk-wrapper #edit-bulk-wrapper-operations .bulk-question-mark {
+.campaignion-manage-bulkops .bulkops-radios .bulk-question-mark {
   width: 32px;
   height: 32px;
   right: 0px;
@@ -74,16 +71,16 @@
   font-weight: bold;
   cursor: pointer;
 }
-#edit-bulk-wrapper #edit-bulk-wrapper-operations .form-type-radio.form-item-bulk-wrapper-operations {
-  padding-right: 50px;
-}
-#edit-bulk-wrapper #edit-bulk-wrapper-actions,
-#edit-bulk-wrapper .form-type-radios.form-item-bulk-wrapper-operations {
+.campaignion-manage-bulkops .form-type-radios.form-item-bulk-wrapper-operations {
+  position: relative;
   width: 48%;
   float: left;
   clear: left;
 }
-#edit-bulk-wrapper .form-item-bulk-wrapper-operations .popover {
+.campaignion-manage-bulkops .form-type-radios.form-item-bulk-wrapper-operations .form-type-radio.form-item-bulk-wrapper-operations {
+  padding-right: 50px;
+}
+.campaignion-manage-bulkops .form-item-bulk-wrapper-operations .popover {
   width: 90%;
   max-width: 100%;
 }

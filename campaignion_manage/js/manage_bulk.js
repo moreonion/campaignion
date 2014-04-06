@@ -5,73 +5,55 @@
 (function($) {
 Drupal.behaviors.campaignion_manage_bulk = {};
 Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
-  var $bulkWrapper = $('#edit-bulk-wrapper');
-  var $bulkFieldsetWrapper = $('#edit-bulk-wrapper');
-  var $bulkOpsWrapper = $('#edit-bulk-wrapper-operations');
-  $bulkWrapper.hide().addClass('bulk-dialog');
-  $bulkWrapper.before('<a class="button" id="bulk-edit-button"  href="#">' + Drupal.t('Bulk edit') + '</a>');
-  var $button = $('#bulk-edit-button');
+  $('form.campaignion-manage-bulkops .bulkops', context).each(function() {
+    var $wrapper = $(this);
+    var $dialogBg = $('.campaignion-dialog-wrapper');
+    var defaultZ = $('.campaignion-dialog-wrapper').css('z-index');
 
-  var $dialogBg = $('.campaignion-dialog-wrapper');
-  var defaultZ = $('.campaignion-dialog-wrapper').css('z-index');
+    $wrapper.hide().addClass('bulk-dialog');
 
-  $button.click(function(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    // Button for opening the dialog.
+    $('<a class="button" id="bulk-edit-button"  href="#">' + Drupal.t('Bulk edit') + '</a>')
+    .click(function(e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-    $bulkWrapper.show();
-    $dialogBg.css('z-index', 500).show();
-  });
+      $wrapper.show();
+      $dialogBg.css('z-index', 500).show();
+    }).insertBefore($wrapper);
 
-  $('> legend', $bulkWrapper).append('<div id="bulk-dialog-close">' + Drupal.t('Close') + '</div>');
-  var $closeWrapper = $('#bulk-dialog-close');
-  $closeWrapper.click(function(e) {
-    $bulkWrapper.hide();
-    $dialogBg.css('z-index', defaultZ).hide();
-  });
+    // Button to hide the dialog.
+    $('<div id="bulk-dialog-close">' + Drupal.t('Close') + '</div>')
+    .click(function(e) {
+      $wrapper.hide();
+      $dialogBg.css('z-index', defaultZ).hide();
+    }).appendTo($wrapper.children('legend'));
 
-  // initialize checked state on label
-  var $initRadio = $('.form-item-bulk-wrapper-operations input[type=radio]:checked', $bulkWrapper);
-  $initRadio.siblings('label').addClass('active');
-  $('#edit-bulk-wrapper-op-wrapper-op-' + $initRadio.val()).show();
-  // trigger active states on checked changes
-  $('.form-item-bulk-wrapper-operations input[type=radio]', $bulkWrapper).change(function() {
-    var $self = $(this);
-    var $label = $self.siblings('label');
-    var operation = $self.val();
+    var $radios = $wrapper.find('.bulkops-radios');
+    $radios.find('input[type=radio]').change(function() {
+      var $active = $wrapper.find('.bulkops-op-' + $(this).val());
 
-    // reset all labels to set the active one afterwards
-    $('.form-item-bulk-wrapper-operations label', $bulkWrapper).removeClass('active');
-    if ($self.attr('checked') === 'checked') {
-      $label.addClass('active');
-    }
-    // set visibility of corresponding form fieldset
-    $('fieldset', $bulkFieldsetWrapper).hide();
-    $('#edit-bulk-wrapper-op-wrapper-op-' + operation).show();
+      $wrapper.find('.bulkops-op').hide().find('label').removeClass('active');
+      $active.show().find('label').addClass('active');
+    }).change();
 
-  });
+    $radios.find('label').after('<span class="bulk-question-mark">?</span>');
 
-  // generate question marks for popover help
-  $('label', $bulkOpsWrapper).after('<span class="bulk-question-mark">?</span>');
-  if ($.fn.popover) {
-    $('.bulk-question-mark', $bulkOpsWrapper).each(function() {
-      var $me = $(this);
-      var $input = $me.siblings('input');
-      var operation = $input.val();
-      var $helptext = $("#edit-bulk-wrapper-op-wrapper-op-" + operation + " .help-text", $bulkWrapper);
-
-      $me.popover({
-        content: $helptext.html()
+    if ($.fn.popover) {
+      $radios.find('.bulk-question-mark').each(function() {
+        var $self = $(this);
+        var op = $self.siblings('input').val()
+        $self.popover({
+          content: $wrapper.find('.bulkops-op-' + op).find('.help-text').html(),
+        });
       });
-    });
+    }
 
-    // hide other popovers (but not meself)
-    $bulkWrapper.on('show.bs.popover', function(e) {
+    $radios.on('show.bs.popover', function(e) {
       var $self = $(e.target);
-      $('.bulk-question-mark', $bulkOpsWrapper).not($self).popover('hide');
+      $radios.find('.bulk-question-mark').not($self).popover('hide');
     });
-
-  }
+  });
 };
 
 })(jQuery);

@@ -61,64 +61,25 @@ function campaignion_manage_theme() {
     ),
     'file' => 'campaignion_manage.theme.inc',
   );
+  $theme['campaignion_manage_ajax'] = array(
+    'render element' => 'element',
+    'file' => 'campaignion_manage.theme.inc',
+  );
   return $theme;
 }
 
-function campaignion_manage_action_list($entity_type) {
-  $my_actions = array();
-  $actions = actions_list();
-  foreach($actions as $id => &$action) {
-    if ($action['type'] == $entity_type) {
-      $my_actions[$id] = &$action;
-    }
-  }
-  return $my_actions;
-}
-
 /**
- * helper function for page callbacks
+ * AJAX-callback for the filter form.
  */
-function campaignion_manage_build_page(cm\Query\Content $baseQuery) {
-  // add style + js for interface
-  drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_bulk.js');
-  drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_filter.js');
-  drupal_add_css(drupal_get_path('module', 'campaignion_manage') . '/css/manage_bulk.css');
-
-  $listing = new cm\ContentListing($baseQuery);
-  // filter for node title created separately because it has to be enabled
-  // by default and we need the machine name for the filter
-  $filters['title'] = new cm\Filter\ContentTitle();
-  $defaultActive = array('title');
-  if (module_exists('campaignion_microsite')) {
-    $filters['microsite'] = new cm\Filter\ContentMicrosite($baseQuery->getQuery());
-  }
-  if (module_exists('campaignion_campaign')) {
-    $filters['campaign'] = new cm\Filter\ContentCampaign($baseQuery->getQuery());
-  }
-  $filters['language'] = new cm\Filter\ContentLanguage($baseQuery->getQuery());
-  $filters['type'] = new cm\Filter\ContentType($baseQuery->getQuery());
-  $filters['status'] = new cm\Filter\ContentStatus();
-
-  $filterForm = new cm\FilterForm($filters, $defaultActive);
-  $baseQuery->setFilter($filterForm);
-
-  $baseQuery->page(20);
-
-  $bulkOpForm = new cm\BulkOpForm($listing, array(
-    new cm\PublishBulkOp(),
-    new cm\UnpublishBulkOp(),
-  ));
-
-  // ATTENTION: drupal_get_form() has to be called before $baseQuery->execute()
-  //            as query conditions are set in the form submit handler.
-  $output = array(
-    'filter' => drupal_get_form('campaignion_manage_filter_form', $filterForm),
-    'bulkop_listing' => drupal_get_form('campaignion_manage_bulkops_form', $bulkOpForm),
-    'pager' => array(
-      '#theme' => 'pager',
-    ),
+function campaignion_manage_ajax_filter($form, &$form_state) {
+  $function = $form['#formObj']->pageCallback;
+  $renderable = $function();
+  unset($renderable['#theme_wrapper']);
+  $commands[] = ajax_command_replace('#campaignion-manage-ajax-wrapper', render($renderable));
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands,
   );
-  return $output;
 }
 
 /**
@@ -127,9 +88,9 @@ function campaignion_manage_build_page(cm\Query\Content $baseQuery) {
 function campaignion_manage_content_page() {
   drupal_set_title(t('Manage Content & Actions'), PASS_THROUGH);
 
-  $baseQuery = new \Drupal\campaignion_manage\Query\Content();
-
-  return campaignion_manage_build_page($baseQuery);
+  $page = new cm\ContentPage(new cm\Query\Content());
+  $page->filterForm->pageCallback = __FUNCTION__;
+  return $page->renderable();
 }
 
 /**
@@ -138,46 +99,20 @@ function campaignion_manage_content_page() {
 function campaignion_manage_action_templates() {
   drupal_set_title(t('Action Templates'), PASS_THROUGH);
 
-  $baseQuery = new \Drupal\campaignion_manage\Query\Template();
-
-  return campaignion_manage_build_page($baseQuery);
+  $page = new cm\ContentPage(new cm\Query\Template());
+  $page->filterForm->pageCallback = __FUNCTION__;
+  return $page->renderable();
 }
 
 /**
  * Page callback: Manage your supporters page
  */
 function campaignion_manage_supporters_page() {
-  // add style + js for interface
-  drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_bulk.js');
-  drupal_add_js(drupal_get_path('module', 'campaignion_manage') . '/js/manage_filter.js');
-  drupal_add_css(drupal_get_path('module', 'campaignion_manage') . '/css/manage_bulk.css');
-
   drupal_set_title(t('Manage your supporters'), PASS_THROUGH);
 
-  $baseQuery = new cm\Query\Supporter();
-  
-  $listing = new cm\SupporterListing($baseQuery);
-
-  $filters = array();
-  $defaultActive = array();
-  if (module_exists('campaignion_supporter_tags')) {
-    $filters['tags'] = new cm\Filter\SupporterTag($baseQuery->getQuery());
-  }
-  $filters['name'] = new cm\Filter\SupporterName();
-  $defaultActive    = array('name');
-  $filterForm = new cm\FilterForm($filters, $defaultActive);
-  $baseQuery->setFilter($filterForm);
-  $baseQuery->page(20);
-  $bulkOpForm = new cm\BulkOpForm($listing, array());
-  
-  $output = array(
-    'filter' => drupal_get_form('campaignion_manage_filter_form', $filterForm),
-    'bulkop_listing' => drupal_get_form('campaignion_manage_bulkops_form', $bulkOpForm),
-    'pager' => array(
-      '#theme' => 'pager',
-    ),
-  );
-  return $output;
+  $page = new cm\SupporterPage(new cm\Query\Supporter());
+  $page->filterForm->pageCallback = __FUNCTION__;
+  return $page->renderable();
 }
 
 function campaignion_manage_forms() {

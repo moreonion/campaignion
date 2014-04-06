@@ -76,3 +76,9 @@ function theme_campaignion_manage_contact($variables) {
 EOT;
   return $content;
 }
+
+function theme_campaignion_manage_ajax($variables) {
+  $element = &$variables['element'];
+  // We need a double wrapper because jquery.replaceWith seems to produce extra-divs.
+  return '<div id="campaignion-manage-ajax-wrapper"><div>' . $element['#children'] . '</div></div>';
+}
