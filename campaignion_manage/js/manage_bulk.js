@@ -29,29 +29,40 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
       $dialogBg.css('z-index', defaultZ).hide();
     }).appendTo($wrapper.children('legend'));
 
-    var $radios = $wrapper.find('.bulkops-radios');
-    $radios.find('input[type=radio]').change(function() {
-      var $active = $wrapper.find('.bulkops-op-' + $(this).val());
+    var $radioWrapper = $wrapper.find('.form-item-bulk-wrapper-operations');
+    var $radios = $radioWrapper.find('input[type=radio]');
+    var $bulkopsWrapper = $wrapper.find('.bulkops-ops');
+    var $bulkops = $bulkopsWrapper.find('.bulkops-op');
+    var $actions = $wrapper.find('.actions');
+    $radios.change(function() {
+      $radioWrapper.hide();
+      $actions.show();
+      $bulkopsWrapper.show();
+      $bulkops.hide();
+      $bulkopsWrapper.find('.bulkops-op-' + $(this).val()).show();
+    });
+    $('<input type="button" name="cancel" value="' + Drupal.t('Cancel') + '" class="form-submit" />').click(function() {
+      $radios.prop('checked', false);
+      $bulkops.hide();
+      $bulkopsWrapper.hide();
+      $actions.hide();
+      $radioWrapper.show();
+    }).appendTo($actions).click();
 
-      $wrapper.find('.bulkops-op').hide().find('label').removeClass('active');
-      $active.show().find('label').addClass('active');
-    }).change();
-
-    $radios.find('label').after('<span class="bulk-question-mark">?</span>');
-
+    $radios.siblings('label').after('<span class="bulk-question-mark">?</span>');
     if ($.fn.popover) {
-      $radios.find('.bulk-question-mark').each(function() {
+      $radioWrapper.find('.bulk-question-mark').each(function() {
         var $self = $(this);
-        var op = $self.siblings('input').val()
+        var op = $self.siblings('input').attr('value')
         $self.popover({
-          content: $wrapper.find('.bulkops-op-' + op).find('.help-text').html(),
+          content: $wrapper.find('.bulkops-op-' + op).find('.help-text').hide().html(),
         });
       });
     }
 
-    $radios.on('show.bs.popover', function(e) {
+    $radioWrapper.on('show.bs.popover', function(e) {
       var $self = $(e.target);
-      $radios.find('.bulk-question-mark').not($self).popover('hide');
+      $radioWrapper.find('.bulk-question-mark').not($self).popover('hide');
     });
   });
 };

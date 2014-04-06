@@ -48,6 +48,7 @@ class BulkOpForm {
 
     $form['bulk-wrapper']['actions'] = array(
       '#type' => 'container',
+      '#attributes' => array('class' => array('actions')),
     );
     $form['bulk-wrapper']['actions']['submit'] = array(
       '#type' => 'submit',
