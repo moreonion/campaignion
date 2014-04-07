@@ -7,11 +7,11 @@ Drupal.behaviors.campaignion_manage_bulk = {};
 Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
   $('form.campaignion-manage-bulkops', context).each(function() {
     var $wrapper = $(this);
-    var $bulkops = $wrapper.find('.bulkops');
+    var $dialog = $wrapper.find('.bulkops');
     var $dialogBg = $('.campaignion-dialog-wrapper');
     var defaultZ = $('.campaignion-dialog-wrapper').css('z-index');
 
-    $bulkops.hide().addClass('bulk-dialog');
+    $dialog.hide().addClass('bulk-dialog');
 
     // Button for opening the dialog.
     $('<a class="button" id="bulk-edit-button"  href="#">' + Drupal.t('Bulk edit') + '</a>')
@@ -19,22 +19,22 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
       e.preventDefault();
       e.stopPropagation();
 
-      $bulkops.show();
+      $dialog.show();
       $dialogBg.css('z-index', 500).show();
     }).appendTo($wrapper.find('.bulkop-button-wrapper'));
 
     // Button to hide the dialog.
     $('<div id="bulk-dialog-close">' + Drupal.t('Close') + '</div>')
     .click(function(e) {
-      $bulkops.hide();
+      $dialog.hide();
       $dialogBg.css('z-index', defaultZ).hide();
-    }).appendTo($bulkops.children('legend'));
+    }).appendTo($wrapper.find('.bulkops').children('legend'));
 
-    var $radioWrapper = $bulkops.find('.form-item-bulk-wrapper-operations');
+    var $radioWrapper = $wrapper.find('.form-item-bulk-wrapper-operations');
     var $radios = $radioWrapper.find('input[type=radio]');
-    var $bulkopsWrapper = $bulkops.find('.bulkops-ops');
+    var $bulkopsWrapper = $wrapper.find('.bulkops-ops');
     var $bulkops = $bulkopsWrapper.find('.bulkops-op');
-    var $actions = $bulkops.find('.actions');
+    var $actions = $wrapper.find('.actions');
     $radios.change(function() {
       $radioWrapper.hide();
       $actions.show();
@@ -56,7 +56,7 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
         var $self = $(this);
         var op = $self.siblings('input').attr('value')
         $self.popover({
-          content: $bulkops.find('.bulkops-op-' + op).find('.help-text').hide().html(),
+          content: $wrapper.find('.bulkops-op-' + op).find('.help-text').hide().html(),
         });
       });
     }
