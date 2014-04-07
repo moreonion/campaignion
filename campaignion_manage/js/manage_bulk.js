@@ -84,7 +84,7 @@ $('.bulkop-select-wrapper', context).each(function() {
     }
   }).change();
   $matching.find('input').change(function() {
-    $toggle.prop('disabled', $(this).attr('checked')).change();
+    $toggle.prop('disabled', $(this).attr('checked') == 'checked').change();
   });
 
   var $targets = $wrapper.find('.bulk-select-target');
