@@ -146,3 +146,11 @@ function campaignion_manage_element_info() {
   );
   return $types;
 }
+
+function campaignion_manage_batch_process($handler, $param1, $param2, &$context) {
+  $handler->batchApply($param1, $param2, $context);
+}
+
+function campaignion_manage_batch_finished($success, $results, $operations) {
+  $results['bulkOp']->batchFinish($success, $results, $operations);
+}

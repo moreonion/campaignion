@@ -8,8 +8,8 @@ class BulkOpForm {
   public function __construct($listing, $ops = array()) {
     $this->listing = $listing;
     $this->ops = array();
-    foreach ($ops as $op) {
-      $this->ops[$op->machineName()] = $op;
+    foreach ($ops as $name => $op) {
+      $this->ops[$name] = $op;
     }
   }
   public function form($form, &$form_state) {
@@ -70,6 +70,6 @@ class BulkOpForm {
       return;
     }
     $op = $this->ops[$op_name];
-    $op->apply($nids);
+    $op->apply($nids, $form_state);
   }
 }

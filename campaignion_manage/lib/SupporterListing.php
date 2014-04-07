@@ -122,4 +122,8 @@ class SupporterListing {
     }
     return array_keys($ids);
   }
+
+  public function __sleep() {
+    return array();
+  }
 }

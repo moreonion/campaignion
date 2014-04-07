@@ -12,7 +12,12 @@ class SupporterPage extends Page {
     $filters['name'] = new Filter\SupporterName();
     $this->filterForm = new FilterForm($filters, array('name'));
 
+    $bulkOps = array();
+    if (module_exists('campaignion_supporter_tags')) {
+      $bulkOps['tags'] = new BulkOp\SupporterTag();
+    }
+
     $listing = new SupporterListing($this->baseQuery, 20);
-    $this->bulkOpForm = new BulkOpForm($listing, array());
+    $this->bulkOpForm = new BulkOpForm($listing, $bulkOps);
   }
 }
