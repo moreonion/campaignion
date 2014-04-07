@@ -5,12 +5,13 @@
 (function($) {
 Drupal.behaviors.campaignion_manage_bulk = {};
 Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
-  $('form.campaignion-manage-bulkops .bulkops', context).each(function() {
+  $('form.campaignion-manage-bulkops', context).each(function() {
     var $wrapper = $(this);
+    var $bulkops = $wrapper.find('.bulkops');
     var $dialogBg = $('.campaignion-dialog-wrapper');
     var defaultZ = $('.campaignion-dialog-wrapper').css('z-index');
 
-    $wrapper.hide().addClass('bulk-dialog');
+    $bulkops.hide().addClass('bulk-dialog');
 
     // Button for opening the dialog.
     $('<a class="button" id="bulk-edit-button"  href="#">' + Drupal.t('Bulk edit') + '</a>')
@@ -18,22 +19,22 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
       e.preventDefault();
       e.stopPropagation();
 
-      $wrapper.show();
+      $bulkops.show();
       $dialogBg.css('z-index', 500).show();
-    }).insertBefore($wrapper);
+    }).appendTo($wrapper.find('.bulkop-button-wrapper'));
 
     // Button to hide the dialog.
     $('<div id="bulk-dialog-close">' + Drupal.t('Close') + '</div>')
     .click(function(e) {
-      $wrapper.hide();
+      $bulkops.hide();
       $dialogBg.css('z-index', defaultZ).hide();
-    }).appendTo($wrapper.children('legend'));
+    }).appendTo($bulkops.children('legend'));
 
-    var $radioWrapper = $wrapper.find('.form-item-bulk-wrapper-operations');
+    var $radioWrapper = $bulkops.find('.form-item-bulk-wrapper-operations');
     var $radios = $radioWrapper.find('input[type=radio]');
-    var $bulkopsWrapper = $wrapper.find('.bulkops-ops');
+    var $bulkopsWrapper = $bulkops.find('.bulkops-ops');
     var $bulkops = $bulkopsWrapper.find('.bulkops-op');
-    var $actions = $wrapper.find('.actions');
+    var $actions = $bulkops.find('.actions');
     $radios.change(function() {
       $radioWrapper.hide();
       $actions.show();
@@ -55,7 +56,7 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
         var $self = $(this);
         var op = $self.siblings('input').attr('value')
         $self.popover({
-          content: $wrapper.find('.bulkops-op-' + op).find('.help-text').hide().html(),
+          content: $bulkops.find('.bulkops-op-' + op).find('.help-text').hide().html(),
         });
       });
     }
@@ -72,7 +73,7 @@ $('.bulkop-select-wrapper', context).each(function() {
   var $wrapper = $(this);
   var $matching = $wrapper.find('.bulkop-select-toggles .form-item-bulkop-select-all-matching');
   $('<div class="form-item form-type-checkbox"><input type="checkbox" id="select_all_toggle" /><label for="select_all_toggle" class="option">' + Drupal.t('Select all') + '</label></div>')
-  .insertBefore($matching.parent());
+  .insertBefore($matching);
   var $toggle = $wrapper.find('#select_all_toggle');
   $toggle.change(function() {
     if ($(this).prop('checked')) {

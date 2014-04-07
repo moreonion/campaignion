@@ -32,7 +32,6 @@ class SupporterListing {
     $rows = array();
     $selectAll = array(
       'no-striping' => TRUE,
-      'class' => array('bulkop-select-toggles'),
     );
     $selectAll['data'][0] = array(
       'data' => array(
@@ -42,6 +41,7 @@ class SupporterListing {
         '#description' => t('Check this if you want to apply a bulk operation to all matching content (on all pages).'),
       ),
       'colspan' => $columns,
+      'class' => array('bulkop-select-toggles', 'bulkop-button-wrapper'),
     );
     $rows[] = $selectAll;
 
