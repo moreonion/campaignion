@@ -66,5 +66,44 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
     });
   });
 };
+Drupal.behaviors.campaignion_manage_select_all = {};
+Drupal.behaviors.campaignion_manage_select_all.attach = function(context) {
+$('.bulkop-select-wrapper', context).each(function() {
+  var $wrapper = $(this);
+  var $matching = $wrapper.find('.bulkop-select-toggles .form-item-bulkop-select-all-matching');
+  $('<div class="form-item form-type-checkbox"><input type="checkbox" id="select_all_toggle" /><label for="select_all_toggle" class="option">' + Drupal.t('Select all') + '</label></div>')
+  .insertBefore($matching.parent());
+  var $toggle = $wrapper.find('#select_all_toggle');
+  $toggle.change(function() {
+    if ($(this).prop('checked')) {
+      $matching.show();
+    }
+    else {
+      $matching.hide();
+    }
+  }).change();
+  $matching.find('input').change(function() {
+    $toggle.prop('disabled', $(this).attr('checked')).change();
+  });
+
+  var $targets = $wrapper.find('.bulk-select-target');
+  $toggle.change(function(event, noprop = false) {
+    if (noprop) {
+      return;
+    }
+    if ($(this).prop('checked')) {
+      $targets.prop('checked', true);
+    }
+    else {
+      $targets.prop('checked', false);
+    }
+  });
+  $targets.change(function() {
+    if (!$(this).prop('checked')) {
+      $toggle.prop('checked', false).trigger('change', true);
+    }
+  });
+});
+};
 
 })(jQuery);

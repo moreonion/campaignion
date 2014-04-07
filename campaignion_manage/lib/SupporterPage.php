@@ -12,7 +12,7 @@ class SupporterPage extends Page {
     $filters['name'] = new Filter\SupporterName();
     $this->filterForm = new FilterForm($filters, array('name'));
 
-    $listing = new SupporterListing($this->baseQuery);
+    $listing = new SupporterListing($this->baseQuery, 20);
     $this->bulkOpForm = new BulkOpForm($listing, array());
   }
 }

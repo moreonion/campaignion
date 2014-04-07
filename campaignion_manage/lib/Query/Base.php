@@ -17,8 +17,10 @@ abstract class Base {
     return $rows;
   }
 
-  public function page($size) {
-    $this->query = $this->query->extend('PagerDefault')->limit($size);
+  public function paged($size) {
+    $copy = clone $this;
+    $copy->query = $copy->query->extend('PagerDefault')->limit($size);
+    return $copy;
   }
 
   public function modifyResult(&$rows) {
@@ -29,5 +31,9 @@ abstract class Base {
 
   public function getQuery() {
     return $this->query;
+  }
+
+  public function __clone() {
+    $this->query = clone $this->query;
   }
 }

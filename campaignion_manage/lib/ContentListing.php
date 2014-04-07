@@ -4,8 +4,10 @@ namespace Drupal\campaignion_manage;
 
 class ContentListing {
   protected $query;
-  public function __construct($query) {
+  protected $size;
+  public function __construct($query, $pageSize) {
     $this->query = $query;
+    $this->size = $pageSize;
   }
   /**
    * Build a renderable array based on the data-rows.
@@ -24,22 +26,38 @@ class ContentListing {
   }
 
   public function process(&$element, &$form_state) {
-    $result = $this->query->execute();
+    $query = $this->query->paged($this->size);
     $columns = 3;
 
     $rows = array();
+    $selectAll = array(
+      'no-striping' => TRUE,
+      'class' => array('bulkop-select-toggles'),
+    );
+    $selectAll['data'][0] = array(
+      'data' => array(
+        '#type' => 'checkbox',
+        '#name' => 'bulkop_select_all_matching',
+        '#title' => t('Select items from all pages'),
+        '#description' => t('Check this if you want to apply a bulk operation to all matching content (on all pages).'),
+      ),
+      'colspan' => $columns,
+    );
+    $rows[] = $selectAll;
 
     $element['bulk_nid'] = array(
       '#type' => 'checkboxes',
       '#options' => array(),
+      '#attributes' => array('class' => array('bulk-select-target')),
     );
     $element['bulk_tnid'] = array(
       '#type' => 'checkboxes',
       '#options' => array(),
+      '#attributes' => array('class' => array('bulk-select-target')),
     );
 
     $tnode_count = 1;
-    foreach ($result as $tnode) {
+    foreach ($query->execute() as $tnode) {
       $class = ($tnode_count++ % 2 == 0) ? 'even' : 'odd';
       $row = $this->nodeRow($tnode, TRUE, $element);
       $row['class'][] = $class;
@@ -61,6 +79,7 @@ class ContentListing {
       }
     }
 
+    $element['#attributes']['class'][] = 'bulkop-select-wrapper';
     $element += array(
       '#rows' => $rows,
     );
@@ -118,6 +137,17 @@ class ContentListing {
   }
 
   public function selectedIds(&$element, &$form_state) {
+    if (isset($form_state['values']['bulkop_select_all_matching'])) {
+      $query = clone $this->query;
+      $baseQuery = $query->getQuery();
+      $baseQuery->fields = array();
+      $baseQuery->addField('n', 'nid', 'id');
+      $ids = array();
+      foreach ($query->execute() as $row) {
+        $ids[] = $row['id'];
+      }
+      return $ids;
+    }
     $values = &drupal_array_get_nested_value($form_state['values'], $element['#array_parents']);
     $nids = array();
     foreach ($values['bulk_nid'] as $nid => $selected) {

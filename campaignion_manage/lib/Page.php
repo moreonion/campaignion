@@ -5,7 +5,6 @@ namespace Drupal\campaignion_manage;
 abstract class Page {
   protected $baseQuery;
   public $filterForm;
-  protected $pageSize = 20;
   protected $bulkOpForm;
   public function renderable() {
     // add style + js for interface
@@ -15,7 +14,6 @@ abstract class Page {
 
     $baseQuery = $this->baseQuery;
     $baseQuery->setFilter($this->filterForm);
-    $baseQuery->page($this->pageSize);
 
     $output = array(
       'filter' => drupal_get_form('campaignion_manage_filter_form', $this->filterForm),

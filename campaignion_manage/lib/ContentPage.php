@@ -20,7 +20,7 @@ class ContentPage extends Page {
     $filters['status'] = new Filter\ContentStatus();
     $this->filterForm = new FilterForm($filters, array('title'));
 
-    $listing = new ContentListing($this->baseQuery);
+    $listing = new ContentListing($this->baseQuery, 20);
     $this->bulkOpForm = new BulkOpForm($listing, array(
       new PublishBulkOp(),
       new UnpublishBulkOp(),
