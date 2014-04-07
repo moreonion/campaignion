@@ -48,6 +48,7 @@ class SupporterListing {
     $element['bulk_id'] = array(
       '#type' => 'checkboxes',
       '#options' => array(),
+      '#attributes' => array('class' => array('bulk-select-target')),
     );
 
     $evenodd = 1;
