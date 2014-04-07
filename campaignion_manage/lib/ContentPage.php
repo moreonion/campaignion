@@ -22,8 +22,8 @@ class ContentPage extends Page {
 
     $listing = new ContentListing($this->baseQuery, 20);
     $this->bulkOpForm = new BulkOpForm($listing, array(
-      new PublishBulkOp(),
-      new UnpublishBulkOp(),
+      new BulkOp\ContentPublish(),
+      new BulkOp\ContentUnpublish(),
     ));
   }
 }

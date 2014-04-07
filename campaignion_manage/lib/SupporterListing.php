@@ -33,13 +33,15 @@ class SupporterListing {
     $selectAll = array(
       'no-striping' => TRUE,
     );
+    $element['bulkop_select_all_matching'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Select items from all pages'),
+      '#description' => t('Check this if you want to apply a bulk operation to all matching contacts (on all pages).'),
+    );
     $selectAll['data'][0] = array(
       'data' => array(
-        '#type' => 'checkbox',
-        '#name' => 'bulkop_select_all_matching',
-        '#title' => t('Select items from all pages'),
-        '#description' => t('Check this if you want to apply a bulk operation to all matching content (on all pages).'),
-      ),
+        '#name' => 'listing[bulkop_select_all_matching]',
+      ) + $element['bulkop_select_all_matching'],
       'colspan' => $columns,
       'class' => array('bulkop-select-toggles', 'bulkop-button-wrapper'),
     );
@@ -102,18 +104,19 @@ class SupporterListing {
   }
 
   public function selectedIds(&$element, &$form_state) {
-    if (isset($form_state['values']['bulkop_select_all_matching'])) {
+    $values = &drupal_array_get_nested_value($form_state['values'], $element['#array_parents']);
+    if (!empty($values['bulkop_select_all_matching'])) {
       $query = clone $this->query;
       $baseQuery = $query->getQuery();
-      $baseQuery->fields = array();
+      $fields = $baseQuery->getfields();
+      $fields = array();
       $baseQuery->addField('r', 'contact_id', 'id');
       $ids = array();
       foreach ($query->execute() as $row) {
-        $ids[] = $row['id'];
+        $ids[] = $row->id;
       }
       return $ids;
     }
-    $values = &drupal_array_get_nested_value($form_state['values'], $element['#array_parents']);
     $ids = array();
     foreach ($values['bulk_id'] as $id => $selected) {
       if ($selected) {

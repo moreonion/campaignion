@@ -71,7 +71,7 @@ Drupal.behaviors.campaignion_manage_select_all = {};
 Drupal.behaviors.campaignion_manage_select_all.attach = function(context) {
 $('.bulkop-select-wrapper', context).each(function() {
   var $wrapper = $(this);
-  var $matching = $wrapper.find('.bulkop-select-toggles .form-item-bulkop-select-all-matching');
+  var $matching = $wrapper.find('.bulkop-select-toggles .form-item-listing-bulkop-select-all-matching');
   $('<div class="form-item form-type-checkbox"><input type="checkbox" id="select_all_toggle" /><label for="select_all_toggle" class="option">' + Drupal.t('Select all') + '</label></div>')
   .insertBefore($matching);
   var $toggle = $wrapper.find('#select_all_toggle');
