@@ -131,6 +131,6 @@ class SupporterListing {
   }
 
   public function count() {
-    return $this->query->getQuery()->countQuery()->execute()->fetchField();
+    return $this->query->count();
   }
 }

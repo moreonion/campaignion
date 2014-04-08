@@ -14,7 +14,8 @@ class SupporterPage extends Page {
 
     $bulkOps = array();
     if (module_exists('campaignion_supporter_tags')) {
-      $bulkOps['tags'] = new BulkOp\SupporterTag();
+      $bulkOps['tag']   = new BulkOp\SupporterTag(TRUE);
+      $bulkOps['untag'] = new BulkOp\SupporterTag(FALSE);
     }
 
     $listing = new SupporterListing($this->baseQuery, 20);

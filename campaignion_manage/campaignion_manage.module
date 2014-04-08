@@ -75,6 +75,7 @@ function campaignion_manage_ajax_filter($form, &$form_state) {
   $function = $form['#formObj']->pageCallback;
   $renderable = $function();
   unset($renderable['#theme_wrapper']);
+  $renderable['bulkop_listing']['#action'] = $renderable['filter']['#action'];
   $commands[] = ajax_command_replace('#campaignion-manage-ajax-wrapper', render($renderable));
   return array(
     '#type' => 'ajax',

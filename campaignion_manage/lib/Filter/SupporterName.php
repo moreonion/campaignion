@@ -19,7 +19,7 @@ class SupporterName implements FilterInterface {
 
   public function apply($query, array $values) {
     if (!empty($values['name'])) {
-      $search = preg_replace('/[[:blank:]]*/', '%', $values['name']);
+      $search = preg_replace('/[[:blank:]]+/', '%', $values['name']);
       $query->getQuery()->where(
         '   LOWER(r.first_name)  LIKE :search_string ' .
         'OR LOWER(r.middle_name) LIKE :search_string ' .
