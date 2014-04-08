@@ -5,6 +5,27 @@
  */
 
 use \Drupal\campaignion_newsletters_mailchimp\MailChimp;
+use \Drupal\campaignion_newsletters\Subscription;
+
+define('CAMPAIGNION_NEWSLETTERS_MAILCHIMP_WEBHOOK_URL',
+  'campaignion_newsletters_mailchimp_webhook');
+
+/**
+ * Implements hook_menu().
+ */
+function campaignion_newsletters_mailchimp_menu() {
+  $items = array();
+
+  // webhook handler
+  $items[CAMPAIGNION_NEWSLETTERS_MAILCHIMP_WEBHOOK_URL] = array(
+    'title' => 'Webhook',
+    'page callback' => 'campaignion_newsletters_mailchimp_webhook',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
 
 /**
 * Implements hook_libraries_info().
@@ -57,4 +78,22 @@ function campaignion_newsletters_mailchimp_get_key($name) {
   if (isset($keys[$name])) {
     return $keys[$name];
   }
+}
+
+/**
+ * Page callback for MailChimps webhooks
+ */
+function campaignion_newsletters_mailchimp_webhook() {
+  if (!empty($_POST['data']) && $_POST['data']['action'] === 'unsub') {
+    $list_id = db_query('SELECT list_id FROM {campaignion_newsletters_lists} ' .
+              'WHERE identifier=:identifier', array(
+                ':identifier' => check_plain($_POST['data']['list_id']),
+              ))->fetchField();
+    foreach (Subscription::byEmail($_POST['data']['email']) as $subscription) {
+      if ($subscription->list_id === $list_id) {
+        $subscription->delete(TRUE);
+      }
+    }
+  }
+
 }

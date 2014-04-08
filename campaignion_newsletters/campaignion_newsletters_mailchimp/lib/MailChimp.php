@@ -50,6 +50,16 @@ class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInt
           'data'       => (object) $list,
           // @TODO: find a way to get an actual list specific language.
         ));
+
+      $webhook_url = $GLOBALS['base_url'] . '/' .
+        CAMPAIGNION_NEWSLETTERS_MAILCHIMP_WEBHOOK_URL;
+      $webhook_urls = array();
+      foreach ($this->api->lists->webhooks($list['id']) as $webhook) {
+        $webhook_urls[] = $webhook['url'];
+      }
+      if (!in_array($webhook_url, $webhook_urls)) {
+        $this->call('webhookAdd', $list['id'], $webhook_url);
+      }
     }
     return $lists;
   }
