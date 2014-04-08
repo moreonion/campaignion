@@ -165,4 +165,8 @@ class ContentListing {
     }
     return array_keys($nids);
   }
+
+  public function count() {
+    return $this->query->getQuery()->countQuery()->execute()->fetchField();
+  }
 }

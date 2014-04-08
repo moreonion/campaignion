@@ -19,6 +19,9 @@ class BulkOpForm {
       '#attributes' => array('class' => array('bulkops')),
       '#title' => t('Bulk edit'),
     );
+    $form['bulk-wrapper']['info'] = array(
+      '#markup' => '<div class="bulkop-selected">' . t('!count items selected.', array('!count' => '<span class="bulkop-count"></span>')) . '</div>',
+    );
     $form['bulk-wrapper']['operations'] = array(
       '#type' => 'radios',
       '#title' => t('Selected bulk operation'),
@@ -56,6 +59,7 @@ class BulkOpForm {
     );
 
     $form['listing'] = array();
+    $form['listing']['#attributes']['data-count'] = $this->listing->count();
     $this->listing->build($form['listing'], $form_state);
 
     $form['#attributes']['class'][] = 'campaignion-manage-bulkops';

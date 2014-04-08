@@ -129,4 +129,8 @@ class SupporterListing {
   public function __sleep() {
     return array();
   }
+
+  public function count() {
+    return $this->query->getQuery()->countQuery()->execute()->fetchField();
+  }
 }

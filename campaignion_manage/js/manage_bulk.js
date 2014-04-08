@@ -97,6 +97,7 @@ $('.bulkop-select-wrapper', context).each(function() {
     }
     else {
       $targets.prop('checked', false);
+      $matching.prop('checked', false);
     }
   });
   $targets.change(function() {
@@ -104,7 +105,18 @@ $('.bulkop-select-wrapper', context).each(function() {
       $toggle.prop('checked', false).trigger('change', true);
     }
   });
+
+  var allCount = $wrapper.attr('data-count');
+  var $counter = $wrapper.parents('form').find('.bulkop-count');
+  $targets.change(function() {
+    var newVal = $targets.filter(':checked').length;
+    $counter.html(newVal);
+  }).change();
+  $matching.change(function() {
+    var newVal = $('input', this).prop('checked') ? allCount : $targets.filter(':checked').length;
+    $counter.html(newVal);
+  });
+
 });
 };
-
 })(jQuery);

@@ -7,7 +7,6 @@ class Content extends Base {
     $query = db_select('node', 'n');
     $query->innerJoin('users', 'u', 'u.uid = n.uid');
     $query->fields('n', array('nid', 'title', 'type', 'language', 'status', 'uid'))
-      ->where('n.nid = n.tnid OR n.tnid = 0')
       ->condition('n.type', 'thank_you_page', '!=')
       ->fields('u', array('name'))
       ->orderBy('n.changed', 'DESC');
@@ -36,5 +35,11 @@ SQL;
     foreach ($result as $row) {
       $rows_by_nid[$row->tnid]->translations[$row->language] = $row;
     }
+  }
+
+  public function paged($size) {
+    $query = parent::paged($size);
+    $query->getQuery()->where('n.nid = n.tnid OR n.tnid = 0');
+    return $query;
   }
 }
