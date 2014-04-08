@@ -16,7 +16,7 @@ Drupal.behaviors.campaignion_manage_translation_sets.attach = function(context) 
         $translations.show();
         $showHideLink.html(Drupal.t('hide translations')).addClass('hide').removeClass('show');
       }
-    }).appendTo($tset.find('.manage-content'));
+    }).appendTo($tset.find('.campaignion-manage'));
   });
 };
 

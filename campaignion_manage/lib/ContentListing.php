@@ -16,11 +16,9 @@ class ContentListing {
    * @return renderable array for output.
    */
   public function build(&$element, &$form_state) {
+    $element['#attributes']['class'][] = 'campaignion-manage-content-listing';
     $element += array(
       '#type' => 'campaignion_manage_listing',
-      '#attributes' => array(
-        'class' => array('campaignion-manage-content-listing'),
-      ),
       '#formObj' => $this,
     );
   }
