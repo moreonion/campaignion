@@ -211,9 +211,8 @@ margin-bottom: 0;
 
 /* bulk operations */
  
-#campaignion-manage-bulkops-form {
+.campaignion-manage-bulkops {
   clear: both;
-  
 }
 
 /* table listing*/
