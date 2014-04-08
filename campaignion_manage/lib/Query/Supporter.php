@@ -8,8 +8,9 @@ class Supporter extends Base {
     $query->innerJoin('field_data_redhen_contact_email', 'e', 'e.entity_id = r.contact_id');
     $query->fields('r', array('contact_id', 'first_name', 'middle_name', 'last_name'))
       ->fields('e', array('redhen_contact_email_value', 'redhen_contact_email_hold'))
+      ->condition('r.type', 'contact')
       ->orderBy('r.updated', 'DESC');
-    
+
     $this->query = $query;
   }
   public function modifyResult(&$rows) {

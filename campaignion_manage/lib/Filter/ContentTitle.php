@@ -20,6 +20,9 @@ class ContentTitle implements FilterInterface {
   public function apply($query, array $values) {
     if (!empty($values['title'])) {
       $search = preg_replace('/[[:blank:]]+/', '%', $values['title']);
+      $search = preg_replace('/%%+/', '%', $search);
+      $search = preg_replace('/^%/', '', $search);
+      $search = preg_replace('/%$/', '', $search);
       $query->getQuery()->where('LOWER(n.title) LIKE :search_string', array( ':search_string' => '%' . strtolower($search) . '%'));
     }
   }
