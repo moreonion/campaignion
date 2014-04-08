@@ -74,6 +74,6 @@ class BulkOpForm {
       return;
     }
     $op = $this->ops[$op_name];
-    $op->apply($nids, $form_state);
+    $op->apply($nids, $form_state['values']['bulk-wrapper']['op-wrapper']['op'][$op_name]);
   }
 }

@@ -31,14 +31,12 @@ class SupporterTag implements BulkOpBatchInterface {
     );
   }
 
-  public function apply($contact_ids, &$form_state) {
+  public function apply($contact_ids, $values) {
     if (count($contact_ids) <= 0) {
       return;
     }
-    $values = $form_state['values']['bulk-wrapper']['op-wrapper']['op']['tag']['tag'];
-    //dpm($values, 'values');
     $term_ids = array();
-    foreach($values as $tid => $value) {
+    foreach($values['tag'] as $tid => $value) {
       if ($value) {
         $term_ids[$tid] = $tid;
       }

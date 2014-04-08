@@ -18,7 +18,7 @@ for almost all visitors of your website. Are you sure?
 STR;
     $element['warn']['message']['#markup'] = t($message, array('!count' => '<span class="bulkop-count"></span>'));
   }
-  public function apply($nids, &$form_state) {
+  public function apply($nids, $values) {
     $nodes = node_load_multiple($nids);
     foreach ($nodes as $node) {
       if (!$node->status) {
