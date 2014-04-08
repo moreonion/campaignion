@@ -31,7 +31,7 @@ class SupporterListing {
 
     $rows = array();
     $selectAll = array(
-      'no-striping' => TRUE,
+      'no_striping' => TRUE,
     );
     $element['bulkop_select_all_matching'] = array(
       '#type' => 'checkbox',
@@ -55,9 +55,7 @@ class SupporterListing {
 
     $evenodd = 1;
     foreach ($query->execute() as $contact) {
-      $class = ($evenodd++ % 2 == 0) ? 'even' : 'odd';
       $row = $this->renderRow($contact, $element);
-      $row['class'][] = $class;
       $rows[] = $row;
     }
 
