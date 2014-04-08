@@ -192,7 +192,7 @@ function _campaignion_recent_supporters_recent_supporters($nid, $limit = 10) {
   $sql = <<<SQL
 SELECT rc.first_name, rc.last_name, ca.created as timestamp, wt.country, fdfa.field_address_country, n.tnid
 FROM {node} tn
-  INNER JOIN {node} n USING (tnid)
+  INNER JOIN {node} n ON tn.nid=n.nid OR (tn.tnid<>0 AND tn.tnid=n.tnid)
   INNER JOIN {campaignion_activity_webform} caw ON caw.nid = n.nid
   INNER JOIN {campaignion_activity} ca ON ca.activity_id=caw.activity_id AND ca.type='webform_submission'
   INNER JOIN {redhen_contact} rc USING (contact_id)
