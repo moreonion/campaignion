@@ -17,7 +17,7 @@ class SupporterPage extends Page {
       $bulkOps['tag']   = new BulkOp\SupporterTag(TRUE);
       $bulkOps['untag'] = new BulkOp\SupporterTag(FALSE);
     }
-
+    $bulkOps['export'] = new BulkOp\SupporterExport();
     $listing = new SupporterListing($this->baseQuery, 20);
     $this->bulkOpForm = new BulkOpForm($listing, $bulkOps);
   }
