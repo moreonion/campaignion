@@ -59,6 +59,7 @@ class ContentStep extends WizardStep {
   }
 
   public function submitStep($form, &$form_state) {
+    parent::submitStep($form, $form_state);
     $this->nodeForm->submit($form, $form_state);
     $form_state['form_info']['path'] = 'node/' . $form_state['embedded']['node']->nid . '/wizard/%step';
   }

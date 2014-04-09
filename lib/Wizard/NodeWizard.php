@@ -20,12 +20,10 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
     $this->formInfo['path'] = $node ? "node/{$node->nid}/wizard/%step" : "wizard/{$this->node->type}";
 
     drupal_set_title(t('Create ' . node_type_get_name($this->node)));
-    if (isset($this->node->nid) && $this->node->status) {
-      $this->formInfo += array(
-        'show return' => TRUE,
-        'return path' => 'node/' . $this->node->nid,
-      );
-    }
+    $this->formInfo += array(
+      'show return' => TRUE,
+      'return path' => 'node/' . $this->node->nid,
+    );
   }
 
   public function wizardForm() {

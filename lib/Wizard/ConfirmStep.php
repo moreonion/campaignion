@@ -50,6 +50,7 @@ class ConfirmStep extends WizardStep {
       '#value' => t('Publish now!'),
       '#type' => 'submit',
       '#name' => 'finish',
+      '#wizard type' => 'return',
       '#attributes' => array('class' => array('button-finish')),
     );
     $form['confirm_container']['buttons']['schedule'] = array(
@@ -64,6 +65,7 @@ class ConfirmStep extends WizardStep {
       '#value' => t('Save as draft'),
       '#name' => 'draft',
       '#weight' => 1020,
+      '#wizard type' => 'return',
       '#attributes' => array('class' => array('button-finish-other')),
     );
 

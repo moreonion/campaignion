@@ -32,7 +32,8 @@ abstract class WizardStep extends \Drupal\oowizard\WizardStep {
     $form['buttons']['next']['#value'] = t('Next');
 
     if (isset($form['buttons']['return'])) {
-      $form['buttons']['return']['#value'] = t('Save & return');
+      $label = (!isset($this->wizard->node) || $this->wizard->node->status) ? t('Save & return') : t('Save as draft');
+      $form['buttons']['return']['#value'] = $label;
     }
 
     $form['wizard_head']['buttons'] = $form['buttons'];
