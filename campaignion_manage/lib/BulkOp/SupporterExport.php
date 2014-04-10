@@ -45,6 +45,29 @@ class SupporterExport implements BulkOpBatchInterface {
     batch_set($batch);
   }
 
+  protected function initBatch($contact_ids, &$context, $address_mapping, $fields) {
+    $context['sandbox']['progress']    = 0;
+    $context['sandbox']['current_id']  = 0;
+    $context['sandbox']['max']         = count($contact_ids);
+    $context['sandbox']['csv_name']    = $context['results']['csv_name'] = tempnam(file_directory_temp(), 'CampaignionSupporterExport_' );
+    $context['results']['bulkOp']      = $this;
+    // create the CSV column header line
+    $csv_header = array();
+    foreach ($fields as $key => $value) {
+      if ($key === 'field_address') {
+        foreach ($address_mapping as $mapped_key => $key) {
+          $csv_header[$mapped_key] = $mapped_key;
+        }
+      }
+      else {
+        $csv_header[$key] = $value;
+      }
+    }
+    $handle = fopen($context['sandbox']['csv_name'], 'w');
+    fputcsv($handle, $csv_header);
+    fclose($handle);
+  }
+
   public function batchApply($contact_ids, $fields, &$context) {
     $address_mapping = array(
       'street'  => 'thoroughfare',
@@ -54,26 +77,7 @@ class SupporterExport implements BulkOpBatchInterface {
       'region'  => 'administrative_area',
     );
     if (!isset($context['sandbox']['progress'])) {
-      $context['sandbox']['progress']   = 0;
-      $context['sandbox']['current_id'] = 0;
-      $context['sandbox']['max']        = count($contact_ids);
-      $context['sandbox']['csv_name']   = $context['results']['csv_name'] = tempnam(file_directory_temp(), 'CampaignionSupporterExport_' );
-      $context['results']['bulkOp']     = $this;
-      // create the CSV column header line
-      $csv_header = array();
-      foreach ($fields as $key => $value) {
-        if ($key === 'field_address') {
-          foreach ($address_mapping as $mapped_key => $key) {
-            $csv_header[$mapped_key] = $mapped_key;
-          }
-        }
-        else {
-          $csv_header[$key] = $value;
-        }
-      }
-      $handle = fopen($context['sandbox']['csv_name'], 'w');
-      fputcsv($handle, $csv_header);
-      fclose($handle);
+      $this->initBatch($contact_ids, $context, $address_mapping, $fields);
     }
     $ids = array_slice(
       $contact_ids,
@@ -91,7 +95,12 @@ class SupporterExport implements BulkOpBatchInterface {
       $exporter = new \Drupal\campaignion_manage\CampaignionContactExporter($contact, $address_mapping);
       foreach ($fields as $field_name => $field_label) {
         if (is_array($value = $exporter->value($field_name))) {
-          $csv_line += $value;
+          if (empty($value)) {
+            $csv_line[$field_name] = '';
+          }
+          else {
+            $csv_line += $value;
+          }
         }
         else {
           $csv_line[$field_name] = $value;
@@ -108,10 +117,77 @@ class SupporterExport implements BulkOpBatchInterface {
   }
 
   public function batchFinish($success, $results, $operations) {
-    if (isset($results['errors'])) {
-      foreach($results['errors'] as $error_message) {
-        drupal_set_message($error_message);
+    if ($success) {
+      if (isset($results['errors'])) {
+        foreach($results['errors'] as $error_message) {
+          drupal_set_message($error_message);
+        }
+      }
+      else {
+        $file_name = 'Campaignion_Supporter_Export_' . date('Y-m-d_H:i:s') . '.csv';
+        drupal_add_http_header('Content-Type', 'text/csv; utf-8');
+        drupal_add_http_header('Pragma', 'public');
+        drupal_add_http_header('Cache-Control', 'max-age=0');
+        drupal_add_http_header('Content-Disposition', "attachment; filename=$file_name");
+        drupal_send_headers();
+        // compress exports over 20KB
+        if (filesize($results['csv_name']) > 20000) {
+          if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE) {
+            if ($this->compressFile($results['csv_name'])) {
+              unlink($results['csv_name']);
+              $results['csv_name'] .= '.gz';
+              $file_name .= '.gz';
+              ini_set('zlib.output_compression', '0');
+              header('Content-Encoding: gzip');
+            }
+            else {
+              drupal_set_message(t('Error while compressing file for supporter export.'));
+              return;
+            }
+          }
+        }
+        if (ob_get_level()) {
+          ob_end_clean();
+        }
+        readfile($results['csv_name']);
+        unlink($results['csv_name']);
+        drupal_exit();
       }
     }
+  }
+
+  /**
+   * GZIPs a file on disk (appending .gz to the name)
+   *
+   * From http://stackoverflow.com/questions/6073397/how-do-you-create-a-gz-file-using-php
+   * Based on function by Kioob at:
+   * http://www.php.net/manual/en/function.gzwrite.php#34955
+   *
+   * @param string $source Path to file that should be compressed
+   * @param integer $level GZIP compression level (default: 9)
+   * @return string New filename (with .gz appended) if success, or FALSE if operation fails
+   */
+  protected function compressFile($src_file_name, $dest_file_name = NULL, $level = 9){ 
+    if ($dest_file_name == NULL) {
+      $dest_file_name = $src_file_name . '.gz';
+    }
+    $mode = 'wb' . $level;
+    $result = TRUE;
+    if ($fp_out = gzopen($dest_file_name, $mode)) {
+      if ($fp_in = fopen($src_file_name,'rb')) {
+        while (!feof($fp_in)) {
+          gzwrite($fp_out, fread($fp_in, 1024 * 512));
+        }
+        fclose($fp_in);
+      }
+      else {
+        $result = FALSE; 
+      }
+      gzclose($fp_out); 
+    } else {
+      $result = FALSE;
+    }
+
+    return $result;
   }
 }

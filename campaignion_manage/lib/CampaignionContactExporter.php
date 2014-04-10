@@ -26,7 +26,7 @@ class CampaignionContactExporter implements SourceInterface {
     $this->map['field_address']                = new AddressField($wrappedContact, 'field_address', $address_mapping);
     $this->map['created']                      = new DateField($wrappedContact, 'created', '%Y-%m-%d');
     $this->map['updated']                      = new DateField($wrappedContact, 'updated', '%Y-%m-%d');
-    $this->map['field_ip_address']             = new WrapperField($wrappedContact, 'field_ip_address');
+    $this->map['field_ip_adress']              = new WrapperField($wrappedContact, 'field_ip_adress');
     $this->map['field_phone_number']           = new WrapperField($wrappedContact, 'field_phone_number');
     $this->map['field_direct_mail_newsletter'] = new WrapperField($wrappedContact, 'field_direct_mail_newsletter');
     $this->map['field_social_network_links']   = new WrapperField($wrappedContact, 'field_social_network_links');

@@ -29,6 +29,9 @@ class AddressField extends WrapperField {
             $values[$key] = $all_values[$key];
           }
         }
+        else {
+          $values[$key] = '';
+        }
       }
     }
     else {
