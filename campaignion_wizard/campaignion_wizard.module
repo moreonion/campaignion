@@ -51,6 +51,16 @@ function campaignion_wizard_redirect_edit($node) {
   if (TypeBase::isAction($node->type)) {
     campaignion_wizard_redirect("node/{$node->nid}/wizard");
   }
+  elseif ($fields = TypeBase::referenceFieldsByType($node->type)) {
+    foreach ($fields as $field) {
+      // Lookup the action that uses this thank you page.
+      $sql = "SELECT entity_id FROM {field_data_$field} WHERE entity_type='node' AND {$field}_node_reference_nid=:nid LIMIT 1";
+      $result = db_query($sql, array(':nid' => $node->nid));
+      if ($nid = $result->fetchField()) {
+        campaignion_wizard_redirect("node/{$nid}/wizard/thank");
+      }
+    }
+  }
   return node_page_edit($node);
 }
 

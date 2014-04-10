@@ -44,6 +44,25 @@ abstract class TypeBase implements TypeInterface {
     return $static_fast;
   }
 
+  public static function thankYouPageTypes() {
+    $tyTypes = array();
+    foreach (static::types() as $type => $info) {
+      $p = &$info['parameters'];
+      if (isset($p['thank_you_page'])) {
+        $tyTypes[$p['thank_you_page']['type']][$p['thank_you_page']['reference']] = TRUE;
+      }
+    }
+    return $tyTypes;
+  }
+
+  public static function referenceFieldsByType($type) {
+    $types = static::thankYouPageTypes();
+    if (isset($types[$type])) {
+      return array_keys($types[$type]);
+    }
+    return FALSE;
+  }
+
   public static function fromContentType($type) {
     $action_types = self::types();
     if (isset($action_types[$type])) {
