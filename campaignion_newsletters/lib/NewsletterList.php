@@ -20,7 +20,7 @@ class NewsletterList extends \Drupal\little_helpers\DB\Model {
     $result = db_query('SELECT * FROM {campaignion_newsletters_lists} ORDER BY title');
     $lists = array();
     foreach ($result as $row) {
-      $lists[$row->list_id] = new static($row, FALSE);
+      $lists[$row->list_id] = new static($row);
     }
     return $lists;
   }
@@ -28,7 +28,7 @@ class NewsletterList extends \Drupal\little_helpers\DB\Model {
   public static function load($id) {
     $result = db_query('SELECT * FROM {campaignion_newsletters_lists} WHERE list_id=:id', array(':id' => $id));
     if ($row = $result->fetch()) {
-      return new static($row, FALSE);
+      return new static($row);
     }
   }
 
@@ -38,7 +38,7 @@ class NewsletterList extends \Drupal\little_helpers\DB\Model {
       ':identifier' => $identifier,
     ));
     if ($row = $result->fetch()) {
-      return new static($row, FALSE);
+      return new static($row);
     }
   }
 
@@ -49,14 +49,14 @@ class NewsletterList extends \Drupal\little_helpers\DB\Model {
     }
     if ($item = self::byIdentifier($data['source'], $data['identifier'])) {
       unset($adata['list_id']);
-      $item->__construct($adata, FALSE);
+      $item->__construct($adata);
       return $item;
     } else {
-      return new static($data);
+      return new static($data, TRUE);
     }
   }
 
-  public function __construct($data = array(), $new = TRUE) {
+  public function __construct($data = array(), $new = FALSE) {
     parent::__construct($data, $new);
     foreach ($data as $k => $v) {
       $this->$k = (is_string($v) && !empty(self::$serialize[$k])) ? unserialize($v) : $v;
