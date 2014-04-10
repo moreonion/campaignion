@@ -22,7 +22,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
     drupal_set_title(t('Create ' . node_type_get_name($this->node)));
     $this->formInfo += array(
       'show return' => TRUE,
-      'return path' => 'node/' . $this->node->nid,
+      'return path' => $node ? 'node/' . $this->node->nid : 'node',
     );
   }
 
