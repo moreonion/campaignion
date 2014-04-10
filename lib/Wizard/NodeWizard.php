@@ -5,6 +5,8 @@ namespace Drupal\campaignion\Wizard;
 abstract class NodeWizard extends \Drupal\oowizard\Wizard {
   public $node;
   public $parameters;
+  protected $levels;
+  protected $status;
 
   public function __construct($parameters = array(), $node = NULL, $type = NULL, $user = NULL) {
     $this->parameters = $parameters;
@@ -13,6 +15,8 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
         $class = '\\' . __NAMESPACE__ . '\\' . $class;
       }
     }
+    $this->levels = array_flip(array_keys($this->steps));
+    $this->status = NULL;
 
     $this->user = $user ? $user : $GLOBALS['user'];
     $this->node = $node ? $node : $this->prepareNode($type);
@@ -24,6 +28,9 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
       'show return' => TRUE,
       'return path' => $node ? 'node/' . $this->node->nid : 'node',
     );
+    if (!empty($this->node->nid)) {
+      $this->status = Status::loadOrCreate($this->node->nid);
+    }
   }
 
   public function wizardForm() {
@@ -48,15 +55,34 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
   public function trailItems() {
     $trail = array();
     $accessible = TRUE;
+    $completed = empty($this->status) ? -1 : $this->levels[$this->status->step];
     foreach ($this->stepHandlers as $urlpart => $step) {
       $is_current = $urlpart == $this->currentStep;
       $trail[] = array(
         'url' => strtr($this->formInfo['path'], array('%step' => $urlpart)),
         'title' => $step->getTitle(),
-        'accessible' => $accessible = ($accessible && (!$is_current || $this->node->status) && $step->checkDependencies()),
+        'accessible' => $accessible = ($accessible && ($this->levels[$urlpart] <= $completed) && $step->checkDependencies()),
         'current' => $urlpart == $this->currentStep,
       );
     }
     return $trail;
+  }
+
+  public function submit($form, &$form_state) {
+    parent::submit($form, $form_state);
+    if ($this->node->nid) {
+      if (empty($this->status)) {
+        $data['nid'] = $this->node->nid;
+        $data['step'] = $this->currentStep;
+        $this->status = new Status($data);
+        $this->status->save();
+      }
+      else {
+        if ($this->levels[$this->status->step] < $this->levels[$this->currentStep]) {
+          $this->status->step = $this->currentStep;
+          $this->status->save();
+        }
+      }
+    }
   }
 }
