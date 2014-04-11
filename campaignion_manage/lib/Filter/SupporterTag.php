@@ -17,26 +17,35 @@ class SupporterTag implements FilterInterface {
     $fields = array();
     $query->fields('t', array('tid', 'name'));
     $query->groupBy('t.tid');
-    
+
     return $query->execute()->fetchAllKeyed();
   }
   public function formElement(array &$form, array &$form_state, array &$values) {
+    $form['operator'] = array(
+      '#type'          => 'select',
+      '#title'         => t('Operator'),
+      '#options'       => array('IN' => t('is'), 'NOT IN' => t('is not')),
+      '#default_value' => isset($values['operator']) ? $values['operator'] : NULL,
+    );
     $form['tag'] = array(
       '#type'          => 'select',
       '#title'         => t('Tag'),
       '#options'       => $this->getOptions(),
-      '#default_value' => isset($values) ? $values : NULL,
+      '#default_value' => isset($values['tag']) ? $values['tag'] : NULL,
     );
     $form['#attributes']['class'][] = 'campaignion-manage-filter-tags';
   }
+
   public function title() { return t('Is taged with'); }
+
   public function apply($query, array $values) {
     $inner = db_select('field_data_supporter_tags', 'st_inner')
       ->fields('st_inner', array('entity_id'))
       ->condition('entity_type', 'redhen_contact')
       ->condition('supporter_tags_tid', $values['tag']);
-    $query->getQuery()->condition('r.contact_id', $inner, 'IN');
+    $query->getQuery()->condition('r.contact_id', $inner, $values['operator']);
   }
+
   public function nrOfInstances() { return 4; }
 
   public function isApplicable() { return count($this->getOptions()) > 0; }
