@@ -13,7 +13,7 @@ class SupporterTag implements BulkOpBatchInterface {
     $this->tag = (bool) $tag;
   }
 
-  public function title() { return $this->tag ? t('Add tag(s)') : t('Delete tag(s)'); }
+  public function title() { return $this->tag ? t('Add tag') : t('Remove tag'); }
 
   public function helpText() {
     return $this->tag ? t('Add one or more tags to the currently selected supporters.') : t('Remove one or more tags to the currently selected supporters.');

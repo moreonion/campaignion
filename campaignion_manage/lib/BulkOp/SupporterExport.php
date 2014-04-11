@@ -3,7 +3,7 @@
 namespace Drupal\campaignion_manage\BulkOp;
 
 class SupporterExport implements BulkOpBatchInterface {
-  public function title() { return t('Export Supporters'); }
+  public function title() { return t('Export contact data'); }
 
   public function helpText() {
     return t('Export all currently selected supporters into a CSV file.');

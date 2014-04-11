@@ -17,7 +17,7 @@ class BulkOpForm {
     $form['bulk-wrapper'] = array(
       '#type' => 'fieldset',
       '#attributes' => array('class' => array('bulkops')),
-      '#title' => t('Bulk edit'),
+      '#title' => t('Bulk edit your selected supporters'),
     );
     $form['bulk-wrapper']['info'] = array(
       '#markup' => '<div class="bulkop-selected">' . t('!count items selected.', array('!count' => '<span class="bulkop-count"></span>')) . '</div>',
