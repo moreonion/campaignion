@@ -6,7 +6,9 @@
  * … on behalf of the commend.module
  */
 function comment_campaignion_activity_type_info() {
-  $info['comment'] = 'Drupal\campaignion\Activity\CommentType';
+  $info['comment'] = 'Drupal\campaignion\Activity\Comment';
+
+  return $info;
 }
 
 /**

@@ -35,6 +35,8 @@ if (module_exists('comment')) {
 function redhen_contact_campaignion_activity_type_info() {
   $info['redhen_contact_create'] = '\Drupal\campaignion\ActivityType';
   $info['redhen_contact_edit'] = '\Drupal\campaignion\ActivityType';
+
+  return $info;
 }
 
 /**
