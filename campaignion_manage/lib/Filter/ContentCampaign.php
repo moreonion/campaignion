@@ -16,7 +16,9 @@ class ContentCampaign extends ContentNodeReference {
       '#options'       => $this->getOptions(),
       '#default_value' => isset($values) ? $values : NULL,
     );
-    $form['#attributes']['class'][] = 'campaignion-manage-filter-campaign';
+  }
+  public function defaults() {
+    return array('campaign' => reset($this->getOptions()));
   }
   public function title() { return t('Campaign'); }
 }

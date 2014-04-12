@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_manage\Filter;
 
-class ContentType implements FilterInterface {
+class ContentType extends Base implements FilterInterface {
   protected $query;
 
   public function __construct(\SelectQueryInterface $query) {
@@ -34,13 +34,18 @@ class ContentType implements FilterInterface {
       '#options'       => $this->getOptions(),
       '#default_value' => isset($values) ? $values : NULL,
     );
-    $form['#attributes']['class'][] = 'campaignion-manage-filter-type';
   }
   public function title() { return t('Type of page'); }
-  public function apply($query, array $values) {
-    $query->getQuery()->condition('n.type', $values['type']);
-  }
-  public function nrOfInstances() { return 1; }
 
-  public function isApplicable() { return count($this->getOptions()) > 1; }
+  public function apply($query, array $values) {
+    $query->condition('n.type', $values['type']);
+  }
+  public function isApplicable($current) {
+    return empty($current) && count($this->getOptions()) > 1;
+  }
+
+  public function defaults() {
+    $options = $this->getOptions();
+    return array('type' => reset($options));
+  }
 }

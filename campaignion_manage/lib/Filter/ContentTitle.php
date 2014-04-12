@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_manage\Filter;
 
-class ContentTitle implements FilterInterface {
+class ContentTitle extends Base implements FilterInterface {
 
   public function formElement(array &$form, array &$form_state, array &$values) {
     $form['title'] = array(
@@ -12,7 +12,6 @@ class ContentTitle implements FilterInterface {
       '#size'          => 40,
       '#default_value' => isset($values['title']) ? $values['title'] : NULL,
     );
-    $form['#attributes']['class'][] = 'campaignion-manage-filter-title';
   }
 
   public function title() { return t('Filter by typing the title'); }
@@ -23,11 +22,10 @@ class ContentTitle implements FilterInterface {
       $search = preg_replace('/%%+/', '%', $search);
       $search = preg_replace('/^%/', '', $search);
       $search = preg_replace('/%$/', '', $search);
-      $query->getQuery()->where('LOWER(n.title) LIKE :search_string', array( ':search_string' => '%' . strtolower($search) . '%'));
+      $query->where('LOWER(n.title) LIKE :search_string', array( ':search_string' => '%' . strtolower($search) . '%'));
     }
   }
-
-  public function nrOfInstances() { return 1; }
-
-  public function isApplicable() { return TRUE; }
+  public function defaults() {
+    return array('title' => '');
+  }
 }

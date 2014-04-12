@@ -89,22 +89,22 @@
 
 /* ------- Filter ------------------ */
 
-#campaignion-manage-filter-form legend {
+.manage-filter-form legend {
   display: none;
 }
-#campaignion-manage-filter-form fieldset {
+.manage-filter-form fieldset {
   border-radius: 0;
 	border: 1px solid #e3dfd7;
 	background: #fff;
 	margin-bottom: .2em;
   clear: both;
 }
-#campaignion-manage-filter-form .fieldset-content {
+.manage-filter-form .fieldset-content {
   padding: .7em 4.5em .5em 1em;
   border-radius: 0;
 	background: #fff;
 }
-#campaignion-manage-filter-form .fieldset-content > .form-type-checkbox{
+.manage-filter-form .fieldset-content > .form-type-checkbox{
   position: absolute;
   left: -9999px;
   float: left;
@@ -112,23 +112,23 @@
   overflow: hidden;
 }
 
-#campaignion-manage-filter-form .fieldset-content .form-item {
+.manage-filter-form .fieldset-content .form-item {
 margin-bottom: 0;
 }
 
-#campaignion-manage-filter-form .fieldset-content > .form-type-checkbox .ilabel {
+.manage-filter-form .fieldset-content > .form-type-checkbox .ilabel {
   display: none;
 }
 
-#campaignion-manage-filter-form .fieldset-content > .form-type-select .selecter-element {
+.manage-filter-form .fieldset-content > .form-type-select .selecter-element {
   left: -9999px;
 }
-#campaignion-manage-filter-form .fieldset-content > .form-type-select .selecter,
-#campaignion-manage-filter-form .fieldset-content > .form-type-select label {
+.manage-filter-form .fieldset-content > .form-type-select .selecter,
+.manage-filter-form .fieldset-content > .form-type-select label {
   float: left;
   margin: 0.5em; 
 }
-#campaignion-manage-filter-form .fieldset-content > .form-type-select label {
+.manage-filter-form .fieldset-content > .form-type-select label {
   text-transform: none;
   font-size: 1em;
   line-height: 1em;
@@ -137,12 +137,12 @@ margin-bottom: 0;
 	padding-top: 3px;
 	margin-right: 10px;
 }
-#campaignion-manage-filter-form .fieldset-content > .form-type-select .selecter {
+.manage-filter-form .fieldset-content > .form-type-select .selecter {
   min-width: 10em;
   max-width: 30em;
 }
 
-#campaignion-manage-filter-form fieldset > .manage-filter-remove {
+.manage-filter-form fieldset > .manage-filter-remove {
   text-indent: -9999px;
   position: absolute;
   width: 35px;
@@ -154,16 +154,16 @@ margin-bottom: 0;
   background: url(../img/x_beige.png) no-repeat center center transparent;
 	border-radius: 50%;
 }
-#campaignion-manage-filter-form fieldset > .manage-filter-remove:hover, #campaignion-manage-filter-form fieldset > .manage-filter-remove:focus {
+.manage-filter-form fieldset > .manage-filter-remove:hover, .manage-filter-form fieldset > .manage-filter-remove:focus {
   cursor: pointer;
 	background-color: #f5f1e8;
 }
 
 /* search bar */
-#campaignion-manage-filter-form .campaignion-manage-filter-title,
-#campaignion-manage-filter-form .campaignion-manage-filter-name,
-#campaignion-manage-filter-form .campaignion-manage-filter-title .fieldset-content,
-#campaignion-manage-filter-form .campaignion-manage-filter-name .fieldset-content {
+.manage-filter-form .campaignion-manage-filter-title,
+.manage-filter-form .campaignion-manage-filter-name,
+.manage-filter-form .filter-fieldsets .campaignion-manage-filter-title .fieldset-content,
+.manage-filter-form .filter-fieldsets .campaignion-manage-filter-name .fieldset-content {
   background: none transparent;
   border: 0px solid transparent;
   padding: 0px;
@@ -171,8 +171,8 @@ margin-bottom: 0;
   clear: none;
 }
 
-#campaignion-manage-filter-form .campaignion-manage-filter-title,
-#campaignion-manage-filter-form .campaignion-manage-filter-name {
+.manage-filter-form .campaignion-manage-filter-title,
+.manage-filter-form .campaignion-manage-filter-name {
   max-width: 30em;
   float: left;
   margin-right: 1em;
@@ -180,8 +180,8 @@ margin-bottom: 0;
   margin-top: .5em;
 }
 
-#campaignion-manage-filter-form .campaignion-manage-filter-title:after,
-#campaignion-manage-filter-form .campaignion-manage-filter-name:after {
+.manage-filter-form .campaignion-manage-filter-title:after,
+.manage-filter-form .campaignion-manage-filter-name:after {
   content: ".";
   text-indent: -50000000px;
   display: block;
@@ -190,22 +190,22 @@ margin-bottom: 0;
   clear: both;
 }
 
-#campaignion-manage-filter-form .campaignion-manage-filter-title label,
-#campaignion-manage-filter-form .campaignion-manage-filter-name label {
+.manage-filter-form .campaignion-manage-filter-title label,
+.manage-filter-form .campaignion-manage-filter-name label {
   visibility: hidden;
   display: block;
   height: 0px;
 }
 
-#campaignion-manage-filter-form .campaignion-manage-filter-title .form-text,
-#campaignion-manage-filter-form .campaignion-manage-filter-name .form-text {
+.manage-filter-form .campaignion-manage-filter-title .form-text,
+.manage-filter-form .campaignion-manage-filter-name .form-text {
   font-size: 130%;
   padding: .6em .5em .5em 45px;
   background: url('../img/search.png') no-repeat 5px center #fff;
 }
 
 
-#campaignion-manage-filter-form #edit-submit {
+.manage-filter-form #edit-submit {
   clear: both;
 }
 

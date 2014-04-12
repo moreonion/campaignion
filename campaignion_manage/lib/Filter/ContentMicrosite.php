@@ -16,7 +16,9 @@ class ContentMicrosite extends ContentNodeReference {
       '#options'       => $this->getOptions(),
       '#default_value' => isset($values) ? $values : NULL,
     );
-    $form['#attributes']['class'][] = 'campaignion-manage-filter-microsite';
   }
   public function title() { return t('Micro-Site'); }
+  public function defaults() {
+    return array('microsite' => reset($this->getOptions()));
+  }
 }

@@ -5,7 +5,7 @@
 (function($) {
 Drupal.behaviors.campaignion_manage_bulk = {};
 Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
-  $('form.campaignion-manage-bulkops', context).each(function() {
+  $('.campaignion-manage-bulkops', context).each(function() {
     var $wrapper = $(this);
     var $dialog = $wrapper.find('.bulkops');
     var $dialogBg = $('.campaignion-dialog-wrapper');
@@ -21,16 +21,16 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
 
       $dialog.show();
       $dialogBg.css('z-index', 500).show();
-    }).appendTo($wrapper.find('.bulkop-button-wrapper'));
+    }).appendTo($wrapper.parents('form').find('.bulkop-button-wrapper'));
 
     // Button to hide the dialog.
     $('<div id="bulk-dialog-close">' + Drupal.t('Close') + '</div>')
     .click(function(e) {
       $dialog.hide();
       $dialogBg.css('z-index', defaultZ).hide();
-    }).appendTo($wrapper.find('.bulkops').children('legend'));
+    }).appendTo($dialog.children('legend'));
 
-    var $radioWrapper = $wrapper.find('.form-item-bulk-wrapper-operations');
+    var $radioWrapper = $wrapper.find('div.bulkops-radios').parent();
     var $radios = $radioWrapper.find('input[type=radio]');
     var $bulkopsWrapper = $wrapper.find('.bulkops-ops');
     var $bulkops = $bulkopsWrapper.find('.bulkops-op');

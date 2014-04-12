@@ -5,61 +5,47 @@
 (function($) {
 Drupal.behaviors.campaignion_manage_filter = {};
 Drupal.behaviors.campaignion_manage_filter.attach = function(context) {
-  var $filterWrapper = $('#campaignion-manage-filter-form', context);
-  var $filterFieldsets = $('fieldset[id^=edit-filter-]', $filterWrapper).not('fieldset[id^=edit-filter-title-]').not('fieldset[id^=edit-filter-name-]');
-  console.log($filterFieldsets);
+  var $wrapper = $('.manage-filter-form', context);
+  var $addables = $wrapper.find('.form-checkboxes.filter-add input');
 
   // generate filter list
-  var html = '';
-  html += '<ul class="manage-filter-dropdown listdropdown-menu">';
-  $filterFieldsets.each(function () {
-    var $label = $('label:not([for$=active])', $(this));
-    html += '<li class="filter-toggle filter-disabled" data-filter-for="' + $(this).attr('id') + '">' + $label.text() + '</li>';
-  });
-  html += '</ul>';
-  $ul = $(html);
-  $filterWrapper.prepend($ul);
+  var $ul = $('<ul class="manage-filter-dropdown listdropdown-menu"></ul>');
+  $addables.each(function () {
+    var $addToggle = $(this);
+    $('<li class="filter-toggle filter-disabled">' + $addToggle.siblings('.option').text() + '</li>')
+    .click(function() {
+      $addToggle.prop('checked', true).change();
+    }).appendTo($ul);
+  }).parents('.form-type-checkboxes').hide();
+  $wrapper.prepend($ul);
 
   // initialize hidden/shown state + add close button
-  $filterFieldsets.each(function () {
+  $filterFieldsets = $wrapper.find('.filter-fieldsets').children();
+  $filterFieldsets.filter('.filter-removable').each(function () {
     var $filterFieldset = $(this);
     $filterFieldset.append('<span class="manage-filter-remove">remove</span>');
-    if (!$('input.filter-active-toggle', $filterFieldset).attr('checked')) {
-      $filterFieldset.hide();
-    } else {
-      $('.filter-toggle[data-filter-for=' + $filterFieldset.attr('id') + ']', $filterWrapper).hide();
-    }
   });
 
   // close button handler
-  $('.manage-filter-remove', $filterWrapper).click(function() {
-    var $fieldsetContent = $(this).siblings('.fieldset-content');
-    var $filterFieldset = $(this).closest('fieldset');
-    var $myCheckbox = $('input.filter-active-toggle', $fieldsetContent);
-    $myCheckbox.attr('checked', false).trigger('change');
-
-    $(this).closest('fieldset').hide();
-    $('.filter-toggle[data-filter-for=' + $filterFieldset.attr('id') + ']', $filterWrapper).show();
+  $('.manage-filter-remove', $wrapper).click(function() {
+    $(this).closest('fieldset').hide()
+    .find('input.filter-active-toggle').prop('checked', false).change();
   });
 
   // filter add handler
   // get fieldset, show it and enable filter active checkbox
-  $('.filter-toggle', $filterWrapper).click(function() {
+  $('.filter-toggle', $wrapper).click(function() {
     var $self = $(this);
     var filterFieldsetId = $self.attr('data-filter-for');
     var $filterFieldset = $('#' + filterFieldsetId);
-
-    $filterFieldset.show();
-    $self.hide();
-    $('input.filter-active-toggle', $filterFieldset).attr('checked', true).trigger('change');
-
+    $('input.filter-active-toggle', $filterFieldset).attr('checked', true);
   });
 
   $('ul.manage-filter-dropdown', context).listdropdown({
     defaultText: Drupal.t('Add filter')
   });
 
-  $filterWrapper.find('.ctools-auto-submit-click').click(function() {
+  $wrapper.find('.ctools-auto-submit-click').click(function() {
     $(this).mousedown();
   }).hide();
 };

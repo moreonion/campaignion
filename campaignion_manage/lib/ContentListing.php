@@ -3,10 +3,8 @@
 namespace Drupal\campaignion_manage;
 
 class ContentListing {
-  protected $query;
   protected $size;
-  public function __construct($query, $pageSize) {
-    $this->query = $query;
+  public function __construct($pageSize = 20) {
     $this->size = $pageSize;
   }
   /**
@@ -23,8 +21,9 @@ class ContentListing {
     );
   }
 
-  public function process(&$element, &$form_state) {
-    $query = $this->query->paged($this->size);
+  public function process(&$element, &$form_state, $query) {
+    $element['#attributes']['data-count'] = $query->count();
+    $query->setPage($this->size);
     $columns = 3;
 
     $rows = array();
@@ -62,10 +61,11 @@ class ContentListing {
       $row = $this->nodeRow($tnode, TRUE, $element);
       $row['class'][] = $class;
       $rows[] = $row;
-      if (count($tnode->translations) > 1) {
+      if (count($tnode->translations) > 0) {
         $bigcellrow['data']['bigcell']['colspan'] = $columns;
         $bigcellrow['class'][] = 'node-translations';
         $bigcellrow['class'][] = $class;
+        $bigcellrow['no_striping'] = TRUE;
 
         $innerrows = array();
         foreach ($tnode->translations as $lang => $node) {
@@ -162,9 +162,5 @@ class ContentListing {
       }
     }
     return array_keys($nids);
-  }
-
-  public function count() {
-    return $this->query->count();
   }
 }

@@ -11,7 +11,7 @@ class Supporter extends Base {
       ->condition('r.type', 'contact')
       ->orderBy('r.updated', 'DESC');
 
-    $this->query = $query;
+    parent::__construct($query);
   }
   public function modifyResult(&$rows) {
     if (empty($rows)) {

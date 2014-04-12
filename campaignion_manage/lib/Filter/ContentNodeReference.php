@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_manage\Filter;
 
-class ContentNodeReference implements FilterInterface {
+class ContentNodeReference extends Base implements FilterInterface {
   protected $query;
   protected $referenceField;
   protected $referenceColumn;
@@ -42,14 +42,13 @@ class ContentNodeReference implements FilterInterface {
       '#options'       => $this->getOptions(),
       '#default_value' => isset($values) ? $values : NULL,
     );
-    $form['#attributes']['class'][] = 'campaignion-manage-filter-node-reference';
   }
   public function title() { return t('Node Reference'); }
   public function apply($query, array $values) {
-    $query->getQuery()->innerJoin('field_data_' . $this->referenceField, 'ref', 'ref.entity_id = n.nid');
-    $query->getQuery()->condition('ref.' . $this->referenceColumn, $values[$this->machineName()]);
+    $query->innerJoin('field_data_' . $this->referenceField, 'ref', 'ref.entity_id = n.nid');
+    $query->condition('ref.' . $this->referenceColumn, $values[$this->machineName()]);
   }
-  public function nrOfInstances() { return 1; }
-
-  public function isApplicable() { return count($this->getOptions()) > 0; }
+  public function isApplicable($current) {
+    return empty($current) && count($this->getOptions()) > 0;
+  }
 }

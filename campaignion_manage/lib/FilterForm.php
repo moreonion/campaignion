@@ -14,61 +14,83 @@ class FilterForm {
    *   machineName      is the machine name of the filter
    *   filterObject     instance of a filter object
    */
-  public function __construct($filters = array(), $defaultActive = array()) {
-    $this->values = isset($_SESSION['campaignion_manage_content_filter']) ? $_SESSION['campaignion_manage_content_filter'] : NULL;
-
-    $this->filters = $filters;
-
-    foreach ($filters as $name => $filter) {
-      for ($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
-        if (!isset($this->values['filter'][$name][$delta]['active'])) {
-          if (($index = array_search($name, $defaultActive)) !== FALSE) {
-            $this->values['filter'][$name][$delta]['active'] = TRUE;
-            // only set the first instance of the filter active
-            unset($defaultActive[$index]);
-          }
-          else {
-            $this->values['filter'][$name][$delta]['active'] = FALSE;
-          }
-        }
+  public function __construct($filters = array(), $defaults = array()) {
+    $this->values = array();
+    $this->values += isset($_SESSION['campaignion_manage_content_filter']) ? $_SESSION['campaignion_manage_content_filter'] : array();
+    foreach ($defaults as $index => $values) {
+      if (isset($this->values[$index])) {
+        $this->values[$index] = drupal_array_merge_deep($this->values[$index], $values);
+      }
+      else {
+        $this->values[] = $values;
       }
     }
+
+    $this->filters = $filters;
   }
 
   public function applyFilters($query) {
-    foreach ($this->filters as $name => $filter) {
-      for($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
-        if ($this->filterIsActive($name, $delta)) {
-          $filter->apply($query, $this->values['filter'][$name][$delta]);
-        }
+    foreach ($this->values as $values) {
+      if (!is_array($values) || !isset($values['type']) || !isset($this->filters[$values['type']])) {
+        continue;
       }
+      $filter = $this->filters[$values['type']];
+      $filter->apply($query, $values['values']);
     }
   }
 
-  public function form($form, &$form_state) {
-    $form['#tree'] = TRUE;
+  public function form(&$form, &$form_state, $values = NULL) {
+    if ($values) {
+      $this->values = $values['filter'];
+    }
     ctools_add_js('auto-submit');
     $form['#attributes']['class'][] = 'ctools-auto-submit-full-form';
-    foreach ($this->filters as $name => $filter) {
-      if ($filter->isApplicable()) {
-        for($delta = 0; $delta < $filter->nrOfInstances(); $delta++) {
-          $form['filter'][$name][$delta] = array(
-            '#type'       => 'fieldset',
-            '#title'      => $filter->title(),
-            '#attributes' => array('class' => array('clearfix')),
-          );
-          $element = &$form['filter'][$name][$delta];
-          $element['active'] = array(
-            '#type'          => 'checkbox',
-            '#title'         => t('active'),
-            '#description'   => t('The filter will only be applied if this checkbox is checked.'),
-            '#default_value' => !empty($this->values['filter'][$name][$delta]['active']),
-            '#attributes'    => array('class' => array('filter-active-toggle')),
-          );
+    $form['add_filter'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Add filter'),
+      '#options' => array(),
+      '#attributes' => array('class' => array('filter-add')),
+    );
+    $form['filter'] = array(
+      '#type' => 'container',
+      '#attributes' => array('class' => array('filter-fieldsets')),
+    );
 
-          $filter->formElement($element, $form_state, $this->values['filter'][$name][$delta]);
-        }
+    foreach ($this->values as $delta => &$values) {
+      if (!isset($values['type']) || !isset($this->filters[$values['type']])) {
+        continue;
       }
+      $values += array('values' => array());
+      $filter = $this->filters[$values['type']];
+      $removable = !isset($values['removable']) || $values['removable'];
+      $form['filter'][$delta] = array(
+        '#type'       => 'fieldset',
+        '#title'      => $filter->title(),
+        '#attributes' => array('class' => array('clearfix', 'campaignion-manage-filter-' . $values['type'])),
+      );
+      $element = &$form['filter'][$delta];
+      $element['type'] = array(
+        '#type' => 'value',
+        '#value' => $values['type'],
+      );
+      $element['removable'] = array(
+        '#type' => 'value',
+        '#value' => $removable,
+      );
+      if ($removable) {
+        $element['#attributes']['class'][] = 'filter-removable';
+      }
+      $element['active'] = array(
+        '#type'          => $removable ? 'checkbox' : 'value',
+        '#title'         => t('active'),
+        '#description'   => t('The filter will only be applied if this checkbox is checked.'),
+        '#default_value' => TRUE,
+        '#attributes'    => array('class' => array('filter-active-toggle')),
+      );
+      $element['values'] = array(
+        '#type' => 'container',
+      );
+      $filter->formElement($element['values'], $form_state, $values['values']);
     }
 
     $form['submit'] = array(
@@ -79,17 +101,46 @@ class FilterForm {
       ),
       '#attributes' => array('class' => array('ctools-use-ajax', 'ctools-auto-submit-click')),
     );
-    return $form;
+  }
+
+  public function process(&$form, &$form_state) {
+    $valuesByType = array();
+    foreach ($this->values as $config) {
+      $valuesByType[$config['type']] = $config['values'];
+    }
+    $options = array();
+    foreach ($this->filters as $name => $filter) {
+      $current = isset($valuesByType[$name]) ? $valuesByType[$name] : array();
+      if ($filter->isApplicable($current)) {
+        $options[$name] = $filter->title();
+      }
+    }
+    $form['add_filter']['#options'] = $options;
   }
 
   public function submit(&$form, &$form_state) {
     $form_state['redirect'] = FALSE;
-    $this->values = $form_state['values'];
+    $fvalues = &drupal_array_get_nested_value($form_state['values'], $form['#parents']);
+    $finput = &drupal_array_get_nested_value($form_state['input'], $form['#parents']);
+    $this->values = &$fvalues['filter'];
+    foreach ($this->values as $delta => $values) {
+      if (empty($values['active'])) {
+        unset($this->values[$delta]);
+      }
+    }
+    foreach ($fvalues['add_filter'] as $name => $active) {
+      if ($active) {
+        $this->values[] = array(
+          'type' => $name,
+          'values' => $this->filters[$name]->defaults(),
+        );
+      }
+    }
+    // We want to uncheck all checkboxes again (else we keep adding filters)
+    // form_builder() uses $form_state['input'] to set $element['#value'] on
+    // the individual checkboxes. So we need to unset the values there.
+    $finput['add_filter'] = array();
+    $form_state['rebuild'] = TRUE;
     $_SESSION['campaignion_manage_content_filter'] = $this->values;
-  }
-
-  protected function filterIsActive($name, $delta) {
-    $f = &$this->values['filter'][$name][$delta];
-    return isset($f) && $f['active'];
   }
 }

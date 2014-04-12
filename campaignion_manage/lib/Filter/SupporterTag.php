@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_manage\Filter;
 
-class SupporterTag implements FilterInterface {
+class SupporterTag extends Base implements FilterInterface {
   protected $query;
 
   public function __construct(\SelectQueryInterface $query) {
@@ -33,7 +33,6 @@ class SupporterTag implements FilterInterface {
       '#options'       => $this->getOptions(),
       '#default_value' => isset($values['tag']) ? $values['tag'] : NULL,
     );
-    $form['#attributes']['class'][] = 'campaignion-manage-filter-tags';
   }
 
   public function title() { return t('Is taged with'); }
@@ -43,10 +42,14 @@ class SupporterTag implements FilterInterface {
       ->fields('st_inner', array('entity_id'))
       ->condition('entity_type', 'redhen_contact')
       ->condition('supporter_tags_tid', $values['tag']);
-    $query->getQuery()->condition('r.contact_id', $inner, $values['operator']);
+    $query->condition('r.contact_id', $inner, $values['operator']);
   }
 
-  public function nrOfInstances() { return 4; }
+  public function isApplicable($current) {
+    return count($current) <= 3 && count($this->getOptions()) > 0;
+  }
 
-  public function isApplicable() { return count($this->getOptions()) > 0; }
+  public function defaults() {
+    return array('operator' => 'IN', 'tag' => reset($this->getOptions()));
+  }
 }

@@ -12,8 +12,7 @@ class BulkOpForm {
       $this->ops[$name] = $op;
     }
   }
-  public function form($form, &$form_state) {
-    $form['#tree'] = TRUE;
+  public function form(&$form, &$form_state) {
     $form['bulk-wrapper'] = array(
       '#type' => 'fieldset',
       '#attributes' => array('class' => array('bulkops')),
@@ -58,12 +57,7 @@ class BulkOpForm {
       '#value' => t('Apply'),
     );
 
-    $form['listing'] = array();
-    $form['listing']['#attributes']['data-count'] = $this->listing->count();
-    $this->listing->build($form['listing'], $form_state);
-
     $form['#attributes']['class'][] = 'campaignion-manage-bulkops';
-    return $form;
   }
   public function submit(&$form, &$form_state) {
     $values = &$form_state['values'];

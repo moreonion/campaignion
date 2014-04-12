@@ -5,7 +5,7 @@ namespace Drupal\campaignion_manage;
 class ContentPage extends Page {
   public function __construct($query) {
     $this->baseQuery = $query;
-    $select = $query->getQuery();
+    $select = $query->query();
 
     $filters['title'] = new Filter\ContentTitle();
     $defaultActive = array('title');
@@ -18,10 +18,11 @@ class ContentPage extends Page {
     $filters['language'] = new Filter\ContentLanguage($select);
     $filters['type'] = new Filter\ContentType($select);
     $filters['status'] = new Filter\ContentStatus();
-    $this->filterForm = new FilterForm($filters, array('title'));
+    $default[] = array('type' => 'title', 'removable' => FALSE);
+    $this->filterForm = new FilterForm($filters, $default);
 
-    $listing = new ContentListing($this->baseQuery, 20);
-    $this->bulkOpForm = new BulkOpForm($listing, array(
+    $this->listing = new ContentListing(20);
+    $this->bulkOpForm = new BulkOpForm($this->listing, array(
       'publish' => new BulkOp\ContentPublish(),
       'unpubslih' => new BulkOp\ContentUnpublish(),
     ));

@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_manage\Filter;
 
-class ContentLanguage implements FilterInterface {
+class ContentLanguage extends Base implements FilterInterface {
   protected $query;
 
   public function __construct(\SelectQueryInterface $query) {
@@ -42,13 +42,15 @@ class ContentLanguage implements FilterInterface {
       '#options'       => $this->getOptions(),
       '#default_value' => isset($values) ? $values : NULL,
     );
-    $form['#attributes']['class'][] = 'campaignion-manage-filter-language';
   }
   public function title() { return t('Language'); }
   public function apply($query, array $values) {
-    $query->getQuery()->condition('n.language', $values['language']);
+    $query->condition('n.language', $values['language']);
   }
-  public function nrOfInstances() { return 1; }
-
-  public function isApplicable() { return count($this->getOptions()) > 1; }
+  public function defaults() {
+    return array('language' => language_default()->language);
+  }
+  public function isApplicable($current) {
+    return empty($current) && count($this->getOptions()) > 1;
+  }
 }

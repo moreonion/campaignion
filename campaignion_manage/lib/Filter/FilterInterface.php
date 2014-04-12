@@ -26,16 +26,10 @@ interface FilterInterface {
   public function apply($query, array $values);
 
   /**
-   * Get the number of instances that are possible for this filter
-   *
-   * @return number of instances
-   */
-  public function nrOfInstances();
-
-  /**
    * Provide information if the filter is currently applicable
    *
+   * @param $current array of already applied instances of this filter.
    * @return TRUE if the filter is currently applicable, FALSE otherwise
    */
-  public function isApplicable();
+  public function isApplicable($current);
 }

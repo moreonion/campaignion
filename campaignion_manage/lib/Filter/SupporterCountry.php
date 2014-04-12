@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_manage\Filter;
 
-class SupporterCountry implements FilterInterface {
+class SupporterCountry extends Base implements FilterInterface {
   protected $query;
 
   public function __construct(\SelectQueryInterface $query) {
@@ -30,7 +30,6 @@ class SupporterCountry implements FilterInterface {
       '#options'       => $this->getOptions(),
       '#default_value' => isset($values) ? $values : NULL,
     );
-    $form['#attributes']['class'][] = 'campaignion-manage-filter-country';
   }
 
   public function title() { return t('Is from'); }
@@ -40,10 +39,14 @@ class SupporterCountry implements FilterInterface {
       ->fields('ctr', array('entity_id'))
       ->condition('ctr.entity_type', 'redhen_contact')
       ->condition('ctr.field_address_country', $values['country']);
-    $query->getQuery()->condition('r.contact_id', $inner, 'IN');
+    $query->condition('r.contact_id', $inner, 'IN');
   }
 
-  public function nrOfInstances() { return 1; }
+  public function isApplicable($current) {
+    return empty($current) && count($this->getOptions()) > 0;
+  }
 
-  public function isApplicable() { return count($this->getOptions()) > 0; }
+  public function defaults() {
+    return reset($this->getOptions());
+  }
 }

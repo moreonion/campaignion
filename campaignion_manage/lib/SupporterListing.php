@@ -5,8 +5,7 @@ namespace Drupal\campaignion_manage;
 class SupporterListing {
   protected $query;
   protected $size;
-  public function __construct($query, $pageSize = 20) {
-    $this->query = $query;
+  public function __construct($pageSize = 20) {
     $this->size = $pageSize;
   }
   /**
@@ -25,8 +24,9 @@ class SupporterListing {
     );
   }
 
-  public function process(&$element, &$form_state) {
-    $query = $this->query->paged($this->size);
+  public function process(&$element, &$form_state, $query) {
+    $element['#attributes']['data-count'] = $query->count();
+    $query->setPage($this->size);
     $columns = 3;
 
     $rows = array();
@@ -122,13 +122,5 @@ class SupporterListing {
       }
     }
     return array_keys($ids);
-  }
-
-  public function __sleep() {
-    return array();
-  }
-
-  public function count() {
-    return $this->query->count();
   }
 }

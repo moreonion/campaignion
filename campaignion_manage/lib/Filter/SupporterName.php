@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_manage\Filter;
 
-class SupporterName implements FilterInterface {
+class SupporterName extends Base implements FilterInterface {
 
   public function formElement(array &$form, array &$form_state, array &$values) {
     $form['name'] = array(
@@ -12,7 +12,6 @@ class SupporterName implements FilterInterface {
       '#size'          => 40,
       '#default_value' => isset($values['name']) ? $values['name'] : NULL,
     );
-    $form['#attributes']['class'][] = 'campaignion-manage-filter-name';
   }
 
   public function title() { return t('Filter by typing the supporter name'); }
@@ -23,7 +22,7 @@ class SupporterName implements FilterInterface {
       $search = preg_replace('/%%+/', '%', $search);
       $search = preg_replace('/^%/', '', $search);
       $search = preg_replace('/%$/', '', $search);
-      $query->getQuery()->where(
+      $query->where(
         '   LOWER(r.first_name)  LIKE :search_string ' .
         'OR LOWER(r.middle_name) LIKE :search_string ' .
         'OR LOWER(r.last_name)   LIKE :search_string ',
@@ -31,8 +30,7 @@ class SupporterName implements FilterInterface {
       );
     }
   }
-
-  public function nrOfInstances() { return 1; }
-
-  public function isApplicable() { return TRUE; }
+  public function defaults() {
+    return array('name' => '');
+  }
 }

@@ -3,33 +3,31 @@
 namespace Drupal\campaignion_manage\Query;
 
 abstract class Base {
+  protected $_query;
   protected $query;
-  protected $filter;
-  protected $filtered = FALSE;
+  protected $filtered;
+  protected $paged;
 
-  public function setFilter($filter) {
-    $this->filter = $filter;
-  }
-
-  public function filter() {
-    if ($this->filtered) {
-      return;
-    }
-    $this->filter->applyFilters($this);
-    $this->filtered = TRUE;
+  public function __construct(\SelectQuery $query) {
+    $this->_query = $query;
+    $this->reset();
   }
 
   public function execute() {
-    $this->filter();
-    $rows = $this->query->execute()->fetchAll();
+    $rows = $this->paged->execute()->fetchAll();
     $this->modifyResult($rows);
     return $rows;
   }
 
-  public function paged($size) {
-    $copy = clone $this;
-    $copy->query = $copy->query->extend('PagerDefault')->limit($size);
-    return $copy;
+  public function setPage($size) {
+    $this->paged = clone $this->filtered;
+    $this->paged = $this->paged->extend('PagerDefault')->limit($size);
+  }
+
+  public function reset() {
+    $this->query = clone $this->_query;
+    $this->filtered = clone $this->_query;
+    $this->paged = clone $this->_query;
   }
 
   public function modifyResult(&$rows) {
@@ -38,16 +36,30 @@ abstract class Base {
   public function ensureTable($alias) {
   }
 
-  public function getQuery() {
+  public function query() {
     return $this->query;
   }
 
-  public function count() {
-    $this->filter();
-    return $this->query->countQuery()->execute()->fetchField();
+  public function filtered() {
+    return $this->filtered;
   }
 
-  public function __clone() {
-    $this->query = clone $this->query;
+  public function paged() {
+    return $this->paged;
+  }
+
+  public function count() {
+    return $this->filtered->countQuery()->execute()->fetchField();
+  }
+
+  public function __sleep() {
+    $this->query = NULL;
+    $this->filtered = NULL;
+    $this->paged = NULL;
+    return array('_query');
+  }
+
+  public function __wakeup() {
+    $this->reset();
   }
 }

@@ -8,10 +8,12 @@ class SupporterPage extends Page {
 
     $filters['name'] = new Filter\SupporterName();
     if (module_exists('campaignion_supporter_tags')) {
-      $filters['tags'] = new Filter\SupporterTag($this->baseQuery->getQuery());
+      $filters['tags'] = new Filter\SupporterTag($this->baseQuery->query());
     }
     $filters['country'] = new Filter\SupporterCountry($this->baseQuery->getQuery());
-    $this->filterForm = new FilterForm($filters, array('name'));
+    $filters['name'] = new Filter\SupporterName();
+    $default[] = array('type' => 'name', 'removable' => FALSE);
+    $this->filterForm = new FilterForm($filters, $default);
 
     $bulkOps = array();
     if (module_exists('campaignion_supporter_tags')) {
@@ -19,7 +21,7 @@ class SupporterPage extends Page {
       $bulkOps['untag'] = new BulkOp\SupporterTag(FALSE);
     }
     $bulkOps['export'] = new BulkOp\SupporterExport();
-    $listing = new SupporterListing($this->baseQuery, 20);
-    $this->bulkOpForm = new BulkOpForm($listing, $bulkOps);
+    $this->listing = new SupporterListing(20);
+    $this->bulkOpForm = new BulkOpForm($bulkOps);
   }
 }

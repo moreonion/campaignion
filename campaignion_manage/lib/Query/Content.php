@@ -9,9 +9,10 @@ class Content extends Base {
     $query->fields('n', array('nid', 'title', 'type', 'language', 'status', 'uid'))
       ->condition('n.type', 'thank_you_page', '!=')
       ->fields('u', array('name'))
+      ->where('n.nid = n.tnid OR n.tnid = 0')
       ->orderBy('n.changed', 'DESC');
 
-    $this->query = $query;
+    parent::__construct($query);
   }
 
   public function modifyResult(&$rows) {
@@ -37,9 +38,9 @@ SQL;
     }
   }
 
-  public function paged($size) {
-    $query = parent::paged($size);
-    $query->getQuery()->where('n.nid = n.tnid OR n.tnid = 0');
-    return $query;
+  public function count() {
+    $query = clone $this->filtered();
+    $query->innerJoin('node', 'c', 'c.nid=n.nid OR (n.tnid!=0 AND c.tnid=n.tnid)');
+    return $query->countQuery()->execute()->fetchField();
   }
 }
