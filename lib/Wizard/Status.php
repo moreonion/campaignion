@@ -14,10 +14,10 @@ class Status extends \Drupal\little_helpers\DB\Model {
   public static function loadOrCreate($nid) {
     $table = self::$table;
     $item = db_query("SELECT * FROM {{$table}} WHERE nid=:nid", array(':nid' => $nid))
-      ->fetchObject(get_called_class());
-    if (!$item) {
-      $item = new static(array('nid' => $nid), TRUE);
+      ->fetch();
+    if ($item) {
+      return new static($item, FALSE);;
     }
-    return $item;
+    return new static(array('nid' => $nid), TRUE);
   }
 }

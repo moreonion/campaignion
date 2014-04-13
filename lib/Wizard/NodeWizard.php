@@ -78,7 +78,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
         $this->status->save();
       }
       else {
-        if ($this->levels[$this->status->step] < $this->levels[$this->currentStep]) {
+        if (!$this->status->step || $this->levels[$this->status->step] < $this->levels[$this->currentStep]) {
           $this->status->step = $this->currentStep;
           $this->status->save();
         }

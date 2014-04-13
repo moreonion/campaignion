@@ -22,7 +22,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
       ->condition('email', $email)
       ->execute();
     if ($row = $result->fetch()) {
-      return new static($row);
+      return new static($row, FALSE);
     } else {
       return static::fromData($list_id, $email);
     }
@@ -43,7 +43,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
       ->condition('email', $email)
       ->execute();
     foreach ($result as $row) {
-      $subscriptions[] = new static($row);
+      $subscriptions[] = new static($row, FALSE);
     }
     return $subscriptions;
   }
