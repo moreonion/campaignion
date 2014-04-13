@@ -108,6 +108,13 @@ function campaignion_form_builder_webform_client_form_alter(&$form, &$form_state
 }
 
 /**
+ * Implements hook_form_builder_palette_groups_alter().
+ */
+function campaignion_form_builder_form_builder_palette_groups_alter(&$groups, $type, $form) {
+  $groups['default']['title'] = t('Generic fields');
+}
+
+/**
   * Implements hook_menu().
   */
 function campaignion_form_builder_menu() {
