@@ -255,7 +255,47 @@ margin-bottom: 0;
   clear: both;
 }
 
-/* table listing*/
+/* ----------- table ------------- */
+
+
+/* table heading */
+td.bulkop-button-wrapper {
+  background-color: #E3DED5;
+  padding: .5em 1em .5em 1em;
+}
+
+td.bulkop-button-wrapper .form-type-checkbox {
+  float: left;
+  width: 60%;
+  padding-top: .5em;
+}
+
+td.bulkop-button-wrapper .form-type-checkbox label {
+  display: inline-block;
+  font-size: 13px;
+}
+
+td.bulkop-button-wrapper .form-type-checkbox .description {
+  padding-left: 28px;
+}
+
+td.bulkop-button-wrapper .form-type-checkbox input {
+  margin-top: 5px;
+  margin-right: 10px;
+}
+
+
+td.bulkop-button-wrapper .form-item-listing-bulkop-select-all-matching input {
+  margin-top: 0;
+  margin-right: 5px;
+}
+
+
+td.bulkop-button-wrapper .button {
+  float: right;
+}
+
+/* table listing */
 
 table.campaignion-manage-content-listing table {
   border: 0px;
