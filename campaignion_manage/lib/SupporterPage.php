@@ -10,8 +10,8 @@ class SupporterPage extends Page {
     if (module_exists('campaignion_supporter_tags')) {
       $filters['tags'] = new Filter\SupporterTag($this->baseQuery->query());
     }
-    $filters['country'] = new Filter\SupporterCountry($this->baseQuery->getQuery());
-    $filters['name'] = new Filter\SupporterName();
+    $filters['country']  = new Filter\SupporterCountry($this->baseQuery->query());
+    $filters['activity'] = new Filter\SupporterActivity($this->baseQuery->query());
     $default[] = array('type' => 'name', 'removable' => FALSE);
     $this->filterForm = new FilterForm($filters, $default);
 
