@@ -25,7 +25,7 @@ function campaignion_bar_menu_links_alter(&$links, &$menu, &$parameters) {
  */
 function campaignion_bar_permission() {
   return array(
-    'access ae bar' => array(
+    'access campaignion bar' => array(
       'title' => t('Access the campaignion menu bar'),
       'description' => t('Users with this permission will see the campaignion bar at the top of each page.'),
     ),
@@ -38,7 +38,7 @@ function campaignion_bar_permission() {
 function campaignion_bar_init() {
   global $user;
 
-  if(user_access('access ae bar')) {
+  if(user_access('access campaignion bar')) {
     // load js libraries from core
     drupal_add_library("system", "effects.core");
     drupal_add_library("system", "effects.slide");
