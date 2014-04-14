@@ -10,15 +10,17 @@ class SupporterActivity extends Base implements FilterInterface {
   }
 
   protected function getOptions() {
+    $activities_in_use = array('any_activity' => t('Any activity'));
+
     $query = clone $this->query;
     $query->innerJoin('campaignion_activity', 'act', "r.contact_id = act.contact_id");
     $fields =& $query->getFields();
     $fields = array();
-    $query->condition('act.type', array('redhen_contact_create', 'redhen_contact_edit'), 'IN');
+    $query->condition('act.type', 'redhen_contact_create');
     $query->fields('act', array('type'));
     $query->groupBy('act.type');
 
-    $activities_in_use = $query->execute()->fetchAllKeyed(0,0);
+    $activities_in_use += $query->execute()->fetchAllKeyed(0,0);
 
     $query = clone $this->query;
     $query->innerJoin('campaignion_activity', 'act', "r.contact_id = act.contact_id");
@@ -32,12 +34,12 @@ class SupporterActivity extends Base implements FilterInterface {
     $activities_in_use += $query->execute()->fetchAllKeyed(0,0);
 
     $available_activities = array(
+      'any_activity'          => t('Any activity'),
       'redhen_contact_create' => t('Contact created'),
-      'redhen_contact_edit' => t('Contact edited'),
-      'petition' => t('Petition'),
-      'donation' => t('Donation'),
-      'email_protest' => t('Email Protest'),
-      'webform' => t('Flexible Form'),
+      'petition'              => t('Petition'),
+      'donation'              => t('Donation'),
+      'email_protest'         => t('Email Protest'),
+      'webform'               => t('Flexible Form'),
     );
 
     return array_intersect_key($available_activities, $activities_in_use);
@@ -119,21 +121,28 @@ class SupporterActivity extends Base implements FilterInterface {
   public function apply($query, array $values) {
     $inner = clone $query;
     $inner->innerJoin('campaignion_activity', 'act', "r.contact_id = act.contact_id");
+    // "RedHen contact was edited" activities are never shown
+    $inner->condition('act.type', 'redhen_contact_edit', '!=');
     $fields =& $inner->getFields();
     $fields = array();
     $inner->fields('r', array('contact_id'));
     $inner->groupBy('r.contact_id');
 
-    if ($values['activity'] == 'redhen_contact_create' || $values['activity'] == 'redhen_contact_edit') {
-      $inner->condition('act.type', $values['activity']);
+    if ($values['activity'] == 'redhen_contact_create') {
+      $inner->condition('act.type', 'redhen_contact_create');
     }
-    else {
+    elseif ($values['activity'] != 'any_activity') {
       $inner->innerJoin('campaignion_activity_webform', 'wact', "act.activity_id = wact.activity_id");
       $inner->innerJoin('node', 'n', "wact.nid = n.nid");
       $inner->condition('n.type', $values['activity']);
     }
 
     if ($values['frequency'] === 'how_many') {
+      if ($values['activity'] == 'any_activity') {
+        // when the user selects any activity but wants to filter for number of
+        // activities we don't want to include "RedHen contact was created" activities
+        $inner->condition('act.type', 'redhen_contact_create', '!=');
+      }
       $inner->addExpression('COUNT(r.contact_id)', 'count_activities');
       $inner->havingCondition('count_activities', $values['how_many_nr'], $values['how_many_op']);
     }
