@@ -5,4 +5,5 @@ package = Campaignion
 project = campaignion
 
 dependencies[] = campaignion_form_builder
+dependencies[] = list
 dependencies[] = little_helpers
