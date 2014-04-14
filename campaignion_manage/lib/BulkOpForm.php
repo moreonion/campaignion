@@ -64,6 +64,7 @@ class BulkOpForm {
       return;
     }
     $op = $this->ops[$op_name];
-    $op->apply($ids, $values['op-wrapper']['op'][$op_name]);
+    $op_parameters = isset($values['op-wrapper']['op'][$op_name]) ? $values['op-wrapper']['op'][$op_name] : NULL;
+    $op->apply($ids, $op_parameters);
   }
 }

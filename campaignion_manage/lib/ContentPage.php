@@ -22,7 +22,7 @@ class ContentPage extends Page {
     $this->filterForm = new FilterForm($filters, $default);
 
     $this->listing = new ContentListing(20);
-    $this->bulkOpForm = new BulkOpForm($this->listing, array(
+    $this->bulkOpForm = new BulkOpForm(array(
       'publish' => new BulkOp\ContentPublish(),
       'unpubslih' => new BulkOp\ContentUnpublish(),
     ));
