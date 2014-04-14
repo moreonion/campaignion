@@ -86,25 +86,65 @@
   min-width: 8em;
 }
 
+/* ----------- Filter new --------------*/
+
+
+
+#campaignion-manage-ajax-wrapper fieldset.filter-removable {
+  padding: 0;
+  border: 1px solid #e3dfd7;
+  background: #fff;
+  margin-bottom: .2em;
+  clear: both;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+}
+#campaignion-manage-ajax-wrapper fieldset.filter-removable .fieldset-content {
+  padding: .7em 4.5em .5em 1em;
+  border-radius: 0;
+  background: #fff;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+}
+
+#campaignion-manage-ajax-wrapper fieldset.campaignion-manage-filter-status label,
+.filter-removable .form-item label {
+  display: inline-block;
+  margin-right: .5em;
+}
+
+#campaignion-manage-ajax-wrapper legend {
+  display: none;
+}
+
+
+#campaignion-manage-ajax-wrapper .form-item-filter-add-filter label {
+  display: block;
+  height: 0px;
+  text-indent: -5000000000px;
+  color: transparent;
+  position: absolute;
+  visibility: hidden;
+}
 
 /* ------- Filter ------------------ */
 
-.manage-filter-form legend {
-  display: none;
-}
-.manage-filter-form fieldset {
+
+/*.manage-filter-form fieldset {
   border-radius: 0;
 	border: 1px solid #e3dfd7;
 	background: #fff;
 	margin-bottom: .2em;
   clear: both;
-}
+}*/
 .manage-filter-form .fieldset-content {
   padding: .7em 4.5em .5em 1em;
   border-radius: 0;
 	background: #fff;
 }
-.manage-filter-form .fieldset-content > .form-type-checkbox{
+.manage-filter-form .fieldset-content > .form-type-checkbox {
   position: absolute;
   left: -9999px;
   float: left;
