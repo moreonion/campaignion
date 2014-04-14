@@ -44,9 +44,12 @@ class SupporterActivity extends Base implements FilterInterface {
   }
 
   public function formElement(array &$form, array &$form_state, array &$values) {
+    $frequency_id  = drupal_html_id('activity-frequency');
+    $date_range_id = drupal_html_id('activity-date-range');
     $form['frequency'] = array(
       '#type'          => 'select',
       '#title'         => t('Activity frequency'),
+      '#attributes'    => array('id' => $frequency_id),
       '#options'       => array('any' => t('Any frequency'), 'how_many' => t('How many times?')),
       '#default_value' => isset($values['frequency']) ? $values['frequency'] : NULL,
     );
@@ -54,6 +57,7 @@ class SupporterActivity extends Base implements FilterInterface {
       '#type'          => 'select',
       '#title'         => t('Frequency operator'),
       '#options'       => array('=' => t('Exactly'), '>' => t('More than'), '<' => t('Less than')),
+      '#states'        => array('visible' => array('#' . $frequency_id => array('value' => 'how_many'))),
       '#default_value' => isset($values['how_many_op']) ? $values['how_many_op'] : NULL,
     );
     $form['how_many_nr'] = array(
@@ -61,7 +65,9 @@ class SupporterActivity extends Base implements FilterInterface {
       '#title'         => t('Specify number of times'),
       '#size'          => 10,
       '#maxlength'     => 10,
+      '#states'        => array('visible' => array('#' . $frequency_id => array('value' => 'how_many'))),
       '#default_value' => isset($values['how_many_nr']) ? $values['how_many_nr'] : NULL,
+      '#element_validate' => array('campaignion_manage_activity_how_many_validate'),
     );
     $form['activity'] = array(
       '#type'          => 'select',
@@ -72,21 +78,38 @@ class SupporterActivity extends Base implements FilterInterface {
     $form['date_range'] = array(
       '#type'          => 'select',
       '#title'         => t('Date range'),
-      '#options'       => array('none' => t('-- None --'), 'range' => t('Date range'), 'before' => t('Before'), 'after' => t('After')),
+      '#attributes'    => array('id' => $date_range_id),
+      '#options'       => array('all' => t('All dates'), 'range' => t('Date range'), 'before' => t('Before'), 'after' => t('After')),
       '#default_value' => isset($values['date_range']) ? $values['date_range'] : NULL,
     );
     $form['date_after'] = array(
-      '#type'          => 'textfield',
+      '#type'          => 'date_popup',
       '#title'         => t('After'),
-      '#size'          => 10,
-      '#maxlength'     => 10,
+      '#description'   => t('Specify a date in the format YYYY/MM/DD'),
+      '#date_format'   => 'Y/m/d',
+      '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'after'))),
       '#default_value' => isset($values['date_after']) ? $values['date_after'] : NULL,
     );
     $form['date_before'] = array(
-      '#type'          => 'textfield',
+      '#type'          => 'date_popup',
       '#title'         => t('Before'),
-      '#size'          => 10,
-      '#maxlength'     => 10,
+      '#date_format'   => 'Y/m/d',
+      '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'before'))),
+      '#default_value' => isset($values['date_before']) ? $values['date_before'] : NULL,
+    );
+    $form['date_range_after'] = array(
+      '#type'          => 'date_popup',
+      '#title'         => t('After'),
+      '#description'   => t('Specify a date in the format YYYY/MM/DD'),
+      '#date_format'   => 'Y/m/d',
+      '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'range'))),
+      '#default_value' => isset($values['date_after']) ? $values['date_after'] : NULL,
+    );
+    $form['date_range_before'] = array(
+      '#type'          => 'date_popup',
+      '#title'         => t('Before'),
+      '#date_format'   => 'Y/m/d',
+      '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'range'))),
       '#default_value' => isset($values['date_before']) ? $values['date_before'] : NULL,
     );
   }
@@ -110,19 +133,43 @@ class SupporterActivity extends Base implements FilterInterface {
       $inner->condition('n.type', $values['activity']);
     }
 
-    $query->condition('r.contact_id', $inner, 'IN');
+    if ($values['frequency'] === 'how_many') {
+      $inner->addExpression('COUNT(r.contact_id)', 'count_activities');
+      $inner->havingCondition('count_activities', $values['how_many_nr'], $values['how_many_op']);
+    }
+
+    switch ($values['date_range']) {
+      case 'range':
+        $date_range = array(strtotime($values['date_range_after']), strtotime($values['date_range_before']));
+        $inner->condition('act.created', $date_range, 'BETWEEN');
+        break;
+      case 'before':
+        $before = strtotime($values['date_before']);
+        $inner->condition('act.created', $before, '<');
+        break;
+      case 'after':
+        $after  = strtotime($values['date_after']);
+        $inner->condition('act.created', $after, '>');
+        break;
+    }
+
+    if (empty($contact_ids = $inner->execute()->fetchCol(0))) {
+      $contact_ids = array('');
+    }
+    $query->condition('r.contact_id', $contact_ids, 'IN');
   }
 
   public function isApplicable($current) { return empty($current) && count($this->getOptions()) > 0; }
 
   public function defaults() {
+    $options = array_keys($this->getOptions());
     return array(
-      'frequency' => 'any',
+      'frequency'   => 'any',
       'how_many_op' => '=',
       'how_many_nr' => '1',
-      'activity' => reset($this->getOptions()),
-      'date_range' => 'none',
-      'date_after' => '',
+      'activity'    => reset($options),
+      'date_range'  => 'all',
+      'date_after'  => '',
       'date_before' => '',
       );
   }

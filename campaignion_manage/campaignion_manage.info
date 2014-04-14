@@ -8,6 +8,7 @@ dependencies[] = campaignion
 dependencies[] = campaignion_ux
 ; for ctools dropbutton
 dependencies[] = ctools
+dependencies[] = date_popup
 dependencies[] = node
 dependencies[] = psr0
 

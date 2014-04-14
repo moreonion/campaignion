@@ -138,3 +138,10 @@ function campaignion_manage_batch_process($handler, $param1, $param2, &$context)
 function campaignion_manage_batch_finished($success, $results, $operations) {
   $results['bulkOp']->batchFinish($success, $results, $operations);
 }
+
+function campaignion_manage_activity_how_many_validate($element, &$form_state) {
+  $values = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  if ((string)(int)$values != $values || (int) $values < 0) {
+    form_error($element, t('The number of times has to be a positive integer value.'));
+  }
+}
