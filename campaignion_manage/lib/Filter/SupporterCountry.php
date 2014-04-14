@@ -47,6 +47,7 @@ class SupporterCountry extends Base implements FilterInterface {
   }
 
   public function defaults() {
-    return reset($this->getOptions());
+    $options = array_keys($this->getOptions());
+    return array('country' => reset($options));
   }
 }

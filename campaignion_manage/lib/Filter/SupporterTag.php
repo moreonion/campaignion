@@ -50,6 +50,7 @@ class SupporterTag extends Base implements FilterInterface {
   }
 
   public function defaults() {
-    return array('operator' => 'IN', 'tag' => reset($this->getOptions()));
+    $options = array_keys($this->getOptions());
+    return array('operator' => 'IN', 'tag' => reset($options));
   }
 }

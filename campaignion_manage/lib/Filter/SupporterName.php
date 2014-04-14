@@ -22,11 +22,8 @@ class SupporterName extends Base implements FilterInterface {
       $search = preg_replace('/%%+/', '%', $search);
       $search = preg_replace('/^%/', '', $search);
       $search = preg_replace('/%$/', '', $search);
-      $query->where(
-        '   LOWER(r.first_name)  LIKE :search_string ' .
-        'OR LOWER(r.middle_name) LIKE :search_string ' .
-        'OR LOWER(r.last_name)   LIKE :search_string ',
-        array( ':search_string' => '%' . strtolower($search) . '%')
+      $query->where('LOWER(CONCAT(r.first_name, r.middle_name, r.last_name)) LIKE :search_string',
+        array(':search_string' => '%' . strtolower($search) . '%')
       );
     }
   }
