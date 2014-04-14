@@ -115,7 +115,7 @@
   margin-right: .5em;
 }
 
-#campaignion-manage-ajax-wrapper legend {
+#campaignion-manage-ajax-wrapper .manage-filter-form. legend {
   display: none;
 }
 
