@@ -22,6 +22,6 @@ class SupporterPage extends Page {
     }
     $bulkOps['export'] = new BulkOp\SupporterExport();
     $this->listing = new SupporterListing(20);
-    $this->bulkOpForm = new BulkOpForm($listing, $bulkOps);
+    $this->bulkOpForm = new BulkOpForm($bulkOps);
   }
 }

@@ -57,8 +57,9 @@ abstract class Page {
       case 'filter':
         $this->filterForm->submit($form['filter'], $form_state);
         break;
-      case 'bulkops_listing':
-        $this->bulkOpForm->submit($form['bulkops_listing'], $form_state);
+      case 'bulkop':
+        $ids = $this->listing->selectedIds($form['listing'], $form_state);
+        $this->bulkOpForm->submit($form['bulkops_listing'], $form_state, $ids);
         break;
     }
   }

@@ -3,10 +3,8 @@
 namespace Drupal\campaignion_manage;
 
 class BulkOpForm {
-  protected $listing;
   protected $ops;
-  public function __construct($listing, $ops = array()) {
-    $this->listing = $listing;
+  public function __construct($ops = array()) {
     $this->ops = array();
     foreach ($ops as $name => $op) {
       $this->ops[$name] = $op;
@@ -59,15 +57,13 @@ class BulkOpForm {
 
     $form['#attributes']['class'][] = 'campaignion-manage-bulkops';
   }
-  public function submit(&$form, &$form_state) {
-    $values = &$form_state['values'];
-    $nids = $this->listing->selectedIds($form['listing'], $form_state);
-
-    $op_name = $values['bulk-wrapper']['operations'];
+  public function submit(&$form, &$form_state, $ids) {
+    $values  = &$form_state['values']['bulkop']['bulk-wrapper'];
+    $op_name = $values['operations'];
     if (!isset($this->ops[$op_name])) {
       return;
     }
     $op = $this->ops[$op_name];
-    $op->apply($nids, $form_state['values']['bulk-wrapper']['op-wrapper']['op'][$op_name]);
+    $op->apply($ids, $values['op-wrapper']['op'][$op_name]);
   }
 }
