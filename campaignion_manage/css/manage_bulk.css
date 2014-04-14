@@ -24,10 +24,6 @@
 .campaignion-manage-bulkops #bulk-dialog-close:active {
   cursor: pointer;
 }
-.campaignion-manage-bulkops .bulkops-ops {
-  width: 50%;
-  float: right;
-}
 .campaignion-manage-bulkops .bulkops-ops fieldset {
   display: none;
 }
