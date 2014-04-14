@@ -8,7 +8,7 @@
  */
 
 function campaignion_recent_supporters_bootstrap_inc() {
-  $dir = dirname($_SERVER['DOCUMENT_ROOT'] . $_SERVER['PHP_SELF']);
+  $dir = dirname($_SERVER['DOCUMENT_ROOT'] . $_SERVER['SCRIPT_NAME']);
   while ($dir != '/') {
     $bootstrap = $dir . '/includes/bootstrap.inc';
     if (file_exists($bootstrap)) {
