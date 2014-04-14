@@ -161,8 +161,8 @@ class SupporterActivity extends Base implements FilterInterface {
         $inner->condition('act.created', $after, '>');
         break;
     }
-
-    if (empty($contact_ids = $inner->execute()->fetchCol(0))) {
+    $contact_ids = $inner->execute()->fetchCol(0);
+    if (empty($contact_ids)) {
       $contact_ids = array('');
     }
     $query->condition('r.contact_id', $contact_ids, 'IN');
