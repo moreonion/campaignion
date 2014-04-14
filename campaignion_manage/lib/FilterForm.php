@@ -106,7 +106,7 @@ class FilterForm {
   public function process(&$form, &$form_state) {
     $valuesByType = array();
     foreach ($this->values as $config) {
-      $valuesByType[$config['type']] = $config['values'];
+      $valuesByType[$config['type']][] = $config['values'];
     }
     $options = array();
     foreach ($this->filters as $name => $filter) {
