@@ -67,23 +67,5 @@ function _campaignion_form_builder_form_builder_types_select() {
   $fields['direct_mail_newsletter']['default']['#type']          = 'checkboxes';
   $fields['email_newsletter']['default']['#form_builder']['element_type'] = 'checkboxes';
 
-  $fields['state'] = array(
-    'title'  => t('State'),
-    'weight' => -73,
-  ) + $defaults;
-  $fields['state']['default']['#options'] = array(
-    'W'  => t('Wien'),
-    'N'  => t('Niederösterreich'),
-    'O'  => t('Oberösterreich'),
-    'S'  => t('Salzburg'),
-    'T'  => t('Tirol'),
-    'V'  => t('Vorarlberg'),
-    'B'  => t('Burgenland'),
-    'St' => t('Steiermark'),
-    'K'  => t('Kärnten'),
-  );
-  $fields['state']['default']['#title']         = t('State');
-  $fields['state']['default']['#default_value'] = '%get[p10]';
-
   return $fields;
 }

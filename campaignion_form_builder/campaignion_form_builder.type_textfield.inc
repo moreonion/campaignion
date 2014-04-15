@@ -56,6 +56,13 @@ function _campaignion_form_builder_form_builder_types_textfield() {
   $fields['zip_code']['default']['#title'] = t('ZIP code');
   $fields['zip_code']['default']['#default_value'] = '%get[p8]';
 
+  $fields['state'] = array(
+    'title'  => t('Region'),
+    'weight' => -73,
+  ) + $unique_ae;
+  $fields['state']['default']['#title']         = t('Region');
+  $fields['state']['default']['#default_value'] = '%get[p10]';
+
   $fields['city'] = array(
     'title' => t('City'),
     'weight' => -72,
