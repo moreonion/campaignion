@@ -63,6 +63,7 @@ class Email {
 
     $email_form['template']['#collapsible'] = FALSE;
     $email_form['template']['#title'] = t('Your email');
+    $email_form['template']['#description']  = "";
     $email_form['template']['components']['#access'] = FALSE;
     $email_form['template']['template_option']['#default_value'] = 'custom';
     $email_form['template']['template_option']['#access'] = FALSE;
