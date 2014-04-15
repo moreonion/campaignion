@@ -62,7 +62,7 @@ class Email {
     unset($email_form['from_address_component']);
 
     $email_form['template']['#collapsible'] = FALSE;
-    $email_form['template']['#title'] = t('You can select an email template:');
+    $email_form['template']['#title'] = t('Your email');
     $email_form['template']['components']['#access'] = FALSE;
     $email_form['template']['template_option']['#default_value'] = 'custom';
     $email_form['template']['template_option']['#access'] = FALSE;
