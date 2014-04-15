@@ -2,6 +2,8 @@
 
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\QueueItem;
+use \Drupal\campaignion_newsletters\ApiError;
+use \Drupal\campaignion_newsletters\ApiPersistentError;
 
 /**
  * Send items from the cron queue.
@@ -15,15 +17,22 @@ function campaignion_newsletters_send_queue() {
     $list = $lists[$item->list_id];
     $provider = $list->provider();
 
-    $success = FALSE;
-    if ($item->action == QueueItem::SUBSCRIBE) {
-      $success = $provider->subscribe($list, $item->email, $item->data);
-    }
-    elseif ($item->action == QueueItem::UNSUBSCRIBE) {
-      $success = $provider->unsubscribe($list, $item->email);
-    }
-    if ($success) {
+    try {
+      if ($item->action == QueueItem::SUBSCRIBE) {
+        $provider->subscribe($list, $item->email, $item->data);
+      }
+      elseif ($item->action == QueueItem::UNSUBSCRIBE) {
+        $provider->unsubscribe($list, $item->email);
+      }
       $item->delete();
+    }
+    catch (ApiPersistentError $e) {
+      $e->log();
+      // There is no point to items with persistent errors in the queue.
+      $item->delete();
+    }
+    catch (ApiError $e) {
+      $e->log();
     }
   }
 }

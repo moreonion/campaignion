@@ -11,6 +11,8 @@ namespace Drupal\campaignion_newsletters_cleverreach;
 use \Drupal\campaignion\Contact;
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\Subscription;
+use \Drupal\campaignion_newsletters\ApiError;
+use \Drupal\campaignion_newsletters\ApiPersistentError;
 
 class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderInterface {
   protected $account;
@@ -174,17 +176,19 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
    */
   protected function handleResult($result) {
     if ($result->status !== 'SUCCESS') {
-      watchdog('CleverReach', '@status #@code: @message', array(
-          '@status' => $result->status,
-          '@code' => $result->statuscode,
-          '@message' => $result->message,
-        ),
-        WATCHDOG_ERROR);
-      return FALSE;
+      $b = 'CleverReach';
+      $args = array(
+        '@status' => $result->status,
+        '@message' => $result->message,
+      );
+      switch ($result->code) {
+        case 40:
+          throw new ApiPersistentError($b, '@status #@code @message - removing item from queue.', $args, $result->code);
+        default:
+          throw new ApiError($b, '@status #@code: @message', $args, $result->code);
+      }
     }
-    else {
-      return $result->data;
-    }
+    return $result->data;
   }
 
   /**
