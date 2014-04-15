@@ -6,6 +6,7 @@ project = campaignion
 
 dependencies[] = cck_blocks
 dependencies[] = context
+dependencies[] = context_get
 dependencies[] = ctools
 dependencies[] = webform_block
 features[context][] = current_webform_embedded
