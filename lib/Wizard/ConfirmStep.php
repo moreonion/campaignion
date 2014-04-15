@@ -58,6 +58,7 @@ class ConfirmStep extends WizardStep {
       '#value' => t('Schedule publishing'),
       '#name' => 'schedule',
       '#weight' => 1010,
+      '#access' => FALSE,
       '#attributes' => array('class' => array('button-finish-other')),
     );
     $form['confirm_container']['buttons']['draft'] = array(
