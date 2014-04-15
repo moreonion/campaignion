@@ -62,7 +62,11 @@ msgid "Email Newsletter"
 msgstr ""
 
 #: modules/campaignion_form_builder/campaignion_form_builder.module:93
-msgid "Direct Mail"
+msgid "Snail Mail Opt-In"
+msgstr ""
+
+#: modules/campaignion_form_builder/campaignion_form_builder.module:93
+msgid "Direct Mail Newsletter"
 msgstr ""
 
 #: modules/campaignion_form_builder/campaignion_form_builder.module:96
