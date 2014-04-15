@@ -108,10 +108,11 @@ $('.bulkop-select-wrapper', context).each(function() {
 
   var allCount = $wrapper.attr('data-count');
   var $counter = $wrapper.parents('form').find('.bulkop-count');
-  $targets.change(function() {
+  $toggle.add($targets).change(function() {
     var newVal = $targets.filter(':checked').length;
     $counter.html(newVal);
-  }).change();
+  })
+  $toggle.change();
   $matching.change(function() {
     var newVal = $('input', this).prop('checked') ? allCount : $targets.filter(':checked').length;
     $counter.html(newVal);
