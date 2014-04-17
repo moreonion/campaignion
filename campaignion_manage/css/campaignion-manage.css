@@ -249,6 +249,11 @@ margin-bottom: 0;
   clear: both;
 }
 
+/* date filter */
+.container-inline-date .form-type-date-popup .date-padding label {
+  display: none;
+}
+
 /* bulk operations */
  
 .campaignion-manage-bulkops {

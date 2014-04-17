@@ -38,7 +38,7 @@ class SupporterActivity extends Base implements FilterInterface {
     }
 
     $available_activities = array(
-      'any_activity'          => t('Any activity'),
+      'any_activity'          => t('Any type'),
       'redhen_contact_create' => t('Contact created'),
       'petition'              => t('Petition'),
       'donation'              => t('Donation'),
@@ -57,21 +57,19 @@ class SupporterActivity extends Base implements FilterInterface {
     $options = $this->getOptions();
     $form['frequency'] = array(
       '#type'          => 'select',
-      '#title'         => t('Activity frequency'),
+      '#title'         => t('Activity'),
       '#attributes'    => array('id' => $frequency_id),
       '#options'       => array('any' => t('Any frequency'), 'how_many' => t('How many times?')),
       '#default_value' => isset($values['frequency']) ? $values['frequency'] : NULL,
     );
     $form['how_many_op'] = array(
       '#type'          => 'select',
-      '#title'         => t('Frequency operator'),
       '#options'       => array('=' => t('Exactly'), '>' => t('More than'), '<' => t('Less than')),
       '#states'        => array('visible' => array('#' . $frequency_id => array('value' => 'how_many'))),
       '#default_value' => isset($values['how_many_op']) ? $values['how_many_op'] : NULL,
     );
     $form['how_many_nr'] = array(
       '#type'          => 'textfield',
-      '#title'         => t('Specify number of times'),
       '#size'          => 10,
       '#maxlength'     => 10,
       '#states'        => array('visible' => array('#' . $frequency_id => array('value' => 'how_many'))),
@@ -80,7 +78,6 @@ class SupporterActivity extends Base implements FilterInterface {
     );
     $form['activity'] = array(
       '#type'          => 'select',
-      '#title'         => t('Activity'),
       '#attributes'    => array('id' => $activity_type_id),
       '#options'       => $options['activity_types'],
       '#default_value' => isset($values['activity']) ? $values['activity'] : NULL,
@@ -95,7 +92,6 @@ class SupporterActivity extends Base implements FilterInterface {
       if (!empty($options['actions'][$type])) {
         $form['action_' . $type] = array(
           '#type'          => 'select',
-          '#title'         => $type_name,
           '#options'       => array('no_specific' => t('No specific action')) + $options['actions'][$type],
           '#states'        => array('visible' => array('#' . $activity_type_id => array('value' => $type))),
           '#default_value' => isset($values['action_' . $type]) ? $values['action_' . $type] : NULL,
@@ -104,40 +100,43 @@ class SupporterActivity extends Base implements FilterInterface {
     }
     $form['date_range'] = array(
       '#type'          => 'select',
-      '#title'         => t('Date range'),
       '#attributes'    => array('id' => $date_range_id),
-      '#options'       => array('all' => t('All dates'), 'range' => t('Date range'), 'before' => t('Before'), 'after' => t('After')),
+      '#options'       => array('all' => t('Any time'), 'range' => t('Date range'), 'to' => t('to'), 'from' => t('from')),
       '#default_value' => isset($values['date_range']) ? $values['date_range'] : NULL,
     );
-    $form['date_after'] = array(
+    $form['date_from'] = array(
       '#type'          => 'date_popup',
-      '#title'         => t('After'),
+      '#title'         => t('from'),
       '#description'   => t('Specify a date in the format YYYY/MM/DD'),
       '#date_format'   => 'Y/m/d',
-      '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'after'))),
-      '#default_value' => isset($values['date_after']) ? $values['date_after'] : NULL,
+      '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'from'))),
+      '#default_value' => isset($values['date_from']) ? $values['date_from'] : NULL,
+      '#attributes'    => array('class' => array('campaignion-manage-date')),
     );
-    $form['date_before'] = array(
+    $form['date_to'] = array(
       '#type'          => 'date_popup',
-      '#title'         => t('Before'),
+      '#title'         => t('to'),
       '#date_format'   => 'Y/m/d',
-      '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'before'))),
-      '#default_value' => isset($values['date_before']) ? $values['date_before'] : NULL,
+      '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'to'))),
+      '#default_value' => isset($values['date_to']) ? $values['date_to'] : NULL,
+      '#attributes'    => array('class' => array('campaignion-manage-date')),
     );
-    $form['date_range_after'] = array(
+    $form['date_range_from'] = array(
       '#type'          => 'date_popup',
-      '#title'         => t('After'),
+      '#title'         => t('from'),
       '#description'   => t('Specify a date in the format YYYY/MM/DD'),
       '#date_format'   => 'Y/m/d',
       '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'range'))),
-      '#default_value' => isset($values['date_after']) ? $values['date_after'] : NULL,
+      '#default_value' => isset($values['date_from']) ? $values['date_from'] : NULL,
+      '#attributes'    => array('class' => array('campaignion-manage-date')),
     );
-    $form['date_range_before'] = array(
+    $form['date_range_to'] = array(
       '#type'          => 'date_popup',
-      '#title'         => t('Before'),
+      '#title'         => t('to'),
       '#date_format'   => 'Y/m/d',
       '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'range'))),
-      '#default_value' => isset($values['date_before']) ? $values['date_before'] : NULL,
+      '#default_value' => isset($values['date_to']) ? $values['date_to'] : NULL,
+      '#attributes'    => array('class' => array('campaignion-manage-date')),
     );
   }
 
@@ -179,16 +178,16 @@ class SupporterActivity extends Base implements FilterInterface {
 
     switch ($values['date_range']) {
       case 'range':
-        $date_range = array(strtotime($values['date_range_after']), strtotime($values['date_range_before']));
+        $date_range = array(strtotime($values['date_range_from']), strtotime($values['date_range_to']));
         $inner->condition('act.created', $date_range, 'BETWEEN');
         break;
-      case 'before':
-        $before = strtotime($values['date_before']);
-        $inner->condition('act.created', $before, '<');
+      case 'to':
+        $to = strtotime($values['date_to']);
+        $inner->condition('act.created', $to, '<');
         break;
-      case 'after':
-        $after  = strtotime($values['date_after']);
-        $inner->condition('act.created', $after, '>');
+      case 'from':
+        $from  = strtotime($values['date_from']);
+        $inner->condition('act.created', $from, '>');
         break;
     }
     $contact_ids = $inner->execute()->fetchCol(0);
