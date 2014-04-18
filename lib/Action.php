@@ -33,7 +33,7 @@ class Action {
 
   public function copyForm($nid) {
     $_SESSION['webform_template'] = $nid;
-    _webform_template_attach($this->node, 'update');
+    webform_template_node_insert($this->node);
     unset($_SESSION['webform_template']);
   }
 }
