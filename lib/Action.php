@@ -21,19 +21,16 @@ class Action {
     $this->node->action = $this;
   }
 
-  public function applyDefaultTemplate() {
-    // Only apply defaults if no components are specified.
-    if (!empty($this->node->webform['components'])) {
-      return;
+  public function presave() {
+    $node = $this->node;
+    if (isset($node->translation_source)) {
+      $_SESSION['webform_template'] = $node->translation_source->nid;
+    } else {
+      if (!isset($node->nid) && empty($node->webform['components'])) {
+        if ($nid = $this->type->defaultTemplateNid()) {
+          $_SESSION['webform_template'] = $nid;
+        }
+      }
     }
-    if ($nid = $this->type->defaultTemplateNid()) {
-      $this->copyForm($nid);
-    }
-  }
-
-  public function copyForm($nid) {
-    $_SESSION['webform_template'] = $nid;
-    webform_template_node_insert($this->node);
-    unset($_SESSION['webform_template']);
   }
 }

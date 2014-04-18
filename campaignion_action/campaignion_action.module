@@ -1,16 +1,12 @@
 <?php
 
 /**
- * Implements hook_node_insert()
+ * Implements hook_node_presave().
  */
-function campaignion_action_node_insert($node) {
+function campaignion_action_node_presave($node) {
   if (isset($node->action) || Drupal\campaignion\Action\TypeBase::isAction($node->type)) {
     $action = Drupal\campaignion\Action::fromNode($node);
-    if (isset($node->translation_source)) {
-      $action->copyForm($node->translation_source->nid);
-    } else {
-      $action->applyDefaultTemplate();
-    }
+    $action->presave();
   }
 }
 
