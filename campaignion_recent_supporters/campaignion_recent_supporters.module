@@ -25,6 +25,80 @@ function _campaignion_recent_supporters_countries_dir() {
   return $directory_path . '/countries';
 }
 
+function campaignion_recent_supporters_preprocess_html($variables) {
+  $langcode = '';
+  if (!empty($variables['language'])) {
+    $lang = preg_split('/-/', $variables['language']->language);
+    $langcode = array_shift($lang);
+  }
+  // try to load localized timeago library
+  // if this fails load the default (not localized) timeago lib
+  $library = libraries_detect('timeago');
+  if (!empty($library['variants'][$langcode])) {
+    libraries_load('timeago', $langcode);
+  } else {
+    libraries_load('timeago');
+  }
+}
+/**
+ * Implements hook_library().
+ */
+function campaignion_recent_supporters_library() {
+  $path = drupal_get_path('module', 'campaignion_recent_supporters');
+  if (function_exists('libraries_get_path') && file_exists(libraries_get_path('timeago'))) {
+    $path = libraries_get_path('timeago');
+  }
+  return array(
+    'timeago' => array(
+      'title' => t('Time ago'),
+      'website' => 'http://timeago.yarp.com',
+      'version' => '1.4.1',
+      'js' => array(
+        $path . '/jquery.timeago.js',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function campaignion_recent_supporters_libraries_info() {
+  $library = array(
+    'timeago' => array(
+      'name' => t('Time ago'),
+      'vendor url' => 'http://timeago.yarp.com',
+      'download url' => 'https://github.com/rmm5t/jquery-timeago',
+      'version arguments' => array(
+        'file' => 'jquery.timeago.js',
+        'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@',
+      ),
+      'files' => array(
+        'js' => array(
+          'jquery.timeago.js',
+        ),
+      ),
+      'variants' => array(),
+    ),
+  );
+
+  // define all locales as variants of timeago
+  foreach (array(
+    "ar", "bg", "bs", "ca", "cs", "cy", "da", "de", "el", "en", "en-short", "es", "es-short", "et", "fa", "fi", "fr", "fr-short", "gl", "he", "hr", "hu", "hy", "id", "is", "it", "ja", "jv", "ko", "lt", "mk", "nl", "no", "pl", "pt-br", "pt", "ro", "rs", "ru", "sk", "sl", "sv", "th", "tr", "uk", "uz", "vi", "zh-CN", "zh-TW"
+  ) as $variant) {
+    $library['timeago']['variants'][$variant] = array(
+      'files' => array(
+        'js' => array(
+          'jquery.timeago.js',
+          'locales/jquery.timeago.'.$variant.'.js',
+        ),
+      ),
+    );
+  }
+
+  return $library;
+}
+
 /**
  * Implements hook_block_info().
  */
