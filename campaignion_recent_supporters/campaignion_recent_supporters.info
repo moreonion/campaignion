@@ -13,6 +13,5 @@ dependencies[] = libraries
 stylesheets[all][] = recent-supporters.css
 stylesheets[all][] = flags.css
 
-scripts[] = jquery.easing.1.3.js
 scripts[] = jquery.recent-supporters.js
 scripts[] = recent-supporters.js
