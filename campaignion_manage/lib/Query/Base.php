@@ -62,4 +62,8 @@ abstract class Base {
   public function __wakeup() {
     $this->reset();
   }
+
+  public function filter($form) {
+    $form->applyFilters($this->filtered);
+  }
 }

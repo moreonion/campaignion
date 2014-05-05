@@ -47,7 +47,7 @@ abstract class Page {
 
   public function process(&$form, &$form_state) {
     $this->baseQuery->reset();
-    $this->filterForm->applyFilters($this->baseQuery->filtered());
+    $this->baseQuery->filter($this->filterForm);
     $this->filterForm->process($form['filter'], $form_state);
     $this->listing->process($form['listing'], $form_state, $this->baseQuery);
   }

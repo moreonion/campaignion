@@ -3,44 +3,90 @@
 namespace Drupal\campaignion_manage\Query;
 
 class Content extends Base {
+  protected $langs;
+
   public function __construct() {
     $query = db_select('node', 'n');
-    $query->innerJoin('users', 'u', 'u.uid = n.uid');
-    $query->fields('n', array('nid', 'title', 'type', 'language', 'status', 'uid'))
-      ->condition('n.type', 'thank_you_page', '!=')
-      ->fields('u', array('name'))
-      ->where('n.nid = n.tnid OR n.tnid = 0')
+    $query->addExpression('IF(n.tnid=0, n.nid, n.tnid)', 'tset');
+    $query->fields('n', array('nid', 'tnid', 'title', 'type', 'language', 'status', 'uid'));
+    $query->innerJoin('users', 'u', 'u.uid=n.uid');
+    $query->addField('u', 'name');
+    $query->condition('n.type', 'thank_you_page', '!=')
       ->orderBy('n.changed', 'DESC');
 
     parent::__construct($query);
+
+    $this->langs = array($GLOBALS['language']->language, language_default()->language);
+  }
+
+  protected function pagerQuery() {
+    $query = db_select('node', 'n');
+    $query->addExpression('IF(n.tnid=0, n.nid, n.tnid)', 'tset');
+    $query->addExpression('MAX(n.changed)', 'changed');
+    $query->addField('n', 'tnid');
+    $query->condition('n.type', 'thank_you_page', '!=')
+      ->groupBy('tset')
+      ->orderBy('changed', 'DESC');
+    return $query;
+  }
+
+  public function reset() {
+    $this->query = clone $this->_query;
+    $this->filtered = clone $this->_query;
+    $this->paged = $this->pagerQuery();
+  }
+
+  public function setPage($size) {
+    $this->paged = clone $this->paged;
+    $this->paged = $this->paged->extend('PagerDefault')->limit($size);
+  }
+
+  public function filter($form) {
+    parent::filter($form);
+    // Paged is completely separate from other queries - so we need to apply
+    // filters there too.
+    $form->applyFilters($this->paged);
   }
 
   public function modifyResult(&$rows) {
     if (empty($rows)) {
       return;
     }
-    $rows_by_nid = array();
+    $nids = array();
     foreach ($rows as $row) {
-      $row->translations = array();
-      $rows_by_nid[$row->nid] = $row;
+      $nids[$row->tset] = $row->tset;
     }
 
-    $sql = <<<SQL
-SELECT n.tnid, n.nid, n.title, n.type, n.language, n.status, n.uid, u.name
-FROM {node} n 
-  INNER JOIN {users} u ON u.uid=n.uid
-WHERE n.tnid IN(:nids) AND n.tnid!=n.nid
-ORDER BY n.language
-SQL;
-    $result = db_query($sql, array(':nids' => array_keys($rows_by_nid)));
+    $query = clone $this->filtered;
+    $or = db_or();
+    $or->condition('n.tnid', $nids, 'IN');
+    $or->condition('n.nid', $nids, 'IN');
+    $query->condition($or);
+    $result = $query->execute();
+
+    $tsets = array();
     foreach ($result as $row) {
-      $rows_by_nid[$row->tnid]->translations[$row->language] = $row;
+      $tsets[$row->tset][$row->language] = $row;
+    }
+
+    foreach ($rows as $index => $row) {
+      $tset = $row->tset;
+      $rows[$index] = $this->buildTset($tsets[$tset]);
     }
   }
 
-  public function count() {
-    $query = clone $this->filtered();
-    $query->innerJoin('node', 'c', 'c.nid=n.nid OR (n.tnid!=0 AND c.tnid=n.tnid)');
-    return $query->countQuery()->execute()->fetchField();
+  protected function buildTset($nodes) {
+    reset($nodes);
+    $lc = key($nodes);
+    foreach ($this->langs as $test_lc) {
+      if (isset($nodes[$test_lc])) {
+        $lc = $test_lc;
+        break;
+      }
+    }
+    $node = $nodes[$lc];
+    unset($nodes[$lc]);
+    $node->translations = $nodes;
+    return $node;
   }
 }
