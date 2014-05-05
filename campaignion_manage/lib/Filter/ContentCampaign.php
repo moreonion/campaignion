@@ -10,15 +10,8 @@ class ContentCampaign extends ContentNodeReference {
   }
 
   public function formElement(array &$form, array &$form_state, array &$values) {
-    $form['campaign'] = array(
-      '#type'          => 'select',
-      '#title'         => t('Campaign'),
-      '#options'       => $this->getOptions(),
-      '#default_value' => isset($values) ? $values : NULL,
-    );
-  }
-  public function defaults() {
-    return array('campaign' => reset($this->getOptions()));
+    parent::formElement($form, $form_state, $values);
+    $form['nid']['#title'] = t('Campaign');
   }
   public function title() { return t('Campaign'); }
 }

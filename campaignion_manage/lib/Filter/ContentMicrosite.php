@@ -10,15 +10,8 @@ class ContentMicrosite extends ContentNodeReference {
   }
 
   public function formElement(array &$form, array &$form_state, array &$values) {
-    $form['microsite'] = array(
-      '#type'          => 'select',
-      '#title'         => t('Micro-Site'),
-      '#options'       => $this->getOptions(),
-      '#default_value' => isset($values) ? $values : NULL,
-    );
+    parent::formElement($form, $form_state, $values);
+    $form['nid']['#title'] = t('Micro-Site');
   }
   public function title() { return t('Micro-Site'); }
-  public function defaults() {
-    return array('microsite' => reset($this->getOptions()));
-  }
 }

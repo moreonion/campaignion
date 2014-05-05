@@ -36,7 +36,7 @@ class ContentNodeReference extends Base implements FilterInterface {
   }
 
   public function formElement(array &$form, array &$form_state, array &$values) {
-    $form['node_reference'] = array(
+    $form['nid'] = array(
       '#type'          => 'select',
       '#title'         => t('Node Reference'),
       '#options'       => $this->getOptions(),
@@ -46,9 +46,14 @@ class ContentNodeReference extends Base implements FilterInterface {
   public function title() { return t('Node Reference'); }
   public function apply($query, array $values) {
     $query->innerJoin('field_data_' . $this->referenceField, 'ref', 'ref.entity_id = n.nid');
-    $query->condition('ref.' . $this->referenceColumn, $values[$this->machineName()]);
+    $query->condition('ref.' . $this->referenceColumn, $values['nid']);
   }
   public function isApplicable($current) {
     return empty($current) && count($this->getOptions()) > 0;
   }
+  public function defaults() {
+    $options = $this->getOptions();
+    return array('nid' => key($options));
+  }
 }
+
