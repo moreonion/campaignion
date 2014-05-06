@@ -10,9 +10,10 @@ class Action {
     if (isset($node->action)) {
       return $node->action;
     }
-    $type = Action\TypeBase::fromContentType($node->type);
-    // give type the control over which class is used.
-    return $type->actionFromNode($node);
+    if ($type = Action\TypeBase::fromContentType($node->type)) {
+      // give type the control over which class is used.
+      return $type->actionFromNode($node);
+    }
   }
 
   public function __construct(Action\TypeInterface $type, $node) {
@@ -31,6 +32,15 @@ class Action {
           $_SESSION['webform_template'] = $nid;
         }
       }
+    }
+  }
+
+  public function prepare() {
+    $node = $this->node;
+    if (module_exists('webform_ajax') && isset($node->webform)) {
+      $node->webform += array(
+        'webform_ajax' => 1,
+      );
     }
   }
 }

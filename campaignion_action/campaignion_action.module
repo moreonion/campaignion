@@ -1,11 +1,22 @@
 <?php
 
+use \Drupal\campaignion\Action\TypeBase;
+use \Drupal\campaignion\Action;
+
+/**
+ * Implements hook_node_prepare().
+ */
+function campaignion_action_node_prepare($node) {
+  if ($action = Action::fromNode($node)) {
+    $action->prepare();
+  }
+}
+
 /**
  * Implements hook_node_presave().
  */
 function campaignion_action_node_presave($node) {
-  if (isset($node->action) || Drupal\campaignion\Action\TypeBase::isAction($node->type)) {
-    $action = Drupal\campaignion\Action::fromNode($node);
+  if ($action = Action::fromNode($node)) {
     $action->presave();
   }
 }

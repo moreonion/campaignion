@@ -69,8 +69,6 @@ abstract class TypeBase implements TypeInterface {
       $info = &$action_types[$type];
       $class = $info['class'];
       return new $class($type, $info['parameters']);
-    } else {
-      throw new \Exception('Trying to get ActionType for unregistered bundle.');
     }
   }
 }
