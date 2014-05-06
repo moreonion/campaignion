@@ -28,8 +28,13 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
       'show return' => TRUE,
       'return path' => $node ? 'node/' . $this->node->nid : 'node',
     );
-    if (!empty($this->node->nid)) {
-      $this->status = Status::loadOrCreate($this->node->nid);
+    $this->status = $this->node->nid ? Status::loadOrCreate($this->node->nid) : new Status();
+  }
+
+  public function setStep($step) {
+    parent::setStep($step);
+    if (!$this->status->step || $this->levels[$this->status->step] < $this->levels[$step]) {
+      $this->status->step = $step;
     }
   }
 
@@ -70,19 +75,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
 
   public function submit($form, &$form_state) {
     parent::submit($form, $form_state);
-    if ($this->node->nid) {
-      if (empty($this->status)) {
-        $data['nid'] = $this->node->nid;
-        $data['step'] = $this->currentStep;
-        $this->status = new Status($data);
-        $this->status->save();
-      }
-      else {
-        if (!$this->status->step || $this->levels[$this->status->step] < $this->levels[$this->currentStep]) {
-          $this->status->step = $this->currentStep;
-          $this->status->save();
-        }
-      }
-    }
+    $this->status->nid = $this->node->nid;
+    $this->status->save();
   }
 }
