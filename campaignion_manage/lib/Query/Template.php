@@ -10,4 +10,11 @@ class Template extends Content {
     $this->query->condition('fat.action_template_value', 1);
     $this->reset();
   }
+
+  public function pagerQuery() {
+    $query = parent::pagerQuery();
+    $query->innerJoin('field_data_action_template', 'fat', 'fat.entity_id = n.nid');
+    $query->condition('fat.action_template_value', 1);
+    return $query;
+  }
 }

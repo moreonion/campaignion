@@ -3,31 +3,27 @@
 namespace Drupal\campaignion_manage\Query;
 
 abstract class Base {
-  protected $_query;
   protected $query;
   protected $filtered;
-  protected $paged;
+  protected $size;
 
   public function __construct(\SelectQuery $query) {
-    $this->_query = $query;
+    $this->query = $query;
     $this->reset();
   }
 
   public function execute() {
-    $rows = $this->paged->execute()->fetchAll();
+    $rows = $this->paged()->execute()->fetchAll();
     $this->modifyResult($rows);
     return $rows;
   }
 
   public function setPage($size) {
-    $this->paged = clone $this->filtered;
-    $this->paged = $this->paged->extend('PagerDefault')->limit($size);
+    $this->size = $size;
   }
 
   public function reset() {
-    $this->query = clone $this->_query;
-    $this->filtered = clone $this->_query;
-    $this->paged = clone $this->_query;
+    $this->filtered = clone $this->query;
   }
 
   public function modifyResult(&$rows) {
@@ -37,33 +33,25 @@ abstract class Base {
   }
 
   public function query() {
-    return $this->query;
+    return clone $this->query;
   }
 
   public function filtered() {
-    return $this->filtered;
+    return clone $this->filtered;
   }
 
   public function paged() {
-    return $this->paged;
+    $paged = clone $this->filtered;
+    $paged = $paged->extend('PagerDefault')->limit($this->size);
+    return $paged;
   }
 
   public function count() {
-    return $this->filtered->countQuery()->execute()->fetchField();
-  }
-
-  public function __sleep() {
-    $this->query = NULL;
-    $this->filtered = NULL;
-    $this->paged = NULL;
-    return array('_query');
-  }
-
-  public function __wakeup() {
-    $this->reset();
+    return $this->filtered()->countQuery()->execute()->fetchField();
   }
 
   public function filter($form) {
+    $this->reset();
     $form->applyFilters($this->filtered);
   }
 }

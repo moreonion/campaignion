@@ -28,7 +28,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
       'show return' => TRUE,
       'return path' => $node ? 'node/' . $this->node->nid : 'node',
     );
-    $this->status = $this->node->nid ? Status::loadOrCreate($this->node->nid) : new Status();
+    $this->status = !empty($this->node->nid) ? Status::loadOrCreate($this->node->nid) : new Status();
   }
 
   public function setStep($step) {

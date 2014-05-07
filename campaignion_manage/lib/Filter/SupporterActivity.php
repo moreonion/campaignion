@@ -204,15 +204,14 @@ class SupporterActivity extends Base implements FilterInterface {
 
   public function defaults() {
     $options = $this->getOptions();
-    $options = array_keys($options['activity_types']);
     return array(
       'frequency'   => 'any',
       'how_many_op' => '=',
       'how_many_nr' => '1',
-      'activity'    => reset($options),
+      'activity'    => key($options['activity_types']),
       'date_range'  => 'all',
       'date_after'  => '',
       'date_before' => '',
-      );
+    );
   }
 }

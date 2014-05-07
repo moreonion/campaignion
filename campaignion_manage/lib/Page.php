@@ -13,7 +13,6 @@ abstract class Page {
   }
 
   public function form($form, &$form_state) {
-    $this->baseQuery->__sleep();
     $form['#tree'] = TRUE;
 
     $form['filter'] = array(
@@ -46,7 +45,6 @@ abstract class Page {
   }
 
   public function process(&$form, &$form_state) {
-    $this->baseQuery->reset();
     $this->baseQuery->filter($this->filterForm);
     $this->filterForm->process($form['filter'], $form_state);
     $this->listing->process($form['listing'], $form_state, $this->baseQuery);

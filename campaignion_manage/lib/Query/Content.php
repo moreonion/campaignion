@@ -4,6 +4,7 @@ namespace Drupal\campaignion_manage\Query;
 
 class Content extends Base {
   protected $langs;
+  protected $paged;
 
   public function __construct() {
     $query = db_select('node', 'n');
@@ -31,14 +32,8 @@ class Content extends Base {
   }
 
   public function reset() {
-    $this->query = clone $this->_query;
-    $this->filtered = clone $this->_query;
+    parent::reset();
     $this->paged = $this->pagerQuery();
-  }
-
-  public function setPage($size) {
-    $this->paged = clone $this->paged;
-    $this->paged = $this->paged->extend('PagerDefault')->limit($size);
   }
 
   public function filter($form) {
@@ -46,6 +41,12 @@ class Content extends Base {
     // Paged is completely separate from other queries - so we need to apply
     // filters there too.
     $form->applyFilters($this->paged);
+  }
+
+  public function paged() {
+    $paged = clone $this->paged;
+    $paged = $paged->extend('PagerDefault')->limit($this->size);
+    return $paged;
   }
 
   public function modifyResult(&$rows) {

@@ -46,6 +46,6 @@ class ContentType extends Base implements FilterInterface {
 
   public function defaults() {
     $options = $this->getOptions();
-    return array('type' => reset($options));
+    return array('type' => key($options));
   }
 }
