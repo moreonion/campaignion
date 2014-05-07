@@ -13,15 +13,10 @@ class ContentListing {
    * @param rows result from the Query object
    * @return renderable array for output.
    */
-  public function build(&$element, &$form_state) {
+  public function build(&$element, &$form_state, $query) {
     $element['#attributes']['class'][] = 'campaignion-manage-content-listing';
-    $element += array(
-      '#type' => 'campaignion_manage_listing',
-      '#formObj' => $this,
-    );
-  }
+    $element['#type'] = 'campaignion_manage_listing';
 
-  public function process(&$element, &$form_state, $query) {
     $element['#attributes']['data-count'] = $query->count();
     $query->setPage($this->size);
     $columns = 3;

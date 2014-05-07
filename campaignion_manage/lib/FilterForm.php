@@ -48,7 +48,7 @@ class FilterForm {
     $form['add_filter'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Add filter'),
-      '#options' => array(),
+      '#options' => $this->availableFilterOptions(),
       '#attributes' => array('class' => array('filter-add')),
     );
     $form['filter'] = array(
@@ -103,7 +103,7 @@ class FilterForm {
     );
   }
 
-  public function process(&$form, &$form_state) {
+  public function availableFilterOptions() {
     $valuesByType = array();
     foreach ($this->values as $config) {
       $valuesByType[$config['type']][] = $config['values'];
@@ -115,7 +115,7 @@ class FilterForm {
         $options[$name] = $filter->title();
       }
     }
-    $form['add_filter']['#options'] = $options;
+    return $options;
   }
 
   public function submit(&$form, &$form_state) {

@@ -13,6 +13,7 @@ abstract class Page {
   }
 
   public function form($form, &$form_state) {
+    $this->baseQuery->filter($this->filterForm);
     $form['#tree'] = TRUE;
 
     $form['filter'] = array(
@@ -28,7 +29,7 @@ abstract class Page {
     $this->bulkOpForm->form($form['bulkop'], $form_state);
 
     $form['listing'] = array();
-    $this->listing->build($form['listing'], $form_state);
+    $this->listing->build($form['listing'], $form_state, $this->baseQuery);
 
     $form['pager']['#theme'] = 'pager';
     $form['#theme_wrappers'][] = 'form';
@@ -40,14 +41,7 @@ abstract class Page {
     $form['#attached']['css'] = array(
       drupal_get_path('module', 'campaignion_manage') . '/css/manage_bulk.css',
     );
-    $form['#process'] = array('campaignion_manage_form_process');
     return $form;
-  }
-
-  public function process(&$form, &$form_state) {
-    $this->baseQuery->filter($this->filterForm);
-    $this->filterForm->process($form['filter'], $form_state);
-    $this->listing->process($form['listing'], $form_state, $this->baseQuery);
   }
 
   public function submit($form, &$form_state) {
