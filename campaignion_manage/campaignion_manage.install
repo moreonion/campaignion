@@ -1,0 +1,37 @@
+<?php
+
+function campaignion_manage_install() {
+  _campaignion_manage_deactivate_clientside_validation();
+}
+
+function _campaignion_manage_deactivate_clientside_validation() {
+  if (!module_exists('clientside_validation')) {
+    return;
+  }
+
+  $in_or_out =  variable_get('clientside_validation_validate_all', CLIENTSIDE_VALIDATION_VALIDATE_ALL);
+  if ($in_or_out == CLIENTSIDE_VALIDATION_VALIDATE_ALL) {
+    $in_or_out = CLIENTSIDE_VALIDATION_VALIDATE_ALL_EXCEPT;
+    variable_set('clientside_validation_validate_all', $in_or_out);
+  }
+  $specific_setting = variable_get('clientside_validation_validate_specific', '');
+  $specific = preg_split('/(\r\n?|\n)/', $specific_setting, -1, PREG_SPLIT_NO_EMPTY);
+  $found = array_search('campaignion_manage_form', $specific) !== FALSE;
+  if ($in_or_out == CLIENTSIDE_VALIDATION_VALIDATE_ALL_EXCEPT) {
+    if (!$found) {
+      $specific[] = 'campaignion_manage_form';
+    }
+  } else {
+    if ($found) {
+      unset($specific[$found]);
+    }
+  }
+  variable_set('clientside_validation_validate_specific', implode("\n", $specific));
+}
+
+/**
+ * Disable clientside_validation on campaignion_manage_form.
+ */
+function campaignion_manage_update_7101() {
+  _campaignion_manage_deactivate_clientside_validation();
+}

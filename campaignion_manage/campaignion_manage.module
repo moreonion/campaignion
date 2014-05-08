@@ -69,6 +69,16 @@ function campaignion_manage_theme() {
 }
 
 /**
+ * Implements hook_module_enable().
+ */
+function campaignion_manage_modules_enabled($modules) {
+  if (in_array('clientside_validation', $modules)) {
+    module_load_install('campaignion_manage');
+    _campaignion_manage_deactivate_clientside_validation();
+  }
+}
+
+/**
  * AJAX-callback for the filter form.
  */
 function campaignion_manage_ajax_filter($form, &$form_state) {
