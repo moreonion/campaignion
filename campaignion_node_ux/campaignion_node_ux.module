@@ -37,6 +37,12 @@ function campaignion_node_ux_form_node_form_alter(&$form, &$form_state) {
     'invisible' => array("#$id" => array('checked' => FALSE)),
   );
 
+  // move settings-advanced into group_advanced_settings if available
+  if (!empty($form['#fieldgroups']['group_advanced_settings'])) {
+    $form['#group_children']['toggle_settings_advanced'] = "group_advanced_settings";
+    $form['#group_children']['settings_advanced'] = "group_advanced_settings";
+  }
+
   if (isset($form_state['#wizard_type']) && $form_state['#wizard_type'] == 'thank_you') {
     // Thank you pages won't be shared. So we don't need users
     // to configure opengraph_meta data.
