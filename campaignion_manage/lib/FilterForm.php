@@ -5,6 +5,7 @@ namespace Drupal\campaignion_manage;
 class FilterForm {
   protected $filters;
   protected $values;
+  protected $key;
 
   /**
    * @param $filters array of filters with the structure
@@ -14,10 +15,14 @@ class FilterForm {
    *   machineName      is the machine name of the filter
    *   filterObject     instance of a filter object
    */
-  public function __construct($filters = array(), $defaults = array()) {
+  public function __construct($session_key, $filters = array(), $defaults = array()) {
+    $this->key = $session_key;
+    $this->filters = $filters;
     $this->values = array();
-    $this->values += isset($_SESSION['campaignion_manage_content_filter']) ? $_SESSION['campaignion_manage_content_filter'] : array();
+    $this->values += isset($_SESSION['campaignion_manage']) && isset($_SESSION['campaignion_manage'][$session_key]) ? $_SESSION['campaignion_manage'][$session_key] : array();
     foreach ($defaults as $index => $values) {
+      $values += array('values' => array());
+      $values['values'] += $this->filters[$values['type']]->defaults();
       if (isset($this->values[$index])) {
         $this->values[$index] = drupal_array_merge_deep($this->values[$index], $values);
       }
@@ -25,8 +30,6 @@ class FilterForm {
         $this->values[] = $values;
       }
     }
-
-    $this->filters = $filters;
   }
 
   public function applyFilters($query) {
@@ -141,6 +144,6 @@ class FilterForm {
     // the individual checkboxes. So we need to unset the values there.
     $finput['add_filter'] = array();
     $form_state['rebuild'] = TRUE;
-    $_SESSION['campaignion_manage_content_filter'] = $this->values;
+    $_SESSION['campaignion_manage'][$this->key] = $this->values;
   }
 }

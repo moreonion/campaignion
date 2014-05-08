@@ -19,7 +19,7 @@ class ContentPage extends Page {
     $filters['type'] = new Filter\ContentType($select);
     $filters['status'] = new Filter\ContentStatus();
     $default[] = array('type' => 'title', 'removable' => FALSE);
-    $this->filterForm = new FilterForm($filters, $default);
+    $this->filterForm = new FilterForm('content', $filters, $default);
 
     $this->listing = new ContentListing(20);
     $this->bulkOpForm = new BulkOpForm(array(

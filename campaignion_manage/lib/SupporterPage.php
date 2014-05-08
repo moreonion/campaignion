@@ -13,7 +13,7 @@ class SupporterPage extends Page {
     $filters['country']  = new Filter\SupporterCountry($this->baseQuery->query());
     $filters['activity'] = new Filter\SupporterActivity($this->baseQuery->query());
     $default[] = array('type' => 'name', 'removable' => FALSE);
-    $this->filterForm = new FilterForm($filters, $default);
+    $this->filterForm = new FilterForm('supporter', $filters, $default);
 
     $bulkOps = array();
     if (module_exists('campaignion_supporter_tags')) {
