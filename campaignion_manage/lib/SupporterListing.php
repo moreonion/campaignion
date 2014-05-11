@@ -14,7 +14,7 @@ class SupporterListing {
    * @param rows result from the Query object
    * @return renderable array for output.
    */
-  public function build(&$element, &$form_state) {
+  public function build(&$element, &$form_state, $query) {
     $element += array(
       '#type' => 'campaignion_manage_listing',
       '#attributes' => array(
@@ -22,9 +22,7 @@ class SupporterListing {
       ),
       '#formObj' => $this,
     );
-  }
 
-  public function process(&$element, &$form_state, $query) {
     $element['#attributes']['data-count'] = $query->count();
     $query->setPage($this->size);
     $columns = 3;
