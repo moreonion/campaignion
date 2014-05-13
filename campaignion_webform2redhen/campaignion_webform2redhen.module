@@ -37,6 +37,18 @@ function campaignion_webform2redhen_cron() {
 }
 
 /**
+ * Makes a user name unique by adding (N) prefixes.
+ */
+function _campaignion_webform2redhen_unique_name($oname) {
+  $name = $oname;
+  $i = 2;
+  while (db_query('SELECT count(*) FROM {users} WHERE name=:name', array(':name' => $name))->fetchField() > 0) {
+    $name = $oname . "($i)";
+  }
+  return $name;
+}
+
+/**
  * Implements hook_entity_insert().
  *
  * Create a drupal user for each redhen contact.
@@ -53,17 +65,7 @@ function campaignion_webform2redhen_entity_insert($entity, $type) {
 
   // check if there's already a user with this name and attach an integer
   // to keep the username unique, if so.
-  $query = new EntityFieldQuery;
-  $result = $query
-    ->entityCondition('entity_type', 'user')
-    ->propertyCondition('name', $name)
-    ->execute();
-  $user_count = isset($result['user']) ? (count($result['user']) + 1) : 0;
-
-  if($user_count > 1) {
-    $name .= " ($user_count)";
-  }
-
+  $name = _campaignion_webform2redhen_unique_name($name);
 
   $mails = field_get_items($type, $entity, 'redhen_contact_email');
   $mail = isset($mails[0]) ? check_plain($mails[0]['value']) : '';
