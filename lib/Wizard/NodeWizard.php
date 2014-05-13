@@ -54,6 +54,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
     $node->name = $this->user->name;
     $node->language = LANGUAGE_NONE;
     $node->title = '';
+    $node->sticky = 0;
     return $node;
   }
 
