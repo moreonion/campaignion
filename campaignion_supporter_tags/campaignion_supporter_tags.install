@@ -10,12 +10,13 @@ use \Drupal\little_helpers\Field\Instance;
  * Create taxonomy term field for supporter tagging.
  */
 function campaignion_supporter_tags_install() {
-  $vocabulary = new stdclass(array(
+  $edit = array(
     'name' => 'Supporter Tags',
     'machine_name' => 'supporter_tags',
     'description' => 'Vocabulary for Campaignion supporter tags.',
     'module' => 'campaignion_supportert_tags',
-  ));
+  );
+  $vocabulary = (object) $edit;
 
   taxonomy_vocabulary_save($vocabulary);
 
