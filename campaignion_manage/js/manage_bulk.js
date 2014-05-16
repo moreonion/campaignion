@@ -88,7 +88,8 @@ $('.bulkop-select-wrapper', context).each(function() {
   });
 
   var $targets = $wrapper.find('.bulk-select-target');
-  $toggle.change(function(event, noprop = false) {
+  $toggle.change(function(event, noprop) {
+    noprop = (typeof noprop == 'undefined') ? false : noprop;
     if (noprop) {
       return;
     }
