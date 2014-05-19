@@ -99,14 +99,13 @@ class SupporterListing {
     return $links;
   }
 
-  public function selectedIds(&$element, &$form_state) {
+  public function selectedIds(&$element, &$form_state, $baseQuery) {
     $values = &drupal_array_get_nested_value($form_state['values'], $element['#array_parents']);
     if (!empty($values['bulkop_select_all_matching'])) {
-      $query = clone $this->query;
-      $baseQuery = $query->getQuery();
-      $fields = $baseQuery->getfields();
+      $query = $baseQuery->filtered();
+      $fields = $query->getfields();
       $fields = array();
-      $baseQuery->addField('r', 'contact_id', 'id');
+      $query->addField('r', 'contact_id', 'id');
       $ids = array();
       foreach ($query->execute() as $row) {
         $ids[] = $row->id;
