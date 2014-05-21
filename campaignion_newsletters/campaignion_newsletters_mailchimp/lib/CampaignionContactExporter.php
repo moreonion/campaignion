@@ -40,8 +40,7 @@ class CampaignionContactExporter implements SourceInterface {
     $this->map['ZIP'] = new KeyedField($wrappedContact, 'field_address', 'postal_code');
     $this->map['CITY'] = new KeyedField($wrappedContact, 'field_address', 'locality');
     $this->map['REGION'] = new KeyedField($wrappedContact, 'field_address', 'administrative_area');
-    // Not part of usual redhen contacts?
-    //$this->map['language'] = new WrapperField($wrappedContact, 'field_preferred_language');
+    $this->map['LANGUAGE'] = new WrapperField($wrappedContact, 'field_preferred_language');
     $this->map['CREATED'] = new DateField($wrappedContact, 'created', '%Y-%m-%d');
     $this->map['UPDATED'] = new DateField($wrappedContact, 'updated', '%Y-%m-%d');
     $this->map['TAGS'] = new TagExporter($wrappedContact, 'supporter_tags');
