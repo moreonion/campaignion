@@ -1,4 +1,4 @@
-name = Campaignion Resent Supporters
+name = Campaignion Recent Supporters
 description = Display recent supporters for campaignion
 core = 7.x
 package = Campaignion
