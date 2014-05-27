@@ -12,22 +12,16 @@ class SupporterActivity extends Base implements FilterInterface {
   protected function getOptions() {
     $activities_in_use = array('any_activity' => t('Any activity'));
 
-    $query = clone $this->query;
-    $query->innerJoin('campaignion_activity', 'act', "r.contact_id = act.contact_id");
-    $fields =& $query->getFields();
-    $fields = array();
+    $query = db_select('campaignion_activity', 'act');
     $query->condition('act.type', 'redhen_contact_create');
     $query->fields('act', array('type'));
     $query->groupBy('act.type');
 
     $activities_in_use += $query->execute()->fetchAllKeyed(0,0);
 
-    $query = clone $this->query;
-    $query->innerJoin('campaignion_activity', 'act', "r.contact_id = act.contact_id");
+    $query = db_select('campaignion_activity', 'act');
     $query->innerJoin('campaignion_activity_webform', 'wact', "act.activity_id = wact.activity_id");
     $query->innerJoin('node', 'n', "wact.nid = n.nid");
-    $fields =& $query->getFields();
-    $fields = array();
     $query->fields('n', array('nid', 'type', 'title'));
     $query->where('n.tnid = 0 OR n.tnid = n.nid');
 
@@ -143,14 +137,13 @@ class SupporterActivity extends Base implements FilterInterface {
   public function title() { return t('Activity'); }
 
   public function apply($query, array $values) {
-    $inner = clone $query;
+    $inner = db_select('redhen_contact', 'r');
     $inner->innerJoin('campaignion_activity', 'act', "r.contact_id = act.contact_id");
     // "RedHen contact was edited" activities are never shown
     $inner->condition('act.type', 'redhen_contact_edit', '!=');
     $fields =& $inner->getFields();
     $fields = array();
     $inner->fields('r', array('contact_id'));
-    $inner->groupBy('r.contact_id');
 
     if ($values['activity'] === 'redhen_contact_create') {
       $inner->condition('act.type', 'redhen_contact_create');
@@ -190,11 +183,7 @@ class SupporterActivity extends Base implements FilterInterface {
         $inner->condition('act.created', $from, '>');
         break;
     }
-    $contact_ids = $inner->execute()->fetchCol(0);
-    if (empty($contact_ids)) {
-      $contact_ids = array('');
-    }
-    $query->condition('r.contact_id', $contact_ids, 'IN');
+    $query->condition('r.contact_id', $inner, 'IN');
   }
 
   public function isApplicable($current) {
