@@ -27,7 +27,7 @@ class SupporterActivity extends Base implements FilterInterface {
     $available_activities = array(
       'any_activity'          => t('Any type'),
       'redhen_contact_create' => t('Contact created'),
-      'webform_submission'    => t('Online action'),
+      'webform_submission'    => t('Form submission'),
       'webform_payment'       => t('Online payment'),
     );
 
@@ -73,7 +73,7 @@ class SupporterActivity extends Base implements FilterInterface {
         $form['action_' . $type] = array(
           '#type'          => 'select',
           '#options'       => array('no_specific' => t('No specific action')) + $actions[$type],
-          '#states'        => array('visible' => array('#' . $action_type_id => array('value' => $type))),
+          '#states'        => array('visible' => array('#' . $action_type_id => array('value' => $type), '#' . $activity_type_id => array('value' => 'webform_submission'))),
           '#default_value' => isset($values['action_' . $type]) ? $values['action_' . $type] : NULL,
         );
       }
