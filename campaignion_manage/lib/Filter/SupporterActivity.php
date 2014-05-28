@@ -9,46 +9,43 @@ class SupporterActivity extends Base implements FilterInterface {
     $this->query = $query;
   }
 
-  protected function getOptions() {
-    $activities_in_use = array('any_activity' => t('Any activity'));
-
-    $query = db_select('campaignion_activity', 'act');
-    $query->condition('act.type', 'redhen_contact_create');
-    $query->fields('act', array('type'));
-    $query->groupBy('act.type');
-
-    $activities_in_use += $query->execute()->fetchAllKeyed(0,0);
-
-    $query = db_select('campaignion_activity', 'act');
-    $query->innerJoin('campaignion_activity_webform', 'wact', "act.activity_id = wact.activity_id");
+  protected function actionsWithActivity() {
+    $query = db_select('campaignion_activity_webform', 'wact');
     $query->innerJoin('node', 'n', "wact.nid = n.nid");
     $query->fields('n', array('nid', 'type', 'title'));
     $query->where('n.tnid = 0 OR n.tnid = n.nid');
 
-    $options = array();
+    $actions = array();
     foreach ($query->execute()->fetchAllAssoc('nid') as $nid => $action) {
-      $activities_in_use[$action->type] = $action->type;
-      $options['actions'][$action->type][$nid] = $action->title;
+      $actions[$action->type][$nid] = $action->title;
     }
 
+    return $actions;
+  }
+
+  protected function typesInUse() {
     $available_activities = array(
       'any_activity'          => t('Any type'),
       'redhen_contact_create' => t('Contact created'),
-      'petition'              => t('Petition'),
-      'donation'              => t('Donation'),
-      'email_protest'         => t('Email Protest'),
-      'webform'               => t('Flexible Form'),
+      'webform_submission'    => t('Online action'),
+      'webform_payment'       => t('Online payment'),
     );
-    $options['activity_types'] = array_intersect_key($available_activities, $activities_in_use);
 
-    return $options;
+    $activities_in_use = array('any_activity' => t('Any activity'));
+
+    $query = db_select('campaignion_activity', 'act');
+    $query->condition('act.type', array_keys($available_activities), 'IN');
+    $query->fields('act', array('type'));
+    $query->groupBy('act.type');
+
+    $activities_in_use += $query->execute()->fetchAllKeyed(0,0);
+    return array_intersect_key($available_activities, $activities_in_use);
   }
 
   public function formElement(array &$form, array &$form_state, array &$values) {
     $frequency_id  = drupal_html_id('activity-frequency');
     $date_range_id = drupal_html_id('activity-date-range');
     $activity_type_id = drupal_html_id('activity-type');
-    $options = $this->getOptions();
     $form['frequency'] = array(
       '#type'          => 'select',
       '#title'         => t('Activity'),
@@ -72,22 +69,32 @@ class SupporterActivity extends Base implements FilterInterface {
     );
     $form['activity'] = array(
       '#type'          => 'select',
-      '#attributes'    => array('id' => $activity_type_id),
-      '#options'       => $options['activity_types'],
+      '#id'            => $activity_type_id,
+      '#options'       => $this->typesInUse(),
       '#default_value' => isset($values['activity']) ? $values['activity'] : NULL,
     );
-    $activity_types = array(
-      'donation'      => t('Donation Action'),
-      'email_protest' => t('Email Protest Actions'),
-      'petition'      => t('Petition Actions'),
-      'webform'       => t('Flexible Form Actions'),
+    $action_types = array(
+      'any'           => t('Any type of action'),
+      'donation'      => t('Donation'),
+      'email_protest' => t('Email Protest'),
+      'petition'      => t('Petition'),
+      'webform'       => t('Flexible Form'),
     );
-    foreach ($activity_types as $type => $type_name) {
-      if (!empty($options['actions'][$type])) {
+    $action_type_id = drupal_html_id('action-type');
+    $form['action_type'] = array(
+      '#type' => 'select',
+      '#id' => $action_type_id,
+      '#options' => $action_types,
+      '#states'  => array('visible' => array('#' . $activity_type_id => array('value' => 'webform_submission'))),
+      '#default_value' => isset($values['action_type']) ? $values['action_type'] : 'any',
+    );
+    $actions = $this->actionsWithActivity();
+    foreach ($action_types as $type => $type_name) {
+      if (!empty($actions[$type])) {
         $form['action_' . $type] = array(
           '#type'          => 'select',
-          '#options'       => array('no_specific' => t('No specific action')) + $options['actions'][$type],
-          '#states'        => array('visible' => array('#' . $activity_type_id => array('value' => $type))),
+          '#options'       => array('no_specific' => t('No specific action')) + $actions[$type],
+          '#states'        => array('visible' => array('#' . $action_type_id => array('value' => $type))),
           '#default_value' => isset($values['action_' . $type]) ? $values['action_' . $type] : NULL,
         );
       }
@@ -137,25 +144,23 @@ class SupporterActivity extends Base implements FilterInterface {
   public function title() { return t('Activity'); }
 
   public function apply($query, array $values) {
-    $inner = db_select('redhen_contact', 'r');
-    $inner->innerJoin('campaignion_activity', 'act', "r.contact_id = act.contact_id");
+    $inner = db_select('campaignion_activity', 'act');
+    $inner->fields('act', array('contact_id'));
     // "RedHen contact was edited" activities are never shown
     $inner->condition('act.type', 'redhen_contact_edit', '!=');
-    $fields =& $inner->getFields();
-    $fields = array();
-    $inner->fields('r', array('contact_id'));
 
-    if ($values['activity'] === 'redhen_contact_create') {
-      $inner->condition('act.type', 'redhen_contact_create');
+    if ($values['activity'] != 'any_activity') {
+      $inner->condition('act.type', $values['activity']);
     }
-    elseif ($values['activity'] !== 'any_activity') {
+    if ($values['activity'] == 'webform_submission' && $values['action_type'] != 'any') {
+      $type = $values['action_type'];
       $inner->innerJoin('campaignion_activity_webform', 'wact', "act.activity_id = wact.activity_id");
       $inner->innerJoin('node', 'n', "wact.nid = n.nid");
-      if ($values['action_' . $values['activity']] !== 'no_specific') {
-        $inner->where('n.nid = :nid OR n.tnid = :nid', array(':nid' => $values['action_' . $values['activity']]));
+      if (!empty($values["action_$type"]) && $values["action_$type"] !== 'no_specific') {
+        $inner->where('n.nid = :nid OR n.tnid = :nid', array(':nid' => $values['action_' . $type]));
       }
       else {
-        $inner->condition('n.type', $values['activity']);
+        $inner->condition('n.type', $values['action_type']);
       }
     }
 
@@ -165,8 +170,8 @@ class SupporterActivity extends Base implements FilterInterface {
         // activities we don't want to include "RedHen contact was created" activities
         $inner->condition('act.type', 'redhen_contact_create', '!=');
       }
-      $inner->addExpression('COUNT(r.contact_id)', 'count_activities');
-      $inner->havingCondition('count_activities', $values['how_many_nr'], $values['how_many_op']);
+      $inner->having('COUNT(*)' . $values['how_many_op'] . ' :nr', array(':nr' => $values['how_many_nr']));
+      $inner->groupBy('act.contact_id');
     }
 
     switch ($values['date_range']) {
@@ -187,17 +192,17 @@ class SupporterActivity extends Base implements FilterInterface {
   }
 
   public function isApplicable($current) {
-    $options = $this->getOptions();
-    return empty($current) && count($options['activity_types']) > 1;
+    return empty($current) && count($this->typesInUse()) > 1;
   }
 
   public function defaults() {
-    $options = $this->getOptions();
+    $types = $this->typesInUse();
     return array(
       'frequency'   => 'any',
       'how_many_op' => '=',
       'how_many_nr' => '1',
-      'activity'    => key($options['activity_types']),
+      'activity'    => key($types),
+      'action_type' => 'any',
       'date_range'  => 'all',
       'date_after'  => '',
       'date_before' => '',
