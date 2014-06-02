@@ -26,7 +26,7 @@ class ECPaymentController extends \PayPalPaymentECPaymentMethodController {
       $context->redirect($this->checkoutURL($payment->method->controller_data['server'], $authentication->token));
     }
     else {
-      $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_FAILED));
+      $payment->setStatus(new \PaymentStatusItem(PAYMENT_STATUS_FAILED));
     }
   }
 }
