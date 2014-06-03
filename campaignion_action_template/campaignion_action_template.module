@@ -38,7 +38,7 @@ SQL;
   // add a submit function before the usual submit
   $form['#submit'] = array('campaignion_action_template_selector_form_submit');
   // define the submit button
-  $form['submit'] = array(
+  $form['submit-template'] = array(
     '#type'  => 'submit',
     '#value' => t('Apply template'),
   );

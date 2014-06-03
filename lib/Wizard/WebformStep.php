@@ -41,7 +41,6 @@ class WebformStep extends WizardStep {
     foreach (form_builder_interface('webform', $form['nid']['#value']) as $k => $f) {
       $build[$k + 2] = $f;
     }
-    $build[3]['submit']['#access'] = FALSE;
 
     return $build;
   }
