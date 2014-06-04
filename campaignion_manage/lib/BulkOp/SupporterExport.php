@@ -29,6 +29,7 @@ class SupporterExport implements BulkOpBatchInterface {
       '#type'     => 'checkboxes',
       '#title'    => t('Select one or more fields that you want to export.'),
       '#options'  => $options,
+      '#default_value' => array_keys($options),
     );
   }
 
