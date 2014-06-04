@@ -15,9 +15,8 @@ class SupporterExport implements BulkOpBatchInterface {
       $options[$field_name] = $field['label'];
     }
     $element['export'] = array(
-      '#type'     => 'select',
+      '#type'     => 'checkboxes',
       '#title'    => t('Select one or more fields that you want to export.'),
-      '#multiple' => TRUE,
       '#options'  => $options,
     );
   }
@@ -28,7 +27,7 @@ class SupporterExport implements BulkOpBatchInterface {
     }
     $fields = array();
     foreach (field_info_instances('redhen_contact', 'contact') as $field_name => $field) {
-      if (isset($values['export'][$field_name])) {
+      if (isset($values['export'][$field_name]) && $values['export'][$field_name]) {
         $fields[$field_name] = $field['label'];
       }
     }
