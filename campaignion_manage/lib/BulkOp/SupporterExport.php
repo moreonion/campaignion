@@ -9,11 +9,22 @@ class SupporterExport implements BulkOpBatchInterface {
     return t('Export all currently selected supporters into a CSV file.');
   }
 
-  public function formElement(&$element, &$form_state) {
-    $options = array();
-    foreach (field_info_instances('redhen_contact', 'contact') as $field_name => $field) {
-      $options[$field_name] = $field['label'];
+  private function getFields() {
+    $fields = array(
+        'first_name' => 'First name',
+        'middle_name' => 'Middle name',
+        'last_name' => 'Last name',
+    );
+
+    foreach (field_info_instances('redhen_contact', 'contact') as $name => $field) {
+      $fields[$name] = $field['label'];
     }
+    return $fields;
+  }
+
+
+  public function formElement(&$element, &$form_state) {
+    $options = $this->getFields();
     $element['export'] = array(
       '#type'     => 'checkboxes',
       '#title'    => t('Select one or more fields that you want to export.'),
@@ -26,9 +37,9 @@ class SupporterExport implements BulkOpBatchInterface {
       return;
     }
     $fields = array();
-    foreach (field_info_instances('redhen_contact', 'contact') as $field_name => $field) {
+    foreach ($this->getFields() as $field_name => $label) {
       if (isset($values['export'][$field_name]) && $values['export'][$field_name]) {
-        $fields[$field_name] = $field['label'];
+        $fields[$field_name] = $label;
       }
     }
     $batch = array(
