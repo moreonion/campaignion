@@ -17,7 +17,11 @@ class Content extends Base {
 
     parent::__construct($query);
 
-    $this->langs = array($GLOBALS['language']->language, language_default()->language);
+    $this->langs = array();
+    if (!empty($GLOBALS['user']->language)) {
+      $this->langs[] = $GLOBALS['user']->language;
+    }
+    $this->langs[] = language_default()->language;
   }
 
   protected function pagerQuery() {
@@ -57,19 +61,16 @@ class Content extends Base {
     foreach ($rows as $row) {
       $nids[$row->tset] = $row->tset;
     }
-
     $query = clone $this->filtered;
     $or = db_or();
     $or->condition('n.tnid', $nids, 'IN');
     $or->condition('n.nid', $nids, 'IN');
     $query->condition($or);
     $result = $query->execute();
-
     $tsets = array();
     foreach ($result as $row) {
       $tsets[$row->tset][$row->language] = $row;
     }
-
     foreach ($rows as $index => $row) {
       $tset = $row->tset;
       $rows[$index] = $this->buildTset($tsets[$tset]);
