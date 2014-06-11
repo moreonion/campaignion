@@ -126,6 +126,7 @@ class ContentListing {
       $links[$path] = array(
         'href' => "node/{$node->nid}/$path",
         'title' => $title,
+        'query' => array('destination' => 'admin/manage/content_and_actions')
       );
     }
     return $links;
