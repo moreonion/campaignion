@@ -181,11 +181,11 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
         '@status' => $result->status,
         '@message' => $result->message,
       );
-      switch ($result->code) {
+      switch ($result->statuscode) {
         case 40:
-          throw new ApiPersistentError($b, '@status #@code @message - removing item from queue.', $args, $result->code);
+          throw new ApiPersistentError($b, '@status #@code @message - removing item from queue.', $args, $result->statuscode);
         default:
-          throw new ApiError($b, '@status #@code: @message', $args, $result->code);
+          throw new ApiError($b, '@status #@code: @message', $args, $result->statuscode);
       }
     }
     return $result->data;

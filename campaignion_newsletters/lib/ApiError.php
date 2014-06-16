@@ -15,6 +15,6 @@ class ApiError extends \Exception {
     parent::__construct($message, $code, $previous);
   }
   public function log() {
-    \watchdog($this->backend, $this->message, $this->variables, $this->link, WATCHDOG_ERROR);
+    \watchdog($this->backend, $this->message, $this->variables, WATCHDOG_ERROR, $this->link);
   }
 }
