@@ -221,17 +221,19 @@ function _campaignion_recent_supporters_block_recent_supporters() {
   if ($show) {
     // save values for polling
     $polling_url = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'campaignion_recent_supporters') . '/poll.php?nid=' . $node->nid;
-    $cycle = isset($field['options']['cycle_toggle']) ? $field['options']['cycle_toggle'] : 0;
-    $visible_count = isset($field['options']['visible_count']) ? $field['options']['visible_count'] : 6;
-    $country = isset($field['options']['country_toggle']) ? $field['options']['country_toggle'] : 0;
+    $options = $field['options'] + array(
+      'cycle_toggle' => 0,
+      'visible_count' => 6,
+      'country_toggle' => 0,
+      'name_display' => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
+    );
 
     $block['subject'] = t('Recent supporters');
-    $name_display = isset($field['options']['name_display']) ? $field['options']['name_display'] : CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT;
-    $supporters = _campaignion_recent_supporters_get_supporters_one_action($node->nid, $name_display, (int) $field['options']['visible_count'] + 1);
+    $supporters = _campaignion_recent_supporters_get_supporters_one_action($node->nid, $options['name_display'], $options['visible_count']);
     $block['content'] = array(
       '#theme' => 'recent_supporters',
       '#supporters' => $supporters,
-      '#show_country' => ($country == '1') ? TRUE : FALSE,
+      '#show_country' => (bool) $options['country_toggle'],
       '#all_actions' => FALSE,
       '#texts' => NULL,
     );
@@ -242,9 +244,9 @@ function _campaignion_recent_supporters_block_recent_supporters() {
     drupal_add_js(array('recentSupporters' => array(
       'blocks' => array(
         $block_id => array(
-          'cycleSupporters' => $cycle,
-          'showCountry' => $country,
-          'visibleCount' => $visible_count,
+          'cycleSupporters' => $options['cycle_toggle'],
+          'showCountry' => $options['country_toggle'],
+          'visibleCount' => $options['visible_count'],
           'pollingURL' => $polling_url,
           'nodeID' => $node->nid,
           'allActions' => FALSE,
@@ -252,7 +254,7 @@ function _campaignion_recent_supporters_block_recent_supporters() {
       )
     )), 'setting');
 
-    if ($country) {
+    if ($options['country_toggle']) {
       $dir = _campaignion_recent_supporters_countries_dir();
       drupal_add_js($dir . '/' . $GLOBALS['language']->language . '.js', array('scope' => 'footer', 'preprocess' => FALSE));
     }
@@ -295,14 +297,14 @@ function _campaignion_recent_supporters_get_types_defaults($lang_code = NULL) {
 function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
   $block = array();
   global $language;
-  $defaults = array(
+  $saved_settings = variable_get('campaignion_recent_supporters_settings', array()) + array(
     'name_display'   => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
     'visible_count'  => 6,
     'cycle_toggle'   => 0,
     'country_toggle' => 1,
   );
-  $saved_settings = variable_get('campaignion_recent_supporters_settings', $defaults);
-  $types_settings = variable_get('campaignion_recent_supporters_settings_types', _campaignion_recent_supporters_get_types_defaults($language->language));
+  $types_settings = variable_get('campaignion_recent_supporters_settings_types', array())
+    + _campaignion_recent_supporters_get_types_defaults($language->language);
   $types          = array();
   foreach ($types_settings as $type => $setting) {
     if ($setting['enabled']) {
@@ -316,13 +318,13 @@ function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
   $default_language = language_default();
   $lang             = isset($language->language) ? $language->language : $default_language->language;
   $name_display     = $saved_settings['name_display'];
-  $limit            = NULL;
+  $limit            = $saved_settings['visible_count'];
   $hash             = drupal_hmac_base64($lang.$limit.$name_display, drupal_get_hash_salt());
   $polling_url     .= isset($lang) ? "&lang=".$lang : '';
   $polling_url     .= isset($name_display) ? "&name_display=".$name_display : '';
   $polling_url     .= "&hash=".$hash;
 
-  $supporters       = _campaignion_recent_supporters_get_supporters_all_actions($types, $name_display, (int) $field['options']['visible_count'] + 1, $lang);
+  $supporters       = _campaignion_recent_supporters_get_supporters_all_actions($types, $name_display, $limit, $lang);
   $texts = _campaignion_recent_supporters_get_action_texts($types);
 
   $block['subject'] = t('Recent supporters');
@@ -538,9 +540,9 @@ FROM {node} n
 WHERE n.status = 1 AND (n.nid=:nid OR n.nid IN(SELECT tn.nid FROM {node} tn INNER JOIN {node} n USING(tnid) WHERE n.nid=:nid AND n.tnid<>0))
 ORDER BY ca.created DESC
 SQL;
-  $result = db_query_range($sql, 0, $limit - 1, array(':nid' => $nid));
+  $result = db_query_range($sql, 0, $limit, array(':nid' => $nid));
 
-  return _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display);
+  return _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, $limit);
 }
 
 /**
@@ -568,12 +570,7 @@ SELECT rc.first_name, rc.last_name, ca.created as timestamp, wt.country, fdfa.fi
   WHERE na.status = 1 AND na.type IN (:types)
   ORDER BY ca.created DESC
 SQL;
-  $result = db_query_range(
-    $sql,
-    0,
-    $limit - 1,
-    array(':types' => $types, ':lang' => $lang)
-  );
+  $result = db_query_range($sql, 0, $limit, array(':types' => $types, ':lang' => $lang));
 
   return _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, TRUE, $lang);
 }
