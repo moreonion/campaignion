@@ -6,41 +6,45 @@ class ContentNodeReference extends Base implements FilterInterface {
   protected $query;
   protected $referenceField;
   protected $referenceColumn;
+  protected $langs;
 
   public function __construct(\SelectQueryInterface $query, $reference_field, $reference_column) {
     $this->query           = $query;
     $this->referenceField  = $reference_field;
     $this->referenceColumn = $reference_column;
+    $this->langs[] = $GLOBALS['language']->language;
+    if (!empty($GLOBALS['user']->language)) {
+      $this->langs[] = $GLOBALS['user']->language;
+    }
+    $this->langs[] = language_default()->language;
   }
 
   protected function getOptions() {
-    $language = $default_lang = language_default()->language;
-    if (!empty($GLOBALS['user']->language)) {
-      $language = $GLOBALS['user']->language;
-    }
     $query = clone $this->query;
     $fields =& $query->getFields();
+    $fields = array();
     $query->innerJoin('field_data_' . $this->referenceField, 'ref', 'ref.entity_id = n.nid OR ref.entity_id = n.tnid');
     $query->innerJoin('node', 'cn', 'ref.' . $this->referenceColumn . ' = cn.nid');
-    $query->addExpression('IF(cn.tnid = 0, cn.nid, cn.tnid)', 'tset_ref');
+    $query->innerJoin('node', 'tn', 'tn.nid=cn.nid OR (cn.tnid<>0 AND tn.tnid=cn.tnid)');
+    $query->addExpression('IF(tn.tnid = 0, tn.nid, tn.tnid)', 'tset_ref');
     $fields = array(
       'nid' => array(
         'field' => 'nid',
-        'table' => 'cn',
+        'table' => 'tn',
         'alias' => 'nid',
       ),
       'title' => array(
         'field' => 'title',
-        'table' => 'cn',
+        'table' => 'tn',
         'alias' => 'title',
       ),
       'language' => array(
         'field' => 'language',
-        'table' => 'cn',
+        'table' => 'tn',
         'alias' => 'language',
       ),
     );
-    $query->groupBy('cn.title');
+    $query->groupBy('tn.nid');
     $tset_result = array();
     // build result as a translation set structure with
     // array[orig_nid][language][nid, title, language, tset_ref]
@@ -49,21 +53,17 @@ class ContentNodeReference extends Base implements FilterInterface {
     }
     $result = array();
     foreach ($tset_result as $orig_nid => $set) {
-      if (isset($set[$language])) {
-        // if the referenced node exists in the user language, take this one
-        $result[$set[$language]->nid] = $set[$language]->title;
+      $node = NULL;
+      foreach ($this->langs as $langcode) {
+        if (isset($set[$langcode])) {
+          $node = $set[$langcode];
+          break;
+        }
       }
-      elseif (isset($set[$default_lang])) {
-        // if the referenced node exists in the site default language, take
-        // this one
-        $result[$set[$default_lang]->nid] = $set[$default_lang]->title;
+      if (!$node) {
+        $node = array_shift($set);
       }
-      else {
-        // the referenced node is neither in user nor in site default language
-        // available, let's take the first we can get
-        $first = array_shift($set);
-        $result[$first->nid] = $first->title;
-      }
+      $result[$node->nid] = $node->title;
     }
     return $result;
   }

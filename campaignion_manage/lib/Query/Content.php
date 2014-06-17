@@ -17,7 +17,7 @@ class Content extends Base {
 
     parent::__construct($query);
 
-    $this->langs = array();
+    $this->langs[] = $GLOBALS['language']->language;
     if (!empty($GLOBALS['user']->language)) {
       $this->langs[] = $GLOBALS['user']->language;
     }
