@@ -86,7 +86,7 @@ msgid "Last name"
 msgstr "Nachname"
 
 #: modules/campaignion_form_builder/campaignion_form_builder.module:165
-msgid "Bitte folgendermaßen eintragen: 16/9/1983"
+msgid "Please use the following format: 16/9/1983"
 msgstr "Bitte folgendermaßen eintragen: 16/9/1983"
 
 #: modules/campaignion_form_builder/campaignion_form_builder.module:168;171

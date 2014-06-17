@@ -40,7 +40,7 @@ function _campaignion_form_builder_form_builder_types_textfield() {
   ) + $unique_ae;
   $fields['date_of_birth']['default']['#title'] = t('Date of birth');
   $fields['date_of_birth']['default']['#default_value'] = '%get[p6]';
-  $fields['date_of_birth']['default']['#description'] = t('Bitte folgendermaßen eintragen: 16/9/1983');
+  $fields['date_of_birth']['default']['#description'] = t('Please use the following format: 16/9/1983');
 
   $fields['street_address'] = array(
     'title' => t('Street address'),
