@@ -572,7 +572,7 @@ SELECT rc.first_name, rc.last_name, ca.created as timestamp, wt.country, fdfa.fi
 SQL;
   $result = db_query_range($sql, 0, $limit, array(':types' => $types, ':lang' => $lang));
 
-  return _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, TRUE, $lang);
+  return _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, TRUE);
 }
 
 /**
@@ -603,7 +603,7 @@ function _campaignion_recent_supporters_get_action_texts($types = array()) {
  * helper function: compile a list of recent supporters from the DB result parameter
  * ATTENTION: minimal bootstrap possible
  */
-function _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, $has_text = FALSE, $lang = NULL) {
+function _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, $has_text = FALSE) {
   $supporters = array();
 
   // resolve "default" name display
