@@ -542,7 +542,7 @@ ORDER BY ca.created DESC
 SQL;
   $result = db_query_range($sql, 0, $limit, array(':nid' => $nid));
 
-  return _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, $limit);
+  return _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, FALSE);
 }
 
 /**
