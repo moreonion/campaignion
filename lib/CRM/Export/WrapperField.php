@@ -11,10 +11,15 @@ class WrapperField {
   }
 
   public function value() {
-    $value = $this->wrappedContact->{$this->key}->value();
-    if (is_array($value) && isset($value[0]) && count($value) == 1) {
-      return $value[0];
+    if ($this->wrappedContact->__isset($this->key)) {
+      $value = $this->wrappedContact->{$this->key}->value();
+      if (is_array($value) && isset($value[0]) && count($value) == 1) {
+        return $value[0];
+      }
+      return $value;
     }
-    return $value;
+    else {
+      return NULL;
+    }
   }
 }
