@@ -3,6 +3,10 @@
 namespace Drupal\campaignion_paypal;
 
 class ECPaymentController extends \PayPalPaymentECPaymentMethodController {
+
+  // callback for user form
+  public $payment_configuration_form_elements_callback = 'campaignion_paypal_payment_method_form';
+
   /**
    * Implements PaymentMethodController::execute().
    */
