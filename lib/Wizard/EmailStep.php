@@ -60,10 +60,10 @@ class EmailStep extends WizardStep {
     // we are using only custom and default options
     // therefore if the custom address is set to campaignion, we take this as the
     // default for the notification option
-    if ($form['notification_email']['from_address_custom']['#default_value'] === 'your@campaignion.org') {
+    if ($form['notification_email']['from_address_custom']['#default_value'] === 'you@example.com') {
       $form['notification_email']['from_address_custom']['#default_value'] = '';
     }
-    $form['notification_email']['from_address_option']['#default_value'] = 'campaignion';
+    $form['notification_email']['from_address_option']['#default_value'] = 'You';
 
     $form['notification_email']['email_option']['#access'] = TRUE;
     $form['notification_email']['email_option']['#default_value'] = 'custom';
@@ -71,11 +71,11 @@ class EmailStep extends WizardStep {
     unset($form['notification_email']['email_option']['#options']['default']);
     $form['notification_email']['email_custom']['#access'] = TRUE;
     if (!$form['notification_email']['email_custom']['#default_value']) {
-      $form['notification_email']['email_custom']['#default_value'] = 'noreply@campaignion.org';
+      $form['notification_email']['email_custom']['#default_value'] = 'noreply@example.com';
     }
     // add the new option in beginning
     $form['notification_email']['from_address_option']['#options'] =
-      array('campaignion' => 'Default: <em class="placeholder">your@campaignion.org</em>')
+      array('campaignion' => 'Default: <em class="placeholder">you@example.com</em>')
       + $form['notification_email']['from_address_option']['#options'];
     unset($form['notification_email']['from_address_option']['#options']['default']);
 
@@ -103,7 +103,7 @@ class EmailStep extends WizardStep {
     $type = $values['confirmation_request_email']['confirmation_request_check'] == 1 ? 2 : 0;
     $this->emails['thank_you']->submit($form, $form_state, $type);
 
-    $values['notification_email']['from_address_campaignion'] = 'your@campaignion.org'; // Default notification from address
+    $values['notification_email']['from_address_campaignion'] = 'you@example.com'; // Default notification from address
     $this->emails['notification']->submit($form, $form_state, 0);
   }
 
