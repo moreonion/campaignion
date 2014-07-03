@@ -152,7 +152,7 @@ class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInt
         array('email' => $mail)
       );
     }
-    catch (Mailchimp_Email_NotExists $e) { return true; }
+    catch (\Mailchimp_Email_NotExists $e) { return true; }
     return true;
   }
 
@@ -162,17 +162,16 @@ class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInt
   protected function call($function) {
     $arguments = func_get_args();
     array_shift($arguments);
-
+    $result = array('data' => NULL);
     try {
       $result = call_user_func_array(
         array($this->api->lists, $function),
         $arguments
       );
     }
-    catch(Mailchimp_Error $e) {
-      watchdog('MailChimp', $error);
+    catch(\Mailchimp_Error $e) {
+      watchdog('MailChimp', 'Mailchimp API Exception: "' . $e->getMessage() . '"', NULL, WATCHDOG_INFO);
     }
-
     if (!empty($result['errors'])) {
       foreach ($result['errors'] as $error) {
         watchdog('MailChimp', $error);
