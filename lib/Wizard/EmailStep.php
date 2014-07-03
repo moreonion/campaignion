@@ -57,14 +57,6 @@ class EmailStep extends WizardStep {
     );
     $form += $email->form($messages, $form_state);
 
-    // we are using only custom and default options
-    // therefore if the custom address is set to campaignion, we take this as the
-    // default for the notification option
-    if ($form['notification_email']['from_address_custom']['#default_value'] === 'you@example.com') {
-      $form['notification_email']['from_address_custom']['#default_value'] = '';
-    }
-    $form['notification_email']['from_address_option']['#default_value'] = 'You';
-
     $form['notification_email']['email_option']['#access'] = TRUE;
     $form['notification_email']['email_option']['#default_value'] = 'custom';
     unset($form['notification_email']['email_option']['#options']['component']);
@@ -73,11 +65,15 @@ class EmailStep extends WizardStep {
     if (!$form['notification_email']['email_custom']['#default_value']) {
       $form['notification_email']['email_custom']['#default_value'] = 'noreply@example.com';
     }
-    // add the new option in beginning
-    $form['notification_email']['from_address_option']['#options'] =
-      array('campaignion' => 'Default: <em class="placeholder">you@example.com</em>')
-      + $form['notification_email']['from_address_option']['#options'];
-    unset($form['notification_email']['from_address_option']['#options']['default']);
+
+    // we are using only custom and default options
+    // therefore if the custom address is set to campaignion, we take this as the
+    // default for the notification option
+    if ($form['notification_email']['from_address_custom']['#default_value'] === 'you@example.com') {
+      $form['notification_email']['from_address_custom']['#default_value'] = '';
+    }
+    $form['notification_email']['from_address_option']['#default_value'] = 'default';
+    $form['notification_email']['from_address_option']['#options']['default'] = 'Default: <em class="placeholder">you@example.com</em>';
 
     return $form;
   }
