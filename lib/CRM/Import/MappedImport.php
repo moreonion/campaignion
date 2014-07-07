@@ -32,10 +32,26 @@ class MappedImport {
     if (!($email = $source->value('email'))) {
       return;
     }
-
     $isNewOrUpdated = empty($wrapped_contact->contact_id);
     foreach ($this->mappings as $mapper) {
       $isNewOrUpdated = $mapper->import($source, $wrapped_contact, TRUE) || $isNewOrUpdated;
+    }
+    $gender_salutation_mapping = array(
+      'f' => 'mrs',
+      'm' => 'mr',
+      'o' => 'other',
+    );
+    if (!empty($source->value('gender')) && empty($source->value('salutation')) && $wrapped_contact->__isset('field_salutation')) {
+      $wrapped_contact->field_salutation->set($gender_salutation_mapping[$source->value('gender')]);
+      $wrapped_contact->save();
+    }
+    elseif (empty($source->value('gender')) && !empty($source->value('salutation')) && $wrapped_contact->__isset('field_gender')) {
+      $gender_salutation_mapping = array_flip($gender_salutation_mapping);
+      if (!isset($gender_salutation_mapping[$source->value('salutation')])) {
+        $gender_salutation_mapping[$source->value('salutation')] = 'o';
+      }
+      $wrapped_contact->field_gender->set($gender_salutation_mapping[$source->value('salutation')]);
+      $wrapped_contact->save();
     }
 
     return $isNewOrUpdated;
