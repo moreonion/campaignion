@@ -16,6 +16,11 @@ function campaignion_form_builder_form_builder_types_alter(&$types) {
     $field['default']['#default_value'] = '%get[p5]';
     $field['default']['#key']           = $field['default']['#webform_component']['form_key'] = 'email';
   }
+  if (isset($types['webform']['newsletter']) == TRUE) {
+    $field                  = &$types['webform']['newsletter'];
+    $field['unique']        = TRUE;
+    $field['palette_group'] = 'supporter_data';
+  }
 }
 
 /**
