@@ -41,17 +41,25 @@ class MappedImport {
       'm' => 'mr',
       'o' => 'other',
     );
-    if (!empty($source->value('gender')) && empty($source->value('salutation')) && $wrapped_contact->__isset('field_salutation')) {
+    if ($wrapped_contact->__isset('field_salutation') && !empty($source->value('gender')) && empty($source->value('salutation'))) {
       $wrapped_contact->field_salutation->set($gender_salutation_mapping[$source->value('gender')]);
-      $wrapped_contact->save();
+      $isNewOrUpdated = TRUE;
     }
-    elseif (empty($source->value('gender')) && !empty($source->value('salutation')) && $wrapped_contact->__isset('field_gender')) {
+    elseif ($wrapped_contact->__isset('field_gender') && empty($source->value('gender')) && !empty($source->value('salutation'))) {
       $gender_salutation_mapping = array_flip($gender_salutation_mapping);
       if (!isset($gender_salutation_mapping[$source->value('salutation')])) {
         $gender_salutation_mapping[$source->value('salutation')] = 'o';
       }
       $wrapped_contact->field_gender->set($gender_salutation_mapping[$source->value('salutation')]);
-      $wrapped_contact->save();
+      $isNewOrUpdated = TRUE;
+    }
+    if ($wrapped_contact->first_name->value() !== ucwords(strtolower($wrapped_contact->first_name->value()))) {
+      $wrapped_contact->first_name->set(ucwords(strtolower($wrapped_contact->first_name->value())));
+      $isNewOrUpdated = TRUE;
+    }
+    if ($wrapped_contact->last_name->value() !== ucwords(strtolower($wrapped_contact->last_name->value()))) {
+      $wrapped_contact->last_name->set(ucwords(strtolower($wrapped_contact->last_name->value())));
+      $isNewOrUpdated = TRUE;
     }
 
     return $isNewOrUpdated;
