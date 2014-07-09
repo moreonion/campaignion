@@ -36,29 +36,28 @@ class MappedImport {
     foreach ($this->mappings as $mapper) {
       $isNewOrUpdated = $mapper->import($source, $wrapped_contact, TRUE) || $isNewOrUpdated;
     }
-    $gender_salutation_mapping = array(
-      'f' => 'mrs',
-      'm' => 'mr',
-      'o' => 'other',
-    );
-    if ($wrapped_contact->__isset('field_salutation') && !empty($source->value('gender')) && empty($source->value('salutation'))) {
+    $gender_salutation_mapping = array('f' => 'mrs', 'm' => 'mr',);
+    $gender     = $source->value('gender');
+    $salutation = $source->value('salutation');
+    if ($wrapped_contact->__isset('field_salutation') && !empty($gender) && empty($salutation) && isset($gender_salutation_mapping[$gender])) {
       $wrapped_contact->field_salutation->set($gender_salutation_mapping[$source->value('gender')]);
       $isNewOrUpdated = TRUE;
     }
-    elseif ($wrapped_contact->__isset('field_gender') && empty($source->value('gender')) && !empty($source->value('salutation'))) {
+    elseif ($wrapped_contact->__isset('field_gender') && empty($gender) && !empty($salutation)) {
       $gender_salutation_mapping = array_flip($gender_salutation_mapping);
-      if (!isset($gender_salutation_mapping[$source->value('salutation')])) {
-        $gender_salutation_mapping[$source->value('salutation')] = 'o';
+      if (isset($gender_salutation_mapping[$salutation])) {
+        $wrapped_contact->field_gender->set($gender_salutation_mapping[$source->value('salutation')]);
+        $isNewOrUpdated = TRUE;
       }
-      $wrapped_contact->field_gender->set($gender_salutation_mapping[$source->value('salutation')]);
+    }
+    $first_name = $wrapped_contact->first_name->value();
+    if ($first_name !== ucwords(strtolower($first_name))) {
+      $wrapped_contact->first_name->set(ucwords(strtolower($first_name)));
       $isNewOrUpdated = TRUE;
     }
-    if ($wrapped_contact->first_name->value() !== ucwords(strtolower($wrapped_contact->first_name->value()))) {
-      $wrapped_contact->first_name->set(ucwords(strtolower($wrapped_contact->first_name->value())));
-      $isNewOrUpdated = TRUE;
-    }
-    if ($wrapped_contact->last_name->value() !== ucwords(strtolower($wrapped_contact->last_name->value()))) {
-      $wrapped_contact->last_name->set(ucwords(strtolower($wrapped_contact->last_name->value())));
+    $last_name = $wrapped_contact->last_name->value();
+    if ($last_name !== ucwords(strtolower($last_name))) {
+      $wrapped_contact->last_name->set(ucwords(strtolower($last_name)));
       $isNewOrUpdated = TRUE;
     }
 
