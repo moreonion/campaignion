@@ -51,7 +51,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
   public function prepareNode($type) {
     $node = (object) array('type' => $type);
     $node->uid  = $this->user->uid;
-    $node->name = $this->user->name;
+    $node->name = isset($this->user->name) ? $this->user->name : NULL;
     $node->language = LANGUAGE_NONE;
     $node->title = '';
     $node->sticky = 0;
