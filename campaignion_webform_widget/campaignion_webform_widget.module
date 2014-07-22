@@ -68,6 +68,7 @@ function campaignion_webform_widget_admin_paths() {
 function _campaignion_webform_widget_page($node) {
   $path = url('node/' . $node->nid, array('absolute' => TRUE));
   $path_embed = url('node/' . $node->nid, array('absolute' => TRUE, 'query' => array('embed' => '1', 'source' => 'widget')));
+  $path_fallback = url('node/' . $node->nid, array('absolute' => TRUE, 'query' => array('source' => 'widget')));
   $embed_js = drupal_get_path('module', 'campaignion_webform_widget') . '/js/embed.js';
   global $base_url;
   global $theme;
