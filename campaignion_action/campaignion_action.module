@@ -22,6 +22,24 @@ function campaignion_action_node_presave($node) {
 }
 
 /**
+ * Implements hook_node_update().
+ */
+function campaignion_action_node_update($node) {
+  if ($action = Action::fromNode($node)) {
+    $action->update();
+  }
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function campaignion_action_node_insert($node) {
+  if ($action = Action::fromNode($node)) {
+    $action->insert();
+  }
+}
+
+/**
  * Implements hook_form_BASE_FORM_ID_alter().
  * Implements hook_form_webform_client_form_alter().
  *

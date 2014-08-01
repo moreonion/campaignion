@@ -22,6 +22,9 @@ class Action {
     $this->node->action = $this;
   }
 
+  /**
+   * Called whenever hook_node_presave() is called on this node.
+   */
   public function presave() {
     $node = $this->node;
     if (isset($node->translation_source)) {
@@ -35,6 +38,9 @@ class Action {
     }
   }
 
+  /**
+   * Called whenever hook_node_prepare is called on this node.
+   */
   public function prepare() {
     $node = $this->node;
     if (module_exists('webform_ajax') && isset($node->webform)) {
@@ -42,5 +48,25 @@ class Action {
         'webform_ajax' => 1,
       );
     }
+  }
+
+  /**
+   * Called whenever the node is saved (either by update or insert).
+   */
+  public function save() {
+  }
+
+  /**
+   * Called whenever hook_node_update() is called on this node.
+   */
+  public function update() {
+    $this->save();
+  }
+
+  /**
+   * Called whenever hook_node_insert() is called on this node.
+   */
+  public function insert() {
+    $this->save();
   }
 }
