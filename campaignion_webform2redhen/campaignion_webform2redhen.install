@@ -1,15 +1,10 @@
 <?php
 
 /**
- * Implements hook_install().
+ * Deactivate module, move queue to campaignion_action and contact
+ * import to it's own plugin system / library.
  */
-function campaignion_webform2redhen_install() {
-  DrupalQueue::get('campaignion_webform2redhen')->createQueue();
-}
-
-/**
- * Implements hook_uninstall().
- */
-function campaignion_webform2redhen_uninstall() {
-  DrupalQueue::get('campaignion_webform2redhen')->deleteQueue();
+function campaignion_webform2redhen_update_1() {
+  db_query("UPDATE {queue} SET name='campaignion_action' WHERE name='campaignion_webform2redhen'");
+  module_disable(array('campaignion_webform2redhen'));
 }

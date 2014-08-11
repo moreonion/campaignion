@@ -2,6 +2,7 @@
 
 use \Drupal\campaignion\Action\TypeBase;
 use \Drupal\campaignion\Action;
+use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 
 /**
  * Implements hook_node_prepare().
@@ -67,5 +68,31 @@ function _campaignion_action_webform_share_redirect($form, &$form_state) {
       $form_state['redirect'],
       array('query' => array('share' => $action_path)),
     );
+  }
+}
+
+/**
+ * Implements hook_webform_submission_insert().
+ */
+function campaignion_action_webform_submission_insert($node, $submission) {
+  $item = array('nid' => $node->nid, 'sid' => $submission->sid);
+  DrupalQueue::get('campaignion_action')->createItem($item);
+}
+
+/**
+ * Implements hook_cron().
+ */
+function campaignion_action_cron() {
+  $end = time() + 10; // run for 10 seconds
+  $queue = DrupalQueue::get('campaignion_action');
+  while (time() < $end && ($item = $queue->claimItem())) {
+    $d = &$item->data;
+    $node = node_load($d['nid']);
+    if ($submissionObj = WebformSubmission::load($d['nid'], $d['sid'])) {
+      module_invoke_all('campaignion_action_taken', $node, $submissionObj);
+    } else {
+      watchdog('campaignion_action', 'Submission(!nid,!sid) has vanished before import.', array('!nid' => $d['nid'], '!sid' => $d['sid']), WATCHDOG_INFO);
+    }
+    $queue->deleteItem($item);
   }
 }

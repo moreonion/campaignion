@@ -34,7 +34,7 @@ class MappedImport {
     }
     $isNewOrUpdated = empty($wrapped_contact->contact_id);
     foreach ($this->mappings as $mapper) {
-      $isNewOrUpdated = $mapper->import($source, $wrapped_contact, TRUE) || $isNewOrUpdated;
+      $isNewOrUpdated = $mapper->import($source, $wrapped_contact) || $isNewOrUpdated;
     }
     return $isNewOrUpdated;
   }

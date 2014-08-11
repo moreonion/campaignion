@@ -20,7 +20,7 @@ class EmailBulk extends Field {
     return $value;
   }
 
-  public function storeValue($entity, $value, $override) {
+  public function storeValue($entity, $value) {
     return TRUE;
   }
 

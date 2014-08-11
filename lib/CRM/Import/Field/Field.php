@@ -36,19 +36,14 @@ class Field {
    *   Source to import from
    * @param EntityMetadataWrapper $entity
    *   Entity that stores imported data
-   * @param bool $override
-   *   TRUE if existing values should be overriden
    *
    * @return bool
    *   TRUE if at least one value of the entity was changed.
    */
-  public function import(SourceInterface $source, \EntityMetadataWrapper $entity, $override) {
+  public function import(SourceInterface $source, \EntityMetadataWrapper $entity) {
     try {
-      if (!$override && $entity->{$this->field}->value()) {
-        return FALSE;
-      }
       if (($value = $this->getValue($source)) && ($value = $this->preprocessField($value))) {
-        if ($this->storeValue($entity, $value, $override)) {
+        if ($this->storeValue($entity, $value)) {
           return $this->setValue($entity, $value);
         } else {
           return FALSE;
@@ -69,7 +64,7 @@ class Field {
     return $value;
   }
 
-  protected function storeValue($entity, $value, $override) {
-    return $override || ($entity->{$this->field}->value() != $value);
+  protected function storeValue($entity, $value) {
+    return $entity->{$this->field}->value() != $value;
   }
 }

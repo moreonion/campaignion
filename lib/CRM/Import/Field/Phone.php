@@ -24,7 +24,7 @@ class Phone extends Field {
 
   // returns the array offset when it finds the number
   // or NULL otherwise
-  public function storeValue($entity, $newNumber, $override) {
+  public function storeValue($entity, $newNumber) {
     try {
       foreach ($entity->{$this->field}->value() as $delta => $storedNumber) {
         if ($this->phoneNumbersEqual($storedNumber, $newNumber)) {

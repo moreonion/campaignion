@@ -31,17 +31,14 @@ class Address extends Field {
     return $address;
   }
 
-  public function storeValue($entity, $new_address, $override) {
+  public function storeValue($entity, $new_address) {
     return TRUE;
   }
 
-  public function import(SourceInterface $source, \EntityMetadataWrapper $entity, $override) {
+  public function import(SourceInterface $source, \EntityMetadataWrapper $entity) {
     try {
-      if (!$override && $entity->{$this->field}->value()) {
-        return FALSE;
-      }
       if (($value = $this->getValue($source)) && ($value = $this->preprocessField($value))) {
-        if ($this->storeValue($entity, $value, $override)) {
+        if ($this->storeValue($entity, $value)) {
           $this->setValue($entity, $value);
           return TRUE;
         } else {

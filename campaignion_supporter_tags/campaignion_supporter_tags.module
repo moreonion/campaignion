@@ -25,7 +25,7 @@ function campaignion_supporter_tags_form_node_form_alter(&$form, &$form_state) {
  *
  * Add all tags from action to supporter.
  */
-function campaignion_supporter_tags_campaignion_webform2redhen_contact_alter($wrappedContact, $submissionObj, $action_node) {
+function campaignion_supporter_tags_campaignion_supporter_contact_alter($wrappedContact, $submissionObj, $action_node) {
   if (!isset($wrappedContact->supporter_tags)) {
     return FALSE;
   }
