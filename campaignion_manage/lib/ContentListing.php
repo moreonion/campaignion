@@ -25,8 +25,10 @@ class ContentListing {
     $selectAll = array(
       'no_striping' => TRUE,
     );
+    $id = drupal_html_id('bulkop-select-all-matching');
     $element['bulkop_select_all_matching'] = array(
       '#type' => 'checkbox',
+      '#id' => $id,
       '#title' => t('Select items from all pages'),
       '#description' => t('Check this if you want to apply a bulk operation to all matching content (on all pages).'),
     );
