@@ -118,6 +118,7 @@ class ThankyouStep extends WizardStep {
     // order the form fields
     $node_form['field_main_image']['#attributes']['class'][] = 'sidebar-narrow-right';
     $node_form['#tree'] = TRUE;
+    $node_form['actions']['#access'] = FALSE;
 
     $form['node_form'] =& $node_form;
     $form['#attributes']['class'][] = 'thank-you-node-wrapper';
