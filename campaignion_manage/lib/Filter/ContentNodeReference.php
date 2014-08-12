@@ -85,15 +85,8 @@ class ContentNodeReference extends Base implements FilterInterface {
       '    WHERE n.nid = :ref_nid ' ,
       array(':ref_nid' => $values['nid'])
     )->fetchCol();
-    $query->innerJoin('field_data_' . $this->referenceField, 'ref', 'ref.entity_id = n.nid');
-    $query->innerJoin('node', 'tr', 'IF(tr.tnid=0, tr.nid, tr.tnid) = IF(n.tnid=0, n.nid, n.tnid)');
-    $query->condition('ref.' . $this->referenceColumn, $ref_nids, 'IN');
-    $fields =& $query->getFields();
-    foreach ($fields as &$field) {
-      if ($field['table'] === 'n') {
-	$field['table'] = 'tr';
-      }
-    }
+    $alias = $query->innerJoin('field_data_' . $this->referenceField, 'ref', 'ref.entity_id = n.nid');
+    $query->condition($alias . '.' . $this->referenceColumn, $ref_nids, 'IN');
   }
   public function isApplicable($current) {
     return empty($current) && count($this->getOptions()) > 0;
