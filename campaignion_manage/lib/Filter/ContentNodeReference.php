@@ -12,10 +12,14 @@ class ContentNodeReference extends Base implements FilterInterface {
     $this->query           = $query;
     $this->referenceField  = $reference_field;
     $this->referenceColumn = $reference_column;
+    // build the language preference list:
+    // 1.) get the actual page language
     $this->langs[] = $GLOBALS['language']->language;
+    // 2.) if the user is logged in, get the users preferred language
     if (!empty($GLOBALS['user']->language)) {
       $this->langs[] = $GLOBALS['user']->language;
     }
+    // 3.) get the site default language
     $this->langs[] = language_default()->language;
   }
 
@@ -23,8 +27,11 @@ class ContentNodeReference extends Base implements FilterInterface {
     $query = clone $this->query;
     $fields =& $query->getFields();
     $fields = array();
+    // join the field table that has the nid for the referenced node
     $query->innerJoin('field_data_' . $this->referenceField, 'ref', 'ref.entity_id = n.nid OR ref.entity_id = n.tnid');
+    // join the node table for the referenced node
     $query->innerJoin('node', 'cn', 'ref.' . $this->referenceColumn . ' = cn.nid');
+    // join the node table to build a complete translation set for the referenced node
     $query->innerJoin('node', 'tn', 'tn.nid=cn.nid OR (cn.tnid<>0 AND tn.tnid=cn.tnid)');
     $query->addExpression('IF(tn.tnid = 0, tn.nid, tn.tnid)', 'tset_ref');
     $fields = array(
@@ -52,6 +59,8 @@ class ContentNodeReference extends Base implements FilterInterface {
       $tset_result[$set->tset_ref][$set->language] = $set;
     }
     $result = array();
+    // for each matching translation set, get the entry
+    // that matches the language preference best
     foreach ($tset_result as $orig_nid => $set) {
       $node = NULL;
       foreach ($this->langs as $langcode) {
@@ -60,6 +69,8 @@ class ContentNodeReference extends Base implements FilterInterface {
           break;
         }
       }
+      // the translation set has no matching entry for one of the
+      // preferred languages; so we just get the next best entry
       if (!$node) {
         $node = array_shift($set);
       }
@@ -78,6 +89,9 @@ class ContentNodeReference extends Base implements FilterInterface {
   }
   public function title() { return t('Node Reference'); }
   public function apply($query, array $values) {
+    // the user selected a referenced node, we get the nid of the node
+    // via $values['nid']; we now build a list of nids for the complete translation set
+    // for this nid
     $ref_nids = db_query(
       'SELECT tr.nid ' .
       '  FROM {node} n ' .
@@ -86,6 +100,8 @@ class ContentNodeReference extends Base implements FilterInterface {
       array(':ref_nid' => $values['nid'])
     )->fetchCol();
     $alias = $query->innerJoin('field_data_' . $this->referenceField, 'ref', 'ref.entity_id = n.nid');
+    // we filter for all nodes where the node reference has nid matching the previously build
+    // set of translation set nids
     $query->condition($alias . '.' . $this->referenceColumn, $ref_nids, 'IN');
   }
   public function isApplicable($current) {

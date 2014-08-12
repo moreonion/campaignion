@@ -17,10 +17,14 @@ class Content extends Base {
 
     parent::__construct($query);
 
+    // build the language preference list:
+    // 1.) get the actual page language
     $this->langs[] = $GLOBALS['language']->language;
+    // 2.) if the user is logged in, get the users preferred language
     if (!empty($GLOBALS['user']->language)) {
       $this->langs[] = $GLOBALS['user']->language;
     }
+    // 3.) get the site default language
     $this->langs[] = language_default()->language;
   }
 
