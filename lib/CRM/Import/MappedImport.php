@@ -36,17 +36,17 @@ class MappedImport {
     foreach ($this->mappings as $mapper) {
       $isNewOrUpdated = $mapper->import($source, $wrapped_contact, TRUE) || $isNewOrUpdated;
     }
-    $gender_salutation_mapping = array('f' => 'mrs', 'm' => 'mr',);
-    $gender     = $source->value('gender');
-    $salutation = $source->value('salutation');
-    if ($wrapped_contact->__isset('field_salutation') && !empty($gender) && empty($salutation) && isset($gender_salutation_mapping[$gender])) {
-      $wrapped_contact->field_salutation->set($gender_salutation_mapping[$source->value('gender')]);
-      $isNewOrUpdated = TRUE;
-    }
-    elseif ($wrapped_contact->__isset('field_gender') && empty($gender) && !empty($salutation)) {
-      $gender_salutation_mapping = array_flip($gender_salutation_mapping);
-      if (isset($gender_salutation_mapping[$salutation])) {
-        $wrapped_contact->field_gender->set($gender_salutation_mapping[$source->value('salutation')]);
+    if ($wrapped_contact->__isset('field_salutation') && $wrapped_contact->__isset('field_gender')) {
+      $gmapping = array('f' => 'mrs', 'm' => 'mr');
+      $smapping = array('mrs' => 'f', 'mr' => 'm');
+      $gender = $wrapped_contact->field_gender->value();
+      $salutation = $wrapped_contact->field_salutation->value();
+      if (!$gender && $salutation) {
+        $wrapped_contact->field_gender->set($smapping[$salutation]);
+        $isNewOrUpdated = TRUE;
+      }
+      elseif ($gender && !$salutation) {
+        $wrapped_contact->field_salutation->set($gmapping[$gender]);
         $isNewOrUpdated = TRUE;
       }
     }
