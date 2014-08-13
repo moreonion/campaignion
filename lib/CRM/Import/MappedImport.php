@@ -11,8 +11,8 @@ class MappedImport {
       new Field\Field('field_gender',     'gender'),
       new Field\Field('field_salutation', 'salutation'),
       new Field\Field('field_title',      'title'),
-      new Field\Field('first_name'),
-      new Field\Field('last_name'),
+      new Field\Name('first_name'),
+      new Field\Name('last_name'),
       new Field\Date('field_date_of_birth',    'date_of_birth'),
       new Field\Address('field_address', array(
         'thoroughfare'        => 'street_address',
@@ -49,16 +49,6 @@ class MappedImport {
         $wrapped_contact->field_gender->set($gender_salutation_mapping[$source->value('salutation')]);
         $isNewOrUpdated = TRUE;
       }
-    }
-    $first_name = $wrapped_contact->first_name->value();
-    if ($first_name !== ucwords(strtolower($first_name))) {
-      $wrapped_contact->first_name->set(ucwords(strtolower($first_name)));
-      $isNewOrUpdated = TRUE;
-    }
-    $last_name = $wrapped_contact->last_name->value();
-    if ($last_name !== ucwords(strtolower($last_name))) {
-      $wrapped_contact->last_name->set(ucwords(strtolower($last_name)));
-      $isNewOrUpdated = TRUE;
     }
 
     return $isNewOrUpdated;
