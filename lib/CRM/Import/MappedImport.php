@@ -36,21 +36,6 @@ class MappedImport {
     foreach ($this->mappings as $mapper) {
       $isNewOrUpdated = $mapper->import($source, $wrapped_contact, TRUE) || $isNewOrUpdated;
     }
-    if ($wrapped_contact->__isset('field_salutation') && $wrapped_contact->__isset('field_gender')) {
-      $gmapping = array('f' => 'mrs', 'm' => 'mr');
-      $smapping = array('mrs' => 'f', 'mr' => 'm');
-      $gender = $wrapped_contact->field_gender->value();
-      $salutation = $wrapped_contact->field_salutation->value();
-      if (!$gender && $salutation) {
-        $wrapped_contact->field_gender->set($smapping[$salutation]);
-        $isNewOrUpdated = TRUE;
-      }
-      elseif ($gender && !$salutation) {
-        $wrapped_contact->field_salutation->set($gmapping[$gender]);
-        $isNewOrUpdated = TRUE;
-      }
-    }
-
     return $isNewOrUpdated;
   }
 
