@@ -52,13 +52,11 @@ class SupporterActivity extends Base implements FilterInterface {
       '#options'       => $this->typesInUse(),
       '#default_value' => isset($values['activity']) ? $values['activity'] : NULL,
     );
-    $action_types = array(
-      'any'           => t('Any type of action'),
-      'donation'      => t('Donation'),
-      'email_protest' => t('Email Protest'),
-      'petition'      => t('Petition'),
-      'webform'       => t('Flexible Form'),
-    );
+
+    $action_types = array('any' => t('Any type of action'));
+    foreach (\Drupal\campaignion\Action\TypeBase::types() as $key => $value) {
+      $action_types[$key] = node_type_get_name($key);
+    }
     $action_type_id = drupal_html_id('action-type');
     $form['action_type'] = array(
       '#type' => 'select',
