@@ -144,13 +144,13 @@
   border-radius: 0;
 	background: #fff;
 }
-.manage-filter-form .fieldset-content > .form-type-checkbox {
+/*.manage-filter-form .fieldset-content > .form-type-checkbox {
   position: absolute;
   left: -9999px;
   float: left;
   width: auto;
   overflow: hidden;
-}
+}*/
 
 .manage-filter-form .fieldset-content .form-item {
 margin-bottom: 0;
@@ -166,7 +166,7 @@ margin-bottom: 0;
 .manage-filter-form .fieldset-content > .form-type-select .selecter,
 .manage-filter-form .fieldset-content > .form-type-select label {
   float: left;
-  margin: 0.5em; 
+  margin: 0.5em;
 }
 .manage-filter-form .fieldset-content > .form-type-select label {
   text-transform: none;
@@ -255,7 +255,7 @@ margin-bottom: 0;
 }
 
 /* bulk operations */
- 
+
 .campaignion-manage-bulkops {
   clear: both;
 }
