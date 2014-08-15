@@ -24,4 +24,20 @@ class SupporterPage extends Page {
     $this->listing = new SupporterListing(20);
     $this->bulkOpForm = new BulkOpForm($bulkOps);
   }
+
+  public function form($form, &$form_state) {
+    $form = parent::form($form, $form_state);
+    array_push($form['filter'], array(
+        '#type' => 'fieldset',
+        '#weight' => 3,
+        'live_update' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Update the listing right away'),
+          '#attributes' => array(
+            'class' => array('no-itoggle'),
+          ),
+        )));
+    return $form;
+
+  }
 }
