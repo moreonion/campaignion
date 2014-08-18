@@ -48,6 +48,25 @@ Drupal.behaviors.campaignion_manage_filter.attach = function(context) {
   $wrapper.find('.ctools-auto-submit-click').click(function() {
     $(this).mousedown();
   }).hide();
+
+    // toggle live updates.
+  $('input[name="filter[0][live_update]"]').click(function (event) {
+      var input = $('input[name="filter[filter][0][values][name]"]');
+
+      if (event.target.checked) {
+          console.log('on');
+          input.removeClass('ctools-auto-submit-exclude');
+          input.removeClass('ctools-auto-submit-processed');
+          Drupal.behaviors.CToolsAutoSubmit.attach(context);
+      } else {
+          console.log('off');
+          input.addClass('ctools-auto-submit-exclude');
+          input.unbind('keydown keyup change');
+          window.test = input;
+      }
+      console.log(input.data('events'));
+      console.log(input.attr('class'));
+  });
 };
 
 })(jQuery);
