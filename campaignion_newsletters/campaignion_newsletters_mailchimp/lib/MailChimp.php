@@ -169,6 +169,9 @@ class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInt
         $arguments
       );
     }
+    catch(\Mailchimp_ValidationError $e) {
+      throw new \Drupal\campaignion_newsletters\ApiPersistentError('MailChimp', $e->getMessage(), array(), $e->getCode(), $e->getFile(), $e);
+    }
     catch(\Mailchimp_Error $e) {
       watchdog('MailChimp', 'Mailchimp API Exception: "' . $e->getMessage() . '"', NULL, WATCHDOG_INFO);
     }
