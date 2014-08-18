@@ -1,0 +1,58 @@
+<?php
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_block_info().
+ */
+function campaignion_language_switcher_block_info() {
+  return array(
+    'campaignion_language_switcher' => array(
+      'info'  => t('Campaignion language switcher'),
+      'cache' => DRUPAL_CACHE_PER_PAGE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function campaignion_language_switcher_block_view($blockname) {
+  if ($blockname === 'campaignion_language_switcher') {
+    return _campaignion_language_switcher_block_campaignion_language_switcher();
+  }
+}
+
+/**
+ * Check if currently logged-in user has access to $path.
+ */
+function _campaignion_language_switcher_check_access($path) {
+  return ($router_item = \menu_get_item($path)) && $router_item['access'];
+}
+
+/**
+ * hook_block_view callback function
+ */
+function _campaignion_language_switcher_block_campaignion_language_switcher() {
+  $links = language_negotiation_get_switch_links('language', current_path());
+
+  if (isset($links->links)) {
+    foreach ($links->links as &$link) {
+      if (isset($link['href']) && !_campaignion_language_switcher_check_access($link['href'])) {
+        unset($link['href']);
+        $link['attributes']['class'][] = 'locale-untranslated';
+      }
+    }
+    drupal_add_css(drupal_get_path('module', 'locale') . '/locale.css');
+    $class     = "campaignion-language-switcher-{$links->provider}";
+    $variables = array(
+      'links'      => $links->links,
+      'attributes' => array('class' => array($class))
+    );
+    $block['content'] = theme('links__locale_block', $variables);
+    $block['subject'] = '<none>';
+
+    return $block;
+  }
+}
