@@ -49,24 +49,26 @@ Drupal.behaviors.campaignion_manage_filter.attach = function(context) {
     $(this).mousedown();
   }).hide();
 
-    // toggle live updates.
-  $('input[name="filter[0][live_update]"]').click(function (event) {
-      var input = $('input[name="filter[filter][0][values][name]"]');
 
-      if (event.target.checked) {
-          console.log('on');
-          input.removeClass('ctools-auto-submit-exclude');
-          input.removeClass('ctools-auto-submit-processed');
-          Drupal.behaviors.CToolsAutoSubmit.attach(context);
-      } else {
-          console.log('off');
-          input.addClass('ctools-auto-submit-exclude');
-          input.unbind('keydown keyup change');
-          window.test = input;
-      }
-      console.log(input.data('events'));
-      console.log(input.attr('class'));
-  });
+  var UpdateLiveFilters = function (event) {
+    var $checkbox = $('input[name="filter[0][live_filters]"]');
+    var $input = $('input[name="filter[filter][0][values][name]"]');
+    var $submit = $('.manage-filter-form .form-submit');
+
+    if ($checkbox.attr('checked') === 'checked') {
+      $input.removeClass('ctools-auto-submit-exclude');
+      $submit.attr('style', 'display: none;');
+      Drupal.behaviors.CToolsAutoSubmit.attach(context);
+    } else {
+      $input.addClass('ctools-auto-submit-exclude');
+      $input.removeClass('ctools-auto-submit-processed');
+      $input.unbind();
+      $submit.attr('style', '');
+    }
+  }
+  // toggle live filters.
+  $('input[name="filter[0][live_filters]"]').click(UpdateLiveFilters);
+  $(document).ready(UpdateLiveFilters);
 };
 
 })(jQuery);

@@ -249,6 +249,10 @@ margin-bottom: 0;
   clear: both;
 }
 
+.manage-filter-form .fieldset-content .form-type-checkbox .toggle-live-filters ~ .ilabel {
+    display: inline;
+}
+
 /* date filter */
 .container-inline-date .form-type-date-popup .date-padding label {
   display: none;

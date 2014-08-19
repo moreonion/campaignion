@@ -27,16 +27,22 @@ class SupporterPage extends Page {
 
   public function form($form, &$form_state) {
     $form = parent::form($form, $form_state);
-    array_push($form['filter'], array(
-        '#type' => 'fieldset',
-        '#weight' => 3,
-        'live_update' => array(
-          '#type' => 'checkbox',
-          '#title' => t('Update the listing right away'),
-          '#attributes' => array(
-            'class' => array('no-itoggle'),
-          ),
-        )));
+    $form['filter']['submit']['#attributes']['class'][] =
+      'ctools-auto-submit-exclude';
+    $live_filters = array(
+      '#type' => 'fieldset',
+      '#weight' => 3,
+      'live_filters' => array(
+        '#type' => 'checkbox',
+        '#title' => t('Update the listing right away'),
+        '#attributes' => array(
+          'class' => array('toggle-live-filters', 'ctools-auto-submit-exclude'),
+        ),
+      ));
+    if(variable_get('campaignion_manage_live_filters_default', TRUE)) {
+      $live_filters['live_filters']['#attributes']['checked'] = 'checked';
+    }
+    array_push($form['filter'], $live_filters);
     return $form;
 
   }
