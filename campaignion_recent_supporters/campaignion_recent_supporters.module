@@ -802,7 +802,9 @@ function campaignion_recent_supporters_field_formatter_info() {
 function campaignion_recent_supporters_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
   if ($field['type'] == 'recent_supporters') {
     foreach ($items as &$item) {
-      $item['options'] = serialize($item['options']);
+      if (is_array($item['options'])) {
+        $item['options'] = serialize($item['options']);
+      }
     }
   }
 }
