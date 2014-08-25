@@ -12,6 +12,7 @@ class TagExporter extends WrapperField {
     foreach ($tags as $tag) {
       $names[] = str_replace(',', '', $tag->name);
     }
-    return ',' . implode(',', $names) . ',';
+    $result = implode(',', $names);
+    return empty($result) ? '' : ',' . $result . ',';
   }
 }
