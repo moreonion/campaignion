@@ -12,5 +12,8 @@
         }
         ga('send', 'event', 'webform', 'submitted');
 
+        $('.share-light li a').click(function(event) {
+            ga('send', 'event', 'share', event.target.title);
+        });
     }
 })(jQuery);
