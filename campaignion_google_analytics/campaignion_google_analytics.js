@@ -10,5 +10,7 @@
             ga('ec:setAction', 'purchase', {id: config.payment.id});
             ga('send', 'event', 'Ecommerce', 'Purchase');
         }
+        ga('send', 'event', 'webform', 'submitted');
+
     }
 })(jQuery);
