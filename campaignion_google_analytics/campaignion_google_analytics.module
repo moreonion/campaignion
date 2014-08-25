@@ -45,5 +45,5 @@ function campaignion_google_analytics_page_build(&$page) {
           ))),
       'setting');
   }
-  drupal_add_js(drupal_get_path('module', 'campaignion_google_analytics') . '/campaignion_google_analytics.js');
+  drupal_add_js(drupal_get_path('module', 'campaignion_google_analytics') . '/thank_you_page.js');
 }
