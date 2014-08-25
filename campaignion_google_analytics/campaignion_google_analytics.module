@@ -33,7 +33,6 @@ function campaignion_google_analytics_page_build(&$page) {
   $submission = \Drupal\little_helpers\Webform\Submission::load($nid, $sid);
 
   if ($payment = _campaignion_google_analytics_load_payment($nid, $sid)) {
-    dpm($payment);
     drupal_add_js(
       array(
         'campaignion_google_analytics' => array(
