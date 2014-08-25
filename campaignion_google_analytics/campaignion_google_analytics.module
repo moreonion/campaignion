@@ -1,0 +1,50 @@
+<?php
+
+function _campaignion_google_analytics_load_payment($nid, $sid) {
+  $subquery = db_select('campaignion_activity_webform', 'w')
+    ->fields('w', array('activity_id'))
+    ->condition('nid', $nid)
+    ->condition('sid', $sid);
+  $pid = db_select('campaignion_activity_payment', 'p')
+    ->fields('p', array('pid'))
+    ->condition('p.activity_id', $subquery, 'in')
+    ->execute()
+    ->fetchColumn();
+  if ($pid) {
+    $payments = entity_load('payment', array($pid));
+    return array_shift($payments);
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Implements hook_init().
+ */
+
+function campaignion_google_analytics_page_build(&$page) {
+  $parameters = drupal_get_query_parameters();
+  if (!isset($parameters['share']) || !isset($parameters['sid'])) {
+    return;
+  }
+
+  $nid = intval(explode('/', $parameters['share'])[1]);
+  $sid = intval($parameters['sid']);
+  $submission = \Drupal\little_helpers\Webform\Submission::load($nid, $sid);
+
+  if ($payment = _campaignion_google_analytics_load_payment($nid, $sid)) {
+    dpm($payment);
+    drupal_add_js(
+      array(
+        'campaignion_google_analytics' => array(
+          'payment' => array(
+            'id' => $payment->pid,
+            'name' => drupal_get_title() . ' (' . variable_get('site_name') . ')',
+            'price' => $payment->totalAmount(false),
+            'variant' => $submission->valueByKey('donation_interval'),
+            'currency' => $payment->currency_code,
+          ))),
+      'setting');
+  }
+  drupal_add_js(drupal_get_path('module', 'campaignion_google_analytics') . '/campaignion_google_analytics.js');
+}

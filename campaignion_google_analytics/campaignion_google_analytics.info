@@ -1,0 +1,10 @@
+name = Campaignion Google Analytics Integration
+core = 7.x
+package = Campaignion
+project = campaignion
+
+dependencies[] = campaignion
+dependencies[] = webform
+dependencies[] = little_helpers
+dependencies[] = googleanalytics
+dependencies[] = psr0
