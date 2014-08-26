@@ -28,6 +28,11 @@ function campaignion_google_analytics_page_build(&$page) {
     return;
   }
 
+  // as long as share and sid are there, we are on a thank you page.
+  drupal_add_js(array('campaignion_google_analytics' => array(
+        'thank_you' => True
+      )), 'setting');
+
   $nid = intval(explode('/', $parameters['share'])[1]);
   $sid = intval($parameters['sid']);
   $submission = \Drupal\little_helpers\Webform\Submission::load($nid, $sid);
@@ -40,8 +45,9 @@ function campaignion_google_analytics_page_build(&$page) {
             'id' => $payment->pid,
             'name' => drupal_get_title() . ' (' . variable_get('site_name') . ')',
             'price' => $payment->totalAmount(false),
-            'variant' => $submission->valueByKey('donation_interval'),
+            'category' => $submission->valueByKey('donation_interval'),
             'currency' => $payment->currency_code,
+            'quantity' => '1',
           ))),
       'setting');
   }
