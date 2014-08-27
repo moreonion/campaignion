@@ -48,27 +48,6 @@ Drupal.behaviors.campaignion_manage_filter.attach = function(context) {
   $wrapper.find('.ctools-auto-submit-click').click(function() {
     $(this).mousedown();
   }).hide();
-
-
-  var UpdateLiveFilters = function (event) {
-    var $checkbox = $('input[name="filter[0][live_filters]"]');
-    var $input = $('input[name="filter[filter][0][values][name]"]');
-    var $submit = $('.manage-filter-form .form-submit');
-
-    if ($checkbox.attr('checked') === 'checked') {
-      $input.removeClass('ctools-auto-submit-exclude');
-      $submit.attr('style', 'display: none;');
-      Drupal.behaviors.CToolsAutoSubmit.attach(context);
-    } else {
-      $input.addClass('ctools-auto-submit-exclude');
-      $input.removeClass('ctools-auto-submit-processed');
-      $input.unbind();
-      $submit.attr('style', '');
-    }
-  }
-  // toggle live filters.
-  $('input[name="filter[0][live_filters]"]').click(UpdateLiveFilters);
-  $(document).ready(UpdateLiveFilters);
 };
 
 })(jQuery);

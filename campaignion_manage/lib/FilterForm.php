@@ -51,13 +51,11 @@ class FilterForm {
     $form['add_filter'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Add filter'),
-      '#weight' => 0,
       '#options' => $this->availableFilterOptions(),
       '#attributes' => array('class' => array('filter-add')),
     );
     $form['filter'] = array(
       '#type' => 'container',
-      '#weight' => 1,
       '#attributes' => array('class' => array('filter-fieldsets')),
     );
 
@@ -71,7 +69,6 @@ class FilterForm {
       $form['filter'][$delta] = array(
         '#type'       => 'fieldset',
         '#title'      => $filter->title(),
-        '#weight' => 3+$delta,
         '#attributes' => array('class' => array('clearfix', 'campaignion-manage-filter-' . $values['type'])),
       );
       $element = &$form['filter'][$delta];
@@ -101,7 +98,6 @@ class FilterForm {
 
     $form['submit'] = array(
       '#type'  => 'submit',
-      '#weight' => 100,
       '#value' => t('Filter'),
       '#ajax' => array(
         'callback' => 'campaignion_manage_ajax_filter',
