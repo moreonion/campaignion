@@ -536,10 +536,9 @@ FROM {node} n
   INNER JOIN {campaignion_activity} ca ON ca.activity_id=caw.activity_id AND ca.type='webform_submission'
   INNER JOIN {redhen_contact} rc USING (contact_id)
   INNER JOIN {webform_tracking} wt ON wt.nid=caw.nid AND wt.sid=caw.sid
-  LEFT OUTER JOIN {field_data_$addressfield} fdfa ON fdfa.entity_id = rc.contact_id
+  LEFT OUTER JOIN {field_data_$addressfield} fdfa ON fdfa.entity_id = rc.contact_id AND fdfa.delta = 0
     WHERE n.status = 1
     AND (n.nid = :nid OR n.nid IN (SELECT tn.nid FROM {node} tn INNER JOIN {node} n USING(tnid) WHERE n.nid = :nid AND n.tnid != 0))
-    AND fdfa.delta = 0
 ORDER BY ca.created DESC
 SQL;
   $result = db_query_range($sql, 0, $limit, array(':nid' => $nid));
