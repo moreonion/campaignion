@@ -63,7 +63,8 @@ class EntityFieldForm {
           field_form_set_state($form['#parents'], $field_name, $langcode, $form_state, $field_state);
         }
       }
-      $this->fieldInvoke('form_errors', $form, $form_state);
+      $this->fieldInvoke('form_errors', $form, $form_state, TRUE);
+      $this->fieldInvoke('form_errors', $form, $form_state, FALSE);
     }
   }
 
