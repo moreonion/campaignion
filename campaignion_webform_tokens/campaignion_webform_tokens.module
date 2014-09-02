@@ -26,9 +26,7 @@ function campaignion_webform_tokens_token_info() {
  * Implements hook_form_FORM_ID_alter().
  */
 function campaignion_webform_tokens_form_webform_client_form_alter(&$form, &$form_state) {
-  if (variable_get('campaignion_webform_tokens_use_hash', '1') == '1') {
-    $form['#submit'][] = 'campaignion_webform_tokens_redirect';
-  }
+  $form['#submit'][] = 'campaignion_webform_tokens_redirect';
 }
 
 /**
@@ -37,11 +35,18 @@ function campaignion_webform_tokens_form_webform_client_form_alter(&$form, &$for
  * Add hash to the redirect if sid is set.
  */
 function campaignion_webform_tokens_redirect($form, &$form_state) {
-  $sid_in_redirect = isset($form_state['redirect']) && is_array($form_state['redirect']) && isset($form_state['redirect'][1]['query']['sid']);
-  if ($sid_in_redirect) {
-    $sid = (int) $form_state['redirect'][1]['query']['sid'];
-    $form_state['redirect'][1]['query']['hash'] = drupal_hmac_base64($sid, drupal_get_private_key() . drupal_get_hash_salt());
+  if (empty($form_state['webform_completed'])) {
+    return;
   }
+  if (!is_array($form_state['redirect'])) {
+    $form_state['redirect'] = array($form_state['redirect'], array('query' => array()));
+  }
+  $sid = $form_state['values']['details']['sid'];
+  $form_state['redirect'][1] += array('query' => array());
+  $form_state['redirect'][1]['query'] += array(
+    'sid' => $sid,
+    'hash' => drupal_hmac_base64($sid, drupal_get_private_key() . drupal_get_hash_salt()),
+  );
 }
 
 /**
