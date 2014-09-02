@@ -21,6 +21,9 @@ class SupporterPage extends Page {
       $bulkOps['untag'] = new BulkOp\SupporterTag(FALSE);
     }
     $bulkOps['export'] = new BulkOp\SupporterExport();
+    if (module_exists('campaignion_newsletters')) {
+      $bulkOps['newsletter'] = new BulkOp\SupporterNewsletter();
+    }
     $this->listing = new SupporterListing(20);
     $this->bulkOpForm = new BulkOpForm($bulkOps);
   }
