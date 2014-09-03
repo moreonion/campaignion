@@ -21,7 +21,6 @@ class SupporterNewsletter implements BulkOpBatchInterface {
       '#title'   => t('Select one or lists'),
       '#options' => $options,
     );
-
   }
 
   public function apply($contact_ids, $values) {
@@ -35,15 +34,16 @@ class SupporterNewsletter implements BulkOpBatchInterface {
       }
     }
     batch_set(array(
-      'operations' => array(
-        array('campaignion_manage_batch_process', array($this, $contact_ids, $list_ids)),
-      ),
-      'finished'         => 'campaignion_manage_batch_finished',
-      'title'            => t('Subscribing supporters to newsletters ...'),
-      'init_message'     => t('Start subscribing supporters to newsletters...'),
-      'progress_message' => t('Start subscribing supporters to newsletters...'),
-      'error_message'    => t('Encountered an error while subscribing supporters to newsletters.'),
-    ));
+        'operations' => array(
+          array('campaignion_manage_batch_process', array($this, $contact_ids, $list_ids)),
+        ),
+        'finished'         => 'campaignion_manage_batch_finished',
+        'title'            => t('Subscribing supporters to newsletters ...'),
+        'init_message'     => t('Start subscribing supporters to newsletters...'),
+        'progress_message' => t('Start subscribing supporters to newsletters...'),
+        'error_message'    => t('Encountered an error while subscribing supporters to newsletters.'),
+      )
+    );
   }
 
   public function batchApply($contact_ids, $list_ids, &$context) {
@@ -62,7 +62,8 @@ class SupporterNewsletter implements BulkOpBatchInterface {
     $contacts = redhen_contact_load_multiple($ids);
     $lists = array_map(
       array('\Drupal\campaignion_newsletters\NewsletterList', 'load'),
-      array_values($list_ids));
+      array_values($list_ids)
+    );
     foreach ($contacts as $contact_id => $contact) {
       $context['sandbox']['current_id'] = $contact_id;
       foreach ($lists as $list) {
