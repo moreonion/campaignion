@@ -133,12 +133,18 @@ class SupporterTag implements BulkOpBatchInterface {
         $count++;
         if ($count < 11) {
           if ($this->tag) {
-            drupal_set_message(t("Couldn't add tags to contact with ID @contact_id: @message",
-                array('@contact_id' => $contact_id, '@message' => $error_message)));
+            drupal_set_message(
+              t("Couldn't add tags to contact with ID @contact_id: @message",
+                array('@contact_id' => $contact_id, '@message' => $error_message)
+              )
+            );
           }
           else {
-            drupal_set_message(t("Couldn't remove tags from contact with ID @contact_id: @message",
-                array('@contact_id' => $contact_id, '@message' => $error_message)));
+            drupal_set_message(
+              t("Couldn't remove tags from contact with ID @contact_id: @message",
+                array('@contact_id' => $contact_id, '@message' => $error_message)
+              )
+            );
           }
         }
       }
