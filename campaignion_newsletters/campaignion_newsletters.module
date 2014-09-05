@@ -24,10 +24,6 @@ function _campaignion_newsletters_poll() {
     $provider = $factory->providerByKey($source);
     foreach ($provider->getLists() as $list) {
       $list->save();
-
-      foreach ($provider->getSubscribers($list) as $subscriber) {
-        Subscription::fromData($list->list_id, $subscriber, FALSE)->save(TRUE);
-      }
     }
   }
 }
