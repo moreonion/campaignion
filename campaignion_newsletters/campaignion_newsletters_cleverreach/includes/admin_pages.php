@@ -103,13 +103,14 @@ function campaignion_newsletters_cleverreach_admin_add_more_submit($form, &$form
  */
 function campaignion_newsletters_cleverreach_admin_validate($form, &$form_state) {
   $keys = &$form_state['values']['cleverreach']['api_keys'];
-  foreach ($keys as $key => $data) {
+  foreach ($keys as $key => &$data) {
     if (empty($data['name']) && empty($data['key'])) {
       continue;
     }
     if (empty($data['name'])) {
       form_set_error('cleverreach][api_keys][' . $key . '][name', t('The API key has to have a unique name.'));
     }
+    $data['key'] = trim($data['key']);
   }
 }
 
