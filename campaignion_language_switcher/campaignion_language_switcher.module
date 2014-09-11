@@ -34,7 +34,10 @@ function _campaignion_language_switcher_check_access($path) {
 /**
  * hook_block_view callback function
  */
-function _campaignion_language_switcher_block_campaignion_language_switcher() {
+function _campaignion_language_switcher_block_campaignion_language_switcher() {  
+  if (!drupal_multilingual()) {
+    return array();
+  }
   $links = language_negotiation_get_switch_links('language', current_path());
 
   if (isset($links->links)) {
