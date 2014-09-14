@@ -5,8 +5,8 @@ namespace Drupal\campaignion\CRM\Export;
 class AddressField extends WrapperField {
   protected $mappedSubkeys;
 
-  public function __construct(\EntityMetadataWrapper $wrappedContact, $key, $subkeys_map = NULL) {
-    parent::__construct($wrappedContact, $key);
+  public function __construct($key, $subkeys_map = NULL) {
+    parent::__construct($key);
     $this->mappedSubkeys = (isset($subkeys_map) && is_array($subkeys_map)) ? $subkeys_map : NULL;
   }
 

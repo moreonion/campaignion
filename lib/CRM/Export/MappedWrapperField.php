@@ -4,8 +4,8 @@ namespace Drupal\campaignion\CRM\Export;
 
 class MappedWrapperField extends WrapperField {
   protected $map;
-  public function __construct(\EntityMetadataWrapper $wrappedContact, $key, $map) {
-    parent::__construct($wrappedContact, $key);
+  public function __construct($key, $map) {
+    parent::__construct($key);
     $this->map = $map;
   }
 

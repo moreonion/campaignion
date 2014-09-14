@@ -3,7 +3,7 @@
 namespace Drupal\campaignion_newsletters_mailchimp;
 
 use \Drupal\campaignion\Contact;
-use \Drupal\campaignion\CRM\Import\Source\SourceInterface;
+use \Drupal\campaignion\CRM\ExporterBase;
 use \Drupal\campaignion\CRM\Export\SingleValueField;
 use \Drupal\campaignion\CRM\Export\WrapperField;
 use \Drupal\campaignion\CRM\Export\MappedWrapperField;
@@ -11,35 +11,25 @@ use \Drupal\campaignion\CRM\Export\DateField;
 use \Drupal\campaignion\CRM\Export\KeyedField;
 use \Drupal\campaignion\CRM\Export\TagsField;
 
-class CampaignionContactExporter implements SourceInterface {
-  protected $map;
+class CampaignionContactExporter extends ExporterBase {
   public function __construct(Contact $contact) {
-    $wrappedContact = $contact->wrap();
-
-    $this->map = array();
-    $this->map['EMAIL'] = new WrapperField($wrappedContact, 'email');
-    $this->map['FNAME'] = new SingleValueField($contact, 'first_name');
-    $this->map['LNAME'] = new SingleValueField($contact, 'last_name');
-    $this->map['SALUTATION'] = new WrapperField($wrappedContact, 'field_salutation');
-    $this->map['TITLE'] = new WrapperField($wrappedContact, 'field_title');
-    $this->map['GENDER'] = new WrapperField($wrappedContact, 'field_gender');
-    $this->map['DATE_OF_BIRTH'] = new DateField($wrappedContact, 'field_date_of_birth', '%Y-%m-%d');
-    $this->map['STREET'] = new KeyedField($wrappedContact, 'field_address', 'thoroughfare');
-    $this->map['COUNTRY'] = new KeyedField($wrappedContact, 'field_address', 'country');
-    $this->map['ZIP'] = new KeyedField($wrappedContact, 'field_address', 'postal_code');
-    $this->map['CITY'] = new KeyedField($wrappedContact, 'field_address', 'locality');
-    $this->map['REGION'] = new KeyedField($wrappedContact, 'field_address', 'administrative_area');
-    $this->map['LANGUAGE'] = new WrapperField($wrappedContact, 'field_preferred_language');
-    $this->map['CREATED'] = new DateField($wrappedContact, 'created', '%Y-%m-%d');
-    $this->map['UPDATED'] = new DateField($wrappedContact, 'updated', '%Y-%m-%d');
-    $this->map['TAGS'] = new TagsField($wrappedContact, 'supporter_tags');
-
-  }
-
-  public function value($key) {
-    if (isset($this->map[$key])) {
-      return $this->map[$key]->value();
-    }
-    return NULL;
+    $map['EMAIL'] = new WrapperField('email');
+    $map['FNAME'] = new SingleValueField('first_name');
+    $map['LNAME'] = new SingleValueField('last_name');
+    $map['SALUTATION'] = new WrapperField('field_salutation');
+    $map['TITLE'] = new WrapperField('field_title');
+    $map['GENDER'] = new WrapperField('field_gender');
+    $map['DATE_OF_BIRTH'] = new DateField('field_date_of_birth', '%Y-%m-%d');
+    $map['STREET'] = new KeyedField('field_address', 'thoroughfare');
+    $map['COUNTRY'] = new KeyedField('field_address', 'country');
+    $map['ZIP'] = new KeyedField('field_address', 'postal_code');
+    $map['CITY'] = new KeyedField('field_address', 'locality');
+    $map['REGION'] = new KeyedField('field_address', 'administrative_area');
+    $map['LANGUAGE'] = new WrapperField('field_preferred_language');
+    $map['CREATED'] = new DateField('created', '%Y-%m-%d');
+    $map['UPDATED'] = new DateField('updated', '%Y-%m-%d');
+    $map['TAGS'] = new TagsField('supporter_tags');
+    parent::__construct($map);
+    $this->setContact($contact);
   }
 }
