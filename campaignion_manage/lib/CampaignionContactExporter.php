@@ -11,7 +11,14 @@ use \Drupal\campaignion\CRM\Export\AddressField;
 use \Drupal\campaignion\CRM\Export\TagsField;
 
 class CampaignionContactExporter extends ExporterBase {
-  public function __construct(Contact $contact, array $address_mapping) {
+  public function __construct(Contact $contact) {
+    $address_mapping = array(
+      'street'  => 'thoroughfare',
+      'country' => 'country',
+      'zip'     => 'postal_code',
+      'city'    => 'locality',
+      'region'  => 'administrative_area',
+    );
     $map['redhen_contact_email']         = new WrapperField('email');
     $map['field_salutation']             = new WrapperField('field_salutation');
     $map['first_name']                   = new SingleValueField('first_name');
