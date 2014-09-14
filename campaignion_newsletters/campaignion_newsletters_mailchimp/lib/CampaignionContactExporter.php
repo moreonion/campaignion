@@ -9,18 +9,7 @@ use \Drupal\campaignion\CRM\Export\WrapperField;
 use \Drupal\campaignion\CRM\Export\MappedWrapperField;
 use \Drupal\campaignion\CRM\Export\DateField;
 use \Drupal\campaignion\CRM\Export\KeyedField;
-
-class TagExporter extends WrapperField {
-
-  public function value() {
-    $tags = $this->wrappedContact->{$this->key}->value();
-    $names = array();
-    foreach ($tags as $tag) {
-      $names[] = str_replace(',', '', $tag->name);
-    }
-    return implode(',', $names);
-  }
-}
+use \Drupal\campaignion\CRM\Export\TagsField;
 
 class CampaignionContactExporter implements SourceInterface {
   protected $map;
@@ -43,7 +32,7 @@ class CampaignionContactExporter implements SourceInterface {
     $this->map['LANGUAGE'] = new WrapperField($wrappedContact, 'field_preferred_language');
     $this->map['CREATED'] = new DateField($wrappedContact, 'created', '%Y-%m-%d');
     $this->map['UPDATED'] = new DateField($wrappedContact, 'updated', '%Y-%m-%d');
-    $this->map['TAGS'] = new TagExporter($wrappedContact, 'supporter_tags');
+    $this->map['TAGS'] = new TagsField($wrappedContact, 'supporter_tags');
 
   }
 

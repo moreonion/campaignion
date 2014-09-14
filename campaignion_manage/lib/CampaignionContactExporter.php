@@ -8,7 +8,7 @@ use \Drupal\campaignion\CRM\Export\SingleValueField;
 use \Drupal\campaignion\CRM\Export\WrapperField;
 use \Drupal\campaignion\CRM\Export\DateField;
 use \Drupal\campaignion\CRM\Export\AddressField;
-use \Drupal\campaignion\CRM\Export\TagField;
+use \Drupal\campaignion\CRM\Export\TagsField;
 
 class CampaignionContactExporter implements SourceInterface {
   protected $map;
@@ -30,7 +30,7 @@ class CampaignionContactExporter implements SourceInterface {
     $this->map['field_phone_number']           = new WrapperField($wrappedContact, 'field_phone_number');
     $this->map['field_direct_mail_newsletter'] = new WrapperField($wrappedContact, 'field_direct_mail_newsletter');
     $this->map['field_social_network_links']   = new WrapperField($wrappedContact, 'field_social_network_links');
-    $this->map['supporter_tags']               = new TagField($wrappedContact, 'supporter_tags');
+    $this->map['supporter_tags']               = new TagsField($wrappedContact, 'supporter_tags');
     $this->map['field_preferred_language']     = new WrapperField($wrappedContact, 'field_preferred_language');
   }
 
