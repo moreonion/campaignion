@@ -18,6 +18,6 @@ function campaignion_action_update_1() {
 /**
  * Implements hook_uninstall().
  */
-function campaignion_webform2redhen_uninstall() {
+function campaignion_action_uninstall() {
   DrupalQueue::get('campaignion_action')->deleteQueue();
 }
