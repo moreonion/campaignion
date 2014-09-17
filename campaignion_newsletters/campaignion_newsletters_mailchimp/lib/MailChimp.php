@@ -8,7 +8,7 @@
 
 namespace Drupal\campaignion_newsletters_mailchimp;
 
-use \Drupal\campaignion\Contact;
+use \Drupal\campaignion\ContactTypeManager;
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\Subscription;
 
@@ -99,9 +99,7 @@ class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInt
         array($list->identifier))[0]['merge_vars'];
     }
 
-    if ($contact = Contact::byEmail($subscription->email)) {
-      $exporter = new CampaignionContactExporter($contact);
-
+    if ($exporter = ContactTypeManager::instance()->exporterByEmail($subscription->email, 'mailchimp')) {
       foreach ($merge_vars[$list->identifier] as $attribute) {
         if ($value = $exporter->value($attribute['tag'])) {
           $attributes[$attribute['tag']] = $value;

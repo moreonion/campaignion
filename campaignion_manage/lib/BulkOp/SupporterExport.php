@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_manage\BulkOp;
 
+use \Drupal\campaignion\ContactTypeManager;
+
 class SupporterExport implements BulkOpBatchInterface {
   public function title() { return t('Export contact data'); }
 
@@ -100,10 +102,11 @@ class SupporterExport implements BulkOpBatchInterface {
       $context['results']['errors'] = t('Couldn\'t open temporary file to export supporters.');
     }
     $contacts = redhen_contact_load_multiple($ids);
+    $manager = ContactTypeManager::instance();
+    $exporter = $manager->exporter('campaignion_manage');
     foreach ($contacts as $contact) {
       $csv_line = array();
-      $contact = new \Drupal\campaignion\Contact($contact);
-      $exporter = new \Drupal\campaignion_manage\CampaignionContactExporter($contact);
+      $exporter->setContact($contact);
       foreach ($fields as $field_name => $field_label) {
         if (is_array($value = $exporter->value($field_name))) {
           if (empty($value)) {
