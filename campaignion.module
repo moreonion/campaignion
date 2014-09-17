@@ -22,3 +22,14 @@ function campaignion_language_switch_links_alter(array &$links, $type, $path) {
     }
   }
 }
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Use our own extended contact class.
+ */
+function campaignion_entity_info_alter(&$entity_info) {
+  if (isset($entity_info['redhen_contact'])) {
+    $entity_info['redhen_contact']['entity class'] = '\\Drupal\\campaignion\\Contact';
+  }
+}

@@ -8,7 +8,7 @@ interface ExporterInterface extends Import\Source\SourceInterface {
   /**
    * Get the contact object the we currently work on.
    *
-   * @return \Drupal\campaignion\ContactInterface
+   * @return \Drupal\campaignion\Contact
    */
   public function getContact();
   /**
