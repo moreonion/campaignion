@@ -226,10 +226,11 @@ function _campaignion_recent_supporters_block_recent_supporters() {
       'visible_count' => 6,
       'country_toggle' => 0,
       'name_display' => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
+      'query_limit' => 10,
     );
 
     $block['subject'] = t('Recent supporters');
-    $supporters = _campaignion_recent_supporters_get_supporters_one_action($node->nid, $options['name_display'], $options['visible_count']);
+    $supporters = _campaignion_recent_supporters_get_supporters_one_action($node->nid, $options['name_display'], $options['query_limit']);
     $block['content'] = array(
       '#theme' => 'recent_supporters',
       '#supporters' => $supporters,
@@ -299,6 +300,7 @@ function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
   global $language;
   $saved_settings = variable_get('campaignion_recent_supporters_settings', array()) + array(
     'name_display'   => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
+    'query_limit'    => 10,
     'visible_count'  => 6,
     'cycle_toggle'   => 0,
     'country_toggle' => 1,
@@ -318,7 +320,7 @@ function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
   $default_language = language_default();
   $lang             = isset($language->language) ? $language->language : $default_language->language;
   $name_display     = $saved_settings['name_display'];
-  $limit            = $saved_settings['visible_count'];
+  $limit            = $saved_settings['query_limit'];
   $hash             = drupal_hmac_base64($lang.$limit.$name_display, drupal_get_hash_salt());
   $polling_url     .= isset($lang) ? "&lang=".$lang : '';
   $polling_url     .= isset($name_display) ? "&name_display=".$name_display : '';
