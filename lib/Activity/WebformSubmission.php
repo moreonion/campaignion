@@ -3,7 +3,7 @@
 namespace Drupal\campaignion\Activity;
 
 use \Drupal\campaignion\ContactTypeManager;
-use \Drupal\little_helpers\Webform\Submission;
+use \Drupal\campaignion\CRM\Import\Source\WebformSubmission as Submission;
 
 class WebformSubmission extends \Drupal\campaignion\Activity {
   protected $type = 'webform_submission';
