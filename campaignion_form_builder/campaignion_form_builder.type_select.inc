@@ -24,7 +24,7 @@ function _campaignion_form_builder_form_builder_types_select() {
   ) + $defaults;
   $fields['salutation']['properties'][] = 'other_option';
   $fields['salutation']['properties'][] = 'other_text';
-  $fields['salutation']['default']['#options']       = array('fam' => t('Family'), 'mrs' => t('Mrs'), 'mr' => t('Mr'));
+  $fields['salutation']['default']['#options']       = array('fam' => t('Family'), 'mrs' => t('Mrs'), 'mr' => t('Mr'), 'org' => t('Organisation'));
   $fields['salutation']['default']['#default_value'] = '%get[p1]';
   $fields['salutation']['default']['#title']         = t('Salutation');
   $fields['salutation']['default']['#other_option']  = TRUE;
