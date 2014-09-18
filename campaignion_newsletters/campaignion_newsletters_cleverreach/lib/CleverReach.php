@@ -8,13 +8,13 @@
 
 namespace Drupal\campaignion_newsletters_cleverreach;
 
-use \Drupal\campaignion\ContactTypeManager;
-use \Drupal\campaignion_newsletters\NewsletterList;
-use \Drupal\campaignion_newsletters\Subscription;
 use \Drupal\campaignion_newsletters\ApiError;
 use \Drupal\campaignion_newsletters\ApiPersistentError;
+use \Drupal\campaignion_newsletters\NewsletterList;
+use \Drupal\campaignion_newsletters\ProviderBase;
+use \Drupal\campaignion_newsletters\Subscription;
 
-class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderInterface {
+class CleverReach extends ProviderBase {
   protected $account;
   protected $key;
   protected $url;
@@ -89,10 +89,10 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
     $list = $subscription->newsletterList();
     $attributes = array();
 
-    if ($exporter = ContactTypeManager::instance()->exporterByEmail($subscription->email, 'cleverreach')) {
-      $listAttributes = array_merge($list->data->attributes, $list->data->globalAttributes);
+    $listAttributes = array_merge($list->data->attributes, $list->data->globalAttributes);
+    if ($source = $this->getSource($subscription->email, 'cleverreach')) {
       foreach ($listAttributes as $attribute) {
-        if ($value = $exporter->value($attribute->key)) {
+        if ($value = $source->value($attribute->key)) {
           $attributes[] = array(
             'key' => $attribute->key,
             'value' => $value,

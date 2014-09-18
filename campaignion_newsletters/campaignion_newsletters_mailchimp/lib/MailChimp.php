@@ -8,11 +8,11 @@
 
 namespace Drupal\campaignion_newsletters_mailchimp;
 
-use \Drupal\campaignion\ContactTypeManager;
 use \Drupal\campaignion_newsletters\NewsletterList;
+use \Drupal\campaignion_newsletters\ProviderBase;
 use \Drupal\campaignion_newsletters\Subscription;
 
-class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInterface {
+class MailChimp extends ProviderBase {
   protected $account;
   protected $key;
   protected $url;
@@ -42,6 +42,7 @@ class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInt
     $this->merge_vars = array();
     $lists = array();
     foreach ($mc_lists as $list) {
+      $list['merge_vars'] = $this->call('mergeVars', $list['id'])[0]['merge_vars'];
       $lists[] = NewsletterList::fromData(
         array(
           'identifier' => $list['id'],
@@ -89,19 +90,12 @@ class MailChimp implements \Drupal\campaignion_newsletters\NewsletterProviderInt
   }
 
   protected function attributeData(Subscription $subscription) {
-    static $merge_vars = array();
     $list = $subscription->newsletterList();
     $attributes = array();
 
-    if (!isset($merge_vars[$list->identifier])) {
-      $merge_vars[$list->identifier] = $this->call(
-        'mergeVars',
-        array($list->identifier))[0]['merge_vars'];
-    }
-
-    if ($exporter = ContactTypeManager::instance()->exporterByEmail($subscription->email, 'mailchimp')) {
-      foreach ($merge_vars[$list->identifier] as $attribute) {
-        if ($value = $exporter->value($attribute['tag'])) {
+    if ($source = $this->getSource($subscription, 'mailchimp')) {
+      foreach ($list->data->merge_vars as $attribute) {
+        if ($value = $source->value($attribute['tag'])) {
           $attributes[$attribute['tag']] = $value;
         }
       }

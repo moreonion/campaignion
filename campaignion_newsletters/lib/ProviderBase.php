@@ -1,0 +1,23 @@
+<?php
+
+namespace Drupal\campaignion_newsletters;
+
+use \Drupal\campaignion_newsletters\Subscription;
+use \Drupal\campaignion\CRM\Import\Source\CombinedSource;
+use \Drupal\campaignion\ContactTypeManager;
+
+abstract class ProviderBase implements NewsletterProviderInterface {
+  protected function getSource(Subscription $subscription, $target) {
+    $source = NULL;
+    if ($subscription->source) {
+      $source = $subscription->source;
+    }
+
+    $manager = ContactTypeManager::instance();
+    if ($manager->crmEnabled() && ($exporter = $manager->exporterByEmail($subscription->email, 'mailchimp'))) {
+      $source = $source ? new CombinedSource($source, $exporter) : $exporter;
+    }
+
+    return $source;
+  }
+}

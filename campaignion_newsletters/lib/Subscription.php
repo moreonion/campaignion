@@ -7,6 +7,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
   public $email;
   public $fingerprint;
   public $delete = FALSE;
+  public $source = NULL;
 
   public static $lists = array();
 

@@ -59,4 +59,14 @@ class ContactTypeManager {
     }
     throw new Exceptions\UndefinedContactTypeException($type);
   }
+
+  /**
+   * Check whether campaignions CRM is enabled.
+   *
+   * @return bool
+   *   TRUE if contacts are enabled, FALSE otherwise.
+   */
+  public function crmEnabled() {
+    return isset($this->types[Contact::defaultType()]);
+  }
 }

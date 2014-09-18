@@ -99,9 +99,9 @@ function campaignion_newsletters_webform_submission_insert($node, $submission) {
  * Implements hook_email_confirmed().
  */
 function campaignion_newsletters_email_confirmed($node, $submission) {
-  $s = new \Drupal\little_helpers\Webform\Submission($node, $submission);
+  $s = new \Drupal\campaignion\CRM\Import\Source\WebformSubmission($node, $submission);
   // use value of the component with key 'email' as email address
-  if (!($email = $s->valueByKey('email'))) {
+  if (!($email = $s->value('email'))) {
     return;
   }
   foreach ($s->webform->componentsByType('newsletter') as $component) {
@@ -111,6 +111,7 @@ function campaignion_newsletters_email_confirmed($node, $submission) {
         if (!empty($value)) {
           $subscription = Subscription::byData($list_id, $email);
           $subscription->delete = FALSE;
+          $subscription->source = $s;
           $subscription->save();
         }
       }
