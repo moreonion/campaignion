@@ -2,17 +2,19 @@
 
 namespace Drupal\campaignion\CRM\Export;
 
-class WrapperField {
-  protected $wrappedContact;
+use \Drupal\campaignion\CRM\ExporterInterface;
+
+class WrapperField implements ExportMapperInterface {
+  protected $exporter;
   protected $key;
-  public function __construct(\EntityMetadataWrapper $wrappedContact, $key) {
+  public function __construct($key) {
     $this->key = $key;
-    $this->wrappedContact = $wrappedContact;
   }
 
   public function value() {
-    if ($this->wrappedContact->__isset($this->key)) {
-      $value = $this->wrappedContact->{$this->key}->value();
+    $w = $this->exporter->getWrappedContact();
+    if ($w->__isset($this->key)) {
+      $value = $w->{$this->key}->value();
       if (is_array($value) && isset($value[0]) && count($value) == 1) {
         return $value[0];
       }
@@ -21,5 +23,9 @@ class WrapperField {
     else {
       return NULL;
     }
+  }
+
+  public function setExporter(ExporterInterface $exporter) {
+    $this->exporter = $exporter;
   }
 }

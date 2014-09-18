@@ -2,6 +2,9 @@
 
 namespace Drupal\campaignion\Activity;
 
+use \Drupal\campaignion\ContactTypeManager;
+use \Drupal\little_helpers\Webform\Submission;
+
 class WebformSubmission extends \Drupal\campaignion\Activity {
   protected $type = 'webform_submission';
 
@@ -29,10 +32,15 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
   }
 
   public static function fromSubmission($node, $submission, $data = array()) {
-    $contact_id = \Drupal\campaignion\Contact::idFromSubmission($node, $submission);
+    $importer = ContactTypeManager::instance()->importer('campaignion_activity');
+    $source = new Submission($node, $submission);
+    $contact = $importer->findOrCreateContact($source);
+    if ($importer->import($source, $contact)) {
+      $contact->save();
+    }
 
     $data = array(
-      'contact_id' => $contact_id,
+      'contact_id' => $contact->contact_id,
       'nid' => $node->nid,
       'sid' => $submission->sid,
     ) + $data;

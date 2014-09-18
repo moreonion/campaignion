@@ -7,7 +7,7 @@ class Activity implements Interfaces\Activity {
   protected $contact_id;
   protected $type;
   protected $created;
-  
+
   public function __construct($data = array()) {
     foreach ($data as $k => &$v) {
       $this->{$k} = &$v;
@@ -62,6 +62,6 @@ class Activity implements Interfaces\Activity {
   }
 
   public function contact() {
-    return \Drupal\campaignion\Contact::load($this->contact_id);
+    return Contact::load($this->contact_id);
   }
 }

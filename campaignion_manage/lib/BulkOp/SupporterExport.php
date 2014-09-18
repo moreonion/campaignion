@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_manage\BulkOp;
 
+use \Drupal\campaignion\ContactTypeManager;
+
 class SupporterExport implements BulkOpBatchInterface {
   public function title() { return t('Export contact data'); }
 
@@ -56,13 +58,20 @@ class SupporterExport implements BulkOpBatchInterface {
     batch_set($batch);
   }
 
-  protected function initBatch($contact_ids, &$context, $address_mapping, $fields) {
+  protected function initBatch($contact_ids, &$context, $fields) {
     $context['sandbox']['progress']    = 0;
     $context['sandbox']['current_id']  = 0;
     $context['sandbox']['max']         = count($contact_ids);
     $context['sandbox']['csv_name']    = $context['results']['csv_name'] = tempnam(file_directory_temp(), 'CampaignionSupporterExport_' );
     $context['results']['bulkOp']      = $this;
     // create the CSV column header line
+    $address_mapping = array(
+      'street'  => 'thoroughfare',
+      'country' => 'country',
+      'zip'     => 'postal_code',
+      'city'    => 'locality',
+      'region'  => 'administrative_area',
+    );
     $csv_header = array();
     foreach ($fields as $key => $value) {
       if ($key === 'field_address') {
@@ -80,15 +89,8 @@ class SupporterExport implements BulkOpBatchInterface {
   }
 
   public function batchApply($contact_ids, $fields, &$context) {
-    $address_mapping = array(
-      'street'  => 'thoroughfare',
-      'country' => 'country',
-      'zip'     => 'postal_code',
-      'city'    => 'locality',
-      'region'  => 'administrative_area',
-    );
     if (!isset($context['sandbox']['progress'])) {
-      $this->initBatch($contact_ids, $context, $address_mapping, $fields);
+      $this->initBatch($contact_ids, $context, $fields);
     }
     $ids = array_slice(
       $contact_ids,
@@ -100,10 +102,11 @@ class SupporterExport implements BulkOpBatchInterface {
       $context['results']['errors'] = t('Couldn\'t open temporary file to export supporters.');
     }
     $contacts = redhen_contact_load_multiple($ids);
+    $manager = ContactTypeManager::instance();
+    $exporter = $manager->exporter('campaignion_manage');
     foreach ($contacts as $contact) {
       $csv_line = array();
-      $contact = new \Drupal\campaignion\Contact($contact);
-      $exporter = new \Drupal\campaignion_manage\CampaignionContactExporter($contact, $address_mapping);
+      $exporter->setContact($contact);
       foreach ($fields as $field_name => $field_label) {
         if (is_array($value = $exporter->value($field_name))) {
           if (empty($value)) {

@@ -51,8 +51,7 @@ EOT;
 
 function theme_campaignion_manage_contact($variables) {
   $contact = $variables['contact'];
-  $contactObj = new \Drupal\campaignion\Contact($contact);
-  $wrappedContact = $contactObj->wrap();
+  $wrappedContact = entity_metadata_wrapper('redhen_contact', $contact);
   $link = l($wrappedContact->full_name->value(), "redhen/contact/{$contact->contact_id}/view");
   $email = $contact->redhen_contact_email_value;
 

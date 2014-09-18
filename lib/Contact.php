@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion;
 
+use \Drupal\campaignion\CRM\Import\Source\SourceInterface;
+
 class Contact extends \RedhenContact {
   public function __construct($values = array()) {
     $objValues = array();
@@ -9,63 +11,73 @@ class Contact extends \RedhenContact {
       $objValues = $values;
       $values = array();
     }
-    if (!isset($values['type'])) {
-      $values['type'] = variable_get('campaignion_contact_type_supporter', 'contact');
-    }
     parent::__construct($values);
     foreach ($objValues as $key => $value) {
       $this->$key = $value;
     }
+    if (!$this->type) {
+      $this->type = static::defaultType();
+    }
+  }
+
+  public static function defaultType() {
+    return variable_get('campaignion_contact_type_supporter', 'contact');
   }
 
   public static function load($id) {
-    $contact = \redhen_contact_load($id);
-    return new static($contact);
+    return \redhen_contact_load($id);
   }
 
-  public static function idFromSubmission($node, $submission) {
-    $s = new \Drupal\little_helpers\Webform\Submission($node, $submission);
-    if ($email = $s->valueByKey('email')) {
-      $first_name = $s->valueByKey('first_name');
-      $last_name  = $s->valueByKey('last_name');
-      return static::idFromBasicData($email, $first_name, $last_name);
-    } else {
-      throw new \Exception("Can't create contact without email address.");
-    }
-  }
-
-  public static function idByEmail($email) {
+  public static function idByEmail($email, $type = NULL) {
+    $type = $type ? $type : static::defaultType();
     $sql = <<<SQL
 SELECT entity_id
 FROM field_data_redhen_contact_email
-WHERE redhen_contact_email_value = :email
+WHERE redhen_contact_email_value = :email AND bundle = :bundle
 SQL;
-    return db_query($sql, array(':email' => $email))->fetchField();
+    return db_query($sql, array(':email' => $email, ':bundle' => $type))->fetchField();
   }
 
-  public static function idFromBasicData($email, $first_name = '', $last_name = '') {
-    if ($contact_id = static::idByEmail($email)) {
-      return $contact_id;
+  public static function idFromBasicData($email, $first_name = '', $last_name = '', $type = NULL) {
+    $contact = static::fromBasicData($email, $first_name, $last_name, $type);
+    if (!$contact->contact_id) {
+      $contact->save();
     }
-    return static::createContactByBasicData($email, $first_name, $last_name)->contact_id;
+    return $contact->contact_id;
   }
 
-  public static function createContactByBasicData($email, $first_name = '', $last_name = '') {
-    $contact = new static();
-    $contact->setEmail($email);
-    $contact->first_name = $first_name;
-    $contact->last_name = $last_name;
-    $contact->save();
+  public static function fromBasicData($email, $first_name = '', $last_name = '', $type = NULL) {
+    $contact = static::fromEmail($email, $type);
+    if (!$contact->contact_id) {
+      $contact->first_name = $first_name;
+      $contact->last_name = $last_name;
+    }
     return $contact;
   }
 
-  public static function byEmail($email) {
-    if ($id = self::idByEmail($email)) {
-      return new static(redhen_contact_load($id));
+  public static function byEmail($email, $type = NULL) {
+    if ($id = static::idByEmail($email, $type)) {
+      return static::load($id);
     }
+  }
+
+  public static function fromEmail($email, $type = NULL) {
+    $type = $type ? $type : static::defaultType();
+    if (!($contact = static::byEmail($email, $type))) {
+      $contact = new static(array('type' => $type));
+      $contact->setEmail($email, 1, 0);
+    }
+    return $contact;
   }
 
   public function wrap() {
     return entity_metadata_wrapper('redhen_contact', $this);
+  }
+
+  public function exportable($target) {
+    if ($exporter = ContactTypeManager::instance()->exporter($target, $this->type)) {
+      $exporter->setContact($this);
+      return $exporter;
+    }
   }
 }

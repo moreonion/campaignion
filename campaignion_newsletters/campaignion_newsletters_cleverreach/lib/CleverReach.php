@@ -8,7 +8,7 @@
 
 namespace Drupal\campaignion_newsletters_cleverreach;
 
-use \Drupal\campaignion\Contact;
+use \Drupal\campaignion\ContactTypeManager;
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\Subscription;
 use \Drupal\campaignion_newsletters\ApiError;
@@ -88,8 +88,8 @@ class CleverReach implements \Drupal\campaignion_newsletters\NewsletterProviderI
   protected function attributeData(Subscription $subscription) {
     $list = $subscription->newsletterList();
     $attributes = array();
-    if ($contact = Contact::byEmail($subscription->email)) {
-      $exporter = new CampaignionContactExporter($contact);
+
+    if ($exporter = ContactTypeManager::instance()->exporterByEmail($subscription->email, 'cleverreach')) {
       $listAttributes = array_merge($list->data->attributes, $list->data->globalAttributes);
       foreach ($listAttributes as $attribute) {
         if ($value = $exporter->value($attribute->key)) {

@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion\Activity;
 
+use \Drupal\campaignion\Contact;
+
 class Comment extends \Drupal\campaignion\Activity {
   protected $type = 'comment';
 
@@ -16,7 +18,7 @@ class Comment extends \Drupal\campaignion\Activity {
     if (empty($comment->mail)) {
       return NULL;
     }
-    $contact_id = \Drupal\campaignion\Contact::idFromBasicData($comment->mail);
+    $contact_id = Contact::idFromBasicData($comment->mail);
     $data = array(
       'contact_id' => $contact_id,
       'nid' => $comment->nid,

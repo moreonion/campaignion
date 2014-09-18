@@ -4,8 +4,8 @@ namespace Drupal\campaignion\CRM\Export;
 
 class KeyedField extends WrapperField {
   protected $subkey;
-  public function __construct(\EntityMetadataWrapper $wrappedContact, $key, $subkey) {
-    parent::__construct($wrappedContact, $key);
+  public function __construct($key, $subkey) {
+    parent::__construct($key);
     $this->subkey = $subkey;
   }
 

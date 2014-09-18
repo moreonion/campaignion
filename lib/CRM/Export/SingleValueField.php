@@ -2,15 +2,21 @@
 
 namespace Drupal\campaignion\CRM\Export;
 
-use Drupal\campaignion\Contact;
+use \Drupal\campaignion\CRM\ExporterInterface;
 
-class SingleValueField {
-  public function __construct(Contact $contact, $key) {
-    $this->contact = $contact;
+class SingleValueField implements ExportMapperInterface {
+  protected $exporter;
+  protected $key;
+  public function __construct($key) {
     $this->key = $key;
   }
 
   public function value() {
-    return isset($this->contact->{$this->key}) ? $this->contact->{$this->key} : NULL;
+    $c = $this->exporter->getContact();
+    return isset($c->{$this->key}) ? $c->{$this->key} : NULL;
+  }
+
+  public function setExporter(ExporterInterface $exporter) {
+    $this->exporter = $exporter;
   }
 }
