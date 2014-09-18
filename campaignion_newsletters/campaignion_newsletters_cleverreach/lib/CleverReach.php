@@ -90,7 +90,7 @@ class CleverReach extends ProviderBase {
     $attributes = array();
 
     $listAttributes = array_merge($list->data->attributes, $list->data->globalAttributes);
-    if ($source = $this->getSource($subscription->email, 'cleverreach')) {
+    if ($source = $this->getSource($subscription, 'cleverreach')) {
       foreach ($listAttributes as $attribute) {
         if ($value = $source->value($attribute->key)) {
           $attributes[] = array(
