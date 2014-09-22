@@ -182,6 +182,7 @@ class CleverReach extends ProviderBase {
         '@message' => $result->message,
       );
       switch ($result->statuscode) {
+        case 20:
         case 40:
           throw new ApiPersistentError($b, '@status #@code @message - removing item from queue.', $args, $result->statuscode);
         default:
