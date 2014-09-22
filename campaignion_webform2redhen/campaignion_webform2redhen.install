@@ -6,5 +6,5 @@
  */
 function campaignion_webform2redhen_update_1() {
   db_query("UPDATE {queue} SET name='campaignion_action' WHERE name='campaignion_webform2redhen'");
-  module_disable(array('campaignion_webform2redhen'));
+  module_disable(array('campaignion_webform2redhen'), FALSE);
 }
