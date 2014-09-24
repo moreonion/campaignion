@@ -1,6 +1,6 @@
 (function($) {
 Drupal.behaviors.campaignion_language_switcher = {};
-Drupal.behaviors.campaiginon_language_switcher.attach = function(context, settings) {
+Drupal.behaviors.campaignion_language_switcher.attach = function(context, settings) {
   var $switcher = $(context).find('.campaignion-language-switcher-locale-url');
   $switcher.hide();
   var $active = $switcher.find('a.active');
