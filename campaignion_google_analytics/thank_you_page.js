@@ -13,9 +13,5 @@
                 ga('ecommerce:send');
             }
         }
-
-        $('.share-light li a').click(function(event) {
-            ga('send', 'event', 'share', event.target.title);
-        });
     }
 })(jQuery);
