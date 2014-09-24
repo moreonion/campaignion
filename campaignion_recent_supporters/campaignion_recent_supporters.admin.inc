@@ -8,12 +8,14 @@
  */
 function recent_supporters_settings_form($form, &$form_state) {
   $defaults = array(
+    'query_limit'    => 10,
     'visible_count'  => 6,
     'cycle_toggle'   => 0,
     'country_toggle' => 1,
     'name_display'   => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
   );
   $saved_settings = variable_get('campaignion_recent_supporters_settings', $defaults);
+  $saved_settings = $saved_settings + $defaults;
 
   $form['#tree'] = TRUE;
 
@@ -29,6 +31,15 @@ function recent_supporters_settings_form($form, &$form_state) {
     '#options'       => _campaignion_recent_supporters_name_display_options(),
     '#attributes'    => array(),
     '#default_value' => $saved_settings['name_display'],
+  );
+  $form['general_settings']['query_limit'] = array(
+    '#title'         => t('Limit of the database query.'),
+    '#description'   => t('Only this count of supporters will be loaded from the DB. This value should be higher than the visible count, otherwise there would be no cycling.This is a global setting and cannot be overriden by the recent supporters fields.'),
+    '#type'          => 'textfield',
+    '#size'          => 12,
+    '#maxlength'     => 10,
+    '#attributes'    => array(),
+    '#default_value' => $saved_settings['query_limit'],
   );
   $form['general_settings']['visible_count'] = array(
     '#title'         => t('Number of max. visible supporters.'),
@@ -108,6 +119,7 @@ function recent_supporters_settings_form($form, &$form_state) {
 
 function campaignion_recent_supporters_settings_form_submit($form, &$form_state) {
   $result = array(
+    'query_limit'    => $form_state['values']['general_settings']['query_limit'],
     'visible_count'  => $form_state['values']['general_settings']['visible_count'],
     'cycle_toggle'   => $form_state['values']['general_settings']['cycle_toggle'],
     'country_toggle' => $form_state['values']['general_settings']['country_toggle'],
