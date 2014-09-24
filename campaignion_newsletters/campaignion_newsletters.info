@@ -7,6 +7,5 @@ project = campaignion
 dependencies[] = elysia_cron
 dependencies[] = little_helpers
 dependencies[] = psr0
-dependencies[] = redhen_contact
 dependencies[] = webform
 dependencies[] = webform_confirm_email
