@@ -8,9 +8,9 @@
  */
 function campaignion_language_switcher_block_info() {
   return array(
-    'campaignion_language_switcher' => array(
+    'locale_url' => array(
       'info'  => t('Campaignion language switcher'),
-      'cache' => DRUPAL_CACHE_PER_PAGE,
+      'cache' => DRUPAL_CACHE_PER_PAGE | DRUPAL_CACHE_PER_ROLE,
     ),
   );
 }
@@ -18,23 +18,7 @@ function campaignion_language_switcher_block_info() {
 /**
  * Implements hook_block_view().
  */
-function campaignion_language_switcher_block_view($blockname) {
-  if ($blockname === 'campaignion_language_switcher') {
-    return _campaignion_language_switcher_block_campaignion_language_switcher();
-  }
-}
-
-/**
- * Check if currently logged-in user has access to $path.
- */
-function _campaignion_language_switcher_check_access($path) {
-  return ($router_item = \menu_get_item($path)) && $router_item['access'];
-}
-
-/**
- * hook_block_view callback function
- */
-function _campaignion_language_switcher_block_campaignion_language_switcher() {  
+function campaignion_language_switcher_block_view($delta = '') {
   if (!drupal_multilingual()) {
     return array();
   }
@@ -61,6 +45,13 @@ function _campaignion_language_switcher_block_campaignion_language_switcher() {
 }
 
 /**
+ * Check if currently logged-in user has access to $path.
+ */
+function _campaignion_language_switcher_check_access($path) {
+  return ($router_item = \menu_get_item($path)) && $router_item['access'];
+}
+
+/**
  * implements hook_module_implements_alter().
  * we copy and change the core language_switch_links_alter hook to add links for
  * yet unpublished nodes
@@ -75,7 +66,7 @@ function campaignion_language_switcher_module_implements_alter(&$implementations
 /**
  * Implements hook_language_switch_links_alter().
  *
- * copied from core/translation module; we don't check the 
+ * copied from core/translation module; we don't check the $node-status.
  */
 function campaignion_language_switcher_language_switch_links_alter(array &$links, $type, $path) {
   $language_type = variable_get('translation_language_type', LANGUAGE_TYPE_INTERFACE);
