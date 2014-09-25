@@ -8,25 +8,27 @@ class Subscriptions {
   protected static $lists = NULL;
 
   public static function byContact($contact) {
-    $subscriptions = array();
-    $lists = NewsletterList::listAll();
-
+    $lists = static::lists();
+    $addresses = array();
     foreach ($contact->allEmail() as $address) {
-      $email = $address['value'];
+      $addresses[] = $address['value'];
+    }
+    $storedSubscriptions = Subscription::byEmail($addresses);
+    return new static($lists, $addresses, $storedSubscriptions);
+  }
+
+  public function __construct($lists, $addresses, $storedSubscriptions) {
+    $subscriptions = array();
+    foreach ($addresses as $email) {
       $subscriptions[$email] = array();
       foreach ($lists as $list_id => $list) {
-        $subscriptions[$email][$list_id] = Subscription::fromData($list_id, $email);
+        $subscriptions[$email][$list_id] = NULL;
       }
     }
 
-    $storedSubscriptions = Subscription::byEmail(array_keys($subscriptions));
     foreach ($storedSubscriptions as $s) {
       $subscriptions[$s->email][$s->list_id] = $s;
     }
-    return new static($subscriptions);
-  }
-
-  public function __construct($subscriptions) {
     $this->subscriptions = $subscriptions;
   }
 
@@ -40,8 +42,12 @@ class Subscriptions {
   public function update($values) {
     foreach ($values as $email => $lists) {
       foreach ($lists as $list_id => $subscribed) {
-        $subscription =  $this->subscriptions[$email][$list_id];
-        $subscription->delete = !$subscribed;
+        if ($subscription = &$this->subscriptions[$email][$list_id]) {
+          $subscription->delete = !$subscribed;
+        }
+        elseif ($subscribed) {
+          $subscription = Subscription::fromData($list_id, $email);
+        }
       }
     }
   }
@@ -49,7 +55,9 @@ class Subscriptions {
   public function save() {
     foreach ($this->subscriptions as $email => $lists) {
       foreach ($lists as $list_id => $subscription) {
-        $subscription->save();
+        if ($subscription) {
+          $subscription->save();
+        }
       }
     }
   }
@@ -73,7 +81,7 @@ class Subscriptions {
   public function values($email) {
     $values = array();
     foreach ($this->subscriptions[$email] as $list_id => $subscription) {
-      $values[$list_id] = !$subscription->delete ? $list_id : 0;
+      $values[$list_id] = ($subscription && !$subscription->delete) ? $list_id : 0;
     }
     return $values;
   }

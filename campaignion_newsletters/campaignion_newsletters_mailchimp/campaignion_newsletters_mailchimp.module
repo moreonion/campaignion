@@ -89,11 +89,6 @@ function campaignion_newsletters_mailchimp_webhook() {
               'WHERE identifier=:identifier', array(
                 ':identifier' => check_plain($_POST['data']['list_id']),
               ))->fetchField();
-    foreach (Subscription::byEmail($_POST['data']['email']) as $subscription) {
-      if ($subscription->list_id === $list_id) {
-        $subscription->delete(TRUE);
-      }
-    }
+    Subscription::byData($list_id, $_POST['data']['email'])->delete();
   }
-
 }

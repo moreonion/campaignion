@@ -5,7 +5,7 @@ namespace Drupal\campaignion_newsletters;
 class Subscription extends \Drupal\little_helpers\DB\Model {
   public $list_id;
   public $email;
-  public $fingerprint;
+  public $fingerprint = '';
   public $delete = FALSE;
   public $source = NULL;
 
@@ -29,11 +29,10 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
     }
   }
 
-  public static function fromData($list_id, $email, $delete = TRUE) {
+  public static function fromData($list_id, $email) {
     return new static(array(
       'list_id' => $list_id,
       'email' => $email,
-      'delete' => $delete,
     ), TRUE);
   }
 
@@ -60,7 +59,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
     if ($this->delete) {
       return $this->delete($fromProvider);
     }
-    list($data, $fingerprint) = $this->newsletterList()->provider()->data($this);
+    list($data, $fingerprint) = $this->providerData();
     if ($fingerprint != $this->fingerprint) {
       $this->fingerprint = $fingerprint;
       if (!$fromProvider) {
@@ -71,21 +70,31 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
           'data' => $data,
         ))->save();
       }
-      parent::save();
+    }
+    db_merge(static::$table)
+      ->key($this->values(static::$key))
+      ->fields($this->values(static::$values))
+      ->execute();
+    $this->new = FALSE;
+  }
+
+  public function providerData() {
+    if (($l = $this->newsletterList()) && ($p = $l->provider())) {
+      return $p->data($this);
+    }
+    else {
+      return array(array(), '');
     }
   }
 
   public function delete($fromProvider = FALSE) {
-    // Nothing to do if this subscription is not yet stored.
-    if (!$this->isNew()) {
-      if (!$fromProvider) {
-        QueueItem::byData(array(
-          'list_id' => $this->list_id,
-          'email' => $this->email,
-          'action' => QueueItem::UNSUBSCRIBE,
-        ))->save();
-      }
-      parent::delete();
+    if (!$this->isNew() && !$fromProvider) {
+      QueueItem::byData(array(
+        'list_id' => $this->list_id,
+        'email' => $this->email,
+        'action' => QueueItem::UNSUBSCRIBE,
+      ))->save();
     }
+    parent::delete();
   }
 }

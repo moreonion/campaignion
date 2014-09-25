@@ -57,12 +57,6 @@ function campaignion_newsletters_schema() {
     'campaignion_newsletters_subscriptions' => array(
       'description' => 'Table for joining users to newsletter lists',
       'fields' => array(
-        'subscription_id' => array(
-          'description' => 'The primary identifier for a subscription.',
-          'type' => 'serial',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ),
         'email' => array(
           'description' => 'The email address of the subscribed user.',
           'type' => 'varchar',
@@ -85,7 +79,7 @@ function campaignion_newsletters_schema() {
           'default' => '123456789x123456789x123456789x123456789x',
         ),
       ),
-      'primary key' => array('subscription_id'),
+      'primary key' => array('email', 'list_id'),
       'indexes' => array(
         'campaignion_newsletters_subscriptions_list' => array('list_id'),
         'campaignion_newsletters_subscriptions_email' => array('email'),
@@ -157,6 +151,16 @@ function campaignion_newsletters_install() {
  */
 function campaignion_newsletters_uninstall() {
   variable_del('campaignion_newsletters_cleverreach_batch_size');
+}
+
+/**
+ * Drop subscription_id column and deduplicate.
+ */
+function campaignion_newsletters_update_7() {
+  $t = 'campaignion_newsletters_subscriptions';
+  db_query("DELETE s1 FROM {{$t}} s1 LEFT OUTER JOIN (SELECT MIN(subscription_id) AS subscription_id FROM {{$t}} GROUP BY email, list_id) s2 USING(subscription_id) WHERE s2.subscription_id IS NULL");
+  db_drop_field($t, 'subscription_id');
+  db_add_primary_key($t, array('email', 'list_id'));
 }
 
 /**
