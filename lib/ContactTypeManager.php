@@ -37,13 +37,16 @@ class ContactTypeManager {
     return $this->getType($type)->importer($source);
   }
 
-  public function exporter($target, $type = NULL) {
-    return $this->getType($type)->exporter($target);
+  public function exporter($target, $type = NULL, $language = NULL) {
+    if (!$language) {
+      $language = language_default();
+    }
+    return $this->getType($type)->exporter($target, $language);
   }
 
-  public function exporterByEmail($email, $target = NULL, $type = NULL) {
+  public function exporterByEmail($email, $target = NULL, $type = NULL, $language = NULL) {
     $contact = Contact::byEmail($email, $type);
-    $exporter = $this->getType($contact->type)->exporter($target);
+    $exporter = $this->getType($contact->type)->exporter($target, $language);
     if ($exporter && $contact) {
       $exporter->setContact($contact);
       return $exporter;

@@ -12,11 +12,13 @@ interface ContactTypeInterface {
    *
    * @param string $target
    *   Target to export to (ie. cleverreach, dadiapi, mailchimp).
+   * @param stdclass $language
+   *   Target language.
    *
    * @return \Drupal\campaignion\CRM\ExporterInterface
    *   An exporter capable for the specified target.
    */
-  public function exporter($target);
+  public function exporter($target, $language);
   /**
    * Get an importer-wrapper for this contact.
    *
