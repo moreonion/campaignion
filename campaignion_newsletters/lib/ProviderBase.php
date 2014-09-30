@@ -19,7 +19,7 @@ abstract class ProviderBase implements NewsletterProviderInterface {
     }
 
     $manager = ContactTypeManager::instance();
-    if ($manager->crmEnabled() && ($exporter = $manager->exporterByEmail($subscription->email, 'mailchimp', NULL, $language))) {
+    if ($manager->crmEnabled() && ($exporter = $manager->exporterByEmail($subscription->email, $target, NULL, $language))) {
       $source = $source ? new CombinedSource($source, $exporter) : $exporter;
     }
 

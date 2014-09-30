@@ -42,7 +42,8 @@ class MailChimp extends ProviderBase {
     $this->merge_vars = array();
     $lists = array();
     foreach ($mc_lists as $list) {
-      $list['merge_vars'] = $this->call('mergeVars', $list['id'])[0]['merge_vars'];
+      $v = $this->call('mergeVars', array($list['id']))[0]['merge_vars'];
+      $list['merge_vars'] = $v ? $v : array();
       $lists[] = NewsletterList::fromData(
         array(
           'identifier' => $list['id'],
