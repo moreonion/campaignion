@@ -154,6 +154,21 @@ function campaignion_newsletters_uninstall() {
 }
 
 /**
+ * Fixup change of hook_webform_confirm_email_email_confirmed().
+ */
+function campaignion_newsletters_update_8() {
+  $last_id = 0;
+  $sql = "SELECT nid, sid FROM {webform_submissions} s WHERE s.confirmed=1 AND s.submitted>=1406851200 AND sid>:last_id LIMIT 1000";
+  while ($rows = db_query($sql, array('last_id' => $last_id))->fetchAll()) {
+    foreach ($rows as $row) {
+      $s = \Drupal\little_helpers\Webform\Submission::load($row->nid, $row->sid);
+      campaignion_newsletters_webform_confirm_email_email_confirmed($s->getNode(), $s->unwrap());
+    }
+    $last_id = $row->sid;
+  }
+}
+
+/**
  * Drop subscription_id column and deduplicate.
  */
 function campaignion_newsletters_update_7() {

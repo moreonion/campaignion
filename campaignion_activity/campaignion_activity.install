@@ -151,6 +151,21 @@ function campaignion_activity_uninstall() {
 }
 
 /**
+ * Fixup unconfirmed webform actvities.
+ */
+function campaignion_activity_update_2() {
+  $sql = "SELECT activity_id FROM {campaignion_activity_webform} a INNER JOIN {campaignion_activity} ca USING(activity_id) INNER JOIN {webform_submissions} w USING(nid,sid) WHERE a.confirmed IS NULL AND w.confirmed=1 AND created>=1406851200 LIMIT 1000";
+  while ($ids = db_query($sql)->fetchCol()) {
+    foreach ($ids as $id) {
+      if ($activity = \Drupal\campaignion\Activity\WebformSubmission::load($id)) {
+        $activity->confirmed = time();
+        $activity->save();
+      }
+    }
+  }
+}
+
+/**
  * Replace redhen_activity and deactivate redhen_engagement.
  */
 function campaignion_activity_update_1() {

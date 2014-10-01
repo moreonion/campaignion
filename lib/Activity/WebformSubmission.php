@@ -16,6 +16,12 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
     return static::byNidSid($node->nid, $submission->sid);
   }
 
+  public static function load($activity_id) {
+    $query = static::buildJoins();
+    $query->condition('a.activity_id', $activity_id);
+    return $query->execute()->fetchObject(get_called_class());
+  }
+
   public static function byNidSid($nid, $sid) {
     $query = static::buildJoins();
     $query->condition('aw.nid', $nid)

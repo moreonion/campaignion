@@ -96,9 +96,9 @@ function campaignion_newsletters_webform_submission_insert($node, $submission) {
 }
 
 /**
- * Implements hook_email_confirmed().
+ * Implements hook_webform_confirm_email_email_confirmed().
  */
-function campaignion_newsletters_email_confirmed($node, $submission) {
+function campaignion_newsletters_webform_confirm_email_email_confirmed($node, $submission) {
   $s = new \Drupal\campaignion\CRM\Import\Source\WebformSubmission($node, $submission);
   // use value of the component with key 'email' as email address
   if (!($email = $s->value('email'))) {

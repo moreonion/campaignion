@@ -16,7 +16,10 @@ function campaignion_activity_webform_submission_insert($node, $submission) {
   }
 }
 
-function campaignion_activity_email_confirmed($node, $submission) {
+/**
+ * Implements hook_webform_confirm_email_email_confirmed().
+ */
+function campaignion_activity_webform_confirm_email_email_confirmed($node, $submission) {
   if (!($activity = \Drupal\campaignion\Activity\WebformSubmission::bySubmission($node, $submission))) {
     watchdog('campaignion_activity', 'Trying to confirm a not yet logged submission: !nid, !sid', array('!nid' => $node->nid, '!sid' => $submission->sid), WATCHDOG_WARNING);
     try {
