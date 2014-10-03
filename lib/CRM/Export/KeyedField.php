@@ -10,8 +10,12 @@ class KeyedField extends WrapperField {
   }
 
   public function value() {
-    if (($value = parent::value(0)) && isset($value[$this->subkey])) {
-      return $value[$this->subkey];
+    if (($values = parent::value(NULL))) {
+      foreach ($values as $value) {
+        if (!empty($value[$this->subkey])) {
+          return $value[$this->subkey];
+        }
+      }
     }
   }
 }

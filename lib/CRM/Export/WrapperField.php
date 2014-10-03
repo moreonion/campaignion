@@ -11,12 +11,12 @@ class WrapperField implements ExportMapperInterface {
     $this->key = $key;
   }
 
-  public function value() {
+  public function value($delta = 0) {
     $w = $this->exporter->getWrappedContact();
     if ($w->__isset($this->key)) {
       $value = $w->{$this->key}->value();
-      if (is_array($value) && isset($value[0]) && count($value) == 1) {
-        return $value[0];
+      if (isset($delta) && is_array($value) && isset($value[$delta])) {
+        return $value[$delta];
       }
       return $value;
     }
