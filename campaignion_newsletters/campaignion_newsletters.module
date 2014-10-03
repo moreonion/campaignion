@@ -91,7 +91,7 @@ function campaignion_newsletters_webform_component_info() {
 function campaignion_newsletters_webform_submission_insert($node, $submission) {
   $webform = new \Drupal\little_helpers\Webform\Webform($node);
   if (!$webform->needsConfirmation()) {
-    campaignion_newsletters_email_confirmed($node, $submission);
+    campaignion_newsletters_webform_confirm_email_email_confirmed($node, $submission);
   }
 }
 
