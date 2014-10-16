@@ -22,6 +22,7 @@ function _webform_defaults_newsletter() {
       'description' => t('Subscribe me to the newsletter.'),
       'private' => FALSE,
       'lists' => array(),
+      'title_display' => 'none',
     ),
   );
 }
@@ -103,6 +104,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
     '#theme_wrappers' => array('webform_element'),
     '#pre_render' => array(),
     '#title' => $component['name'],
+    '#title_display' => $component['extra']['title_display'],
     '#options' => $options,
     '#default_value' => $component['value'],
     '#translatable' => array('title', 'description', 'options'),
