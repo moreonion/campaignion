@@ -23,13 +23,6 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
       $dialogBg.css('z-index', 500).show();
     }).appendTo($wrapper.parents('form').find('.bulkop-button-wrapper'));
 
-    // Button to hide the dialog.
-    $('<div id="bulk-dialog-close">' + Drupal.t('Close') + '</div>')
-    .click(function(e) {
-      $dialog.hide();
-      $dialogBg.css('z-index', defaultZ).hide();
-    }).appendTo($dialog.children('legend'));
-
     var $radioWrapper = $wrapper.find('div.bulkops-radios').parent();
     var $radios = $radioWrapper.find('input[type=radio]');
     var $bulkopsWrapper = $wrapper.find('.bulkops-ops');
@@ -42,13 +35,22 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
       $bulkops.hide();
       $bulkopsWrapper.find('.bulkops-op-' + $(this).val()).show();
     });
-    $('<input type="button" name="cancel" value="' + Drupal.t('Cancel') + '" class="form-submit" />').click(function() {
+    var $cancel = $('<input type="button" name="cancel" value="' + Drupal.t('Cancel') + '" class="form-submit" />')
+    $cancel.click(function() {
       $radios.prop('checked', false);
       $bulkops.hide();
       $bulkopsWrapper.hide();
       $actions.hide();
       $radioWrapper.show();
     }).appendTo($actions).click();
+
+    // Button to hide the dialog.
+    $('<div id="bulk-dialog-close">' + Drupal.t('Close') + '</div>')
+    .click(function(e) {
+      $dialog.hide();
+      $dialogBg.css('z-index', defaultZ).hide();
+      $cancel.click();
+    }).appendTo($dialog.children('legend'));
 
     $radios.siblings('label').after('<span class="bulk-question-mark">?</span>');
     if ($.fn.popover) {
