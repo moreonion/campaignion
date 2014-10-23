@@ -36,16 +36,32 @@ function campaignion_google_analytics_page_build(&$page) {
   $nid = intval(explode('/', $parameters['share'])[1]);
   $sid = intval($parameters['sid']);
   $submission = \Drupal\little_helpers\Webform\Submission::load($nid, $sid);
+  $node = $submission->getNode();
 
   if ($payment = _campaignion_google_analytics_load_payment($nid, $sid)) {
+    $donation_title = $node->title;
+    $donation_lang = $node->language;
+    $interval = '';
+    switch ($submission->valueByKey('donation_interval')) {
+    case '1':
+      $interval = 'only once';
+      break;
+    case 'm':
+      $interval = 'monthly';
+      break;
+    case 'y':
+      $interval = 'yearly';
+      break;
+    }
+    $ga_product_name = $donation_title . ' [' . $donation_lang . '] [' . $interval . ']';
     drupal_add_js(
       array(
         'campaignion_google_analytics' => array(
           'payment' => array(
             'id' => $payment->pid,
-            'name' => drupal_get_title() . ' (' . variable_get('site_name') . ')',
+            'name' => $ga_product_name,
             'price' => $payment->totalAmount(false),
-            'category' => $submission->valueByKey('donation_interval'),
+            'category' => $interval,
             'currency' => $payment->currency_code,
             'quantity' => '1',
           ))),

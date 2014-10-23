@@ -8,7 +8,11 @@
             }
             if (typeof config.payment !== 'undefined') {
                 ga('require', 'ecommerce');
-                ga('ecommerce:addTransaction', {id: config.payment.id});
+                ga('ecommerce:addTransaction', {
+                  id: config.payment.id,
+                  currency: config.payment.currency,
+                  revenue: config.payment.price
+                });
                 ga('ecommerce:addItem', config.payment);
                 ga('ecommerce:send');
             }
