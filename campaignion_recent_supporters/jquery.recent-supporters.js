@@ -227,10 +227,10 @@
           "!supporter_name": nameHtml,
           "!action_title": '<span class="title">'+supporter.action_title+"</span>"
         }
-        if (supporter.action_url !== 'undefined') {
+        if (typeof supporter.action_url !== 'undefined') {
           tokens["!action_title"] = '<span class="title"><a href="'+supporter.action_url+'" title="'+supporter.action_title+'">'+supporter.action_title+'</a></span>';
         }
-        if (settings.texts[supporter.action_type] !== 'undefined' && settings.texts[supporter.action_type].length > 0) {
+        if (typeof settings.texts[supporter.action_type] !== 'undefined' && settings.texts[supporter.action_type].length > 0) {
           text = replaceTokensInText(settings.texts[supporter.action_type], tokens);
         }
       }
@@ -238,7 +238,7 @@
       supporterHtml += "\n"+'<span class="time" data-timestamp="'+timestamp+'" title="'+supporter.rfc8601+'">'+timestamp+'</span>';
       $li.addClass('supporter').append(supporterHtml);
 
-      if (supporter.action_type !== 'undefined' && supporter.action_type.length > 0) {
+      if (typeof supporter.action_type !== 'undefined' && supporter.action_type.length > 0) {
         $li.addClass('action-type-'+supporter.action_type);
       }
 
