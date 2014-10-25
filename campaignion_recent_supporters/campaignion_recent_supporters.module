@@ -323,7 +323,8 @@ function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
   $limit            = $saved_settings['query_limit'];
   $hash             = drupal_hmac_base64($lang.$limit.$name_display, drupal_get_hash_salt());
   $polling_url     .= isset($lang) ? "&lang=".$lang : '';
-  $polling_url     .= isset($name_display) ? "&name_display=".$name_display : '';
+  $polling_url     .= "&name_display=".$name_display;
+  $polling_url     .= "&limit=".$limit;
   $polling_url     .= "&hash=".$hash;
 
   $supporters       = _campaignion_recent_supporters_get_supporters_all_actions($types, $name_display, $limit, $lang);
