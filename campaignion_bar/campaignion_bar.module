@@ -258,8 +258,9 @@ function _campaignion_bar_add_sublinks_to_output(&$output, $sublinks) {
   foreach ($sublinks as $subitem) {
     $link = $subitem['link'];
     $class = array();
+    $empty_container = empty($subitem['below']) && $link['link_path'] == variable_get('site_frontpage', 'node');
 
-    if (!$link['hidden']) {
+    if (!$link['hidden'] && !$empty_container) {
       // Add first, last and active classes to the list of links to help out themers.
       if ($i == 1) {
         $class[] = 'first';
