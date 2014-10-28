@@ -22,6 +22,39 @@ function _campaignion_google_analytics_load_payment($nid, $sid) {
  * Implements hook_init().
  */
 
+function campaignion_google_analytics_node_view($node, $view_mode, $langcode) {
+  if ($node->type == 'donation') {
+    drupal_add_js(drupal_get_path('module', 'campaignion_google_analytics') . '/donation.js');
+    if ($view_mode == 'full') {
+      drupal_add_js(
+        array(
+          'campaignion_google_analytics' => array(
+            'view' => array(
+              'nid' => $node->nid,
+              'title' => $node->title,
+              'lang' => $node->language,
+            ),
+          ),
+        ),
+        'setting');
+    } else if ($view_mode == 'teaser') {
+      drupal_add_js(
+        array(
+          'campaignion_google_analytics' => array(
+            'impressions' => array(
+              $node->nid => array(
+                'nid' => $node->nid,
+                'title' => $node->title,
+                'lang' => $node->language,
+              ),
+            ),
+          ),
+        ),
+        'setting');
+    }
+  }
+}
+
 function campaignion_google_analytics_page_build(&$page) {
   $parameters = drupal_get_query_parameters();
   if (!isset($parameters['share']) || !isset($parameters['sid'])) {
@@ -57,6 +90,9 @@ function campaignion_google_analytics_page_build(&$page) {
     drupal_add_js(
       array(
         'campaignion_google_analytics' => array(
+          'nid' => $node->nid,
+          'title' => $node->title,
+          'lang' => $node->language,
           'payment' => array(
             'id' => $payment->pid,
             'name' => $ga_product_name,
