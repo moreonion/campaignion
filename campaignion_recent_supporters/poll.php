@@ -42,19 +42,27 @@ require_once dirname(__FILE__) . '/campaignion_recent_supporters.module';
 drupal_load('module', 'psr0');
 
 use \Drupal\campaignion_recent_supporters\RequestParams;
+use \Drupal\campaignion_recent_supporters\ActivityBackend;
 
 $params = new RequestParams($_GET);
 if (!$params->isValid()) {
-  campaignion_recent_supporters_send_invalid_hash();
+  drupal_add_http_header("Access-Control-Allow-Origin", "*");
+  drupal_add_http_header("Access-Control-Allow-Headers", "Content-Type");
+  drupal_add_http_header('Status', '403 Forbidden');
+  // no wtachlog log possible due to minimal bootstrap
+  drupal_json_output(array());
   exit;
 }
 
+$backend = new ActivityBackend();
+
 if (isset($_GET['nid'])) {
-  campaignion_recent_supporters_json($params);
+  $backend->recentOnOneActionJson($params);
 }
 elseif (isset($_GET['types'])) {
-  campaignion_recent_supporters_all_action_json($params);
+  $backend->recentOnAllActionsJson($params);
 }
 else {
-  campaignion_recent_supporters_send_empty_json();
+  $backend->emptyJson();
 }
+
