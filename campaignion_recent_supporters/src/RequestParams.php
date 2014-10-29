@@ -19,7 +19,7 @@ class RequestParams {
     return drupal_hmac_base64(http_build_query($data), drupal_get_hash_salt());
   }
   public function isValid() {
-    return $this->params['hash'] == $this->hashKey();
+    return $this->params['hash'] == $this->hashKey() && isset($this->params['backend']);
   }
   public function getParams() {
     return $this->params;
@@ -28,5 +28,9 @@ class RequestParams {
     $params = $this->params;
     $params['hash'] = $this->hashKey();
     return http_build_query($params);
+  }
+  public function getBackend() {
+    $class = $this->params['backend'];
+    return new $class();
   }
 }

@@ -54,7 +54,7 @@ if (!$params->isValid()) {
   exit;
 }
 
-$backend = new ActivityBackend();
+$backend = $params->getBackend('activity');
 
 if (isset($_GET['nid'])) {
   $backend->recentOnOneActionJson($params);
