@@ -119,7 +119,7 @@ function campaignion_recent_supporters_settings_form($form, &$form_state) {
     _variable_realm_variable_settings_form_switcher($form);
   }
   $form = system_settings_form($form);
-  $form['#submit'][] = 'campaignion_recent_supporters_settings_form_submit';
+  array_unshift($form['#submit'], 'campaignion_recent_supporters_settings_form_submit');
   return $form;
 }
 
@@ -133,4 +133,7 @@ function campaignion_recent_supporters_settings_form_submit($form, &$form_state)
     'name_display'   => $form_state['values']['block_settings']['name_display'],
   );
   variable_set('campaignion_recent_supporters_settings', $result);
+  // Don't save those into variables in system_settings_form_submit().
+  unset($form_state['values']['general_settings']);
+  unset($form_state['values']['block_settings']);
 }

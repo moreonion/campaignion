@@ -60,6 +60,10 @@ function campaignion_recent_supporters_menu() {
     'access arguments' => array('administer recent supporters'),
     'file'             => 'campaignion_recent_supporters.admin.inc',
   );
+  $items['admin/config/content/recent-supporters/general'] = array(
+    'title' => t('General settings'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
   return $items;
 }
 
@@ -316,7 +320,7 @@ function _campaignion_recent_supporters_get_types_defaults($lang_code = NULL) {
  */
 function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
   $block = array();
-  $saved_settings = campaignion_recent_supporter_settings();
+  $saved_settings = campaignion_recent_supporters_settings();
   $types_settings = variable_get('campaignion_recent_supporters_settings_types', array())
     + _campaignion_recent_supporters_get_types_defaults($GLOBALS['language']->language);
   $types = array();
@@ -426,7 +430,7 @@ function theme_recent_supporters($variables) {
   $output = '';
 
   if (count($supporters) < 1) {
-    $output = '<div class="no-activity-yet">'.t('No activity yet.').'</div>';
+    $output = '<div class="no-activity-yet">'.t('No recent activity.').'</div>';
     return $output;
   }
   else {

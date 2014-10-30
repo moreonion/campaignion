@@ -4,7 +4,7 @@
  */
 
 /**
- * implements hook_install().
+ * Implements hook_install().
  */
 function campaignion_recent_supporters_install() {
   if (module_exists('variable_realm')) {
@@ -15,7 +15,7 @@ function campaignion_recent_supporters_install() {
 }
 
 /**
- * implements hook_modules_enabled().
+ * Implements hook_modules_enabled().
  */
 function hook_modules_enabled($modules) {
   if (in_array('variable_realm', $modules)) {
@@ -25,7 +25,7 @@ function hook_modules_enabled($modules) {
   }
 }
 /**
- * implements hook_enable().
+ * Implements hook_enable().
  */
 function campaignion_recent_supporters_enable() {
   // create field type if not already defined
