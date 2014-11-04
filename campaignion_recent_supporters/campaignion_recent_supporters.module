@@ -6,6 +6,13 @@ define ('CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_FULL', 1);
 define ('CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_INITIAL', 2);
 define ('CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_FIRST_ONLY', 3);
 
+use \Drupal\campaignion_recent_supporters\Loader;
+
+function campaignion_recent_supporters_campaignion_recent_supporters_backend_info() {
+  $backends['activity'] = '\\Drupal\\campaignion_recent_supporters\\ActivityBackend';
+  return $backends;
+}
+
 function _campaignion_recent_supporters_name_display_options() {
   return array(
     CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT => t('Default'),
@@ -13,6 +20,21 @@ function _campaignion_recent_supporters_name_display_options() {
     CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_INITIAL => t('First name and initial'),
     CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_FIRST_ONLY => t('First name only'),
   );
+}
+
+/**
+ * Get the current recent supporter settings.
+ */
+function campaignion_recent_supporters_settings() {
+  $saved_settings = variable_get('campaignion_recent_supporters_settings', array()) + array(
+    'backend'        => 'activity',
+    'query_limit'    => 10,
+    'visible_count'  => 6,
+    'cycle_toggle'   => 0,
+    'country_toggle' => 1,
+    'name_display'   => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
+  );
+  return $saved_settings;
 }
 
 /**
@@ -33,10 +55,14 @@ function campaignion_recent_supporters_menu() {
   $items['admin/config/content/recent-supporters'] = array(
     'title'            => t('Recent Supporter Settings'),
     'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('recent_supporters_settings_form'),
+    'page arguments'   => array('campaignion_recent_supporters_settings_form'),
     'description'      => 'Recent Supporter settings.',
     'access arguments' => array('administer recent supporters'),
     'file'             => 'campaignion_recent_supporters.admin.inc',
+  );
+  $items['admin/config/content/recent-supporters/general'] = array(
+    'title' => t('General settings'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   return $items;
 }
@@ -220,17 +246,14 @@ function _campaignion_recent_supporters_block_recent_supporters() {
 
   if ($show) {
     // save values for polling
-    $polling_url = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'campaignion_recent_supporters') . '/poll.php?nid=' . $node->nid;
-    $options = $field['options'] + array(
-      'cycle_toggle' => 0,
-      'visible_count' => 6,
-      'country_toggle' => 0,
-      'name_display' => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
-      'query_limit' => 10,
-    );
+    $polling_url = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'campaignion_recent_supporters') . '/poll.php?';
+    $options = $field['options'] + campaignion_recent_supporters_settings();
+    $backend = Loader::instance()->getBackend($options['backend']);
+    $params = $backend->buildParams($options, $node);
+    $polling_url .= $params->buildQuery();
 
     $block['subject'] = t('Recent supporters');
-    $supporters = _campaignion_recent_supporters_get_supporters_one_action($node->nid, $options['name_display'], $options['query_limit']);
+    $supporters = $backend->recentOnOneAction($params);
     $block['content'] = array(
       '#theme' => 'recent_supporters',
       '#supporters' => $supporters,
@@ -297,37 +320,22 @@ function _campaignion_recent_supporters_get_types_defaults($lang_code = NULL) {
  */
 function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
   $block = array();
-  global $language;
-  $saved_settings = variable_get('campaignion_recent_supporters_settings', array()) + array(
-    'name_display'   => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
-    'query_limit'    => 10,
-    'visible_count'  => 6,
-    'cycle_toggle'   => 0,
-    'country_toggle' => 1,
-  );
+  $saved_settings = campaignion_recent_supporters_settings();
   $types_settings = variable_get('campaignion_recent_supporters_settings_types', array())
-    + _campaignion_recent_supporters_get_types_defaults($language->language);
-  $types          = array();
+    + _campaignion_recent_supporters_get_types_defaults($GLOBALS['language']->language);
+  $types = array();
   foreach ($types_settings as $type => $setting) {
     if ($setting['enabled']) {
-      $types[$type] = $type;
+      $types[] = $type;
     }
   }
-  $polling_url      = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'campaignion_recent_supporters') . '/poll_all.php?types=' . implode(',', $types);
+  $polling_url = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'campaignion_recent_supporters') . '/poll.php?';
 
-  // hash the provided params we rely on in the JSON callback (lang, limit, name_display)
-  // for safety reasons
-  $default_language = language_default();
-  $lang             = isset($language->language) ? $language->language : $default_language->language;
-  $name_display     = $saved_settings['name_display'];
-  $limit            = $saved_settings['query_limit'];
-  $hash             = drupal_hmac_base64($lang.$limit.$name_display, drupal_get_hash_salt());
-  $polling_url     .= isset($lang) ? "&lang=".$lang : '';
-  $polling_url     .= "&name_display=".$name_display;
-  $polling_url     .= "&limit=".$limit;
-  $polling_url     .= "&hash=".$hash;
+  $backend = Loader::instance()->getBackend($saved_settings['backend']);
+  $params = $backend->buildParams($saved_settings, NULL, $types);
+  $polling_url .= $params->buildQuery();
 
-  $supporters       = _campaignion_recent_supporters_get_supporters_all_actions($types, $name_display, $limit, $lang);
+  $supporters  = $backend->recentOnAllActions($params);
   $texts = _campaignion_recent_supporters_get_action_texts($types);
 
   $block['subject'] = t('Recent supporters');
@@ -361,8 +369,8 @@ function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
         'visibleCount'    => $saved_settings['visible_count'],
         'pollingURL'      => $polling_url,
         'types'           => $types,
-        'lang'            => $lang,
-        'nameDisplay'     => $name_display,
+        'lang'            => $GLOBALS['language']->language,
+        'nameDisplay'     => $saved_settings['name_display'],
         'allActions'      => TRUE,
       ),
     ),
@@ -422,7 +430,7 @@ function theme_recent_supporters($variables) {
   $output = '';
 
   if (count($supporters) < 1) {
-    $output = '<div class="no-activity-yet">'.t('No activity yet.').'</div>';
+    $output = '<div class="no-activity-yet">'.t('No recent activity.').'</div>';
     return $output;
   }
   else {
@@ -476,109 +484,11 @@ function theme_recent_supporters($variables) {
 }
 
 /**
- * callback function for campaignion_recent_supporters_menu()
- */
-function campaignion_recent_supporters_json($nid) {
-  $supporters = _campaignion_recent_supporters_get_supporters_one_action($nid);
-  drupal_add_http_header("Access-Control-Allow-Origin", "*");
-  drupal_add_http_header("Access-Control-Allow-Headers", "Content-Type");
-  drupal_json_output(array('supporters' => $supporters));
-}
-
-/**
- * polling callback function for getting recent supporter of all action pages
- * BEWARE: this functions assumes that all parameters are already checked and valid!
- * ATTENTION: minimal bootstrap
- */
-function campaignion_recent_supporters_all_action_json($types, $lang = NULL, $limit = 10, $name_display = CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT) {
-  $types      = explode(',', $types);
-  $supporters = _campaignion_recent_supporters_get_supporters_all_actions($types, $name_display, $limit, $lang);
-  drupal_add_http_header("Access-Control-Allow-Origin", "*");
-  drupal_add_http_header("Access-Control-Allow-Headers", "Content-Type");
-  drupal_json_output(array('supporters' => $supporters));
-}
-
-/**
- * poll_all.php callback function for return an empty array (in case of error).
- * ATTENTION: minimal bootstrap
- */
-function campaignion_recent_supporters_send_empty_json() {
-  drupal_add_http_header("Access-Control-Allow-Origin", "*");
-  drupal_add_http_header("Access-Control-Allow-Headers", "Content-Type");
-  drupal_json_output(array('supporters' => array()));
-}
-
-/**
- * poll_all.php callback function for returning if the hash was invalid.
- * ATTENTION: minimal bootstrap
- */
-function campaignion_recent_supporters_send_invalid_hash() {
-  drupal_add_http_header("Access-Control-Allow-Origin", "*");
-  drupal_add_http_header("Access-Control-Allow-Headers", "Content-Type");
-  drupal_add_http_header('Status', '403 Forbidden');
-  // no wtachlog log possible due to minimal bootstrap
-  drupal_json_output(array());
-}
-
-/**
  * callback funtion
  */
 function _campaignion_recent_supporters_strip_callback($value) {
   return mb_substr($value, 0, 1);
 };
-
-/**
- * helper function: query the activities for a specific nid
- */
-function _campaignion_recent_supporters_get_supporters_one_action($nid, $name_display = CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT, $limit = 10) {
-  $addressfield = variable_get('campaignion_recent_supporters_address_field', 'field_address');
-  $sql = <<<SQL
-SELECT rc.first_name, rc.last_name, ca.created as timestamp, wt.country, fdfa.field_address_country, n.tnid, n.nid
-FROM {node} n
-  INNER JOIN {campaignion_activity_webform} caw ON caw.nid = n.nid
-  INNER JOIN {campaignion_activity} ca ON ca.activity_id=caw.activity_id AND ca.type='webform_submission'
-  INNER JOIN {redhen_contact} rc USING (contact_id)
-  INNER JOIN {webform_tracking} wt ON wt.nid=caw.nid AND wt.sid=caw.sid
-  LEFT OUTER JOIN {field_data_$addressfield} fdfa ON fdfa.entity_id = rc.contact_id AND fdfa.delta = 0
-    WHERE n.status = 1
-    AND (n.nid = :nid OR n.nid IN (SELECT tn.nid FROM {node} tn INNER JOIN {node} n USING(tnid) WHERE n.nid = :nid AND n.tnid != 0))
-ORDER BY ca.created DESC
-SQL;
-  $result = db_query_range($sql, 0, $limit, array(':nid' => $nid));
-
-  return _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, FALSE);
-}
-
-/**
- * helper function: query all supporters for specified types
- * ATTENTION: minimal bootstrap possible
- */
-function _campaignion_recent_supporters_get_supporters_all_actions(array $types, $name_display = CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT, $limit = 10, $lang = NULL) {
-  // variable_get does read empty $conf when called from JSON (as vars are not loaded by poll_all.php)
-  // --> change default value here if needed
-  $addressfield = variable_get('campaignion_recent_supporters_address_field', 'field_address');
-  if (!$limit) {
-    $limit = 10;
-  }
-  // get translations: na - activity node, nt - any available node translated into $lang, no - the "original" node (ie. the translation source)
-  $sql = <<<SQL
-SELECT rc.first_name, rc.last_name, ca.created as timestamp, wt.country, fdfa.field_address_country, na.tnid, na.type, na.title, na.nid, na.language, na.status, nt.language as tlanguage, nt.title as ttitle, nt.nid as nt_nid, nt.status as tstatus, no.language as olanguage, no.title as otitle, no.language as olanguage, no.nid as onid, no.status as ostatus
-  FROM {campaignion_activity_webform} caw
-  INNER JOIN {node} na ON caw.nid = na.nid
-  LEFT OUTER JOIN {node} nt ON na.tnid != 0 AND nt.tnid = na.tnid AND nt.language = :lang
-  LEFT OUTER JOIN {node} no ON na.tnid = no.nid
-  INNER JOIN {campaignion_activity} ca ON ca.activity_id = caw.activity_id AND ca.type = 'webform_submission'
-  INNER JOIN {redhen_contact} rc USING (contact_id)
-  INNER JOIN {webform_tracking} wt ON wt.nid = caw.nid AND wt.sid = caw.sid
-  LEFT OUTER JOIN {field_data_$addressfield} fdfa ON fdfa.entity_id = rc.contact_id
-    WHERE na.status = 1 AND na.type IN (:types)
-    AND fdfa.delta = 0
-  ORDER BY ca.created DESC
-SQL;
-  $result = db_query_range($sql, 0, $limit, array(':types' => $types, ':lang' => $lang));
-
-  return _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, TRUE);
-}
 
 /**
  * helper function: get the configured action texts
@@ -602,89 +512,6 @@ function _campaignion_recent_supporters_get_action_texts($types = array()) {
     $result[$type] = $value['text'];
   }
   return $result;
-}
-
-/**
- * helper function: compile a list of recent supporters from the DB result parameter
- * ATTENTION: minimal bootstrap possible
- */
-function _campaignion_recent_supporters_build_supporter_list($result, $addressfield, $name_display, $has_text = FALSE) {
-  $supporters = array();
-
-  // resolve "default" name display
-  if ((int)$name_display === CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT) {
-    $name_display_default = variable_get('campaignion_recent_supporters_name_display_default', CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_INITIAL);
-    // if $name_display_default is still CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT
-    // (e.g. it was explicitly set in the variable) we override it manually, as
-    // 'default' would make no sense here any more
-    if ($name_display_default === CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT) {
-      $name_display_default = CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_INITIAL;
-    }
-
-    $name_display = $name_display_default;
-  }
-
-  global $base_url;
-
-  foreach ($result as $item) {
-    $supporter = array();
-    $supporter['first_name'] = $item->first_name;
-    $supporter['last_name']  = $item->last_name;
-
-    // no CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT any more in $name_display
-    switch ($name_display) {
-      case CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_FIRST_ONLY:
-        // set last_name to empty string
-        $supporter['last_name'] = "";
-        break;
-      case CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_INITIAL:
-        // substitute last_name with initial
-        // convert every component of last_name to it's first letter
-        // also last names with van, von, de, ... and those consisting
-        // of two words
-        // @TODO with hyphens Last-Name
-        if (!empty($supporter['last_name'])) {
-          $ln_array = preg_split("/ +/", $supporter['last_name']);
-          $supporter['last_name'] = implode(' ', array_map('_campaignion_recent_supporters_strip_callback', $ln_array));
-        }
-        break;
-      case CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_FULL:
-      default:
-        // nothing to do (full name loaded already
-        break;
-    }
-
-    $supporter['timestamp']  = $item->timestamp;
-    $supporter['rfc8601']    = date('c', $item->timestamp);
-    $countryval              = $addressfield . '_country';
-    $supporter['country']    = empty($item->$countryval) ? $item->country : $item->$countryval;
-    if (isset($item->nid)) {
-      $supporter['nid'] = $item->nid;
-    }
-    if ($has_text) {
-      $supporter['nid']          = $item->nid;
-      $supporter['action_type']  = $item->type;
-
-      $supporter['action_title'] = $item->title;
-      $supporter['action_nid']   = $item->nid;
-      $supporter['action_lang']  = $item->language;
-      // overwrite action details with any translated informations
-      if (isset($item->ttitle) && $item->tstatus) {
-        $supporter['action_title'] = $item->ttitle;
-        $supporter['action_nid']   = $item->nt_nid;
-        $supporter['action_lang']  = $item->tlanguage;
-      } elseif (isset($item->otitle) && $item->ostatus) {
-        $supporter['action_title'] = $item->otitle;
-        $supporter['action_nid']   = $item->onid;
-        $supporter['action_lang']  = $item->olanguage;
-      }
-
-      $supporter['action_url']   = $base_url.'/node/'.$supporter['action_nid'];
-    }
-    $supporters[] = $supporter;
-  }
-
-  return $supporters;
 }
 
 /**

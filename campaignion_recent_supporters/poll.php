@@ -8,6 +8,15 @@
  */
 
 function campaignion_recent_supporters_bootstrap_inc() {
+  # set base_url explicitly as SCRIPT_NAME would lead to
+  # a 'wrong' base_url for the site
+  global $base_url;
+  $is_https = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
+  $http_protocol = $is_https ? 'https' : 'http';
+  $base_root = $http_protocol . '://' . $_SERVER['HTTP_HOST'];
+  # base_url gets stripped to it's correct location below
+  $base_url = dirname($base_root . $_SERVER['SCRIPT_NAME']);
+
   $dir = dirname($_SERVER['DOCUMENT_ROOT'] . $_SERVER['SCRIPT_NAME']);
   while ($dir != '/') {
     $bootstrap = $dir . '/includes/bootstrap.inc';
@@ -16,6 +25,7 @@ function campaignion_recent_supporters_bootstrap_inc() {
       return $bootstrap;
     }
     $dir = dirname($dir);
+    $base_url = dirname($base_url);
   }
 }
 
@@ -25,13 +35,34 @@ if ($bootstrap = campaignion_recent_supporters_bootstrap_inc()) {
 
 _drupal_bootstrap_configuration();
 _drupal_bootstrap_database();
-
 require_once DRUPAL_ROOT . '/includes/common.inc';
+require_once DRUPAL_ROOT . '/includes/cache.inc';
 require_once dirname(__FILE__) . '/campaignion_recent_supporters.module';
 
-if (!isset($_GET['nid'])) {
-  campaignion_recent_supporters_send_empty_json();
+drupal_load('module', 'psr0');
+
+use \Drupal\campaignion_recent_supporters\RequestParams;
+use \Drupal\campaignion_recent_supporters\ActivityBackend;
+
+$params = new RequestParams($_GET);
+if (!$params->isValid()) {
+  drupal_add_http_header("Access-Control-Allow-Origin", "*");
+  drupal_add_http_header("Access-Control-Allow-Headers", "Content-Type");
+  drupal_add_http_header('Status', '403 Forbidden');
+  // no wtachlog log possible due to minimal bootstrap
+  drupal_json_output(array());
   exit;
 }
 
-campaignion_recent_supporters_json((int) $_GET['nid']);
+$backend = $params->getBackend('activity');
+
+if (isset($_GET['nid'])) {
+  $backend->recentOnOneActionJson($params);
+}
+elseif (isset($_GET['types'])) {
+  $backend->recentOnAllActionsJson($params);
+}
+else {
+  $backend->emptyJson();
+}
+

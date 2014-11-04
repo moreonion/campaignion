@@ -3,28 +3,34 @@
  * @file
  */
 
+use \Drupal\campaignion_recent_supporters\Loader;
+
 /**
  * Menu/form callback: settings form.
  */
-function recent_supporters_settings_form($form, &$form_state) {
-  $defaults = array(
-    'query_limit'    => 10,
-    'visible_count'  => 6,
-    'cycle_toggle'   => 0,
-    'country_toggle' => 1,
-    'name_display'   => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
-  );
-  $saved_settings = variable_get('campaignion_recent_supporters_settings', $defaults);
-  $saved_settings = $saved_settings + $defaults;
+function campaignion_recent_supporters_settings_form($form, &$form_state) {
+  $saved_settings = campaignion_recent_supporters_settings();
 
   $form['#tree'] = TRUE;
-
   $form['general_settings'] = array(
-    '#title' => t('General settings for recent supporter block.'),
+    '#title' => t('General settings for recent supporters.'),
+    '#descrition' => t('These settings are applied globally for this drupal installation.'),
+    '#type'  => 'fieldset',
+  );
+  $form['general_settings']['backend'] = array(
+    '#title' => t('Storage backend'),
+    '#description' => t('The storage backend decides where the recent supporter data is coming from.'),
+    '#type' => 'select',
+    '#options' => Loader::instance()->backendOptions(),
+    '#default_value' => $saved_settings['backend'],
+  );
+
+  $form['block_settings'] = array(
+    '#title' => t('Block settings.'),
     '#type'  => 'fieldset',
   );
 
-  $form['general_settings']['name_display'] = array(
+  $form['block_settings']['name_display'] = array(
     '#title'         => t('Supporter name display'),
     '#description'   => t('Configure the information displayed about the supporters.'),
     '#type'          => 'select',
@@ -32,7 +38,7 @@ function recent_supporters_settings_form($form, &$form_state) {
     '#attributes'    => array(),
     '#default_value' => $saved_settings['name_display'],
   );
-  $form['general_settings']['query_limit'] = array(
+  $form['block_settings']['query_limit'] = array(
     '#title'         => t('Limit of the database query.'),
     '#description'   => t('Only this count of supporters will be loaded from the DB. This value should be higher than the visible count, otherwise there would be no cycling.This is a global setting and cannot be overriden by the recent supporters fields.'),
     '#type'          => 'textfield',
@@ -41,7 +47,7 @@ function recent_supporters_settings_form($form, &$form_state) {
     '#attributes'    => array(),
     '#default_value' => $saved_settings['query_limit'],
   );
-  $form['general_settings']['visible_count'] = array(
+  $form['block_settings']['visible_count'] = array(
     '#title'         => t('Number of max. visible supporters.'),
     '#description'   => t('Number of max. visible supporters.'),
     '#type'          => 'textfield',
@@ -50,13 +56,13 @@ function recent_supporters_settings_form($form, &$form_state) {
     '#attributes'    => array(),
     '#default_value' => $saved_settings['visible_count'],
   );
-  $form['general_settings']['cycle_toggle'] = array(
+  $form['block_settings']['cycle_toggle'] = array(
     '#title'         => t('Cycle supporters.'),
     '#description'   => t('Cycle supporters.'),
     '#type'          => 'checkbox',
     '#default_value' => $saved_settings['cycle_toggle'],
   );
-  $form['general_settings']['country_toggle'] = array(
+  $form['block_settings']['country_toggle'] = array(
     '#title'         => t('Show country of supporters.'),
     '#description'   => t('Show country of supporters.'),
     '#type'          => 'checkbox',
@@ -113,17 +119,21 @@ function recent_supporters_settings_form($form, &$form_state) {
     _variable_realm_variable_settings_form_switcher($form);
   }
   $form = system_settings_form($form);
-  $form['#submit'][] = 'campaignion_recent_supporters_settings_form_submit';
+  array_unshift($form['#submit'], 'campaignion_recent_supporters_settings_form_submit');
   return $form;
 }
 
 function campaignion_recent_supporters_settings_form_submit($form, &$form_state) {
   $result = array(
-    'query_limit'    => $form_state['values']['general_settings']['query_limit'],
-    'visible_count'  => $form_state['values']['general_settings']['visible_count'],
-    'cycle_toggle'   => $form_state['values']['general_settings']['cycle_toggle'],
-    'country_toggle' => $form_state['values']['general_settings']['country_toggle'],
-    'name_display'   => $form_state['values']['general_settings']['name_display'],
+    'backend'        => $form_state['values']['general_settings']['backend'],
+    'query_limit'    => $form_state['values']['block_settings']['query_limit'],
+    'visible_count'  => $form_state['values']['block_settings']['visible_count'],
+    'cycle_toggle'   => $form_state['values']['block_settings']['cycle_toggle'],
+    'country_toggle' => $form_state['values']['block_settings']['country_toggle'],
+    'name_display'   => $form_state['values']['block_settings']['name_display'],
   );
   variable_set('campaignion_recent_supporters_settings', $result);
+  // Don't save those into variables in system_settings_form_submit().
+  unset($form_state['values']['general_settings']);
+  unset($form_state['values']['block_settings']);
 }
