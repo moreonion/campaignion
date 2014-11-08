@@ -1,6 +1,7 @@
 (function($) {
     Drupal.behaviors.campaignion_google_analytics = {};
     Drupal.behaviors.campaignion_google_analytics.attach = function(context, settings) {
+        if (typeof ga === 'undefined') { return; }
         var config =  settings.campaignion_google_analytics;
         if (typeof config !== 'undefined') {
             if (typeof config.thank_you !== "undefined") {

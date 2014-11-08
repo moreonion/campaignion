@@ -1,6 +1,7 @@
 (function($) {
     Drupal.behaviors.campaignion_google_analytics_donation = {};
     Drupal.behaviors.campaignion_google_analytics_donation.attach = function(context, settings) {
+      if (typeof ga === 'undefined') { return; }
       // guard against missing window.sessionStorage
       // this prevents errors, but degrades functionality on systems missing
       // sessionStorage
