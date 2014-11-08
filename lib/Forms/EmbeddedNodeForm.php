@@ -63,12 +63,31 @@ class EmbeddedNodeForm {
     }
   }
 
-  public function formArray() {
+  public function formArray(&$outer_form) {
     $form['#parents'] = $this->parents;
     $form = node_form($form, $this->embed_state, $this->embed_state['node']);
     $this->alterForm($form, $this->embed_state);
     $this->embedFieldGroups($form);
+    $this->remapClientsideValidations($form, $outer_form);
     return $form;
+  }
+
+  protected function remapClientsideValidations(&$form, &$outer_form) {
+    $s = '#clientside_validation_settings';
+    $f = 'clientside_validation_form_after_build';
+    if (!isset($form[$s])) {
+      return;
+    }
+    foreach ($form['#after_build'] as $key => $callback) {
+      if ($callback == $f) {
+        unset($form['#after_build'][$key]);
+      }
+    }
+    $outer_form += array('#after_build' => array(), $s => array());
+    $outer_form[$s] = array_merge($form[$s], $outer_form[$s]);
+    if (array_search($f, $outer_form['#after_build']) !== FALSE) {
+      $outer_form['#after_build'][] = $f;
+    }
   }
 
   public function validate($form, &$form_state) {

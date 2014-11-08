@@ -108,7 +108,7 @@ class ThankyouStep extends WizardStep {
       '#type'    => 'container',
       '#states'  => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'node'))),
       '#tree'    => TRUE,
-    ) + $formObj->formArray();
+    ) + $formObj->formArray($form);
 
     $node_form['title']['#required'] = FALSE;
     // don't publish per default
