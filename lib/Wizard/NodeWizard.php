@@ -20,6 +20,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
 
     $this->user = $user ? $user : $GLOBALS['user'];
     $this->node = $node ? $node : $this->prepareNode($type);
+    node_object_prepare($this->node);
     parent::__construct($user);
     $this->formInfo['path'] = $node ? "node/{$node->nid}/wizard/%step" : "wizard/{$this->node->type}";
 
