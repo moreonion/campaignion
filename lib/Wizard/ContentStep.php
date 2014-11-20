@@ -11,6 +11,12 @@ class ContentStep extends WizardStep {
 
   public function stepForm($form, &$form_state) {
     $form = parent::stepForm($form, $form_state);
+    $node = $this->wizard->node;
+
+    // New translations should always be unpublished.
+    if (empty($node->nid) && !empty($_GET['translation'])) {
+      $node->status = 0;
+    }
 
     // load original node form
     $form_state['embedded']['#wizard_type'] = 'content';
