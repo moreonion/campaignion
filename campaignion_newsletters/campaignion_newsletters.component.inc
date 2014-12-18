@@ -232,7 +232,9 @@ function _webform_csv_headers_newsletter($component, $export_options) {
  */
 function _webform_csv_data_newsletter($component, $export_options, $value) {
   $v = t('not subscribed');
-  if (!empty($value[0]) && $value[0]) {
+  # value of field 'subscribed' set to 'subscribed' if checkbox checked,
+  # '0' otherwise
+  if (!empty($value['subscribed'])) {
     $v = t('subscribed');
   }
   return $v;
