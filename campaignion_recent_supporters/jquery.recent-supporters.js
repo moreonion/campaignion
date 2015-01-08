@@ -236,7 +236,7 @@
       }
       var supporterHtml = text;
       supporterHtml += "\n"+'<span class="time" data-timestamp="'+timestamp+'" title="'+supporter.rfc8601+'">'+timestamp+'</span>';
-      $li.addClass('supporter').append(supporterHtml);
+      $li.addClass('supporter clearfix').append(supporterHtml);
 
       if (typeof supporter.action_type !== 'undefined' && supporter.action_type.length > 0) {
         $li.addClass('action-type-'+supporter.action_type);

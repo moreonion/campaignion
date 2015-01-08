@@ -442,7 +442,7 @@ function theme_recent_supporters($variables) {
       if (!empty($supporter['action_type'])) {
         $action_type = "action-type-" . $supporter['action_type'];
       }
-      $output .= "<li class=\"supporter $action_type\">\n";
+      $output .= "<li class=\"supporter clearfix $action_type\">\n";
 
       if ($show_country && isset($supporter['country'])) {
         $classes = empty($supporter['country']) ? 'no-cc' : "flag-".strtolower(drupal_clean_css_identifier($supporter['country']));
