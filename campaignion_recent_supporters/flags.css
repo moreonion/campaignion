@@ -10,7 +10,10 @@
   overflow: hidden;
 }
 .no-cc {
-  display: none;
+  width: 16px;
+  height: 11px;
+  display: inline-block;
+  background-position: -240px -165px;
 }
 
 .flag-ad {background-position: -16px 0}
