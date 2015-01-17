@@ -26,7 +26,7 @@ class ECPaymentController extends \PayPalPaymentECPaymentMethodController {
 
     // Start checkout.
     if ($authentication) {
-      $context = $payment->context_data['context'];
+      $context = $payment->contextObj;
       $context->redirect($this->checkoutURL($payment->method->controller_data['server'], $authentication->token));
     }
     else {

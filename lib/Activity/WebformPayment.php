@@ -20,7 +20,7 @@ class WebformPayment extends WebformSubmission {
 
   public static function fromPayment(\Payment $payment, $data = array()) {
     $data['pid'] = $payment->pid;
-    $submission = $payment->context_data['context']->getSubmission();
+    $submission = $payment->contextObj->getSubmission();
     return static::fromSubmission($submission->getNode(), $submission->unwrap(), $data);
   }
 

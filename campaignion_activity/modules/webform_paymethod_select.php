@@ -12,7 +12,7 @@ function webform_paymethod_select_campaignion_action_info() {
  */
 function campaignion_activity_payment_status_change(Payment $payment, PaymentStatusItem $previous_status_item) {
   $statusChangedToSuccess = $payment->getStatus()->status == PAYMENT_STATUS_SUCCESS && $previous_status_item->status != PAYMENT_STATUS_SUCCESS;
-  $hasContextObj = isset($payment->context_data['context']) && $payment->context_data['context'] instanceof \Drupal\webform_paymethod_select\WebformPaymentContext;
+  $hasContextObj = $payment->contextObj instanceof \Drupal\webform_paymethod_select\WebformPaymentContext;
   if (!$statusChangedToSuccess || !$hasContextObj)
     return;
 
