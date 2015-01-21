@@ -37,9 +37,15 @@ _drupal_bootstrap_configuration();
 _drupal_bootstrap_database();
 require_once DRUPAL_ROOT . '/includes/common.inc';
 require_once DRUPAL_ROOT . '/includes/cache.inc';
-require_once dirname(__FILE__) . '/campaignion_recent_supporters.module';
-
+spl_autoload_unregister('drupal_autoload_class');
+spl_autoload_unregister('drupal_autoload_interface');
+foreach (variable_get('cache_backends', array()) as $include) {
+  require_once DRUPAL_ROOT . '/' . $include;
+}
 drupal_load('module', 'psr0');
+spl_autoload_register('drupal_autoload_class');
+spl_autoload_register('drupal_autoload_interface');
+require_once dirname(__FILE__) . '/campaignion_recent_supporters.module';
 
 use \Drupal\campaignion_recent_supporters\RequestParams;
 use \Drupal\campaignion_recent_supporters\ActivityBackend;
