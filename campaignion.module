@@ -33,3 +33,12 @@ function campaignion_entity_info_alter(&$entity_info) {
     $entity_info['redhen_contact']['entity class'] = '\\Drupal\\campaignion\\Contact';
   }
 }
+
+/**
+ * Implements hook_share_light_options_alter().
+ */
+function campaignion_share_light_options_alter(&$options) {
+  if (!empty($_GET['sid'])) {
+    $options['link']['query']['refsid'] = $_GET['sid'];
+  }
+}
