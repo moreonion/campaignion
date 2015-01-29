@@ -63,7 +63,7 @@ SQL;
 
   public static function fromEmail($email, $type = NULL) {
     if (!$email) {
-      throw new \InvalidArgumentException("The email address must be a non-empty string. Got '$email' instead.");
+      throw new NoEmailException("The email address must be a non-empty string. Got '$email' instead.");
     }
     $type = $type ? $type : static::defaultType();
     if (!($contact = static::byEmail($email, $type))) {
