@@ -38,6 +38,9 @@ class WebformSubmission extends \Drupal\campaignion\Activity {
   }
 
   public static function fromSubmission($node, $submission, $data = array()) {
+    if ($activity = static::bySubmission($node, $submission)) {
+      return $activity;
+    }
     $importer = ContactTypeManager::instance()->importer('campaignion_activity');
     $source = new Submission($node, $submission);
     $contact = $importer->findOrCreateContact($source);
