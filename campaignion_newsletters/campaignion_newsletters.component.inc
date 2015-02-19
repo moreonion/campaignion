@@ -22,6 +22,7 @@ function _webform_defaults_newsletter() {
       'description' => t('Subscribe me to the newsletter.'),
       'private' => FALSE,
       'lists' => array(),
+      'opt_in_implied' => 1,
       'title_display' => 'none',
     ),
   );
@@ -72,6 +73,16 @@ function _webform_edit_newsletter($component) {
     '#description' => t('Which lists should the user be subscribed to?'),
     '#options' => $newsletters,
     '#weight' => 1,
+  );
+
+  $form['extra']['opt_in_implied'] = array(
+    '#type' => 'radios',
+    '#title' => t('Double opt-in'),
+    '#default_value' => $component['extra']['opt_in_implied'],
+    '#options' => array(
+      0 => t("Newsletter provider: This form doesn't provide double-opt-in functionality the newsletter provider should take care of it."),
+      1 => t('Included in this form: This form includes a double-opt-in process no further action is needed'),
+    ),
   );
 
   return $form;
@@ -146,10 +157,14 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
   if (isset($element['#newsletter_value'])) {
     $element['#webform_component']['value'] = $element['#newsletter_value'];
   }
+  if (isset($element['#newsletter_opt_in_implied'])) {
+    $element['#webform_component']['extra']['opt_in_implied'] = $element['#newsletter_opt_in_implied'];
+  }
   $edit = _webform_edit_newsletter($element['#webform_component']);
   $form['options']['lists'] = $edit['extra']['lists'];
   $form['newsletter_title'] = $edit['extra']['description'];
   $form['newsletter_value'] = $edit['value'];
+  $form['newsletter_opt_in_implied'] = $edit['extra']['opt_in_implied'];
   return $form;
 }
 
@@ -180,6 +195,7 @@ function _webform_form_builder_properties_newsletter() {
       'submit' => array('campaignion_newsletters_form_builder_property_newsletter_form_submit'),
     ),
     'newsletter_title' => array(),
+    'newsletter_opt_in_implied' => array(),
   );
 }
 
@@ -202,6 +218,9 @@ function _webform_form_builder_map_newsletter() {
     ),
     'newsletter_title' => array(
       'storage_parents' => array('extra', 'description'),
+    ),
+    'newsletter_opt_in_implied' => array(
+      'storage_parents' => array('extra', 'opt_in_implied'),
     ),
     'newsletter_value' => array(
       'storage_parents' => array('value'),

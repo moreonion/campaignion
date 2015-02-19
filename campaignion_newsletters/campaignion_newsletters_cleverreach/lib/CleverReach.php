@@ -116,7 +116,7 @@ class CleverReach extends ProviderBase {
    *
    * @return: True on success.
    */
-  public function subscribe($list, $mail, $data) {
+  public function subscribe($list, $mail, $data, $opt_in = FALSE) {
     $user = array(
       'email'  => $mail,
       'active' => TRUE,

@@ -107,11 +107,13 @@ function campaignion_newsletters_webform_confirm_email_email_confirmed($node, $s
   foreach ($s->webform->componentsByType('newsletter') as $component) {
     $value = $s->valuesByCid($component['cid']);
     if (!empty($value['subscribed'])) {
+      $needs_opt_in = !$component['extra']['opt_in_implied'];
       foreach ($component['extra']['lists'] as $list_id => $value) {
         if (!empty($value)) {
           $subscription = Subscription::byData($list_id, $email);
           $subscription->delete = FALSE;
           $subscription->source = $s;
+          $subscription->needs_opt_in = $needs_opt_in;
           $subscription->save();
         }
       }

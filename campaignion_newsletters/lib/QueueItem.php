@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_newsletters;
 
 class QueueItem extends \Drupal\little_helpers\DB\Model {
+  const OPTIN = 2;
   const SUBSCRIBE = 1;
   const UNSUBSCRIBE = 0;
 

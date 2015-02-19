@@ -117,16 +117,16 @@ class MailChimp extends ProviderBase {
    *
    * @return: True on success.
    */
-  public function subscribe($list, $mail, $data) {
+  public function subscribe($list, $mail, $data, $opt_in = FALSE) {
     $this->call('subscribe',
       $list->identifier,
       array('email' => $mail),
       $data,
       'html',
-      false,
-      true,
-      false,
-      true
+      $opt_in, // double_optin
+      true, // update_existing
+      false, // replace_interests
+      false // send_welcome
     );
     return true;
   }
@@ -175,7 +175,7 @@ class MailChimp extends ProviderBase {
       }
     }
     else {
-      return $result['data'];
+      return $result;
     }
   }
 

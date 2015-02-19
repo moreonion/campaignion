@@ -8,6 +8,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
   public $fingerprint = '';
   public $delete = FALSE;
   public $source = NULL;
+  public $needs_opt_in = FALSE;
 
   public static $lists = array();
 
@@ -63,10 +64,14 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
     if ($fingerprint != $this->fingerprint) {
       $this->fingerprint = $fingerprint;
       if (!$fromProvider) {
+        $action = QueueItem::SUBSCRIBE;
+        if ($this->new && $this->needs_opt_in) {
+          $action |= QueueItem::OPTIN;
+        }
         QueueItem::byData(array(
           'list_id' => $this->list_id,
           'email' => $this->email,
-          'action' => QueueItem::SUBSCRIBE,
+          'action' => $action,
           'data' => $data,
         ))->save();
       }

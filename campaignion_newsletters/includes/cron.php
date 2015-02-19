@@ -18,8 +18,8 @@ function campaignion_newsletters_send_queue() {
     $provider = $list->provider();
 
     try {
-      if ($item->action == QueueItem::SUBSCRIBE) {
-        $provider->subscribe($list, $item->email, $item->data);
+      if ($item->action & QueueItem::SUBSCRIBE) {
+        $provider->subscribe($list, $item->email, $item->data, (bool) ($item->action & QueueItem::OPTIN));
       }
       elseif ($item->action == QueueItem::UNSUBSCRIBE) {
         $provider->unsubscribe($list, $item->email);
