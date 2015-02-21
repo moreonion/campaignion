@@ -29,7 +29,7 @@ interface NewsletterProviderInterface {
    *
    * @return: True on success.
    */
-  public function subscribe($newsletter, $mail, $data, $opt_in = FALSE);
+  public function subscribe($newsletter, $mail, $data, $opt_in = FALSE, $welcome = FALSE);
 
   /**
    * Subscribe a user, given a newsletter identifier and email address.
