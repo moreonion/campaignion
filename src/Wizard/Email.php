@@ -94,22 +94,22 @@ class Email {
       '#type'        => 'fieldset',
     );
 
+    $checkbox_id = drupal_html_id($this->form_id . '_checkbox');
     $form[$this->form_id . '_toggle'][$this->form_id . '_check'] = array(
       '#type'          => 'checkbox',
       '#title'         => $messages['toggle_title'],
-      '#parents'       => array($this->form_id . '_email', $this->form_id . '_check'),
+      '#id'            => $checkbox_id,
       '#return_value'  => 1,
       '#default_value' => !$this->is_new ? 1 : 0,
     );
 
-    $js_id = str_replace('_', '-', "{$this->form_id}_email_{$this->form_id}_check");
     $form[$this->form_id . '_email'] = array(
       '#type'        => 'fieldset',
       '#title'       => $messages['email_title'],
       '#attributes'  => array('class' => array('email-wrapper')),
       '#states' => array(
         'visible' => array(   // action to take.
-          '#edit-' . $js_id => array('checked' => TRUE),
+          "#$checkbox_id" => array('checked' => TRUE),
         ),
       ),
     ) + $this->getEmailForm($form_state);

@@ -11,6 +11,35 @@ class EmailStep extends WizardStep {
   protected $step  = 'emails';
   protected $title = 'Emails';
   protected $emails = array();
+  protected $emailInfo = array();
+
+  public function __construct($wizard) {
+    parent::__construct($wizard);
+    $this->emailInfo = array(
+      'confirmation' => array(
+        'form_id' => 'confirmation_request',
+        'type' => 1,
+        'eid' => self::WIZARD_CONFIRMATION_REQUEST_EID,
+        'toggle_title' => t('Enable email confirmation (double opt in)'),
+        'email_title'  => t('Email confirmation'),
+      ),
+      'thank_you' => array(
+        'form_id' => 'confirmation_or_thank_you',
+        'type' => 0,
+        'eid' => self::WIZARD_THANK_YOU_EID,
+        'toggle_title' => t('Enable a thank you email'),
+        'email_title'  => t('Thank you email'),
+      ),
+      'notification' => array(
+        'class' => '\\Drupal\\campaignion\\Wizard\\NotificationEmail',
+        'type' => 0,
+        'form_id' => '',
+        'eid' => self::WIZARD_NOTIFICATION_EID,
+        'toggle_title' => t('Enable a notification email'),
+        'email_title'  => t('Notification email'),
+      ),
+    );
+  }
 
   protected function loadIncludes() {
     module_load_include('inc', 'webform', 'includes/webform.emails');
@@ -25,55 +54,21 @@ class EmailStep extends WizardStep {
     $form['#tree'] = TRUE;
     $form['wizard_head']['#tree'] = FALSE;
 
-    $this->emails['confirmation'] = $email = new Email($node, 'confirmation_request', self::WIZARD_CONFIRMATION_REQUEST_EID);
-    /* double optin / confirmation request email */
-    $messages = array(
-      'toggle_title' => t('Enable email confirmation (double opt in)'),
-      'email_title'  => t('Email confirmation'),
-    );
-    $form += $email->form($messages, $form_state);
-
-    $form['or'] = array(
-      '#type'   => 'markup',
-      '#markup' => '<div class="thank-you-outer-or"><span class="thank-you-line-or">&nbsp;</span></div>',
-    );
-
-    $this->emails['thank_you'] = $email = new Email($node, 'confirmation_or_thank_you', self::WIZARD_THANK_YOU_EID);
-    $messages = array(
-      'toggle_title' => t('Enable a thank you email'),
-      'email_title'  => t('Thank you email'),
-    );
-    $form += $email->form($messages, $form_state);
-
-    $form['or2'] = array(
-      '#type'   => 'markup',
-      '#markup' => '<div class="thank-you-outer-or"><span class="thank-you-line-or">&nbsp;</span></div>',
-    );
-
-    $this->emails['notification'] = $email = new Email($node, 'notification', self::WIZARD_NOTIFICATION_EID);
-    $messages = array(
-      'toggle_title' => t('Enable a notification email'),
-      'email_title'  => t('Notification email'),
-    );
-    $form += $email->form($messages, $form_state);
-
-    $form['notification_email']['email_option']['#access'] = TRUE;
-    $form['notification_email']['email_option']['#default_value'] = 'custom';
-    unset($form['notification_email']['email_option']['#options']['component']);
-    unset($form['notification_email']['email_option']['#options']['default']);
-    $form['notification_email']['email_custom']['#access'] = TRUE;
-    if (!$form['notification_email']['email_custom']['#default_value']) {
-      $form['notification_email']['email_custom']['#default_value'] = 'noreply@example.com';
+    $ors = 0;
+    foreach ($this->emailInfo as $name => $info) {
+      $info += array(
+        'class' => '\\Drupal\\campaignion\\Wizard\\Email',
+      );
+      if ($ors++) {
+        $form['or' . $ors] = array(
+          '#type'   => 'markup',
+          '#markup' => '<div class="thank-you-outer-or"><span class="thank-you-line-or">&nbsp;</span></div>',
+        );
+      }
+      $class = $info['class'];
+      $this->emails[$name] = $email = new $class($node, $info['form_id'], $info['eid']);
+      $form += $email->form($this->emailInfo[$name], $form_state);
     }
-
-    // we are using only custom and default options
-    // therefore if the custom address is set to campaignion, we take this as the
-    // default for the notification option
-    if ($form['notification_email']['from_address_custom']['#default_value'] === 'you@example.com') {
-      $form['notification_email']['from_address_custom']['#default_value'] = '';
-    }
-    $form['notification_email']['from_address_option']['#default_value'] = 'default';
-    $form['notification_email']['from_address_option']['#options']['default'] = 'Default: <em class="placeholder">you@example.com</em>';
 
     return $form;
   }
@@ -92,15 +87,17 @@ class EmailStep extends WizardStep {
     $node = $this->wizard->node;
     $values =& $form_state['values'];
 
-    $this->emails['confirmation']->submit($form, $form_state, 1);
+    // If we want an confirmation the thank you has to be a conditional email.
+    // Otherwise it's sent immediately.
+    if (isset($this->emailInfo['confirmation'])) {
+      if ($values['confirmation_request_email']['confirmation_request_check'] == 1) {
+        $this->emailInfo['thank_you']['type'] = 2;
+      }
+    }
 
-    // if we want an confirmation the thank you has to be a conditional email.
-    // otherwise it's sent immediately.
-    $type = $values['confirmation_request_email']['confirmation_request_check'] == 1 ? 2 : 0;
-    $this->emails['thank_you']->submit($form, $form_state, $type);
-
-    $values['notification_email']['from_address_campaignion'] = 'you@example.com'; // Default notification from address
-    $this->emails['notification']->submit($form, $form_state, 0);
+    foreach ($this->emailInfo as $name => $info) {
+      $this->emails[$name]->submit($form, $form_state, $info['type']);
+    }
   }
 
   public function status() {
