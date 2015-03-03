@@ -26,10 +26,4 @@ class NotificationEmail extends Email {
 
     return $form;
   }
-
-  public function submit($form, &$form_state, $email_type) {
-    $values = &$form_state['values'];
-    $values[$this->form_id . '_email']['from_address_campaignion'] = 'you@example.com'; // Default notification from address
-    parent::submit($form, $form_state, $email_type);
-  }
 }
