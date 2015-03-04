@@ -5,6 +5,7 @@ package = Campaignion
 project = campaignion
 
 dependencies[] = campaignion
+dependencies[] = campaignion_activity
 dependencies[] = campaignion_ux
 ; for ctools dropbutton
 dependencies[] = ctools
