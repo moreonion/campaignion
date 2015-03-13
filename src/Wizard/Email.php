@@ -133,7 +133,7 @@ class Email {
   public function submit($form, &$form_state, $email_type) {
     $values = &$form_state['values'];
 
-    if ($values[$this->form_id . '_email'][$this->form_id . '_check'] == 1) {
+    if ($values[$this->form_id . '_toggle'][$this->form_id . '_check'] == 1) {
       $values[$this->form_id . '_email']['template'] = &$values[$this->form_id . '_email']['template']['value'];
       $form_state['values'] =& $values[$this->form_id . '_email'];
 

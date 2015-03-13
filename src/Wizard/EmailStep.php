@@ -90,7 +90,7 @@ class EmailStep extends WizardStep {
     // If we want an confirmation the thank you has to be a conditional email.
     // Otherwise it's sent immediately.
     if (isset($this->emailInfo['confirmation'])) {
-      if ($values['confirmation_request_email']['confirmation_request_check'] == 1) {
+      if ($values['confirmation_request_toggle']['confirmation_request_check'] == 1) {
         $this->emailInfo['thank_you']['type'] = 2;
       }
     }
