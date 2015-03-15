@@ -146,6 +146,7 @@ class SupporterActivity extends Base implements FilterInterface {
     $inner->fields('act', array('contact_id'));
     // "RedHen contact was edited" activities are never shown
     $inner->condition('act.type', 'redhen_contact_edit', '!=');
+    $inner->groupBy('act.contact_id');
 
     if ($values['activity'] != 'any_activity') {
       $inner->condition('act.type', $values['activity']);
@@ -169,7 +170,6 @@ class SupporterActivity extends Base implements FilterInterface {
         $inner->condition('act.type', 'redhen_contact_create', '!=');
       }
       $inner->having('COUNT(*)' . $values['how_many_op'] . ' :nr', array(':nr' => $values['how_many_nr']));
-      $inner->groupBy('act.contact_id');
     }
 
     switch ($values['date_range']) {
@@ -186,7 +186,8 @@ class SupporterActivity extends Base implements FilterInterface {
         $inner->condition('act.created', $from, '>');
         break;
     }
-    $query->condition('r.contact_id', $inner, 'IN');
+    $tname = db_query_temporary((string) $inner, $inner->getArguments());
+    $query->innerJoin($tname, 'af', "af.contact_id = r.contact_id");
   }
 
   public function isApplicable($current) {
