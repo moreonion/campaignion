@@ -46,6 +46,27 @@ class SupporterActivity extends Base implements FilterInterface {
     $frequency_id  = drupal_html_id('activity-frequency');
     $date_range_id = drupal_html_id('activity-date-range');
     $activity_type_id = drupal_html_id('activity-type');
+    $form['frequency'] = array(
+      '#type'          => 'select',
+      '#title'         => t('Activity'),
+      '#attributes'    => array('id' => $frequency_id),
+      '#options'       => array('any' => t('Any frequency'), 'how_many' => t('How many times?')),
+      '#default_value' => isset($values['frequency']) ? $values['frequency'] : NULL,
+    );
+    $form['how_many_op'] = array(
+      '#type'          => 'select',
+      '#options'       => array('=' => t('Exactly'), '>' => t('More than'), '<' => t('Less than')),
+      '#states'        => array('visible' => array('#' . $frequency_id => array('value' => 'how_many'))),
+      '#default_value' => isset($values['how_many_op']) ? $values['how_many_op'] : NULL,
+    );
+    $form['how_many_nr'] = array(
+      '#type'          => 'textfield',
+      '#size'          => 10,
+      '#maxlength'     => 10,
+      '#states'        => array('visible' => array('#' . $frequency_id => array('value' => 'how_many'))),
+      '#default_value' => isset($values['how_many_nr']) ? $values['how_many_nr'] : NULL,
+      '#element_validate' => array('campaignion_manage_activity_how_many_validate'),
+    );
     $form['activity'] = array(
       '#type'          => 'select',
       '#id'            => $activity_type_id,
@@ -139,6 +160,16 @@ class SupporterActivity extends Base implements FilterInterface {
       else {
         $inner->condition('n.type', $values['action_type']);
       }
+    }
+
+    if ($values['frequency'] === 'how_many') {
+      if ($values['activity'] === 'any_activity') {
+        // when the user selects any activity but wants to filter for number of
+        // activities we don't want to include "RedHen contact was created" activities
+        $inner->condition('act.type', 'redhen_contact_create', '!=');
+      }
+      $inner->having('COUNT(*)' . $values['how_many_op'] . ' :nr', array(':nr' => $values['how_many_nr']));
+      $inner->groupBy('act.contact_id');
     }
 
     switch ($values['date_range']) {
