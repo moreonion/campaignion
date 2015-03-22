@@ -27,4 +27,8 @@ class ContentPage extends Page {
       'unpubslih' => new BulkOp\ContentUnpublish(),
     ));
   }
+
+  protected function getSelectedIds($form, &$form_state) {
+    return $this->listing->selectedIds($form['listing'], $form_state, $this->baseQuery);
+  }
 }

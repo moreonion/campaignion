@@ -57,7 +57,7 @@ class BulkOpForm {
 
     $form['#attributes']['class'][] = 'campaignion-manage-bulkops';
   }
-  public function submit(&$form, &$form_state, $ids) {
+  public function submit(&$form, &$form_state, $result) {
     $values  = &$form_state['values']['bulkop']['bulk-wrapper'];
     $op_name = $values['operations'];
     if (!isset($this->ops[$op_name])) {
@@ -65,6 +65,6 @@ class BulkOpForm {
     }
     $op = $this->ops[$op_name];
     $op_parameters = isset($values['op-wrapper']['op'][$op_name]) ? $values['op-wrapper']['op'][$op_name] : NULL;
-    $op->apply($ids, $op_parameters);
+    $op->apply($result, $op_parameters);
   }
 }

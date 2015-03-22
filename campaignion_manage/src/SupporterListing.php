@@ -100,26 +100,4 @@ class SupporterListing {
     }
     return $links;
   }
-
-  public function selectedIds(&$element, &$form_state, $baseQuery) {
-    $values = &drupal_array_get_nested_value($form_state['values'], $element['#array_parents']);
-    if (!empty($values['bulkop_select_all_matching'])) {
-      $query = $baseQuery->filtered();
-      $fields = $query->getfields();
-      $fields = array();
-      $query->addField('r', 'contact_id', 'id');
-      $ids = array();
-      foreach ($query->execute() as $row) {
-        $ids[] = $row->id;
-      }
-      return $ids;
-    }
-    $ids = array();
-    foreach ($values['bulk_id'] as $id => $selected) {
-      if ($selected) {
-        $ids[$id] = $id;
-      }
-    }
-    return array_keys($ids);
-  }
 }

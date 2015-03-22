@@ -50,9 +50,11 @@ abstract class Page {
         $this->filterForm->submit($form['filter'], $form_state);
         break;
       case 'bulkop':
-        $ids = $this->listing->selectedIds($form['listing'], $form_state, $this->baseQuery);
+        $ids = $this->getSelectedIds($form, $form_state);
         $this->bulkOpForm->submit($form['bulkops_listing'], $form_state, $ids);
         break;
     }
   }
+
+  protected abstract function getSelectedIds($form, &$form_state);
 }
