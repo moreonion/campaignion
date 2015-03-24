@@ -39,7 +39,7 @@ SELECT rc.first_name, rc.last_name, ca.created as timestamp,
   n.tnid, n.nid
 FROM {node} n
   INNER JOIN {campaignion_activity_webform} caw ON caw.nid = n.nid
-  INNER JOIN {campaignion_activity} ca ON ca.activity_id=caw.activity_id
+  INNER JOIN {campaignion_activity} ca ON ca.activity_id=caw.activity_id AND ca.type='webform_submission'
   INNER JOIN {redhen_contact} rc USING (contact_id)
   INNER JOIN {webform_tracking} wt ON wt.nid=caw.nid AND wt.sid=caw.sid
   LEFT OUTER JOIN {field_data_{$config['addressfield']}} fdfa ON fdfa.entity_id = rc.contact_id AND fdfa.delta = 0
@@ -66,7 +66,7 @@ FROM {campaignion_activity_webform} caw
   INNER JOIN {node} na ON caw.nid = na.nid
   LEFT OUTER JOIN {node} nt ON na.tnid != 0 AND nt.tnid = na.tnid AND nt.language = :lang AND nt.status>0
   LEFT OUTER JOIN {node} no ON na.tnid = no.nid AND no.status>0
-  INNER JOIN {campaignion_activity} ca ON ca.activity_id = caw.activity_id
+  INNER JOIN {campaignion_activity} ca ON ca.activity_id = caw.activity_id AND ca.type = 'webform_submission'
   INNER JOIN {redhen_contact} rc USING (contact_id)
   INNER JOIN {webform_tracking} wt ON wt.nid = caw.nid AND wt.sid = caw.sid
   LEFT OUTER JOIN {field_data_{$config['addressfield']}} fdfa ON fdfa.entity_id = rc.contact_id AND fdfa.delta = 0
