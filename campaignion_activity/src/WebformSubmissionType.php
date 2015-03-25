@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion\Activity;
+namespace Drupal\campaignion_activity;
 
-class WebformSubmissionType implements \Drupal\campaignion\Interfaces\ActivityType {
+class WebformSubmissionType implements ActivityTypeInterface {
   public function alterQuery(\SelectQuery $query, $operator) {
   }
   public function createActivityFromRow($data) {

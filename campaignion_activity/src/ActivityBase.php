@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion;
+namespace Drupal\campaignion_activity;
 
-class Activity implements Interfaces\Activity {
+class ActivityBase implements ActivityInterface {
   protected $activity_id = NULL;
   protected $contact_id;
   protected $type;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Activity;
+namespace Drupal\campaignion_activity;
 
 class WebformPayment extends WebformSubmission {
   protected $type = 'webform_payment';

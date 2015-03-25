@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\campaignion\Activity;
+namespace Drupal\campaignion_activity;
 
 use \Drupal\campaignion\ContactTypeManager;
 use \Drupal\campaignion\CRM\Import\Source\WebformSubmission as Submission;
 
-class WebformSubmission extends \Drupal\campaignion\Activity {
+class WebformSubmission extends ActivityBase {
   protected $type = 'webform_submission';
 
   public $sid;

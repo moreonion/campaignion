@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\campaignion\Activity;
+namespace Drupal\campaignion_activity;
 
 use \Drupal\campaignion\Contact;
 
-class Comment extends \Drupal\campaignion\Activity {
+class Comment extends ActivityBase {
   protected $type = 'comment';
 
   public $cid;

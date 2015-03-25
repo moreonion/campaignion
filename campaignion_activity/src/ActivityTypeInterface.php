@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion\Interfaces;
+namespace Drupal\campaignion_activity;
 
-interface ActivityType {
+interface ActivityTypeInterface {
   public function alterQuery(\SelectQuery $query, $operator);
   public function createActivityFromRow($data);
 }

@@ -6,7 +6,7 @@
  * … on behalf of the commend.module
  */
 function comment_campaignion_activity_type_info() {
-  $info['comment'] = 'Drupal\campaignion\Activity\Comment';
+  $info['comment'] = 'Drupal\campaignion_activity\Comment';
 
   return $info;
 }
@@ -15,7 +15,7 @@ function comment_campaignion_activity_type_info() {
  * Implements hook_comment_insert().
  */
 function campaignion_activity_comment_insert($comment) {
-  if ($activity = \Drupal\campaignion\Activity\Comment::fromComment($comment)) {
+  if ($activity = \Drupal\campaignion_activity\Comment::fromComment($comment)) {
     $activity->save();
   }
 }
