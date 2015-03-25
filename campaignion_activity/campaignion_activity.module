@@ -23,10 +23,6 @@ if (module_exists('webform')) {
   }
 }
 
-if (module_exists('comment')) {
-  require_once dirname(__FILE__) . '/modules/comment.php';
-}
-
 /**
  * Implements hook_campaignion_activity_type_info().
  *
