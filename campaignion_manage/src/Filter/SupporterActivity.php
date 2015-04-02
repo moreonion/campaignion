@@ -106,7 +106,6 @@ class SupporterActivity extends Base implements FilterInterface {
     $form['date_from'] = array(
       '#type'          => 'date_popup',
       '#title'         => t('from'),
-      '#description'   => t('Specify a date in the format YYYY/MM/DD'),
       '#date_format'   => 'Y/m/d',
       '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'from'))),
       '#default_value' => isset($values['date_from']) ? $values['date_from'] : NULL,
@@ -123,7 +122,6 @@ class SupporterActivity extends Base implements FilterInterface {
     $form['date_range_from'] = array(
       '#type'          => 'date_popup',
       '#title'         => t('from'),
-      '#description'   => t('Specify a date in the format YYYY/MM/DD'),
       '#date_format'   => 'Y/m/d',
       '#states'        => array('visible' => array('#' . $date_range_id => array('value' => 'range'))),
       '#default_value' => isset($values['date_from']) ? $values['date_from'] : NULL,
