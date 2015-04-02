@@ -50,7 +50,7 @@ class SupporterActivity extends Base implements FilterInterface {
       '#type'          => 'select',
       '#title'         => t('Activity'),
       '#attributes'    => array('id' => $frequency_id),
-      '#options'       => array('any' => t('Any frequency'), 'how_many' => t('How many times?')),
+      '#options'       => array('any' => t('Any frequency'), 'never' => t('Never'), 'how_many' => t('How many times?')),
       '#default_value' => isset($values['frequency']) ? $values['frequency'] : NULL,
     );
     $form['how_many_op'] = array(
@@ -140,11 +140,15 @@ class SupporterActivity extends Base implements FilterInterface {
   public function title() { return t('Activity'); }
 
   public function apply($query, array $values) {
+    // Do nothing for any number of times + any type + any time.
+    if ($values['activity'] == 'any_activity' && $values['frequency'] == 'any' && $values['date_range'] == 'all') {
+      return;
+    }
+
     $inner = db_select('campaignion_activity', 'act');
     $inner->fields('act', array('contact_id'));
     // "RedHen contact was edited" activities are never shown
     $inner->condition('act.type', 'redhen_contact_edit', '!=');
-    $inner->groupBy('act.contact_id');
 
     if ($values['activity'] != 'any_activity') {
       $inner->condition('act.type', $values['activity']);
@@ -184,6 +188,14 @@ class SupporterActivity extends Base implements FilterInterface {
         $inner->condition('act.created', $from, '>');
         break;
     }
+    if ($values['frequency'] == 'never') {
+      $never = db_select('redhen_contact', 'r')
+        ->fields('r', array('contact_id'));
+      $never->leftJoin($inner, 'f', 'r.contact_id=f.contact_id');
+      $never->condition('f.contact_id', NULL);
+      $inner = $never;
+    }
+    $inner->distinct();
     $tname = db_query_temporary((string) $inner, $inner->getArguments());
     $query->innerJoin($tname, 'af', "af.contact_id = r.contact_id");
   }
