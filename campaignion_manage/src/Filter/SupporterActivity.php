@@ -225,13 +225,13 @@ class SupporterActivity extends Base implements FilterInterface {
         break;
     }
     if ($values['frequency'] == 'never') {
-      $never = db_select('redhen_contact', 'r')
-        ->fields('r', array('contact_id'));
-      $never->leftJoin($inner, 'f', 'r.contact_id=f.contact_id');
-      $never->condition('f.contact_id', NULL);
-      $inner = $never;
+      $inner = db_select('redhen_contact', 'r')
+        ->fields('r', array('contact_id'))
+        ->condition('r.contact_id', $inner, 'NOT IN');
     }
-    $inner->distinct();
+    else {
+      $inner->distinct();
+    }
     $tname = db_query_temporary((string) $inner, $inner->getArguments());
     $query->innerJoin($tname, 'af', "af.contact_id = r.contact_id");
   }
