@@ -30,23 +30,30 @@ abstract class TypeBase implements TypeInterface {
     return isset($action_types[$type]);
   }
 
+  public static function typesInfo() {
+    $types_info = \module_invoke_all('campaignion_action_info');
+    foreach ($types_info as $type => &$info) {
+      $info += array('parameters' => array());
+    }
+    return $types_info;
+  }
+
   public static function types() {
-    static $static_fast = NULL;
-    if (!isset($static_fast)) {
-      $static_fast = &drupal_static(__CLASS__, array());
-      $static_fast = \module_invoke_all('campaignion_action_info');
-      foreach ($static_fast as $type => &$info) {
-        $info += array(
-          'parameters' => array(),
-        );
+    $types = drupal_static(__CLASS__);
+    if ($types === NULL) {
+      $types = array();
+      $types_info = static::typesInfo();
+      foreach ($types_info as $type => $info) {
+        $class = $info['class'];
+        $types[$type] = new $class($type, $info['parameters']);
       }
     }
-    return $static_fast;
+    return $types;
   }
 
   public static function thankYouPageTypes() {
     $tyTypes = array();
-    foreach (static::types() as $type => $info) {
+    foreach (static::typesInfo() as $type => $info) {
       $p = &$info['parameters'];
       if (isset($p['thank_you_page'])) {
         $tyTypes[$p['thank_you_page']['type']][$p['thank_you_page']['reference']] = TRUE;
@@ -66,9 +73,14 @@ abstract class TypeBase implements TypeInterface {
   public static function fromContentType($type) {
     $action_types = self::types();
     if (isset($action_types[$type])) {
-      $info = &$action_types[$type];
-      $class = $info['class'];
-      return new $class($type, $info['parameters']);
+      return $action_types[$type];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isDonation() {
+    return FALSE;
   }
 }

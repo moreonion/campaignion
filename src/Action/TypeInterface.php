@@ -15,4 +15,11 @@ interface TypeInterface {
    *  The wizard responsible for changing/adding actions of this type.
    */
   public function wizard($node = NULL);
+  /**
+   * Check whether or not this action-type is a donation.
+   *
+   * @return bool
+   *   TRUE if this action type should be considered a donation else FALSE.
+   */
+  public function isDonation();
 }

@@ -12,8 +12,9 @@ class SupporterActivity extends Base implements FilterInterface {
   protected function actionsWithActivity() {
     $query = db_select('campaignion_activity_webform', 'wact');
     $query->innerJoin('node', 'n', "wact.nid = n.nid");
-    $query->fields('n', array('nid', 'type', 'title'));
-    $query->where('n.tnid = 0 OR n.tnid = n.nid');
+    $query->fields('n', array('nid', 'type', 'title'))
+      ->where('n.tnid = 0 OR n.tnid = n.nid')
+      ->orderBy('n.created', 'DESC');
 
     $actions = array();
     foreach ($query->execute()->fetchAllAssoc('nid') as $nid => $action) {
@@ -74,29 +75,19 @@ class SupporterActivity extends Base implements FilterInterface {
       '#default_value' => isset($values['activity']) ? $values['activity'] : NULL,
     );
 
-    $action_types = array('any' => t('Any type of action'));
-    foreach (\Drupal\campaignion\Action\TypeBase::types() as $key => $value) {
-      $action_types[$key] = node_type_get_name($key);
-    }
-    $action_type_id = drupal_html_id('action-type');
-    $form['action_type'] = array(
-      '#type' => 'select',
-      '#id' => $action_type_id,
-      '#options' => $action_types,
-      '#states'  => array('visible' => array('#' . $activity_type_id => array('value' => 'webform_submission'))),
-      '#default_value' => isset($values['action_type']) ? $values['action_type'] : 'any',
-    );
-    $actions = $this->actionsWithActivity();
-    foreach ($action_types as $type => $type_name) {
-      if (!empty($actions[$type])) {
-        $form['action_' . $type] = array(
-          '#type'          => 'select',
-          '#options'       => array('no_specific' => t('No specific action')) + $actions[$type],
-          '#states'        => array('visible' => array('#' . $action_type_id => array('value' => $type), '#' . $activity_type_id => array('value' => 'webform_submission'))),
-          '#default_value' => isset($values['action_' . $type]) ? $values['action_' . $type] : NULL,
-        );
+    $form_types = array('any' => t('Any type of action'));
+    $payment_types = array('any' => t('Any type of payment'));
+    foreach (\Drupal\campaignion\Action\TypeBase::types() as $key => $action_type) {
+      if ($action_type->isDonation()) {
+        $payment_types[$key] = node_type_get_name($key);
+      }
+      else {
+        $form_types[$key] = node_type_get_name($key);
       }
     }
+    $form += $this->actionSubForm('form', $form_types, $values, 'webform_submission', $activity_type_id);
+    $form += $this->actionSubForm('payment', $payment_types, $values, 'webform_payment', $activity_type_id);
+
     $form['date_range'] = array(
       '#type'          => 'select',
       '#attributes'    => array('id' => $date_range_id),
@@ -137,6 +128,48 @@ class SupporterActivity extends Base implements FilterInterface {
     );
   }
 
+  protected function actionSubForm($pfx, $types, $values, $activity_type, $activity_type_id) {
+    $node_type_id = drupal_html_id('node-type');
+    $form["${pfx}_node_type"] = array(
+      '#type' => 'select',
+      '#id' => $node_type_id,
+      '#options' => $types,
+      '#states'  => array('visible' => array(
+        '#' . $activity_type_id => array('value' => $activity_type)
+      )),
+      '#default_value' => isset($values["${pfx}_action_type"]) ? $values["${pfx}_action_type"] : 'any',
+    );
+    $actions = $this->actionsWithActivity();
+    foreach ($types as $type => $type_name) {
+      if (!empty($actions[$type])) {
+        reset($actions[$type]);
+        $default = key($actions[$type]);
+        $form["node_${type}_nid"] = array(
+          '#type'          => 'select',
+          '#options'       => array('no_specific' => t('No specific action')) + $actions[$type],
+          '#states'        => array('visible' => array(
+            '#' . $node_type_id => array('value' => $type),
+            '#' . $activity_type_id => array('value' => $activity_type)
+          )),
+          '#attributes' => array('class' => array('filter-action')),
+          '#default_value' => isset($values["node_${type}_nid"]) ? $values["node_${type}_nid"] : $default,
+        );
+      }
+    }
+    return $form;
+  }
+
+  protected function addWebformFilter($query, $type, $nid) {
+    $query->innerJoin('campaignion_activity_webform', 'wact', "act.activity_id = wact.activity_id");
+    $query->innerJoin('node', 'n', "wact.nid = n.nid");
+    if ($nid !== 'no_specific') {
+      $query->where('n.nid = :nid OR n.tnid = :nid', array(':nid' => $nid));
+    }
+    else {
+      $query->condition('n.type', $type);
+    }
+  }
+
   public function title() { return t('Activity'); }
 
   public function apply($query, array $values) {
@@ -153,15 +186,16 @@ class SupporterActivity extends Base implements FilterInterface {
     if ($values['activity'] != 'any_activity') {
       $inner->condition('act.type', $values['activity']);
     }
-    if ($values['activity'] == 'webform_submission' && $values['action_type'] != 'any') {
-      $type = $values['action_type'];
-      $inner->innerJoin('campaignion_activity_webform', 'wact', "act.activity_id = wact.activity_id");
-      $inner->innerJoin('node', 'n', "wact.nid = n.nid");
-      if (!empty($values["action_$type"]) && $values["action_$type"] !== 'no_specific') {
-        $inner->where('n.nid = :nid OR n.tnid = :nid', array(':nid' => $values['action_' . $type]));
+    if ($values['activity'] == 'webform_submission') {
+      $type = $values['form_node_type'];
+      if ($type != 'any') {
+        $this->addWebformFilter($inner, $values['form_node_type'], $values["node_${type}_nid"]);
       }
-      else {
-        $inner->condition('n.type', $values['action_type']);
+    }
+    elseif ($values['activity'] == 'webform_payment') {
+      $type = $values['payment_node_type'];
+      if ($type != 'any') {
+        $this->addWebformFilter($inner, $values['payment_node_type'], $values["node_${type}_nid"]);
       }
     }
 
