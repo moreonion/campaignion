@@ -28,7 +28,7 @@ class SupporterActivity extends Base implements FilterInterface {
     $available_activities = array(
       'any_activity'          => t('Any type'),
       'redhen_contact_create' => t('Contact created'),
-      'webform_submission'    => t('Form submission'),
+      'webform_submission'    => t('Online action'),
       'webform_payment'       => t('Online payment'),
     );
 
@@ -77,16 +77,20 @@ class SupporterActivity extends Base implements FilterInterface {
 
     $form_types = array('any' => t('Any type of action'));
     $payment_types = array('any' => t('Any type of payment'));
-    foreach (\Drupal\campaignion\Action\TypeBase::types() as $key => $action_type) {
+    $actions = $this->actionsWithActivity();
+    foreach (\Drupal\campaignion\Action\TypeBase::types() as $type => $action_type) {
+      if (empty($actions[$type])) {
+        continue;
+      }
       if ($action_type->isDonation()) {
-        $payment_types[$key] = node_type_get_name($key);
+        $payment_types[$type] = node_type_get_name($type);
       }
       else {
-        $form_types[$key] = node_type_get_name($key);
+        $form_types[$type] = node_type_get_name($type);
       }
     }
-    $form += $this->actionSubForm('form', $form_types, $values, 'webform_submission', $activity_type_id);
-    $form += $this->actionSubForm('payment', $payment_types, $values, 'webform_payment', $activity_type_id);
+    $form += $this->actionSubForm('form', $form_types, $actions, $values, 'webform_submission', $activity_type_id);
+    $form += $this->actionSubForm('payment', $payment_types, $actions, $values, 'webform_payment', $activity_type_id);
 
     $form['date_range'] = array(
       '#type'          => 'select',
@@ -128,7 +132,7 @@ class SupporterActivity extends Base implements FilterInterface {
     );
   }
 
-  protected function actionSubForm($pfx, $types, $values, $activity_type, $activity_type_id) {
+  protected function actionSubForm($pfx, $types, $actions, $values, $activity_type, $activity_type_id) {
     $node_type_id = drupal_html_id('node-type');
     $form["${pfx}_node_type"] = array(
       '#type' => 'select',
@@ -137,24 +141,22 @@ class SupporterActivity extends Base implements FilterInterface {
       '#states'  => array('visible' => array(
         '#' . $activity_type_id => array('value' => $activity_type)
       )),
-      '#default_value' => isset($values["${pfx}_action_type"]) ? $values["${pfx}_action_type"] : 'any',
+      '#default_value' => isset($values["${pfx}_node_type"]) ? $values["${pfx}_node_type"] : 'any',
     );
-    $actions = $this->actionsWithActivity();
+    unset($types['any']);
     foreach ($types as $type => $type_name) {
-      if (!empty($actions[$type])) {
-        reset($actions[$type]);
-        $default = key($actions[$type]);
-        $form["node_${type}_nid"] = array(
-          '#type'          => 'select',
-          '#options'       => array('no_specific' => t('No specific action')) + $actions[$type],
-          '#states'        => array('visible' => array(
-            '#' . $node_type_id => array('value' => $type),
-            '#' . $activity_type_id => array('value' => $activity_type)
-          )),
-          '#attributes' => array('class' => array('filter-action')),
-          '#default_value' => isset($values["node_${type}_nid"]) ? $values["node_${type}_nid"] : $default,
-        );
-      }
+      reset($actions[$type]);
+      $default = key($actions[$type]);
+      $form["node_${type}_nid"] = array(
+        '#type'          => 'select',
+        '#options'       => array('no_specific' => t('No specific action')) + $actions[$type],
+        '#states'        => array('visible' => array(
+          '#' . $node_type_id => array('value' => $type),
+          '#' . $activity_type_id => array('value' => $activity_type)
+        )),
+        '#attributes' => array('class' => array('filter-action')),
+        '#default_value' => isset($values["node_${type}_nid"]) ? $values["node_${type}_nid"] : $default,
+      );
     }
     return $form;
   }
