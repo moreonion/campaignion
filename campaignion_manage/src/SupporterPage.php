@@ -30,17 +30,10 @@ class SupporterPage extends Page {
 
   protected function getSelectedIds($form, &$form_state) {
     $element = &$form['listing'];
-    $result = new ResultSet();
-    $result->save();
+    $result = $this->baseQuery->result();
     $values = &drupal_array_get_nested_value($form_state['values'], $element['#array_parents']);
-    if (!empty($values['bulkop_select_all_matching'])) {
-      $query = db_select('redhen_contact', 'r');
-      $query->addExpression($result->id, 'meta_id');
-      $query->addField('r', 'contact_id', 'contact_id');
-      $this->filterForm->applyFilters($query);
-      db_insert('campaignion_manage_result')->from($query)->execute();
-    }
-    else {
+    if (empty($values['bulkop_select_all_matching'])) {
+      $result->purge();
       $query = db_insert('campaignion_manage_result')
         ->fields(array('meta_id', 'contact_id'));
       $ids = array();
@@ -54,6 +47,6 @@ class SupporterPage extends Page {
       }
       $query->execute();
     }
-    return $result;;
+    return $result;
   }
 }

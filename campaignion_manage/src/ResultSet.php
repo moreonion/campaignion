@@ -20,10 +20,28 @@ class ResultSet extends \Drupal\little_helpers\DB\Model {
     parent::__construct($data, $new);
   }
 
-  public static function load($uid = NULL, $step = NULL) {
+  public static function loadOrCreate($step = NULL, $uid = NULL) {
+    if (!($obj = static::load($step, $uid))) {
+      $data = array('step' => $step);
+      if ($uid) {
+        $data['uid'] = $uid;
+      }
+      $obj = new static($data);
+    }
+    return $obj;
+  }
+
+  public static function load($step = NULL, $uid = NULL) {
     $uid = $uid ? $uid : $GLOBALS['user']->uid;
     $t = static::$table;
-    db_query("SELECT * FROM {{$t}} WHERE uid=:uid AND step=:step", array(':uid' => $uid, ':step' => $step));
+    return db_query("SELECT * FROM {{$t}} WHERE uid=:uid AND step=:step", array(':uid' => $uid, ':step' => $step))
+      ->fetchObject(get_called_class());
+  }
+
+  public function startOver($step = NULL, $uid = NULL) {
+    $uid = $uid ? $uid : $GLOBALS['user']->uid;
+    static::purgeAll();
+    return new static(array('uid' => $uid, 'step' => $step));
   }
 
   public function save() {
@@ -46,6 +64,29 @@ class ResultSet extends \Drupal\little_helpers\DB\Model {
   public function purge() {
     $filter = array(':id' => $this->id);
     db_query('DELETE FROM {campaignion_manage_result} WHERE meta_id=:id', $filter);
+  }
+
+  public function resetFromQuery(\SelectQueryInterface $query) {
+    $fields = $query->getFields();
+    $expressions = $query->getExpressions();
+    $this->created = REQUEST_TIME;
+    $this->save();
+    if (!isset($fields['meta_id']) && !isset($expressions['meta_id'])) {
+      $query->addExpression($this->id, 'meta_id');
+    }
+    $this->purge();
+    db_insert('campaignion_manage_result')->from($query)->execute();
+  }
+
+  public function joinTo(\SelectQueryInterface $query) {
+    $query->innerJoin('campaignion_manage_result', 'cmr', 'cmr.contact_id=r.contact_id AND cmr.meta_id=:meta_id', array(':meta_id' => $this->id));
+  }
+
+  public static function purgeAll($uid = NULL) {
+    $uid = $uid ? $uid : $GLOBALS['user']->uid;
+    $t = static::$table;
+    db_query("DELETE FROM {campaignion_manage_result} WHERE meta_id IN (SELECT id from {{$t}} WHERE uid=:uid)", array(':uid' => $uid));
+    db_query("DELETE FROM {{$t}} WHERE uid=:uid", array(':uid' => $uid));
   }
 
   public function count() {

@@ -2,7 +2,11 @@
 
 namespace Drupal\campaignion_manage\Query;
 
+use \Drupal\campaignion_manage\ResultSet;
+
 class Supporter extends Base {
+  protected $result;
+  protected $resultCalculated = FALSE;
   public function __construct() {
     $query = db_select('redhen_contact', 'r');
     $query->innerJoin('field_data_redhen_contact_email', 'e', 'e.entity_id = r.contact_id');
@@ -12,6 +16,23 @@ class Supporter extends Base {
       ->orderBy('r.updated', 'DESC');
 
     parent::__construct($query);
+    $this->result = ResultSet::loadOrCreate(0);
+    $this->result->joinTo($this->query);
+  }
+  public function reset() {
+    $this->resultCalculated = NULL;
+    $this->filtered = db_select('redhen_contact', 'r')
+      ->fields('r', array('contact_id'));
+  }
+  protected function calculateResult() {
+    if (!$this->resultCalculated) {
+      $this->result->resetFromQuery($this->filtered);
+    }
+  }
+  public function paged() {
+    $paged = clone $this->query;
+    $paged = $paged->extend('PagerDefault')->limit($this->size);
+    return $paged;
   }
   public function modifyResult(&$rows) {
     if (empty($rows)) {
@@ -35,5 +56,12 @@ SQL;
     foreach ($result as $row) {
       $rows_by_id[$row->entity_id]->tags[$row->tid] = $row->name;
     }
+  }
+  public function count() {
+    $this->calculateResult();
+    return $this->result->count();
+  }
+  public function result() {
+    return $this->result;
   }
 }
