@@ -232,7 +232,7 @@ class SupporterActivity extends Base implements FilterInterface {
       $inner->distinct();
     }
     $tname = db_query_temporary((string) $inner, $inner->getArguments());
-    $query->innerJoin($tname, 'af', "af.contact_id = r.contact_id");
+    $query->innerJoin($tname, 'af', "%alias.contact_id = r.contact_id");
   }
 
   public function isApplicable($current) {
