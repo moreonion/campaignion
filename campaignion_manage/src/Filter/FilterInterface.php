@@ -32,4 +32,16 @@ interface FilterInterface {
    * @return TRUE if the filter is currently applicable, FALSE otherwise
    */
   public function isApplicable($current);
+  /**
+   * Should the result be stored as an intemediate result?
+   *
+   * This allows us to avoid slow queries. Filters having this flag set to TRUE
+   * are applied one by one. The intermediate results are stored and used as
+   * input to the next filter.
+   *
+   * @return bool
+   *   TRUE if this filter-operation will be expensive / slow to combine with
+   *   other filters.
+   */
+  public function intermediateResult(array $values);
 }

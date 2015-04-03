@@ -22,7 +22,8 @@ class Supporter extends Base {
   public function reset() {
     $this->resultCalculated = NULL;
     $this->filtered = db_select('redhen_contact', 'r')
-      ->fields('r', array('contact_id'));
+      ->fields('r', array('contact_id'))
+      ->distinct();
   }
   protected function calculateResult() {
     if (!$this->resultCalculated) {

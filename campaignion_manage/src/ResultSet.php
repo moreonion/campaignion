@@ -82,6 +82,13 @@ class ResultSet extends \Drupal\little_helpers\DB\Model {
     $query->innerJoin('campaignion_manage_result', 'cmr', 'cmr.contact_id=r.contact_id AND cmr.meta_id=:meta_id', array(':meta_id' => $this->id));
   }
 
+  public function asQuery($alias = 'r') {
+    return db_select('campaignion_manage_result', $alias)
+      ->fields($alias, array('contact_id'))
+      ->condition("$alias.meta_id", $this->id)
+      ->distinct();
+  }
+
   public static function purgeAll($uid = NULL) {
     $uid = $uid ? $uid : $GLOBALS['user']->uid;
     $t = static::$table;

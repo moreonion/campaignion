@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_manage\Filter;
 
-class SupporterActivity extends Base implements FilterInterface {
+class SupporterActivity extends Base {
   protected $query;
 
   public function __construct(\SelectQueryInterface $query) {
@@ -173,9 +173,21 @@ class SupporterActivity extends Base implements FilterInterface {
 
   public function title() { return t('Activity'); }
 
+
+  protected function isNoop(array $values) {
+    return $values['activity'] == 'any_activity' && $values['frequency'] == 'any' && $values['date_range'] == 'all';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function intermediateResult(array $values) {
+    return !$this->isNoop($values);
+  }
+
   public function apply($query, array $values) {
     // Do nothing for any number of times + any type + any time.
-    if ($values['activity'] == 'any_activity' && $values['frequency'] == 'any' && $values['date_range'] == 'all') {
+    if ($this->isNoop($values)) {
       return;
     }
 
@@ -224,15 +236,11 @@ class SupporterActivity extends Base implements FilterInterface {
         break;
     }
     if ($values['frequency'] == 'never') {
-      $inner = db_select('redhen_contact', 'r')
-        ->fields('r', array('contact_id'))
-        ->condition('r.contact_id', $inner, 'NOT IN');
+      $query->condition('r.contact_id', $inner, 'NOT IN');
     }
     else {
-      $inner->distinct();
+      $query->condition('r.contact_id', $inner, 'IN');
     }
-    $tname = db_query_temporary((string) $inner, $inner->getArguments());
-    $query->innerJoin($tname, 'af', "%alias.contact_id = r.contact_id");
   }
 
   public function isApplicable($current) {

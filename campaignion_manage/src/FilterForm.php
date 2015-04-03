@@ -33,12 +33,44 @@ class FilterForm {
   }
 
   public function applyFilters($query) {
+    $easy = array();
+    $hard = array();
     foreach ($this->values as $values) {
       if (!is_array($values) || !isset($values['type']) || !isset($this->filters[$values['type']])) {
         continue;
       }
+
       $filter = $this->filters[$values['type']];
-      $filter->apply($query, $values['values']);
+      if ($filter->intermediateResult($values['values'])) {
+        $hard[] = array($filter, $values['values']);
+      }
+      else {
+        $easy[] = array($filter, $values['values']);
+      }
+    }
+    $hard_result = NULL;
+    if (!empty($hard)) {
+      // Initialize two results: one for the current result and one for the
+      // next. Exchange them after each filter so each filter uses the result
+      // of the one before it.
+      $results = array(ResultSet::loadOrCreate(1), ResultSet::loadOrCreate(2));
+      foreach ($hard as $i => $h) {
+        list($filter, $values) = $h;
+        if ($i == 0) {
+          $hquery = clone $query;
+        }
+        else {
+          $hquery = $results[0]->asQuery();
+        }
+        $filter->apply($hquery, $values);
+        $results[1]->resetFromQuery($hquery);
+        $results = array($results[1], $results[0]);
+      }
+      $results[0]->joinTo($query);
+    }
+    foreach ($easy as $e) {
+      list($filter, $values) = $e;
+      $filter->apply($query, $values);
     }
   }
 
