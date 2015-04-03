@@ -10,8 +10,7 @@ class SupporterActivity extends Base implements FilterInterface {
   }
 
   protected function actionsWithActivity() {
-    $query = db_select('campaignion_activity_webform', 'wact');
-    $query->innerJoin('node', 'n', "wact.nid = n.nid");
+    $query = db_select('node', 'n');
     $query->fields('n', array('nid', 'type', 'title'))
       ->where('n.tnid = 0 OR n.tnid = n.nid')
       ->orderBy('n.created', 'DESC');
