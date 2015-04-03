@@ -10,27 +10,29 @@ class SupporterTagBatch extends BatchBase {
     $this->tag = (bool) $data['tag'];
   }
   public function apply($contact, &$results) {
+    $needs_save = FALSE;
     if ($this->tag) {
       $tids = $this->tids;
-      // add tags
+      // Remove all already-set tags from te todo list.
       foreach ($contact->supporter_tags['und'] as $already_set) {
         unset($tids[$already_set['tid']]);
       }
+      $needs_save = !empty($tids);
+      // Add new field-items for the rest.
       foreach ($tids as $tid) {
         $contact->supporter_tags['und'][] = array('tid' => $tid);
       }
     }
     else {
       // delete tags
-      $tids = array();
       foreach ($contact->supporter_tags['und'] as $tag_index => $tag) {
-        if (isset($tids[$tag['tid']])) {
+        if (isset($this->tids[$tag['tid']])) {
           unset($contact->supporter_tags['und'][$tag_index]);
-          $tids[$tag['tid']] = $tag['tid'];
+          $needs_save = TRUE;
         }
       }
     }
-    if (!empty($tids)) {
+    if ($needs_save) {
       try {
         $contact->save();
       } catch (Exception $e) {
