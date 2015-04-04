@@ -218,6 +218,7 @@ class SupporterActivity extends Base {
         // activities we don't want to include "RedHen contact was created" activities
         $inner->condition('act.type', 'redhen_contact_create', '!=');
       }
+      $inner->groupBy('act.contact_id');
       $inner->having('COUNT(*)' . $values['how_many_op'] . ' :nr', array(':nr' => $values['how_many_nr']));
     }
 
@@ -236,11 +237,15 @@ class SupporterActivity extends Base {
         break;
     }
     if ($values['frequency'] == 'never') {
-      $query->condition('r.contact_id', $inner, 'NOT IN');
+      $inner = db_select('redhen_contact', 'r')
+        ->fields('r', array('contact_id'))
+        ->condition('r.contact_id', $inner, 'NOT IN');
     }
     else {
-      $query->condition('r.contact_id', $inner, 'IN');
+      $inner->distinct();
     }
+    $tname = db_query_temporary((string) $inner, $inner->getArguments());
+    $query->innerJoin($tname, 'af', "%alias.contact_id = r.contact_id");
   }
 
   public function isApplicable($current) {
