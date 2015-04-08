@@ -4,7 +4,7 @@ namespace Drupal\campaignion_manage\BulkOp;
 
 use \Drupal\campaignion_manage\BatchJob;
 
-class SupporterNewsletter implements BulkOpBatchInterface {
+class SupporterNewsletter implements BatchInterface {
   public function title() {
     return 'Subscribe to Newsletter';
   }
@@ -48,5 +48,5 @@ class SupporterNewsletter implements BulkOpBatchInterface {
     return new SupporterNewsletterBatch($data);
   }
 
-  public function batchFinish(&$data) {}
+  public function batchFinish(&$data, &$results) {}
 }

@@ -193,11 +193,13 @@ class SupporterActivity extends Base {
 
     $inner = db_select('campaignion_activity', 'act');
     $inner->fields('act', array('contact_id'));
-    // "RedHen contact was edited" activities are never shown
-    $inner->condition('act.type', 'redhen_contact_edit', '!=');
 
     if ($values['activity'] != 'any_activity') {
       $inner->condition('act.type', $values['activity']);
+    }
+    else {
+      // "RedHen contact was edited" activities are never shown
+      $inner->condition('act.type', 'redhen_contact_edit', '!=');
     }
     if ($values['activity'] == 'webform_submission') {
       $type = $values['form_node_type'];

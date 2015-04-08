@@ -27,6 +27,7 @@ class ResultSet extends \Drupal\little_helpers\DB\Model {
         $data['uid'] = $uid;
       }
       $obj = new static($data);
+      $obj->save();
     }
     return $obj;
   }
