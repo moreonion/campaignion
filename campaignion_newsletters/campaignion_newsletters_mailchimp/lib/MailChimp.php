@@ -17,6 +17,8 @@ class MailChimp extends ProviderBase {
   protected $key;
   protected $url;
   protected $api;
+  protected $merge_vars;
+
   /**
    * Constructor. Gets settings and fetches intial group list.
    */
@@ -166,16 +168,19 @@ class MailChimp extends ProviderBase {
       throw new \Drupal\campaignion_newsletters\ApiPersistentError('MailChimp', $e->getMessage(), array(), $e->getCode(), $e->getFile(), $e);
     }
     catch(\Mailchimp_Error $e) {
-      watchdog('MailChimp', 'Mailchimp API Exception: "' . $e->getMessage() . '"', NULL, WATCHDOG_INFO);
+      $v['@error'] = $e->getMessage();
+      watchdog('MailChimp', 'Mailchimp API Exception: "@error"', $v, WATCHDOG_INFO);
     }
     if (!empty($result['errors'])) {
       foreach ($result['errors'] as $error) {
-        watchdog('MailChimp', $error);
+        $v['@error'] = $error['error'];
+        $v['@code'] = $error['code'];
+        watchdog('MailChimp', '@error (@code)', $v);
         return false;
       }
     }
     else {
-      return $result;
+      return $result['data'];
     }
   }
 
