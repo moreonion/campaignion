@@ -11,7 +11,7 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
     var $dialogBg = $('.campaignion-dialog-wrapper');
     var defaultZ = $('.campaignion-dialog-wrapper').css('z-index');
 
-    $dialog.hide().addClass('bulk-dialog');
+    $dialog.addClass('bulk-dialog');
 
     // Button for opening the dialog.
     $('<a class="button" id="bulk-edit-button"  href="#">' + Drupal.t('Bulk edit') + '</a>')
@@ -19,7 +19,9 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
       e.preventDefault();
       e.stopPropagation();
 
-      $dialog.show();
+      $wrapper.show(0, function(){
+        $('html').css('overflow-y', 'hidden')
+      });
       $dialogBg.css('z-index', 500).show();
     }).appendTo($wrapper.parents('form').find('.bulkop-button-wrapper'));
 
@@ -47,7 +49,9 @@ Drupal.behaviors.campaignion_manage_bulk.attach = function(context) {
     // Button to hide the dialog.
     $('<div id="bulk-dialog-close">' + Drupal.t('Close') + '</div>')
     .click(function(e) {
-      $dialog.hide();
+      $wrapper.hide(0, function(){
+        $('html').css('overflow-y', 'auto')
+      });
       $dialogBg.css('z-index', defaultZ).hide();
       $cancel.click();
     }).appendTo($dialog.children('legend'));
