@@ -5,7 +5,7 @@ function campaignion_action_template_selector_form($form, &$unused_form_state, $
   $sql = <<<SQL
 SELECT n.nid, n.title, n.language
 FROM {node} n
-  INNER JOIN {field_data_action_template} t
+  INNER JOIN {field_data_action_template} t ON t.entity_type='node' AND t.entity_id=n.nid
 WHERE n.type=:type AND t.action_template_value = 1
 ORDER BY n.tnid, n.nid
 SQL;
