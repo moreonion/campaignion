@@ -2,6 +2,11 @@
 
 namespace Drupal\campaignion_wizard;
 
+/**
+ * Wizard step for configuring email protest emails.
+ *
+ * NOTE: Needs webform_confirm_email to work.
+ */
 class EmailProtestEmailStep extends EmailStep {
 
   const WIZARD_PROTEST_EID = 4;

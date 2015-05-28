@@ -2,6 +2,11 @@
 
 namespace Drupal\campaignion_wizard;
 
+/**
+ * Wizard step for configuring webforms using form_builder.
+ *
+ * NOTE: Needs form_builder_webform to work.
+ */
 class WebformStep extends WizardStep {
   protected $step = 'form';
   protected $title = 'Form';

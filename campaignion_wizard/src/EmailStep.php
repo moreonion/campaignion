@@ -2,6 +2,11 @@
 
 namespace Drupal\campaignion_wizard;
 
+/**
+ * Standard email configuration wizard step.
+ *
+ * NOTE: Needs webform_confirm_email to work.
+ */
 class EmailStep extends WizardStep {
 
   const WIZARD_THANK_YOU_EID = 1;
