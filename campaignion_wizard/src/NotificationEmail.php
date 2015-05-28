@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Wizard;
+namespace Drupal\campaignion_wizard;
 
 class NotificationEmail extends Email {
   protected function &getEmailForm(&$form_state) {

@@ -52,7 +52,7 @@ SELECT nid, IF(status=1, 'confirm', 'content') AS step
 FROM {node}
 WHERE type IN(:types)
 SQL;
-  db_query($sql, array(':types' => array_keys(\Drupal\campaignion\Action\TypeBase::types())));
+  db_query($sql, array(':types' => array_keys(\Drupal\campaignion_action\TypeBase::types())));
 }
 
 /**

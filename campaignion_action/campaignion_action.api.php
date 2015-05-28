@@ -14,7 +14,7 @@ use \Drupal\little_helpers\Webform\Submission;
  */
 function hook_campaignion_action_info() {
   $types['webform'] = array(
-    'class' => 'Drupal\\campaignion\\Action\\FlexibleForm',
+    'class' => 'Drupal\\campaignion_action\\FlexibleForm',
     'parameters' => array(
       'thank_you_page' => array(
         'type' => 'thank_you_page',

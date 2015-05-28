@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Action;
+namespace Drupal\campaignion_action;
 
 abstract class TypeBase implements TypeInterface {
   /**
@@ -22,7 +22,7 @@ abstract class TypeBase implements TypeInterface {
   }
 
   public function actionFromNode($node) {
-    return new \Drupal\campaignion\Action($this, $node);
+    return new ActionBase($this, $node);
   }
 
   public static function isAction($type) {

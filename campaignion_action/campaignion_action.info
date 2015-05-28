@@ -5,4 +5,5 @@ package = Campaignion
 project = campaignion
 
 dependencies[] = campaignion
+dependencies[] = psr0
 dependencies[] = webform_template

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Action;
+namespace Drupal\campaignion_action;
 
 /**
  * Every ActionType (Petition) has to implement this interface.

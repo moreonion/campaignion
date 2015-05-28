@@ -77,7 +77,7 @@ class SupporterActivity extends Base {
     $form_types = array('any' => t('Any type of action'));
     $payment_types = array('any' => t('Any type of payment'));
     $actions = $this->actionsWithActivity();
-    foreach (\Drupal\campaignion\Action\TypeBase::types() as $type => $action_type) {
+    foreach (\Drupal\campaignion_action\TypeBase::types() as $type => $action_type) {
       if (empty($actions[$type])) {
         continue;
       }

@@ -82,7 +82,7 @@ function campaignion_recent_supporters_settings_form($form, &$form_state) {
     '#title' => t('Choose types of actions and texts.'),
     '#type'  => 'fieldset',
   );
-  $available_types = array_intersect_key(node_type_get_types(), Drupal\campaignion\Action\TypeBase::types());
+  $available_types = array_intersect_key(node_type_get_types(), Drupal\campaignion_action\TypeBase::types());
   foreach ($available_types as $type => $type_config) {
     $type_id = drupal_html_id('campaignion-recent-supporters-type-' . str_replace('_', '-', $type));
     $form['campaignion_recent_supporters_settings_types'][$type]['enabled'] = array(

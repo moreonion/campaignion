@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Wizard;
+namespace Drupal\campaignion_wizard;
 
 class DonationEmailStep extends EmailStep {
 

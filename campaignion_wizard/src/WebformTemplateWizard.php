@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Wizard;
+namespace Drupal\campaignion_wizard;
 
 class WebformTemplateWizard extends NodeWizard {
   public $steps = array(

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Wizard;
+namespace Drupal\campaignion_wizard;
 
 abstract class NodeWizard extends \Drupal\oowizard\Wizard {
   public $node;

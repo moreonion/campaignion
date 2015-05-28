@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Wizard;
+namespace Drupal\campaignion_wizard;
 
 class Status extends \Drupal\little_helpers\DB\Model {
   protected static $table = 'campaignion_wizard_status';

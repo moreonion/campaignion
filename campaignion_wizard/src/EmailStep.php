@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Wizard;
+namespace Drupal\campaignion_wizard;
 
 class EmailStep extends WizardStep {
 
@@ -31,7 +31,7 @@ class EmailStep extends WizardStep {
         'email_title'  => t('Thank you email'),
       ),
       'notification' => array(
-        'class' => '\\Drupal\\campaignion\\Wizard\\NotificationEmail',
+        'class' => '\\Drupal\\campaignion_wizard\\NotificationEmail',
         'type' => 0,
         'form_id' => '',
         'eid' => self::WIZARD_NOTIFICATION_EID,
@@ -57,7 +57,7 @@ class EmailStep extends WizardStep {
     $ors = 0;
     foreach ($this->emailInfo as $name => $info) {
       $info += array(
-        'class' => '\\Drupal\\campaignion\\Wizard\\Email',
+        'class' => '\\Drupal\\campaignion_wizard\\Email',
       );
       if ($ors++) {
         $form['or' . $ors] = array(

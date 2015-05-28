@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\campaignion\Wizard;
+namespace Drupal\campaignion_wizard;
 
-class PetitionWizard extends NodeWizard {
+class WebformWizard extends NodeWizard {
   public $steps = array(
     'content' => 'ContentStep',
-    'form'    => 'PetitionWebformStep',
+    'form'    => 'WebformStep',
     'emails'  => 'EmailStep',
     'thank'   => 'ThankyouStep',
     'confirm' => 'ConfirmStep',

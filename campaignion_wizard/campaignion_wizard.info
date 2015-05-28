@@ -4,8 +4,9 @@ core = 7.x
 package = Campaignion
 project = campaignion
 
-dependencies[] = form_builder_webform
 dependencies[] = campaignion_action
+dependencies[] = form_builder_webform
+dependencies[] = oowizard
+dependencies[] = psr0
 dependencies[] = webform_confirm_email
 dependencies[] = webform_custom_buttons
-dependencies[] = oowizard

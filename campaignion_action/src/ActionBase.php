@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion;
+namespace Drupal\campaignion_action;
 
-class Action {
+class ActionBase {
   protected $type;
   protected $node;
 
@@ -10,13 +10,13 @@ class Action {
     if (isset($node->action)) {
       return $node->action;
     }
-    if ($type = Action\TypeBase::fromContentType($node->type)) {
+    if ($type = TypeBase::fromContentType($node->type)) {
       // give type the control over which class is used.
       return $type->actionFromNode($node);
     }
   }
 
-  public function __construct(Action\TypeInterface $type, $node) {
+  public function __construct(TypeInterface $type, $node) {
     $this->type = $type;
     $this->node = $node;
     $this->node->action = $this;

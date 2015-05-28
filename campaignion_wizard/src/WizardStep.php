@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Wizard;
+namespace Drupal\campaignion_wizard;
 
 abstract class WizardStep extends \Drupal\oowizard\WizardStep {
   public function stepForm($form, &$form_state) {

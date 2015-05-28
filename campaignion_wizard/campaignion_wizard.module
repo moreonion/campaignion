@@ -1,6 +1,6 @@
 <?php
 
-use \Drupal\campaignion\Action\TypeBase;
+use \Drupal\campaignion_action\TypeBase;
 
 /**
  * Implements hook_menu().

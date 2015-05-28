@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\campaignion\Action;
+namespace Drupal\campaignion_action;
 
-use \Drupal\campaignion\Wizard\WebformTemplateWizard;
+use \Drupal\campaignion_wizard\WebformTemplateWizard;
 
 class Template extends TypeBase {
   public function wizard($node = NULL) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion\Wizard;
+namespace Drupal\campaignion_wizard;
 
 class WebformTemplateConfirmStep extends ConfirmStep {
   public function submitStep($form, &$form_state) {
