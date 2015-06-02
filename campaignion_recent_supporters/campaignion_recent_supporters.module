@@ -545,7 +545,7 @@ function campaignion_recent_supporters_field_widget_form(&$form, &$form_state, $
   );
   $element['options'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Recent supporters adavanced settings.'),
+    '#title' => t('Recent supporters advanced settings.'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#states' => array(
