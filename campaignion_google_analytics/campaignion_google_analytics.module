@@ -69,13 +69,15 @@ function campaignion_google_analytics_node_view($node, $view_mode, $langcode) {
 function campaignion_google_analytics_page_build(&$page) {
   $parameters = drupal_get_query_parameters();
 
-  if (!isset($parameters['share']) || !isset($parameters['sid'])) {
+  if (!isset($parameters['sid'])) {
     return;
   }
 
-  $nid = intval(explode('/', $parameters['share'])[1]);
   $sid = intval($parameters['sid']);
-  $submission = \Drupal\little_helpers\Webform\Submission::load($nid, $sid);
+  $nid = db_query('SELECT nid FROM {webform_submissions} WHERE sid=:sid', [':sid' => $sid])->fetchField();
+  if (!($submission = \Drupal\little_helpers\Webform\Submission::load($nid, $sid))) {
+    return;
+  }
   $node = $submission->getNode();
 
   // as long as share and sid are there, we are on a thank you page.
