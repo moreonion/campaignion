@@ -69,6 +69,10 @@ class EmbeddedNodeForm {
     $this->alterForm($form, $this->embed_state);
     $this->embedFieldGroups($form);
     $this->remapClientsideValidations($form, $outer_form);
+    $this->embed_state['handlers'] = [
+      'validate' => !empty($form['#validate']) ? $form['#validate'] : [],
+      'submit' => !empty($form['#submit']) ? $form['#submit'] : [],
+    ];
     return $form;
   }
 
@@ -105,7 +109,9 @@ class EmbeddedNodeForm {
     if (isset($form['path']) && function_exists('path_form_element_validate')) {
       path_form_element_validate($form['path'], $this->embed_state, $form);
     }
-    node_form_validate($form, $this->embed_state);
+    foreach ($this->embed_state['handlers']['validate'] as $function) {
+      $function($form, $this->embed_state);
+    }
   }
 
   public function submit($form, &$form_state) {
@@ -114,6 +120,9 @@ class EmbeddedNodeForm {
     $submit_handlers = isset($form['#submit']) ? $form['#submit'] : FALSE;
     if ($submit_handlers) {
       unset($form['#submit']);
+    }
+    foreach ($this->embed_state['handlers']['submit'] as $function) {
+      $function($form, $this->embed_state);
     }
     node_form_submit($form, $this->embed_state);
     if ($submit_handlers) {
