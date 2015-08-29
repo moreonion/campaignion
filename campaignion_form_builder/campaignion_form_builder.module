@@ -28,9 +28,12 @@ function campaignion_form_builder_form_builder_types_alter(&$types) {
  *
  * This is a hack to get unique to work with reused webform components.
  */
-function campaignion_form_builder_form_builder_palette_fields_alter(&$fields, $form_type, &$form) {
+function campaignion_form_builder_form_builder_palette_fields_alter(&$fields, $form_type, $form_id) {
   if ($form_type == 'webform') {
-    $active_keys = campaignion_form_builder_get_element_keys($form);
+    $elements = FormBuilderLoader::instance()
+      ->fromCache($form_type, $form_id)
+      ->getFormArray();
+    $active_keys = campaignion_form_builder_get_element_keys($elements);
     foreach ($active_keys as $key) {
       if (isset($fields[$key]) && $fields[$key]['unique']) {
         $fields[$key]['in_use'] = TRUE;
@@ -75,8 +78,10 @@ function campaignion_form_builder_form_builder_palette_groups() {
  * Implements hook_form_builder_types().
  * define all form elements that we want to have at display
  */
-function campaignion_form_builder_form_builder_types() {
-
+function campaignion_form_builder_form_builder_types($form_type, $form_id) {
+  if ($form_type != 'webform') {
+    return;
+  }
   module_load_include('inc', 'form_builder_webform', 'form_builder_webform.components');
 
   $fields = array();
@@ -98,7 +103,7 @@ function campaignion_form_builder_form_builder_types() {
     }
     $fields = array_merge($fields, $additional_fields);
   }
-  return array('webform' => $fields);
+  return $fields;
 }
 
 /**
@@ -115,7 +120,7 @@ function campaignion_form_builder_webform_client_form_alter(&$form, &$form_state
 /**
  * Implements hook_form_builder_palette_groups_alter().
  */
-function campaignion_form_builder_form_builder_palette_groups_alter(&$groups, $type, $form) {
+function campaignion_form_builder_form_builder_palette_groups_alter(&$groups, $type, $form_id) {
   $groups['default']['title'] = t('Generic fields');
 }
 
