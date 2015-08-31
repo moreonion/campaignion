@@ -4,6 +4,7 @@ core = 7.x
 package = Campaignion
 project = campaignion
 
+dependencies[] = campaignion_action
 dependencies[] = cck_blocks
 dependencies[] = context
 dependencies[] = context_get

@@ -6,6 +6,8 @@
 
 include_once 'campaignion_webform_widget.features.inc';
 
+use \Drupal\campaignion_action\TypeBase;
+
 /**
  * helper function: returns TRUE if context $cname is active
  */
@@ -119,7 +121,7 @@ PLACEHOLDER;
  * access callback
  */
 function _campaignion_webform_widget_access($node) {
-  return user_access('access widget tab') && campaignion_conf_is_action($node);
+  return user_access('access widget tab') && TypeBase::isAction($node->type);
 }
 
 /**
