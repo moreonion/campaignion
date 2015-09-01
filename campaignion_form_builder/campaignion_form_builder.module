@@ -4,20 +4,23 @@ require_once dirname(__FILE__) . '/campaignion_form_builder.type_select.inc';
 require_once dirname(__FILE__) . '/campaignion_form_builder.type_textfield.inc';
 
 /**
- * Implements hook_form_builder_types_alter().
+ * Implements hook_form_builder_element_types_alter().
  * remove elements from the default palette
  */
-function campaignion_form_builder_form_builder_types_alter(&$types) {
-  if (isset($types['webform']['email']) == TRUE) {
-    $field                              = &$types['webform']['email'];
+function campaignion_form_builder_form_builder_element_types_alter(&$types, $form_type, $form_id) {
+  if ($form_type != 'webform') {
+    return;
+  }
+  if (isset($types['email'])) {
+    $field                              = &$types['email'];
     $field['unique']                    = TRUE;
     $field['palette_group']             = 'supporter_data';
     $field['default']['#title']         = t('Email address');
     $field['default']['#default_value'] = '%get[p5]';
     $field['default']['#key']           = $field['default']['#webform_component']['form_key'] = 'email';
   }
-  if (isset($types['webform']['newsletter']) == TRUE) {
-    $field                  = &$types['webform']['newsletter'];
+  if (isset($types['newsletter'])) {
+    $field                  = &$types['newsletter'];
     $field['unique']        = TRUE;
     $field['palette_group'] = 'supporter_data';
   }
@@ -75,10 +78,10 @@ function campaignion_form_builder_form_builder_palette_groups() {
 }
 
 /**
- * Implements hook_form_builder_types().
+ * Implements hook_form_builder_element_types().
  * define all form elements that we want to have at display
  */
-function campaignion_form_builder_form_builder_types($form_type, $form_id) {
+function campaignion_form_builder_form_builder_element_types($form_type, $form_id) {
   if ($form_type != 'webform') {
     return;
   }

@@ -122,7 +122,7 @@ function campaignion_newsletters_webform_confirm_email_email_confirmed($node, $s
 }
 
 /**
- * Implements hook_form_builder_types().
+ * Implements hook_form_builder_element_types().
  *
  * Defines a new form_builder field:
  * - 'title'
@@ -133,12 +133,15 @@ function campaignion_newsletters_webform_confirm_email_email_confirmed($node, $s
  *   - ['#type'] the form-API type is used as the default form_builder element_type.
  *     @see hook_element_info().
  *   - ['#form_builder'] the form_builder type (again).
- *     @see hook_form_builder_types().
+ *     @see hook_form_builder_element_types().
  * - whether or not the field is ['unique'].
  *
  * Fields are defined per form_type (so far only 'webform' is relevant for us).
  */
-function campaignion_newsletters_form_builder_types() {
+function campaignion_newsletters_form_builder_element_types($form_type, $form_id) {
+  if ($form_type != 'webform') {
+    return;
+  }
   require_once dirname(__FILE__) . '/campaignion_newsletters.component.inc';
   $map = _form_builder_webform_property_map('newsletter');
   // default value is handled by the newsletter property.
@@ -151,7 +154,7 @@ function campaignion_newsletters_form_builder_types() {
       '#form_builder' => array('element_type' => 'newsletter'),
     ) + _form_builder_webform_default('newsletter'),
   );
-  return array('webform' => $fields);
+  return $fields;
 }
 
 /**
@@ -159,8 +162,10 @@ function campaignion_newsletters_form_builder_types() {
  *
  * Remove the email_newsletter field from campaignion_form_builder.
  */
-function campaignion_newsletters_form_builder_types_alter(&$fields) {
-  unset($fields['webform']['email_newsletter']);
+function campaignion_newsletters_form_builder_types_alter(&$fields, $form_type, $form_id) {
+  if ($form_type == 'webform') {
+    unset($fields['email_newsletter']);
+  }
 }
 
 /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Invoked by campaignion_form_builder_form_builder_types().
+ * Invoked by campaignion_form_builder_form_builder_element_types().
  */
 function _campaignion_form_builder_form_builder_types_textfield() {
   $fields = array();

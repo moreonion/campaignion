@@ -208,7 +208,7 @@ function _webform_form_builder_properties_newsletter() {
  * $form_state['values']['newsletter'] -> $component['value'].
  *
  * This hook allows us to extend the list of properties defined in
- * hook_form_builder_types() specific for form_builder_webform.
+ * hook_form_builder_element_types() specific for form_builder_webform.
  */
 function _webform_form_builder_map_newsletter() {
   $map['form_builder_type'] = 'newsletter';
