@@ -16,7 +16,7 @@ function campaignion_supporter_tags_form_node_form_alter(&$form, &$form_state) {
       '#tree'  => FALSE,
     );
     $form['segmentation']['supporter_tags'] = $form['supporter_tags'];
-    unset($form['supporter_tags']);
+    hide($form['supporter_tags']);
   }
 }
 

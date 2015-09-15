@@ -49,7 +49,7 @@ class ContentStep extends WizardStep {
     foreach (array('field_main_image') as $field_name) {
       if (isset($form[$field_name])) {
         $form['wizard_secondary'][$field_name] = $form[$field_name];
-        unset($form[$field_name]);
+        hide($form[$field_name]);
         $wizard_secondary_used = true;
       }
     }
