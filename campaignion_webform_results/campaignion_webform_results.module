@@ -50,8 +50,8 @@ function campaignion_webform_results_webform_results_download($node, $format = '
   $options = array(
     'delimiter' => ',',
     'components' => array_keys($csv_components),
-    'select_keys' => 0,
-    'select_format' => 'seperate',
+    'select_keys' => '0',
+    'select_format' => 'separate',
     'range_type' => 'all',
     'download' => TRUE,
   );
