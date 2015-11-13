@@ -23,7 +23,7 @@
     var height, r,
       regex = new RegExp(xdomain + '$'),
       matches = e.origin.match(regex);
-    if(matches.length = 1){
+    if(matches.length == 1){
       strD = e.data + "";
       r = strD.match(/^(\d+)(s?)$/);
       if(r && r.length == 3){
