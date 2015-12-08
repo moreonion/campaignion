@@ -79,6 +79,10 @@ abstract class BackendBase {
       if (isset($supporter['action_nid'])) {
         $supporter['action_url']   = $GLOBALS['base_url'] . '/node/' . $supporter['action_nid'];
       }
+
+      $supporter['first_name'] = check_plain($supporter['first_name']);
+      $supporter['last_name'] = check_plain($supporter['last_name']);
+      $supporter['comment'] = isset($supporter['comment']) ? check_plain($supporter['comment']) : '';
       $supporters[] = $supporter;
     }
 

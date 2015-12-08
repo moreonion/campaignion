@@ -55,3 +55,20 @@ function campaignion_node_ux_form_node_form_alter(&$form, &$form_state) {
     }
   }
 }
+
+/**
+ * Implements hook_node_presave().
+ */
+function campaignion_node_ux_node_presave($node) {
+  if (!module_exists('metatag')) {
+    return;
+  }
+  $lang = metatag_entity_get_language('node', $node);
+  $metatag = &$node->metatags[$lang];
+
+  if (empty($metatag['og:image']) && !empty($node->field_main_image)) {
+    $info = field_get_items('node', $node, 'field_main_image')[0];
+    $file = file_load($info['fid']);
+    $metatag['og:image']['value'] = $file->uri;
+  }
+}
