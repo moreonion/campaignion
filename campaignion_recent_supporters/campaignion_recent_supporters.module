@@ -32,6 +32,7 @@ function campaignion_recent_supporters_settings() {
     'visible_count'  => 6,
     'cycle_toggle'   => 0,
     'country_toggle' => 1,
+    'comment_toggle' => 0,
     'name_display'   => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
   );
   return $saved_settings;
@@ -258,6 +259,7 @@ function _campaignion_recent_supporters_block_recent_supporters() {
       '#theme' => 'recent_supporters',
       '#supporters' => $supporters,
       '#show_country' => (bool) $options['country_toggle'],
+      '#show_comment' => (bool) $options['comment_toggle'],
       '#all_actions' => FALSE,
       '#texts' => NULL,
     );
@@ -270,6 +272,7 @@ function _campaignion_recent_supporters_block_recent_supporters() {
         $block_id => array(
           'cycleSupporters' => $options['cycle_toggle'],
           'showCountry' => $options['country_toggle'],
+          'showComment' => $options['comment_toggle'],
           'visibleCount' => $options['visible_count'],
           'pollingURL' => $polling_url,
           'nodeID' => $node->nid,
@@ -343,6 +346,7 @@ function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
     '#theme'        => 'recent_supporters',
     '#supporters'   => $supporters,
     '#show_country' => ($saved_settings['country_toggle'] == '1') ? TRUE : FALSE,
+    '#show_comment' => ($saved_settings['comment_toggle'] == '1') ? TRUE : FALSE,
     '#all_actions'  => TRUE,
     '#texts'        => $texts,
   );
@@ -366,6 +370,7 @@ function _campaignion_recent_supporters_block_recent_supporters_all_actions() {
       $block_id => array(
         'cycleSupporters' => $saved_settings['cycle_toggle'],
         'showCountry'     => $saved_settings['country_toggle'],
+        'showComment'     => $saved_settings['comment_toggle'],
         'visibleCount'    => $saved_settings['visible_count'],
         'pollingURL'      => $polling_url,
         'types'           => $types,
@@ -414,7 +419,13 @@ function campaignion_recent_supporters_country_json($filename) {
  */
 function campaignion_recent_supporters_theme() {
   $theme['recent_supporters'] = array(
-    'variables' => array('supporters' => array(), 'show_country' => FALSE, 'all_actions' => FALSE, 'texts' => array()),
+    'variables' => array(
+      'supporters' => array(),
+      'show_country' => FALSE,
+      'show_comment' => FALSE,
+      'all_actions' => FALSE,
+      'texts' => array()
+    ),
   );
   return $theme;
 }
@@ -452,7 +463,7 @@ function theme_recent_supporters($variables) {
         $output .= $supporter['country'];
         $output .= "</span>\n";
       }
-      if ($all_actions === 'recent-supporters-all-actions') {
+      if ($variables['all_actions']) {
         $first_name = $supporter['first_name'] . (!empty($supporter['first_name']) ? " " : "");
         $vars['!supporter_name'] = "<span class=\"name\">" . $first_name . "<span class=\"last_name\">" . $supporter['last_name'] . "</span></span>\n";
         $vars['!action_title']   = "<span class=\"title\">";
@@ -475,6 +486,10 @@ function theme_recent_supporters($variables) {
       $output .= "\n<span class=\"time\" data-timestamp=\"".$supporter['timestamp']."\" title=\"".$supporter['rfc8601']."\">";
       $output .= date('d.m.Y H:i', $supporter['timestamp']);
       $output .= "</span>\n";
+
+      if ($variables['show_comment'] && !empty($supporter['comment'])) {
+        $output .= "\n<span class=\"comment\">{$supporter['comment']}</span>\n";
+      }
 
       $output .= "</li>\n";
     }
@@ -529,6 +544,7 @@ function campaignion_recent_supporters_field_widget_form(&$form, &$form_state, $
       'visible_count' => 6,
       'cycle_toggle' => 0,
       'country_toggle' => 1,
+      'comment_toggle' => 0,
       'name_display' => CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT,
     ),
   );
@@ -582,6 +598,12 @@ function campaignion_recent_supporters_field_widget_form(&$form, &$form_state, $
     '#description' => t('Show country of supporters.'),
     '#type' => 'checkbox',
     '#default_value' => $item['options']['country_toggle'],
+  );
+  $element['options']['comment_toggle'] = array(
+    '#title' => t('Show user comments.'),
+    '#description' => t('Show the comment from the comment field.'),
+    '#type' => 'checkbox',
+    '#default_value' => $item['options']['comment_toggle'],
   );
 
   return $element;

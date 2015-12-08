@@ -12,6 +12,7 @@
           nodeID: blockSettings.nodeID,
           cycleSupporters: (blockSettings.cycleSupporters == "1") ? true : false,
           showCountry: (blockSettings.showCountry == "1") ? true : false,
+          showComment: (blockSettings.showComment == "1") ? true : false,
           maxSupportersVisible: parseInt(blockSettings.visibleCount, 10),
           cycleEasing: 'easeInQuint',
           texts: settings.recentSupporters.actionTexts,

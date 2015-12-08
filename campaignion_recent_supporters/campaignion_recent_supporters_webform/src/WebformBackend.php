@@ -19,7 +19,7 @@ class WebformBackend extends BackendBase {
   public function recentOnOneAction(RequestParams $params) {
       $config = $params->getParams();
     $sql = <<<SQL
-SELECT n.nid, n.tnid, w.first_name, w.last_name, w.timestamp, w.country
+SELECT n.nid, n.tnid, w.first_name, w.last_name, w.timestamp, w.country, w.comment
 FROM {campaignion_recent_supporters_webform} w
   INNER JOIN {node} n USING(nid)
 WHERE n.status = 1
@@ -35,7 +35,7 @@ SQL;
     $config = $params->getParams();
     // get translations: na - activity node, nt - any available node translated into $lang, no - the "original" node (ie. the translation source)
     $sql = <<<SQL
-SELECT w.first_name, w.last_name, w.timestamp, w.country,
+SELECT w.first_name, w.last_name, w.timestamp, w.country, w.comment
   na.nid, na.tnid, na.type AS action_type, na.status,
   COALESCE(nt.title, no.title, na.title) AS action_title,
   COALESCE(nt.tnid, no.tnid, na.nid) AS action_nid,

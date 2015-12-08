@@ -42,9 +42,24 @@ function campaignion_recent_supporters_webform_schema() {
         'type' => 'varchar',
         'length' => 2,
       ),
+      'comment' => array(
+        'description' => 'Users comment',
+        'type' => 'text',
+      ),
     ),
     'primary key' => array('sid'),
     'indexes' => array('node' => array('nid'))
   );
   return $tables;
 }
+
+/**
+ * Add comment field to recent supporters table.
+ */
+function campaignion_recent_supporters_webform_update_7101() {
+  db_add_field('campaignion_recent_supporters_webform', 'comment', array(
+    'description' => 'Users comment',
+    'type' => 'text',
+  ));
+}
+

@@ -19,6 +19,7 @@ class ActivityBackend extends BackendBase {
       'limit' => $options['query_limit'],
       'name_display' => $options['name_display'],
       'addressfield' => variable_get('campaignion_recent_supporters_address_field', 'field_address'),
+      'commentfield' => variable_get('campaignion_recent_supporters_comment_field', 'comment'),
     );
     if ($node) {
       return new RequestParams($config + array('nid' => $node->nid));
@@ -36,12 +37,15 @@ class ActivityBackend extends BackendBase {
     $sql = <<<SQL
 SELECT rc.first_name, rc.last_name, ca.created as timestamp,
   COALESCE(fdfa.{$config['addressfield']}_country, wt.country) AS country,
+  c_wsd.data AS comment,
   n.tnid, n.nid
 FROM {node} n
   INNER JOIN {campaignion_activity_webform} caw ON caw.nid = n.nid
   INNER JOIN {campaignion_activity} ca ON ca.activity_id=caw.activity_id AND ca.type='webform_submission'
   INNER JOIN {redhen_contact} rc USING (contact_id)
   INNER JOIN {webform_tracking} wt ON wt.nid=caw.nid AND wt.sid=caw.sid
+  LEFT OUTER JOIN {webform_component} c_wc ON c_wc.nid=caw.nid AND c_wc.name='{$config['commentfield']}'
+  LEFT OUTER JOIN {webform_submitted_data} c_wsd ON c_wsd.nid=caw.nid AND c_wsd.sid=caw.sid AND c_wsd.cid=c_wc.cid
   LEFT OUTER JOIN {field_data_{$config['addressfield']}} fdfa ON fdfa.entity_id = rc.contact_id AND fdfa.delta = 0
     WHERE n.status = 1
     AND (n.nid = :nid OR n.nid IN (SELECT tn.nid FROM {node} tn INNER JOIN {node} n USING(tnid) WHERE n.nid = :nid AND n.tnid != 0))
@@ -58,6 +62,7 @@ SQL;
     $sql = <<<SQL
 SELECT rc.first_name, rc.last_name, ca.created as timestamp,
   COALESCE(fdfa.{$config['addressfield']}_country, wt.country) AS country,
+  c_wsd.data AS comment,
   na.nid, na.tnid, na.type AS action_type, na.status,
   COALESCE(nt.title, no.title, na.title) AS action_title,
   COALESCE(nt.tnid, no.tnid, na.nid) AS action_nid,
@@ -66,6 +71,8 @@ FROM {campaignion_activity_webform} caw
   INNER JOIN {node} na ON caw.nid = na.nid
   LEFT OUTER JOIN {node} nt ON na.tnid != 0 AND nt.tnid = na.tnid AND nt.language = :lang AND nt.status>0
   LEFT OUTER JOIN {node} no ON na.tnid = no.nid AND no.status>0
+  LEFT OUTER JOIN {webform_component} c_wc ON c_wc.nid=caw.nid AND c_wc.name='{$config['commentfield']}'
+  LEFT OUTER JOIN {webform_submitted_data} c_wsd ON c_wsd.nid=caw.nid AND c_wsd.sid=caw.sid AND c_wsd.cid=c_wc.cid
   INNER JOIN {campaignion_activity} ca ON ca.activity_id = caw.activity_id AND ca.type = 'webform_submission'
   INNER JOIN {redhen_contact} rc USING (contact_id)
   INNER JOIN {webform_tracking} wt ON wt.nid = caw.nid AND wt.sid = caw.sid

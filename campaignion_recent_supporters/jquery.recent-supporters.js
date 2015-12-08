@@ -66,6 +66,7 @@
       maxSupportersVisible: 6,
       maxSupportersInContainer: 15,
       showCountry: true,
+      showComment: false,
       maxPollErrorCount: 15,
       nodeID: '0',
       texts: {},
@@ -246,6 +247,9 @@
         var countryCode = supporter.country ? supporter.country.toLowerCase() : "no-cc";
         var countryName = supporter.country in settings.countries ? settings.countries[supporter.country] : '';
         $li.prepend('<span title="'+countryName+'" class="country flag flag-'+countryCode+'">'+supporter.country+'</span> ');
+      }
+      if (settings.showComment) {
+        $li.append('<span class="comment">' + supporter.comment + '</span> ')
       }
 
       return $li;

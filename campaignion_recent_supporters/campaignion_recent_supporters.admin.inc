@@ -69,6 +69,12 @@ function campaignion_recent_supporters_settings_form($form, &$form_state) {
     '#default_value' => $saved_settings['country_toggle'],
   );
   $lang_code = NULL;
+  $form['block_settings']['comment_toggle'] = array(
+    '#title'         => t('Show user comments.'),
+    '#description'   => t('Allows to display a short statement by the user.'),
+    '#type'          => 'checkbox',
+    '#default_value' => $saved_settings['comment_toggle'],
+  );
   if (module_exists('variable_realm') && module_exists('i18n_variable')) {
     global $language;
     $keys      = variable_realm_current_keys();
