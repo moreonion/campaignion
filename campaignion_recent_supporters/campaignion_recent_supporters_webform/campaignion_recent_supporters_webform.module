@@ -54,6 +54,10 @@ function campaignion_recent_supporters_webform_campaignion_recent_supporters_bac
  * Implements hook_webform_submission_insert().
  */
 function campaignion_recent_supporters_webform_webform_submission_insert($node, $submission) {
+  if ($submission->is_draft) {
+    return;
+  }
+
   $submissionObj = new Submission($node, $submission);
   $map = campaignion_recent_supporters_webform_mapping();
   $fields = array();
@@ -65,7 +69,9 @@ function campaignion_recent_supporters_webform_webform_submission_insert($node, 
         break;
       }
     }
-    if (!$fields[$field] && $field != 'country') {
+  }
+  foreach (['first_name', 'last_name'] as $r) {
+    if (empty($fields[$r])) {
       // This webform submission doesn't contain all the data we need.
       return;
     }
@@ -79,6 +85,13 @@ function campaignion_recent_supporters_webform_webform_submission_insert($node, 
     ->key($dbkey)
     ->fields($fields)
     ->execute();
+}
+
+/**
+ * Implements hook_webform_submission_update().
+ */
+function campaignion_recent_supporters_webform_webform_submission_update($node, $submission) {
+  campaignion_recent_supporters_webform_webform_submission_insert($node, $submission);
 }
 
 /**

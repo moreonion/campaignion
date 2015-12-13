@@ -8,11 +8,6 @@ define ('CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_FIRST_ONLY', 3);
 
 use \Drupal\campaignion_recent_supporters\Loader;
 
-function campaignion_recent_supporters_campaignion_recent_supporters_backend_info() {
-  $backends['activity'] = '\\Drupal\\campaignion_recent_supporters\\ActivityBackend';
-  return $backends;
-}
-
 function _campaignion_recent_supporters_name_display_options() {
   return array(
     CAMPAIGNION_RECENT_SUPPORTERS_NAME_DISPLAY_DEFAULT => t('Default'),
@@ -27,7 +22,7 @@ function _campaignion_recent_supporters_name_display_options() {
  */
 function campaignion_recent_supporters_settings() {
   $saved_settings = variable_get('campaignion_recent_supporters_settings', array()) + array(
-    'backend'        => 'activity',
+    'backend'        => 'webform',
     'query_limit'    => 10,
     'visible_count'  => 6,
     'cycle_toggle'   => 0,

@@ -43,6 +43,46 @@ function campaignion_recent_supporters_enable() {
 }
 
 /**
+ * Migrate from the activity to the webform backend.
+ */
+function campaignion_recent_supporters_update_3() {
+  require_once drupal_get_path('module', 'webform') . '/includes/webform.submissions.inc';
+  // Only migrate if the activity backend is currently used.
+  $settings = variable_get('campaignion_recent_supporters_settings', []);
+  $settings += ['backend' => 'activity', 'query_limit' => 10];
+  if ($settings['backend'] != 'activity') {
+    return;
+  }
+
+  if (!module_exists('campaignion_recent_supporters_webform')) {
+    module_enable(['campaignion_recent_supporters_webform']);
+  }
+
+  $types = variable_get('webform_node_types', ['webform']);
+  $nids = db_select('node', 'n')
+    ->fields('n', ['nid'])
+    ->condition('type', $types)
+    ->execute();
+
+  while ($nid = $nids->fetchColumn()) {
+    $node = node_load($nid);
+    // Get the most recent published submissions.
+    $sids = db_select('webform_submissions', 's')->extend('PagerDefault')
+      ->fields('s', ['sid'])
+      ->condition('is_draft', 0)
+      ->condition('nid', $nid)
+      ->orderBy('submitted', 'DESC')
+      ->limit($settings['query_limit'] * 2)
+      ->execute();
+
+    while ($sid = $sids->fetchColumn()) {
+      $submission = webform_get_submission($nid, $sid);
+      campaignion_recent_supporters_webform_webform_submission_insert($node, $submission);
+    }
+  }
+}
+
+/**
  * change variable name to campaignion_recent_supporters_name_display_default
  */
 function campaignion_recent_supporters_update_2() {
