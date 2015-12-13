@@ -68,10 +68,5 @@ function _campaignion_form_builder_form_builder_types_textfield() {
     'value' => '%get[p12]',
   ], [], -70);
 
-  $fields['comment'] = $text_element([
-    'name' => t('Comment'),
-    'value' => '%get[p13]',
-  ], [], -69);
-
   return $fields;
 }

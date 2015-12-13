@@ -1,8 +1,5 @@
 <?php
 
-require_once dirname(__FILE__) . '/campaignion_form_builder.type_select.inc';
-require_once dirname(__FILE__) . '/campaignion_form_builder.type_textfield.inc';
-
 /**
  * Implements hook_form_builder_element_types_alter().
  * remove elements from the default palette
@@ -89,9 +86,10 @@ function campaignion_form_builder_form_builder_element_types($form_type, $form_i
 
   $fields = array();
 
-  $types = array('textfield', 'select');
+  $types = array('textfield', 'select', 'textarea');
 
   foreach ($types as $type) {
+    module_load_include("type_{$type}.inc", 'campaignion_form_builder');
     $map               = _form_builder_webform_property_map($type);
     $properties        = array_keys($map['properties']);
     $function          = '_campaignion_form_builder_form_builder_types_' . $type;
