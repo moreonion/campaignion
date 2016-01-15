@@ -428,7 +428,7 @@ function campaignion_recent_supporters_theme() {
 /**
  * theme function for theme('recent_supporters', $variables).
  */
-function theme_recent_supporters($variables) {
+function theme_campaignion_recent_supporters($variables) {
   $supporters = $variables['supporters'];
   if ($show_country = $variables['show_country']) {
     $countries = country_get_list();

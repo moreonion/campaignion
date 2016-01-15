@@ -17,7 +17,7 @@ function campaignion_recent_supporters_install() {
 /**
  * Implements hook_modules_enabled().
  */
-function hook_modules_enabled($modules) {
+function campaignion_recent_supporters_modules_enabled($modules) {
   if (in_array('variable_realm', $modules)) {
     $lang_realm_vars   = variable_get('variable_realm_list_language', array());
     $lang_realm_vars[] = 'campaignion_recent_supporters_settings_types';
@@ -40,6 +40,20 @@ function campaignion_recent_supporters_enable() {
   if (field_read_instances(array('field_name' => 'field_show_recent_supporters', entity_type => 'node'))) {
     campaignion_recent_supporters_update_1();
   };
+}
+
+/**
+ * Migrate to the separate recent_supporters module.
+ */
+function campaignion_recent_supporters_update_4() {
+  module_enable(['recent_supporters', 'recent_supporters_webform', 'polling']);
+  db_drop_table('recent_supporters_webform');
+  db_rename_table('campaignion_recent_supporters_webform', 'recent_supporters_webform');
+  foreach (['name_display_default', 'settings', 'settings_types'] as $v) {
+    db_query("UPDATE {variable} SET name='recent_supporters_$v' WHERE name='campaignion_recent_supporters_$v'");
+  }
+  module_disable(['campaignion_recent_supporters_webform', 'campaignion_recent_supporters']);
+  drupal_uninstall_modules(['campaignion_recent_supporters_webfom', 'campaignion_recent_supporters']);
 }
 
 /**
