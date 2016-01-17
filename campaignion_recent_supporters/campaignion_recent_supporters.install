@@ -43,6 +43,14 @@ function campaignion_recent_supporters_enable() {
 }
 
 /**
+ * Implements hook_update_dependencies().
+ */
+function campaignion_recent_supporters_update_dependencies() {
+  $d['campaignion_recent_supporters'][4]['campaignion_recent_supporters_webform'] = 7101;
+  return $d;
+}
+
+/**
  * Migrate to the separate recent_supporters module.
  */
 function campaignion_recent_supporters_update_4() {
@@ -60,6 +68,9 @@ function campaignion_recent_supporters_update_4() {
  * Migrate from the activity to the webform backend.
  */
 function campaignion_recent_supporters_update_3() {
+  if (module_exists('campaignion_recent_supporters_webform')) {
+    return;
+  }
   require_once drupal_get_path('module', 'webform') . '/includes/webform.submissions.inc';
   // Only migrate if the activity backend is currently used.
   $settings = variable_get('campaignion_recent_supporters_settings', []);
@@ -68,9 +79,7 @@ function campaignion_recent_supporters_update_3() {
     return;
   }
 
-  if (!module_exists('campaignion_recent_supporters_webform')) {
-    module_enable(['campaignion_recent_supporters_webform']);
-  }
+  module_enable(['campaignion_recent_supporters_webform']);
 
   $types = variable_get('webform_node_types', ['webform']);
   $nids = db_select('node', 'n')
