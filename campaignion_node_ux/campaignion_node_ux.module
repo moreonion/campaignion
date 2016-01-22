@@ -66,9 +66,8 @@ function campaignion_node_ux_node_presave($node) {
   $lang = metatag_entity_get_language('node', $node);
   $metatag = &$node->metatags[$lang];
 
-  if (empty($metatag['og:image']) && !empty($node->field_main_image)) {
-    $info = field_get_items('node', $node, 'field_main_image')[0];
-    $file = file_load($info['fid']);
+  if (empty($metatag['og:image']) && ($items = field_get_items('node', $node, 'field_main_image'))) {
+    $file = file_load($items[0]['fid']);
     $metatag['og:image']['value'] = $file->uri;
   }
 }
