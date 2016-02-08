@@ -18,7 +18,6 @@ function campaignion_form_builder_form_builder_element_types_alter(&$types, $for
   }
   if (isset($types['newsletter'])) {
     $field                  = &$types['newsletter'];
-    $field['unique']        = TRUE;
     $field['palette_group'] = 'supporter_data';
   }
 }
