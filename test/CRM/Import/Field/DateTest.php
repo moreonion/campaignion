@@ -6,21 +6,30 @@ require_once dirname(__FILE__) . '/RedhenEntityTest.php';
 use \Drupal\campaignion\CRM\Import\Source\ArraySource;
 
 class DateTest extends RedhenEntityTest {
-  function testValidBirthDate() {
-    $field = 'field_date_of_birth'; $string = '1988-10-22';
+  protected function import($string) {
+    $field = 'field_date_of_birth';
     $importer = new Date($field);
     $data[$field] = $string;
     $entity = $this->newRedhenContact();
     $importer->import(new ArraySource($data), $entity, TRUE);
-    $this->assertEqual($string, strftime('%Y-%m-%d', (int) $entity->{$field}->value()));
+    return $entity->{$field}->value();
+  }
+
+  function testValidBirthDate() {
+    $string = '1988-10-22';
+    $imported = strftime('%Y-%m-%d', (int) $this->import($string));
+    $this->assertEqual($string, $imported);
+  }
+
+  function testCampaignionFormat() {
+    $string = '01/04/1976';
+    $imported = strftime('%d/%m/%Y', (int) $this->import($string));
+    $this->assertEqual($string, $imported);
   }
   
   function testInValidBirthDate_IsSetAsNull() {
-    $field = 'field_date_of_birth'; $string = '1988;55yz10-22';
-    $importer = new Date($field);
-    $data[$field] = $string;
-    $entity = $this->newRedhenContact();
-    $importer->import(new ArraySource($data), $entity, TRUE);
-    $this->assertNull($entity->{$field}->value());
+    $string = '1988;55yz10-22';
+    $this->assertNull($this->import($string));
   }
+
 }
