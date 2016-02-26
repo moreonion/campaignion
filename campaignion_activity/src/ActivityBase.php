@@ -7,6 +7,7 @@ class ActivityBase implements ActivityInterface {
   protected $contact_id;
   protected $type;
   protected $created;
+  protected $original = NULL;
 
   public function __construct($data = array()) {
     foreach ($data as $k => &$v) {
@@ -15,14 +16,17 @@ class ActivityBase implements ActivityInterface {
     if (!isset($this->created)) {
       $this->created = time();
     }
+
   }
   
   public static function load($activity_id) {
-    return db_select('campaignion_activity', 'a')
+    $activity = db_select('campaignion_activity', 'a')
       ->fields('a')
       ->condition('activity_id', $activity_id)
       ->execute()
       ->fetchObject(get_called_class());
+    $activity->original = clone $activity;
+    return $activity;
   }
   
   public function save() {
@@ -31,8 +35,8 @@ class ActivityBase implements ActivityInterface {
     } else {
       $this->insert();
     }
-    // Let other modules react on saving an new activity.
-    module_invoke_all('campaignion_activity_save', $this);
+    // Let other modules react on saving an activity.
+    module_invoke_all('campaignion_activity_save', $this, $this->original);
   }
 
   public function delete() {
