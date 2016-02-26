@@ -44,7 +44,7 @@ function campaignion_activity_webform_confirm_email_email_confirmed($node, $subm
       watchdog('campaignion_activity', 'Error when trying to log activity: !message', array('!message' => $e->getMessage()), WATCHDOG_WARNING);
     }
   }
-  $activity->confirmed = time();
+  $activity->confirmed = REQUEST_TIME;
   $activity->save();
 }
 

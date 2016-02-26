@@ -49,6 +49,7 @@ class WebformSubmission extends ActivityBase {
     }
 
     $data = array(
+      'confirmed' => $source->webform->needsConfirmation() ? NULL : REQUEST_TIME,
       'contact_id' => $contact->contact_id,
       'nid' => $node->nid,
       'sid' => $submission->sid,
