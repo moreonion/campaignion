@@ -16,7 +16,9 @@ class ActivityBase implements ActivityInterface {
     if (!isset($this->created)) {
       $this->created = time();
     }
-
+    if ($this->activity_id) {
+      $this->original = clone $this;
+    }
   }
   
   public static function load($activity_id) {
@@ -25,7 +27,6 @@ class ActivityBase implements ActivityInterface {
       ->condition('activity_id', $activity_id)
       ->execute()
       ->fetchObject(get_called_class());
-    $activity->original = clone $activity;
     return $activity;
   }
   
