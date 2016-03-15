@@ -1,8 +1,10 @@
-<div class="wizard-head" id="<?php echo drupal_html_id('wizard-head'); ?>">
+<div class="clearfix wizard-title">
   <h1 class="page-title"><?php echo drupal_get_title(); ?></h1>
   <?php echo render($form['buttons']); ?>
 </div>
-<?php echo render($form['trail']); ?>
+<div class="wizard-head">
+  <?php echo render($form['trail']); ?>
+</div>
 <div id="wizard-main"><?php
   hide($form['wizard_secondary']);
   echo drupal_render_children($form, element_children($form, TRUE));
