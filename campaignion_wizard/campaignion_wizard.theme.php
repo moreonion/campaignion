@@ -44,4 +44,3 @@ function theme_campaignion_wizard_email_form($variables) {
   return drupal_render_children($form, $children);
 
 }
-

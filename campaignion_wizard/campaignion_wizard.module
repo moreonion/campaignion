@@ -135,10 +135,14 @@ function campaignion_wizard_admin_paths() {
  * Used for better control of webform emails setting form
  */
 function campaignion_wizard_theme() {
-  $items['campaignion_wizard_email_form'] = array(
+  $items['campaignion_wizard_form'] = [
+    'render element' => 'form',
+    'template' => 'templates/campaignion-wizard-form',
+  ];
+  $items['campaignion_wizard_email_form'] = [
     'render element' => 'form',
     'file'           => 'campaignion_wizard.theme.php',
-  );
+  ];
 
   return $items;
 }

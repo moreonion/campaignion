@@ -24,7 +24,7 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
     parent::__construct($user);
     $this->formInfo['path'] = $node ? "node/{$node->nid}/wizard/%step" : "wizard/{$this->node->type}";
 
-    drupal_set_title(t('Create ' . node_type_get_name($this->node)));
+    drupal_set_title(t('Create @action', ['@action' => node_type_get_name($this->node)]));
     $this->formInfo += array(
       'show return' => TRUE,
       'return path' => $node ? 'node/' . $this->node->nid : 'node',
@@ -41,11 +41,8 @@ abstract class NodeWizard extends \Drupal\oowizard\Wizard {
 
   public function wizardForm() {
     $form = parent::wizardForm() + array(
-      'wizard_head' => array(),
       'wizard_advanced' => array(),
     );
-    $form['wizard_head']['trail'] = $this->trail();
-
     return $form;
   }
 
