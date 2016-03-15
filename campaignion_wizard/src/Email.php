@@ -61,6 +61,7 @@ class Email {
     unset($email_form['from_address_option']['#options']['component']);
     unset($email_form['from_address_component']);
 
+    $email_form['templates']['#access'] = FALSE;
     $email_form['template']['#collapsible'] = FALSE;
     $email_form['template']['#title'] = t('Your email');
     $email_form['template']['#description']  = "";
@@ -85,7 +86,6 @@ class Email {
       'data' => $settings,
     );
     $email_form['#attached']['js'][] = drupal_get_path('module', 'campaignion_wizard') . '/js/email-text-format.js';
-
     return $email_form;
   }
 

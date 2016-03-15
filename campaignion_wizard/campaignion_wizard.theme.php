@@ -34,10 +34,6 @@ function theme_campaignion_wizard_email_form($variables) {
     '#attributes'  => array(),
   );
 
-  // Ensure templates are completely hidden.
-  $form['templates']['#prefix'] = '<div id="webform-email-templates" style="display: none">';
-  $form['templates']['#suffix'] = '</div>';
-
   // Re-sort the elements since we added the details fieldset.
   $form['#sorted'] = FALSE;
   $children = element_children($form, TRUE);
