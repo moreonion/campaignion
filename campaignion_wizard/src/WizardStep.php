@@ -14,6 +14,7 @@ abstract class WizardStep extends \Drupal\oowizard\WizardStep {
     $form['#attributes']['class'][] = 'wizard-form';
     $form['#attributes']['class'][] = 'wizard-main-container';
 
+    $form['buttons']['#tree'] = FALSE;
     $form['buttons']['#weight'] = -20;
     $form['buttons']['next']['#value'] = t('Next');
 
