@@ -62,7 +62,10 @@ class WebformStep extends WizardStep {
   }
 
   public function validateStep($form, &$form_state) {
-    // form_builder seems to use it's ajax callbacks for validation.
+    // form_builder <= 7.x-1.13 did not have this function.
+    if (function_exists('form_builder_webform_save_form_validate')) {
+      form_builder_webform_save_form_validate($form, $form_state);
+    }
   }
 
   public function submitStep($form, &$form_state) {
