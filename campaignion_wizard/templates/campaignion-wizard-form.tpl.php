@@ -1,6 +1,6 @@
 <div class="clearfix wizard-title">
   <h1 class="page-title"><?php echo drupal_get_title(); ?></h1>
-  <?php echo render($form['buttons']); ?>
+  <?php if (!empty($form['buttons'])) { echo render($form['buttons']); } ?>
 </div>
 <div class="wizard-head">
   <?php echo render($form['trail']); ?>

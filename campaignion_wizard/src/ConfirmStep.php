@@ -41,8 +41,8 @@ class ConfirmStep extends WizardStep {
     $form['confirm_container']['buttons'] = array(
       '#weight' => 1000,
       '#attributes' => array('class' => array('form-submit')),
-    ) + $form['wizard_head']['buttons'];
-    unset($form['wizard_head']['buttons']);
+    ) + $form['buttons'];
+    unset($form['buttons']);
 
     // remove/add buttons
     unset($form['confirm_container']['buttons']['previous']);
