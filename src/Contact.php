@@ -18,6 +18,9 @@ class Contact extends \RedhenContact {
     if (!$this->type) {
       $this->type = static::defaultType();
     }
+    if (!$this->created) {
+      $this->created = REQUEST_TIME;
+    }
   }
 
   public static function defaultType() {
