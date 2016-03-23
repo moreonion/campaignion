@@ -6,26 +6,44 @@
 
 namespace Drupal\campaignion_newsletters_optivo;
 
+use \Drupal\campaignion_newsletters\ApiError;
+use \Drupal\campaignion_newsletters\ApiPersistentError;
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\ProviderBase;
 use \Drupal\campaignion_newsletters\Subscription;
 
 class Optivo extends ProviderBase {
   protected $account;
+  protected $sessionService;
+  protected $recipientListService;
+  protected $recipientService;
   protected $session;
   protected $sessionId;
+
+  public static function fromParams(array $params) {
+    return new static(
+      $params,
+      new Client("https://api.broadmail.de/soap11/RpcSession?wsdl"),
+      new SessionClient("https://api.broadmail.de/soap11/RpcRecipientList?wsdl"),
+      new SessionClient("https://api.broadmail.de/soap11/RpcRecipient?wsdl")
+    );
+  }
 
   /**
    * Constructor. Creates an active session with Optivo.
    */
-  public function __construct(array $params) {
+  public function __construct(array $params, $session_service, $recipient_list_service, $recipient_service) {
     $this->account = $params['name'];
-    $this->session = BroadmailApiSoap::SessionWebservice();
-    $this->sessionId = $this->session->login(
-        $params['madatorId'],
-        $params['username'],
-        $params['password']
-    );
+    $this->sessionService = $session_service;
+    $this->recipientListService = $recipient_list_service;
+    $this->recipientService = $recipient_service;
+    $this->login($params['mandatorId'], $params['username'], $params['password']);
+  }
+
+  public function login($mandatorId, $username, $password) {
+    $session_id = $this->sessionService->login($mandatorId, $username, $password);
+    $this->recipientListService->setSessionId($session_id);
+    $this->recipientService->setSessionId($session_id);
   }
 
   /**
@@ -36,19 +54,18 @@ class Optivo extends ProviderBase {
    *   (properties: identifier, title, source, language).
    */
   public function getLists() {
-    $service = BroadmailApiSoap::RecipientListWebservice();
-    $list_ids = $service->getAllIds($this->sessionId);
-    $lists = array ();
+    $service = $this->recipientListService;
+    $list_ids = $service->getAllIds();
+    $lists = [];
     foreach ( $list_ids as $id ) {
-      $name = $service->getName($this->sessionId, $id);
-      $attributes = $service->getAttributeNames($this->sessionId, $id, 'en');
-      $lists [] = NewsletterList::fromData( array (
+      $name = $service->getName($id);
+      $attributes = $service->getAttributeNames($id, 'en');
+      $lists[] = NewsletterList::fromData([
         'identifier' => $id,
         'title' => $name,
         'source' => 'Optivo-' . $this->account,
-        'data' => ( object ) $attributes
-      // @TODO: find out what to do with language settings.
-      ));
+        'data' => (object) ['attributeNames' => $attributes],
+      ]);
     }
     return $lists;
   }
@@ -60,12 +77,8 @@ class Optivo extends ProviderBase {
    *   an array of subscribers.
    */
   public function getSubscribers($list) {
-    $service = BroadmailApiSoap::RecipientWebservice();
-    $receivers = $service->getAll(
-      $this->sessionId,
-      $list->identifier,
-      'email'
-    );
+    $service = $this->recipientService;
+    $receivers = $service->getAll($list->identifier, 'email');
     return $receivers;
   }
 
@@ -75,13 +88,12 @@ class Optivo extends ProviderBase {
    * @return: True on success.
    */
   public function subscribe($list, $mail, $data, $opt_in = 0) {
-    $service = BroadmailApiSoap::RecipientWebservice();
-    $recipientId = $mail; // @TODO: Check docs what this should be.
-    $address = ''; // Perhaps $mail.
+    $service = $this->recipientService;
+    $recipientId = $mail;
+    $address = $mail;
     $attributeNames = array();
     $attributeValues = array();
-    $service->add2(
-      $this-sessionId,
+    $status = $service->add2(
       $list->identifier,
       $opt_in,
       $recipientId,
@@ -89,8 +101,27 @@ class Optivo extends ProviderBase {
       $attributeNames,
       $attributeValues
     );
+    // Status codes and comments according to v1.13 of the SOAP API.
+    switch ($status) {
+      case 0: // Recipient has been added.
+        return TRUE;
+      case 1: // Recipient validation failed.
+        throw new ApiPersistentError('Optivo', 'Recipient validation failed (@mail)', ['@mail' => $mail], $status);
+      case 2: // Recipient is unsubscribed.
+        throw new ApiError('Optivo', 'Recipient is unsubscribed (@mail)', ['@mail' => $mail], $status);
+      case 3: // Recipient is blacklisted.
+        throw new ApiPersistentError('Optivo', 'Recipient is blacklisted (@mail)', ['@mail' => $mail], $status);
+      case 4: // Recipient is bounce overflowed.
+        throw new ApiPersistentError('Optivo', 'Recipient is bounce overflowed (@mail)', ['@mail' => $mail], $status);
+      case 5: // Recipient is already in the list.
+        return TRUE;
+      case 6: // Recipient has been filtered.
+        throw new ApiError('Optivo', 'Recipient has been filtered (@mail)', ['@mail' => $mail], $status);
+      case 7: // A general error occured.
+        throw new ApiError('Optivo', 'A general error occured when adding @mail', ['@mail' => $mail], $status);
+    }
 
-    return true;
+    throw new ApiError('Optivo', 'API returned unexpected status code', [], $status);
   }
 
   /**
@@ -101,79 +132,9 @@ class Optivo extends ProviderBase {
    * @return: True on success.
    */
   public function unsubscribe($list, $mail) {
-    $service = BroadmailApiSoap::RecipientWebservice();
-    $service->remove($this-sessionId, $list->identifier, $mail);
-
-    return true;
+    $service = $this->recipientService;
+    $service->remove($list->identifier, $mail);
+    return TRUE;
   }
 
-  /**
-   * Wraps Optivo API calls to deal with it's results and errors.
-   */
-  protected function call($service, $function) {
-//     $arguments = func_get_args();
-//     array_shift($arguments);
-//     $result = array('data' => NULL);
-//     try {
-//       $result = call_user_func_array(
-//         array($service, $function),
-//         $arguments
-//       );
-//     }
-//     catch(\Optivo_ValidationError $e) {
-//       throw new \Drupal\campaignion_newsletters\ApiPersistentError('Optivo', $e->getMessage(), array(), $e->getCode(), $e->getFile(), $e);
-//     }
-//     catch(\Optivo_Error $e) {
-//       $v['@error'] = $e->getMessage();
-//       watchdog('Optivo', 'Optivo API Exception: "@error"', $v, WATCHDOG_INFO);
-//     }
-//     if (!empty($result['errors'])) {
-//       foreach ($result['errors'] as $error) {
-//         $v['@error'] = $error['error'];
-//         $v['@code'] = $error['code'];
-//         watchdog('Optivo', '@error (@code)', $v);
-//         return false;
-//       }
-//     }
-//     else {
-//       return $result['data'];
-//     }
-  }
-
-  /**
-   * Protected clone method to prevent cloning of the singleton instance.
-   */
-  protected function __clone() {}
-
-  /**
-   * Protected unserialize method to prevent unserializing of singleton.
-   */
-  protected function __wakeup() {}
-}
-
-
-class BroadmailApiSoap {
-  /**
-   * @return RecipientListWebservice
-   */
-  public static function RecipientListWebservice()
-  {
-    return new SoapClient("https://api.broadmail.de/soap11/RpcRecipientList?wsdl");
-  }
-
-  /**
-   * @return RecipientWebservice
-   */
-  public static function RecipientWebservice()
-  {
-    return new SoapClient("https://api.broadmail.de/soap11/RpcRecipient?wsdl");
-  }
-
-  /**
-   * @return SessionWebservice
-   */
-  public static function SessionWebservice()
-  {
-    return new SoapClient("https://api.broadmail.de/soap11/RpcSession?wsdl");
-  }
 }
