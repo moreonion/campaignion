@@ -4,8 +4,8 @@ core = 7.x
 package = Campaignion
 project = campaignion
 
-dependencies[] = elysia_cron
 dependencies[] = little_helpers
 dependencies[] = psr0
+dependencies[] = ultimate_cron
 dependencies[] = webform
 dependencies[] = webform_confirm_email
