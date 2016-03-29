@@ -20,7 +20,7 @@ class Optivo extends ProviderBase {
   protected $session;
   protected $sessionId;
 
-  public static function fromParams(array $params) {
+  public static function fromParameters(array $params) {
     return new static(
       $params,
       new Client("https://api.broadmail.de/soap11/RpcSession?wsdl"),
@@ -37,7 +37,8 @@ class Optivo extends ProviderBase {
     $this->sessionService = $session_service;
     $this->recipientListService = $recipient_list_service;
     $this->recipientService = $recipient_service;
-    $this->login($params['mandatorId'], $params['username'], $params['password']);
+    $key = $params['key'];
+    $this->login($key['mandatorId'], $key['username'], $key['password']);
   }
 
   public function login($mandatorId, $username, $password) {
@@ -87,7 +88,7 @@ class Optivo extends ProviderBase {
    *
    * @return: True on success.
    */
-  public function subscribe($list, $mail, $data, $opt_in = 0) {
+  public function subscribe($list, $mail, $data, $opt_in = FALSE, $welcome = FALSE) {
     $service = $this->recipientService;
     $recipientId = $mail;
     $address = $mail;
@@ -135,6 +136,10 @@ class Optivo extends ProviderBase {
     $service = $this->recipientService;
     $service->remove($list->identifier, $mail);
     return TRUE;
+  }
+
+  public function data(Subscription $subscription) {
+    return [];
   }
 
 }
