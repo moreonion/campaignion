@@ -31,7 +31,7 @@ function campaignion_newsletters_optivo_menu() {
  * Implements hook_campaignion_newsletters_provider_info().
  */
 function campaignion_newsletters_optivo_campaignion_newsletters_provider_info() {
-  $keys = variable_get('optivo_api_keys', array());
+  $keys = variable_get('optivo_credentials', array());
   $providers = array();
   foreach ($keys as $name => $key) {
     $providers['Optivo-' . $name] = array(
@@ -55,7 +55,7 @@ function campaignion_newsletters_optivo_form_campaignion_newsletters_admin_setti
  * Get API-key by machine name.
  */
 function campaignion_newsletters_optivo_get_key($name) {
-  $keys = variable_get('optivo_api_keys', array());
+  $keys = variable_get('optivo_credentials', array());
   if (isset($keys[$name])) {
     return $keys[$name];
   }

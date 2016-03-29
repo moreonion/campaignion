@@ -5,6 +5,6 @@
  */
 function campaignion_newsletters_optivo_uninstall() {
   variable_del(array(
-    'optivo_api_keys',
+    'optivo_credentials',
   ));
 }
