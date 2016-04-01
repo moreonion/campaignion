@@ -7,7 +7,7 @@
 namespace Drupal\campaignion_newsletters;
 
 interface NewsletterProviderInterface {
-  public function __construct(array $params);
+  public static function fromParameters(array $params);
   /**
    * Fetches current lists from the provider.
    *

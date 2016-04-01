@@ -7,6 +7,10 @@ use \Drupal\campaignion\CRM\Import\Source\CombinedSource;
 use \Drupal\campaignion\ContactTypeManager;
 
 abstract class ProviderBase implements NewsletterProviderInterface {
+  public static function fromParameters(array $params) {
+    return new static($params);
+  }
+
   protected function getSource(Subscription $subscription, $target) {
     $source = NULL;
     if ($subscription->source) {
