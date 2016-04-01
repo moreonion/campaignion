@@ -113,7 +113,8 @@ class Optivo extends ProviderBase {
         throw new ApiPersistentError('Optivo', 'Recipient is blacklisted (@mail)', ['@mail' => $mail], $status);
       case 4: // Recipient is bounce overflowed.
         throw new ApiPersistentError('Optivo', 'Recipient is bounce overflowed (@mail)', ['@mail' => $mail], $status);
-      case 5: // Recipient is already in the list.
+      case 5: // Recipient is already in the list so update the data.
+        $service->setAttributes($list->identifier, $mail, $data['names'], $data['values']);
         return TRUE;
       case 6: // Recipient has been filtered.
         throw new ApiError('Optivo', 'Recipient has been filtered (@mail)', ['@mail' => $mail], $status);
@@ -141,7 +142,6 @@ class Optivo extends ProviderBase {
    * Get the subscriber-data for a subscription object.
    */
   protected function attributeData($subscription) {
-    return ['names' => ['Vorname', 'Nachname'], values => ['Test', 'Monion']];
     $list = $subscription->newsletterList();
     $names = [];
     $values = [];
@@ -162,8 +162,7 @@ class Optivo extends ProviderBase {
    */
   public function data(Subscription $subscription) {
     $data = $this->attributeData($subscription);
-    $attr = $data;
-    $fingerprint = sha1(serialize($attr));
+    $fingerprint = sha1(serialize($data));
     return array($data, $fingerprint);
 
   }
