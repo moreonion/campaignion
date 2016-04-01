@@ -92,15 +92,14 @@ class Optivo extends ProviderBase {
     $service = $this->recipientService;
     $recipientId = $mail;
     $address = $mail;
-    $attributeNames = array();
-    $attributeValues = array();
+    $data += ['names' => [], 'values' => []];
     $status = $service->add2(
       $list->identifier,
       $opt_in,
       $recipientId,
       $address,
-      $attributeNames,
-      $attributeValues
+      $data['names'],
+      $data['values']
     );
     // Status codes and comments according to v1.13 of the SOAP API.
     switch ($status) {
@@ -138,8 +137,35 @@ class Optivo extends ProviderBase {
     return TRUE;
   }
 
+  /**
+   * Get the subscriber-data for a subscription object.
+   */
+  protected function attributeData($subscription) {
+    return ['names' => ['Vorname', 'Nachname'], values => ['Test', 'Monion']];
+    $list = $subscription->newsletterList();
+    $names = [];
+    $values = [];
+
+    if ($source = $this->getSource($subscription, 'optivo')) {
+      foreach ($list->data->attributeNames as $name) {
+        if ($value = $source->value($name)) {
+          $names[] = $name;
+          $values[] = $value;
+        }
+      }
+    }
+    return ['names' => $names, 'values' => $values];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function data(Subscription $subscription) {
-    return [];
+    $data = $this->attributeData($subscription);
+    $attr = $data;
+    $fingerprint = sha1(serialize($attr));
+    return array($data, $fingerprint);
+
   }
 
 }
