@@ -25,8 +25,8 @@ class ProviderFactory {
   public function providerByKey($key) {
     if (isset($this->providers[$key])) {
       $info = $this->providers[$key];
-      $constructor = "{$info['class']}::fromParameters";
-      return $constructor($info['params']);
+      $func = [$info['class'], 'fromParameters'];
+      return call_user_func($func, $info['params']);
     } else {
       \watchdog('campaignion_newsletters', 'No provider found for source-key: !key', array('!key' => $key), WATCHDOG_ERROR);
     }
