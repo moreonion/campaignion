@@ -18,7 +18,7 @@ class Client extends \SoapClient {
       return parent::__call($name, $arguments);
     }
     catch (\SoapFault $e) {
-      throw new ApiError('Optivo', 'Exception during API-call', [], 0, NULL, $e);
+      throw new ApiError('Optivo', 'Exception during API-call: @message', ['@message' => $e->getMessage()], 0, NULL, $e);
     }
   }
 }
