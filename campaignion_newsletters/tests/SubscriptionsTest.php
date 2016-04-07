@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_newsletters;
 
-class SubscriptionsTest extends \Drupal\Tests\DrupalWebTestCase {
+class SubscriptionsTest extends \DrupalWebTestCase {
   public function testSubscribeNew() {
     $list_stubs = array(4711 => NULL, 4712 => NULL);
     $addresses = array('test1@example.com', 'test2@example.com');

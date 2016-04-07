@@ -7,7 +7,7 @@ class MenuFileParserTest extends \DrupalUnitTestCase {
     $start = time();
     // import menu
     $menu_name = 'ae-menu';
-    $uri = DRUPAL_ROOT . '/' . drupal_get_path('module', 'campaignion_bar') . '/' . $menu_name . '.txt';
+    $uri = dirname(__FILE__) . '/testfiles/campaignion_bar.txt';
     $parser = new MenuFileParser($menu_name);
     $menu = $parser->parseFile($uri);
     $this->assertTrue($menu instanceof MenuItem);
@@ -16,7 +16,7 @@ class MenuFileParserTest extends \DrupalUnitTestCase {
 
   public function testToMenuLinks() {
     $menu_name = 'ae-menu';
-    $uri = DRUPAL_ROOT . '/' . drupal_get_path('module', 'campaignion_bar') . '/' . $menu_name . '.txt';
+    $uri = dirname(__FILE__) . '/testfiles/campaignion_bar.txt';
     $parser = new MenuFileParser($menu_name);
     $menu = $parser->fileToMenuLinks($uri);
     foreach ($menu as $key => $item) {
