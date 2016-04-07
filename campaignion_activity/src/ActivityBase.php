@@ -3,7 +3,7 @@
 namespace Drupal\campaignion_activity;
 
 class ActivityBase implements ActivityInterface {
-  protected $activity_id = NULL;
+  public $activity_id = NULL;
   protected $contact_id;
   protected $type;
   protected $created;

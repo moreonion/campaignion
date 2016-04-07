@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_newsletters;
 
-class SubscriptionTest extends \Drupal\Tests\DrupalWebTestCase {
+class SubscriptionTest extends \DrupalWebTestCase {
   public function test_byData_doesntDuplicate() {
     $email = 'bydataduplicate@test.com';
     $list_id = 4711;

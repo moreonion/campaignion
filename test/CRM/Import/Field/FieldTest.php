@@ -32,14 +32,12 @@ class FieldTest extends RedhenEntityTest {
     $importer->import(new ArraySource($data), $entity, TRUE);
   }
 
-  /**
-   * @expectedException PHPUnit_Framework_Error
-   */
   function testNonEntityGivesPHPError() {
     $field = 'first_name'; $string = 'Somename';
     $importer = new Field($field);
     $data[$field] = $string;
     $entity = NULL;
+    $this->expectException(class_exists('TypeError') ? 'TypeError' : 'PHPUnit_Framework_Error');
     $this->assertEqual(NULL, $importer->import(new ArraySource($data), $entity, TRUE));
   }
 }
