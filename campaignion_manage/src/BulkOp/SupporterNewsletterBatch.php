@@ -10,7 +10,7 @@ class SupporterNewsletterBatch extends BatchBase {
       array_values($data['list_ids'])
     );
   }
-  public function apply($contact) {
+  public function apply($contact, &$result) {
     foreach ($this->lists as $list) {
       $list->subscribe($contact->email());
     }

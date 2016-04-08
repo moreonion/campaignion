@@ -36,4 +36,3 @@ function campaignion_newsletters_send_queue() {
     }
   }
 }
-

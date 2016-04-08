@@ -19,7 +19,7 @@ class SupporterExportBatch extends BatchBase {
     $this->file = $handle;
   }
 
-  public function apply($contact) {
+  public function apply($contact, &$result) {
     $this->exporter->setContact($contact);
     $csv_line = array();
     foreach ($this->fields as $field_name => $field_label) {
