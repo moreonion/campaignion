@@ -50,10 +50,15 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     $result = db_query("SELECT * FROM {{$t}} WHERE LOCKED<$now ORDER BY CREATED LIMIT $limit LOCK IN SHARE MODE");
     $items = array();
     foreach ($result as $row) {
+      $row->locked = $now + $time;
       $item = new static($row, FALSE);
-      $item->claim($time);
+      $ids[] = $row->id;
       $items[] = $item;
     }
+    db_update('campaignion_newsletters_queue')
+      ->fields(['locked' => $now + $time])
+      ->condition('id', $ids)
+      ->execute();
     return $items;
   }
 
