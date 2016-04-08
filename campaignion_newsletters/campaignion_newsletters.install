@@ -88,6 +88,12 @@ function campaignion_newsletters_schema() {
     'campaignion_newsletters_queue' => array(
       'description' => 'Send queue for newsletter subscriptions.',
       'fields' => array(
+        'id' => array(
+          'description' => 'Primary key ID',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
         'list_id' => array(
           'description' => 'Reference to newsletter lists.',
           'type' => 'int',
@@ -124,7 +130,10 @@ function campaignion_newsletters_schema() {
           'size' => 'big',
         ),
       ),
-      'primary key' => array('list_id', 'email'),
+      'primary key' => array('id'),
+      'indexes' => [
+        'list_email' => ['list_id', 'email'],
+      ],
     ),
   );
 }
@@ -151,6 +160,20 @@ function campaignion_newsletters_install() {
  */
 function campaignion_newsletters_uninstall() {
   variable_del('campaignion_newsletters_cleverreach_batch_size');
+}
+
+/**
+ * Add new id column to {campaignion_newsletters_queue}.
+ */
+function campaignion_newsletters_update_9() {
+  db_drop_primary_key('campaignion_newsletters_queue');
+  db_add_field('campaignion_newsletters_queue', 'id', [
+      'description' => 'Primary key ID',
+      'type' => 'serial',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+  ], ['primary key' => ['id']]);
+  db_add_index('campaignion_newsletters_queue', 'list_email', ['list_id', 'email']);
 }
 
 /**
