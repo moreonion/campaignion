@@ -5,5 +5,6 @@ package = Campaignion
 project = campaignion
 
 dependencies[] = campaignion_action
+dependencies[] = form_builder_webform (>=7.x-1.14)
 dependencies[] = oowizard
 dependencies[] = psr0
