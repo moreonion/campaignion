@@ -17,15 +17,15 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
   public $fingerprint;
 
   protected static $table = 'campaignion_newsletters_queue';
-  protected static $key = array('list_id', 'email');
-  protected static $values = array('created', 'locked', 'action', 'data');
+  protected static $key = array('id');
+  protected static $values = array('list_id', 'email', 'created', 'locked', 'action', 'data');
   protected static $serialize = array('data' => TRUE);
-  protected static $serial = FALSE;
+  protected static $serial = TRUE;
 
   public static function load($list_id, $email) {
     $table = static::$table;
-    $keys = array(':list_id' => $list_id, ':email' => $email);
-    $result = db_query("SELECT * FROM {{$table}} WHERE list_id=:list_id AND email=:email", $keys);
+    $keys = [':list_id' => $list_id, ':email' => $email, ':now' => REQUEST_TIME];
+    $result = db_query("SELECT * FROM {{$table}} WHERE list_id=:list_id AND email=:email AND locked<:now ORDER BY created DESC LIMIT 1", $keys);
     if ($row = $result->fetch()) {
       return new static($row, FALSE);
     }
@@ -42,13 +42,12 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
   }
 
   public static function claimOldest($limit, $time = 600) {
-    $table = static::$table;
-    $result = db_select(static::$table, 'i')
-      ->fields('i')
-      ->orderBy('created')
-      ->condition('locked', time(), '<')
-      ->range(0, $limit)
-      ->execute();
+    $transaction = db_transaction();
+    $t = static::$table;
+    $now = time();
+    $limit = (int) $limit;
+    // This is MySQL specific and there is no abstraction in Drupal for it.
+    $result = db_query("SELECT * FROM {{$t}} WHERE LOCKED<$now ORDER BY CREATED LIMIT $limit LOCK IN SHARE MODE");
     $items = array();
     foreach ($result as $row) {
       $item = new static($row, FALSE);
