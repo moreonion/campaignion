@@ -1,0 +1,5 @@
+name = Campaignion logo links
+description = Make site logo links point to configurable URLs
+core = 7.x
+
+dependencies[] = variable
