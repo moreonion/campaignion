@@ -24,6 +24,8 @@ function _webform_defaults_newsletter() {
       'lists' => array(),
       'opt_in_implied' => 1,
       'title_display' => 'none',
+      'display' => 'checkbox',
+      'radio_labels' => [t('No'), t('Yes, I want to subscribe to the newsletter')],
     ),
   );
 }
@@ -85,6 +87,34 @@ function _webform_edit_newsletter($component) {
     ),
   );
 
+  $display_id = drupal_html_id('newsletter-display');
+  $form['extra']['display'] = [
+    '#type' => 'select',
+    '#title' => t('Display the newsletter opt-in as …'),
+    '#options' => array(
+      'checkbox' => t('Checkbox'),
+      'radios' => t('Radios'),
+    ),
+    '#default_value' => $component['extra']['display'],
+    '#id' => $display_id,
+  ];
+
+  $form['extra']['radio_labels'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Labels for the radios'),
+    '#states' => ['visible' => ["#$display_id" => ['value' => 'radios']]],
+    1 => [
+      '#type' => 'textfield',
+      '#title' => t('Yes'),
+      '#default_value' => $component['extra']['radio_labels'][1],
+    ],
+    0 => [
+      '#type' => 'textfield',
+      '#title' => t('No'),
+      '#default_value' => $component['extra']['radio_labels'][0],
+    ],
+  ];
+
   return $form;
 }
 
@@ -106,22 +136,47 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
   );
   $component['value'] = unserialize($component['value']);
 
-  $options['subscribed'] = $component['extra']['description'];
   $element += array(
-    '#type' => 'checkboxes',
-    '#default_value' => array(),
     '#required' => $component['mandatory'],
     '#weight' => $component['weight'],
     '#theme_wrappers' => array('webform_element'),
     '#pre_render' => array(),
     '#title' => $component['name'],
     '#title_display' => $component['extra']['title_display'],
-    '#options' => $options,
-    '#default_value' => $component['value'],
     '#translatable' => array('title', 'description', 'options'),
   );
 
+  switch ($component['extra']['display']) {
+    case 'checkbox':
+      $options['subscribed'] = $component['extra']['description'];
+      $element += [
+        '#type' => 'checkboxes',
+        '#default_value' => $component['value'],
+        '#options' => $options,
+      ];
+      break;
+    case 'radios':
+      $l = $component['extra']['radio_labels'];
+      $options = ['yes' => $l[1], 'no' => $l[0]];
+      $element += [
+        '#type' => 'radios',
+        '#default_value' => !empty($component['value']) ? 'yes' : 'no',
+        '#options' => $options,
+        '#element_validate' => ['_campaignion_newsletters_radio_values'],
+      ];
+  }
+
   return $element;
+}
+
+/**
+ * Element validate handler for newsletter opt-in as radios.
+ *
+ * Transform value into whatever the checkbox would evaluate to.
+ */
+function _campaignion_newsletters_radio_values($element, &$form_state) {
+  $value = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  $value = ['subscribed' => $value == 'yes' ? 'subscribed' : 0];
 }
 
 /**
