@@ -100,6 +100,7 @@ function _webform_edit_newsletter($component) {
   ];
 
   $form['extra']['radio_labels'] = [
+    '#tree' => TRUE, // Needed for form_builder.
     '#type' => 'fieldset',
     '#title' => t('Labels for the radios'),
     '#states' => ['visible' => ["#$display_id" => ['value' => 'radios']]],
@@ -220,6 +221,9 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
   $form['newsletter_title'] = $edit['extra']['description'];
   $form['newsletter_value'] = $edit['value'];
   $form['newsletter_opt_in_implied'] = $edit['extra']['opt_in_implied'];
+  $dp['#form_builder']['property_group'] = 'display';
+  $form['newsletter_display'] = $edit['extra']['display'] + $dp;
+  $form['newsletter_radio_labels'] = $edit['extra']['radio_labels'] + $dp;
   return $form;
 }
 
@@ -251,6 +255,8 @@ function _webform_form_builder_properties_newsletter() {
     ),
     'newsletter_title' => array(),
     'newsletter_opt_in_implied' => array(),
+    'newsletter_display' => [],
+    'newsletter_radio_labels' => [],
   );
 }
 
@@ -280,6 +286,12 @@ function _webform_form_builder_map_newsletter() {
     'newsletter_value' => array(
       'storage_parents' => array('value'),
     ),
+    'newsletter_display' => [
+      'storage_parents' => ['extra', 'display'],
+    ],
+    'newsletter_radio_labels' => [
+      'storage_parents' => ['extra', 'radio_labels'],
+    ],
   );
   return $map;
 }
