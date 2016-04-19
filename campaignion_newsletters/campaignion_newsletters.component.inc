@@ -128,16 +128,9 @@ function _webform_value_validate_newsletter(&$element, &$form_state) {
  * Implements _webform_render_component().
  */
 function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
-  // This is needed to correctly save components if they are just
-  // drag-n-dropped and never edited.
-  $element = array(
-    '#newsletter_value' => $component['value'],
-    '#newsletter_lists' => $component['extra']['lists'],
-    '#newsletter_title' => $component['extra']['description'],
-  );
   $component['value'] = unserialize($component['value']);
 
-  $element += array(
+  $element = array(
     '#required' => $component['mandatory'],
     '#weight' => $component['weight'],
     '#theme_wrappers' => array('webform_element'),
