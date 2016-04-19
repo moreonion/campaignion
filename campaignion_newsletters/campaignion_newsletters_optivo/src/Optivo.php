@@ -17,8 +17,8 @@ class Optivo extends ProviderBase {
   protected $sessionService;
   protected $recipientListService;
   protected $recipientService;
-  protected $session;
-  protected $sessionId;
+  protected $sessionId = NULL;
+  protected $credentials = [];
 
   public static function fromParameters(array $params) {
     return new static(
@@ -38,13 +38,39 @@ class Optivo extends ProviderBase {
     $this->recipientListService = $recipient_list_service;
     $this->recipientService = $recipient_service;
     $key = $params['key'];
-    $this->login($key['mandatorId'], $key['username'], $key['password']);
+    $this->credentials = [$key['mandatorId'], $key['username'], $key['password']];
+  }
+
+  /**
+   * Login using stored credentials. If needed.
+   */
+  protected function ensureLogin() {
+    if (!$this->sessionId) {
+      list($m, $u, $p) = $this->credentials;
+      $this->sessionId = $this->login($m, $u, $p);
+    }
+  }
+
+  /**
+   * Log out at the end of the object's life-time.
+   */
+  public function __destruct() {
+    if ($this->sessionId) {
+      $this->logout($this->sessionId);
+    }
   }
 
   public function login($mandatorId, $username, $password) {
     $session_id = $this->sessionService->login($mandatorId, $username, $password);
     $this->recipientListService->setSessionId($session_id);
     $this->recipientService->setSessionId($session_id);
+    return $session_id;
+  }
+
+  public function logout($session_id) {
+    $this->sessionService->logout($session_id);
+    $this->recipientListService->setSessionId(NULL);
+    $this->recipientService->setSessionId(NULL);
   }
 
   /**
@@ -55,6 +81,7 @@ class Optivo extends ProviderBase {
    *   (properties: identifier, title, source, language).
    */
   public function getLists() {
+    $this->ensureLogin();
     $service = $this->recipientListService;
     $list_ids = $service->getAllIds();
     $lists = [];
@@ -78,6 +105,7 @@ class Optivo extends ProviderBase {
    *   an array of subscribers.
    */
   public function getSubscribers($list) {
+    $this->ensureLogin();
     $service = $this->recipientService;
     $receivers = $service->getAll($list->identifier, 'email');
     return $receivers;
@@ -89,6 +117,7 @@ class Optivo extends ProviderBase {
    * @return: True on success.
    */
   public function subscribe($list, $mail, $data, $opt_in = FALSE, $welcome = FALSE) {
+    $this->ensureLogin();
     $service = $this->recipientService;
     $recipientId = $mail;
     $address = $mail;
@@ -133,6 +162,7 @@ class Optivo extends ProviderBase {
    * @return: True on success.
    */
   public function unsubscribe($list, $mail) {
+    $this->ensureLogin();
     $service = $this->recipientService;
     $service->remove($list->identifier, $mail);
     return TRUE;
@@ -148,6 +178,7 @@ class Optivo extends ProviderBase {
 
     if ($source = $this->getSource($subscription, 'optivo')) {
       foreach ($list->data->attributeNames as $name) {
+        $name = strtr(drupal_clean_css_identifier(strtolower($name)), '-', '_');
         if ($value = $source->value($name)) {
           $names[] = $name;
           $values[] = $value;
@@ -164,7 +195,6 @@ class Optivo extends ProviderBase {
     $data = $this->attributeData($subscription);
     $fingerprint = sha1(serialize($data));
     return array($data, $fingerprint);
-
   }
 
 }
