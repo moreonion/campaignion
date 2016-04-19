@@ -163,6 +163,13 @@ function campaignion_newsletters_uninstall() {
 }
 
 /**
+ * Update webform components: Move description to checkbox_label.
+ */
+function campaignion_newsletters_update_10() {
+  db_query("UPDATE {webform_component} SET extra=REPLACE(extra, 's:11:\"description\"', 's:14:\"checkbox_label\"') WHERE type='newsletter'");
+}
+
+/**
  * Add new id column to {campaignion_newsletters_queue}.
  */
 function campaignion_newsletters_update_9() {
