@@ -19,13 +19,14 @@ function _webform_defaults_newsletter() {
       'items' => '',
       'multiple' => NULL,
       'aslist' => NULL,
-      'description' => t('Subscribe me to the newsletter.'),
+      'description' => '',
       'private' => FALSE,
       'lists' => array(),
       'opt_in_implied' => 1,
       'title_display' => 'none',
       'display' => 'checkbox',
       'radio_labels' => [t('No'), t('Yes, I want to subscribe to the newsletter')],
+      'checkbox_label' => t('Subscribe me to the newsletter.'),
     ),
   );
 }
@@ -52,12 +53,10 @@ function _webform_edit_newsletter($component) {
     ->fetchAllKeyed();
 
   $form['extra']['description'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
     '#title' => t('Description'),
-    '#default_value' => !empty($component['extra']['description']) ? $component['extra']['description'] : t('Subscribe me to the newsletter.'),
-    '#description' => t('This text is displayed next to the opt-in checkbox.'),
+    '#default_value' => $component['extra']['description'],
     '#weight' => 0,
-    '#required' => TRUE,
   );
 
   $form['value'] = array(
@@ -99,6 +98,13 @@ function _webform_edit_newsletter($component) {
     '#id' => $display_id,
   ];
 
+  $form['extra']['checkbox_label'] = [
+    '#type' => 'textfield',
+    '#title' => t('Label for the checkbox'),
+    '#default_value' => $component['extra']['checkbox_label'],
+    '#states' => ['visible' => ["#$display_id" => ['value' => 'checkbox']]],
+  ];
+
   $form['extra']['radio_labels'] = [
     '#tree' => TRUE, // Needed for form_builder.
     '#type' => 'fieldset',
@@ -137,12 +143,13 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
     '#pre_render' => array(),
     '#title' => $component['name'],
     '#title_display' => $component['extra']['title_display'],
+    '#description' => $component['extra']['description'],
     '#translatable' => array('title', 'description', 'options'),
   );
 
   switch ($component['extra']['display']) {
     case 'checkbox':
-      $options['subscribed'] = $component['extra']['description'];
+      $options['subscribed'] = $component['extra']['checkbox_label'];
       $element += [
         '#type' => 'checkboxes',
         '#default_value' => $component['value'],
@@ -216,7 +223,9 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
   $form['newsletter_opt_in_implied'] = $edit['extra']['opt_in_implied'];
   $dp['#form_builder']['property_group'] = 'display';
   $form['newsletter_display'] = $edit['extra']['display'] + $dp;
+  $form['newsletter_checkbox_label'] = $edit['extra']['checkbox_label'] + $dp;
   $form['newsletter_radio_labels'] = $edit['extra']['radio_labels'] + $dp;
+
   return $form;
 }
 
@@ -250,6 +259,7 @@ function _webform_form_builder_properties_newsletter() {
     'newsletter_opt_in_implied' => array(),
     'newsletter_display' => [],
     'newsletter_radio_labels' => [],
+    'newsletter_checkbox_label' => [],
   );
 }
 
@@ -284,6 +294,9 @@ function _webform_form_builder_map_newsletter() {
     ],
     'newsletter_radio_labels' => [
       'storage_parents' => ['extra', 'radio_labels'],
+    ],
+    'newsletter_checkbox_label' => [
+      'storage_parents' => ['extra', 'checkbox_label'],
     ],
   );
   return $map;
