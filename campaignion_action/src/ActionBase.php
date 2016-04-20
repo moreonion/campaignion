@@ -69,4 +69,24 @@ class ActionBase {
   public function insert() {
     $this->save();
   }
+
+  /**
+   * Generate a test-link for this action.
+   *
+   * @return \Drupal\campaignion_action\SignedLink
+   *   A test link or NULL if there should be none for this action-type.
+   */
+  public function testLink($title, $query = [], $options = []) {
+    $query['test-mode'] = 1;
+    $options['attributes']['class'][] = 'test-mode-link';
+    $options += ['html' => FALSE];
+    $l = new SignedLink("node/{$this->node->nid}", $query);
+    return [
+      '#theme' => 'link',
+      '#text' => $title,
+      '#path' => $l->path,
+      '#options' => ['query' => $l->hashedQuery()] + $options,
+    ];
+  }
+
 }
