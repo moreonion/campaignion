@@ -2,7 +2,69 @@
 
 use \Drupal\campaignion_action\TypeBase;
 use \Drupal\campaignion_action\ActionBase;
+use \Drupal\campaignion_action\SignedLink;
 use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+
+/**
+ * Implements hook_permission().
+ */
+function campaignion_action_permission() {
+  $permissions['campaignion view test-mode'] = array(
+    'title' => t('View unpublished actions via a test link.'),
+    'description' => t('Allow users to view unpublished actions with unique key in URL path'),
+  );
+  $permissions['campaignion view test-mode link'] = array(
+    'title' => t('Generate test links.'),
+    'description' => t('Allow users to see the link that can be used to access actions in test-mode.'),
+  );
+  return $permissions;
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function campaignion_action_node_view($node) {
+  // Test publish and view node status.
+  // Only unpublished nodes in full page view are affected.
+  if ($node->status == NODE_NOT_PUBLISHED && node_is_page($node)) {
+    // Test user permission.
+    if (user_access('campaignion view test-mode link')) {
+      // Construct URL link.
+      $action = ActionBase::fromNode($node);
+      if ($link = $action->testLink(t('test-mode link'))) {
+        $link_html = drupal_render($link);
+        $link_text = t("You can use !link to view this action in test-mode.", ['!link' => $link_html]);
+        drupal_set_message($link_text, 'status', FALSE);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_node_access().
+ *
+ * Return NODE_ACCESS_ALLOW if url hash matches the path.
+ * In other cases return NODE_ACCESS_IGNORE to allow other modules
+ * or the node_access table to control access.
+ */
+function campaignion_action_node_access($node, $op) {
+  if ($op == 'view' && isset($node->nid) && $node->status == NODE_NOT_PUBLISHED) {
+    // Check whether this node's page is being viewed.
+    // We can't use node_is_page() here since that results in a recursion-loop.
+    if (arg(0) == 'node' && arg(1) == $node->nid) {
+      // Check user permission.
+      if (user_access('campaignion view test-mode')) {
+        $link = SignedLink::fromCurrentLocation();
+        if ($link->checkHash() && !empty($link->query['test-mode'])) {
+          // Add global flag for later reference.
+          return NODE_ACCESS_ALLOW;
+        }
+      }
+    }
+  }
+  return NODE_ACCESS_IGNORE;
+}
+
 
 /**
  * Implements hook_node_prepare().
@@ -47,6 +109,10 @@ function campaignion_action_node_insert($node) {
  * Insert a custom submit handler.
  */
 function campaignion_action_form_webform_client_form_alter(&$form, &$form_state) {
+  $link = SignedLink::fromCurrentLocation();
+  if ($link->checkHash() && !empty($link->query['test-mode'])) {
+    $form_state['test_mode'] = TRUE;
+  }
   $form['#submit'][] = '_campaignion_action_webform_share_redirect';
 }
 
