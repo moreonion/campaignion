@@ -6,16 +6,6 @@ class ActionBase {
   protected $type;
   protected $node;
 
-  public static function fromNode($node) {
-    if (isset($node->action)) {
-      return $node->action;
-    }
-    if ($type = TypeBase::fromContentType($node->type)) {
-      // give type the control over which class is used.
-      return $type->actionFromNode($node);
-    }
-  }
-
   public function __construct(TypeInterface $type, $node) {
     $this->type = $type;
     $this->node = $node;
