@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_manage;
 
+use \Drupal\campaignion_action\Loader;
+
 class ContentListing {
   protected $size;
   public function __construct($pageSize = 20) {
@@ -120,7 +122,7 @@ class ContentListing {
 
     // set path to wizard for action content types
     if (module_exists('campaignion_wizard')) {
-      if (\Drupal\campaignion_action\TypeBase::isAction($node->type)) {
+      if (Loader::instance()->isActionType($node->type)) {
         $edit_path_part = 'wizard';
       }
     }

@@ -2,6 +2,9 @@
 
 namespace Drupal\campaignion_manage\Filter;
 
+use \Drupal\campaignion_action\Loader;
+
+
 class SupporterActivity extends Base {
   protected $query;
 
@@ -77,7 +80,7 @@ class SupporterActivity extends Base {
     $form_types = array('any' => t('Any type of action'));
     $payment_types = array('any' => t('Any type of payment'));
     $actions = $this->actionsWithActivity();
-    foreach (\Drupal\campaignion_action\TypeBase::types() as $type => $action_type) {
+    foreach (Loader::instance()->allTypes() as $type => $action_type) {
       if (empty($actions[$type])) {
         continue;
       }

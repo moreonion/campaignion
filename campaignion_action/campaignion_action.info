@@ -1,5 +1,5 @@
-name = campaignion_action
-description = Webforms as online actions
+name = Campaignion actions
+description = This is the base for all campaignion actions
 core = 7.x
 package = Campaignion
 project = campaignion

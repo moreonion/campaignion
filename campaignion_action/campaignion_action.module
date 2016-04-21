@@ -1,7 +1,6 @@
 <?php
 
-use \Drupal\campaignion_action\TypeBase;
-use \Drupal\campaignion_action\ActionBase;
+use \Drupal\campaignion_action\Loader;
 use \Drupal\campaignion_action\SignedLink;
 use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 
@@ -30,7 +29,7 @@ function campaignion_action_node_view($node) {
     // Test user permission.
     if (user_access('campaignion view test-mode link')) {
       // Construct URL link.
-      $action = ActionBase::fromNode($node);
+      $action = Loader::instance()->actionFromNode($node);
       if ($link = $action->testLink(t('test-mode link'))) {
         $link_html = drupal_render($link);
         $link_text = t("You can use !link to view this action in test-mode.", ['!link' => $link_html]);
@@ -70,7 +69,7 @@ function campaignion_action_node_access($node, $op) {
  * Implements hook_node_prepare().
  */
 function campaignion_action_node_prepare($node) {
-  if ($action = ActionBase::fromNode($node)) {
+  if ($action = Loader::instance()->actionFromNode($node)) {
     $action->prepare();
   }
 }
@@ -79,7 +78,7 @@ function campaignion_action_node_prepare($node) {
  * Implements hook_node_presave().
  */
 function campaignion_action_node_presave($node) {
-  if ($action = ActionBase::fromNode($node)) {
+  if ($action = Loader::instance()->actionFromNode($node)) {
     $action->presave();
   }
 }
@@ -88,7 +87,7 @@ function campaignion_action_node_presave($node) {
  * Implements hook_node_update().
  */
 function campaignion_action_node_update($node) {
-  if ($action = ActionBase::fromNode($node)) {
+  if ($action = Loader::instance()->actionFromNode($node)) {
     $action->update();
   }
 }
@@ -97,7 +96,7 @@ function campaignion_action_node_update($node) {
  * Implements hook_node_insert().
  */
 function campaignion_action_node_insert($node) {
-  if ($action = ActionBase::fromNode($node)) {
+  if ($action = Loader::instance()->actionFromNode($node)) {
     $action->insert();
   }
 }

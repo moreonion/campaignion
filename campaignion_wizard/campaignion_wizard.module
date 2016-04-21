@@ -1,19 +1,19 @@
 <?php
 
-use \Drupal\campaignion_action\TypeBase;
+use \Drupal\campaignion_action\Loader;
 
 /**
  * Implements hook_menu().
  */
 function campaignion_wizard_menu() {
-  $wizards = TypeBase::types();
-  foreach ($wizards as $id => $wizard) {
-    $info['wizard/' . str_replace('_', '-', $id)] = array(
+  foreach (Loader::instance()->actionNodeTypes() as $type) {
+    $url_type = str_replace('_', '-', $type);
+    $info['wizard/' . str_replace('_', '-', $url_type)] = array(
       'title'            => 'Wizard',
       'page callback'    => 'campaignion_wizard_new',
-      'page arguments'   => array($id),
+      'page arguments'   => array($url_type),
       'access callback' => 'node_access',
-      'access arguments' => array('create', $id),
+      'access arguments' => array('create', $url_type),
       'type' => MENU_CALLBACK,
     );
   }
@@ -38,9 +38,9 @@ function campaignion_wizard_menu() {
  * Override core node edit pages.
  */
 function campaignion_wizard_menu_alter(&$info) {
-  foreach (TypeBase::types() as $id => $wizard) {
-    $type = str_replace('_', '-', $id);
-    $info['node/add/' . $type]['page callback'] = 'campaignion_wizard_redirect_add';
+  foreach (Loader::instance()->actionNodeTypes() as $type) {
+    $url_type = str_replace('_', '-', $type);
+    $info['node/add/' . $url_type]['page callback'] = 'campaignion_wizard_redirect_add';
   }
   $info['node/%node/edit']['page callback'] = 'campaignion_wizard_redirect_edit';
   $info['node/%node/webform']['type'] = MENU_LOCAL_TASK;
@@ -50,18 +50,12 @@ function campaignion_wizard_menu_alter(&$info) {
  * Page callback for node/%/edit.
  */
 function campaignion_wizard_redirect_edit($node) {
-  if (TypeBase::isAction($node->type)) {
+  $l = Loader::instance();
+  if ($l->isActionType($node->type)) {
     campaignion_wizard_redirect("node/{$node->nid}/wizard");
   }
-  elseif ($fields = TypeBase::referenceFieldsByType($node->type)) {
-    foreach ($fields as $field) {
-      // Lookup the action that uses this thank you page.
-      $sql = "SELECT entity_id FROM {field_data_$field} WHERE entity_type='node' AND {$field}_node_reference_nid=:nid LIMIT 1";
-      $result = db_query($sql, array(':nid' => $node->nid));
-      if ($nid = $result->fetchField()) {
-        campaignion_wizard_redirect("node/{$nid}/wizard/thank");
-      }
-    }
+  elseif ($nid = $l->actionNidByThankYouNode($node)) {
+    campaignion_wizard_redirect("node/{$nid}/wizard/thank");
   }
   return node_page_edit($node);
 }
@@ -95,23 +89,18 @@ function campaignion_wizard_redirect($path) {
  */
 function campaignion_wizard_new($type) {
   $type = str_replace('-', '_', $type);
-  try {
-    $actionType = TypeBase::fromContentType($type);
+  if ($action_type = Loader::instance()->type($type)) {
+    return $action_type->wizard()->run('content');
   }
-  catch (\Exception $e) {
-    return drupal_not_found();
-  }
-  return $actionType->wizard()->run('content');
+  return drupal_not_found();
 }
 
 /**
  * Page callback for wizard/%node/%step.
  */
 function campaignion_wizard($node = NULL, $step = 'content') {
-  $type = $node->type;
-  if (TypeBase::isAction($type)) {
-    $actionType = TypeBase::fromContentType($type);
-    return $actionType->wizard($node)->run($step);
+  if ($action_type = Loader::instance()->type($node->type)) {
+    return $action_type->wizard($node)->run($step);
   }
   else {
     require_once drupal_get_path('module', 'node') . '/node.pages.inc';
