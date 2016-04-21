@@ -67,6 +67,10 @@ class ActionBase {
    *   A test link or NULL if there should be none for this action-type.
    */
   public function testLink($title, $query = [], $options = []) {
+    return NULL;
+  }
+
+  protected function _testLink($title, $query = [], $options = []) {
     $query['test-mode'] = 1;
     $options['attributes']['class'][] = 'test-mode-link';
     $options += ['html' => FALSE];
