@@ -104,6 +104,47 @@ CODE;
 <a id="{$container_id}-fallback-link" href="{$path_fallback}" target="_blank" class="button">{$fallback_link_title}</a>
 </div>
 PLACEHOLDER;
+
+  $code_ga_linker = <<<CODE_LINKER
+<link rel="stylesheet" href="{$base_url}/{$embed_css}" type="text/css">
+<script type="text/javascript" src="{$base_url}/{$embed_js}"></script>
+<script type="text/javascript">
+var referer = window.location.href;
+window.onload = function() {
+  var options = {
+    src : '{$path_embed}&external_referer=' +  referer,
+    domain : '{$base_url}',
+    element : '{$container_id}'
+  };
+
+  var iframeLoaded = false;
+  var loadIframe = function (options) {
+    if (!iframeLoaded) {
+      iframeLoaded = true;
+      if (IframeResize.load(options)) {
+        var link = document.getElementById(options.element + '-fallback-link');
+        if (link) {
+          link.style.display = 'none';
+        }
+      }
+    }
+  }
+  if(typeof ga === 'function') {
+    setTimeout(function() {
+      loadIframe(options);
+    }, 3000);
+    ga(function(tracker) {
+      var linkerParam = tracker.get('linkerParam');
+      options.src = '{$path_embed}&' + linkerParam + '&external_referer=' +  referer;
+      loadIframe(options);
+    });
+  } else {
+    loadIframe(options);
+  }
+}
+</script>
+CODE_LINKER;
+
   $output = array();
   $output['description'] = array(
     '#markup' => '<div><p>' . t('Use this code to embed the webform in your Website. You will need an element with the id "embed" (see code below) to which an iframe with the petition in it will be appended.') . '</p></div>',
@@ -114,6 +155,22 @@ PLACEHOLDER;
   $output['container_code'] = array(
     '#markup' => '<div><p>' . t('Use this code to provide the needed container for the embeddable webform and a fallback link in case the iframe is not loaded.') . '</p></div><div class="ae-webform-widget"><textarea rows="5" cols="60">' . htmlspecialchars($placeholder) . '</textarea></div>',
   );
+  // load only when GA is enabled
+  if (module_exists('googleanalytics')) {
+    $wrapper = array(
+      '#type'  => 'fieldset',
+      '#title' => t('Cross domain analytics embeddable code'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#tree' => FALSE,
+      '#parents' => array(),
+    );
+    $wrapper['ga_embeddable_code'] = array(
+      '#markup' => '<div><p>' . t('Use this code instead of the code above instead of the code above to provide the needed container for the embeddable webform with cross domain Google Analytics linking. A fallback link is provided in case the iframe is not loaded.<br>NB: The Google Analytics module has to be set up correctly in order to work for Cross domain tracking. Please check with our support if you are not sure.') . '</p></div><div class="ae-webform-widget"><textarea rows="25" cols="60">' . htmlspecialchars($code_ga_linker) . '</textarea></div>',
+    );
+    $dummy_state = array();
+    $output['cross_domain_code_wrapper'] = form_process_fieldset($wrapper, $dummy_state);
+  }
   return $output;
 }
 
