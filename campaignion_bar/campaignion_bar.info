@@ -6,6 +6,5 @@ project = campaignion
 
 dependencies[] = campaignion_ux
 dependencies[] = campaignion_wizard
-dependencies[] = less
 dependencies[] = menu
 dependencies[] = psr0

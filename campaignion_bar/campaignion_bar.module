@@ -52,7 +52,7 @@ function campaignion_bar_init() {
     drupal_add_js($path . '/js/tooltipsy.min.js');
     drupal_add_js($path . '/js/ae_bar.sliding.js');
     drupal_add_js($path . '/js/ae_bar.js');
-    drupal_add_css($path . '/theme/ae_bar.less');
+    drupal_add_css($path . '/theme/ae_bar.css');
   }
 }
 
