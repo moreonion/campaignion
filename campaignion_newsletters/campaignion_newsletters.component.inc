@@ -161,7 +161,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
       $options = ['yes' => $l[1], 'no' => $l[0]];
       $element += [
         '#type' => 'radios',
-        '#default_value' => !empty($component['value']) ? 'yes' : 'no',
+        '#default_value' => !empty($component['value']['subscribed']) ? 'yes' : NULL,
         '#options' => $options,
         '#element_validate' => ['_campaignion_newsletters_radio_values'],
       ];
