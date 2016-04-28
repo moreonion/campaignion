@@ -27,8 +27,8 @@ class AddressTest extends RedhenEntityTest {
         $mapped[$field_key] = $data[$data_key];
       }
     }
-    if (!isset($mapped['country'])) {
-      $mapped['country'] = variable_get('site_default_country', '');
+    if (!isset($mapped['country']) && ($c = variable_get('site_default_country', ''))) {
+      $mapped['country'] = $c;
     }
     return $mapped;
   }
@@ -40,7 +40,7 @@ class AddressTest extends RedhenEntityTest {
   function testWithAllFields() {
     $importer = new Address('field_address', self::$mapping);
     $entity = $this->newRedhenContact();
-    $importer->import(new ArraySource(self::$testdata), $entity, TRUE);
+    $importer->import(new ArraySource(self::$testdata), $entity);
     $this->assertEqual(array($this->mapped(self::$testdata)), $entity->field_address->value());
   }
 
@@ -48,7 +48,7 @@ class AddressTest extends RedhenEntityTest {
     $importer = new Address('field_address',  self::$mapping);
     $entity = $this->newRedhenContact();
     $data = self::filteredData(array('country'));
-    $importer->import(new ArraySource($data), $entity, TRUE);
+    $importer->import(new ArraySource($data), $entity);
     $this->assertEqual(array($this->mapped($data)), $entity->field_address->value());
   }
 
@@ -56,7 +56,18 @@ class AddressTest extends RedhenEntityTest {
     $importer = new Address('field_address', self::$mapping);
     $entity = $this->newRedhenContact();
     $data = self::filteredData(array('street_address'));
-    $importer->import(new ArraySource($data), $entity, TRUE);
+    $importer->import(new ArraySource($data), $entity);
     $this->assertEqual(array($this->mapped($data)), $entity->field_address->value());
   }
+
+  function testTwoIndenticalImports_returnValueFalse() {
+    $importer = new Address('field_address', self::$mapping);
+    $entity = $this->newRedhenContact();
+    $this->assertTrue($importer->import(new ArraySource(self::$testdata), $entity), 'Import into new contact returned FALSE intead of TRUE.');
+    $this->assertFalse($importer->import(new ArraySource(self::$testdata), $entity), 'Import of identical datat returned TRUE twice.');
+    $data = self::filteredData(array('street_address'));
+    $this->assertFalse($importer->import(new ArraySource($data), $entity), 'Import of identical street_address/throughfare returned TRUE instead of FALSE.');
+  }
+
 }
+

@@ -25,8 +25,9 @@ class Address extends Field {
       return FALSE;
     }
     $countryList = country_get_list();
-    if (empty($address['country']) || !isset($countryList[$address['country']])) {
-      $address['country'] = variable_get('site_default_country', 'AT');
+    $empty_or_unknown_country = empty($address['country']) || !isset($countryList[$address['country']]);
+    if ($empty_or_unknown_country && ($c = variable_get('site_default_country', 'AT'))) {
+      $address['country'] = $c;
     }
     return $address;
   }
@@ -39,8 +40,7 @@ class Address extends Field {
     try {
       if (($value = $this->getValue($source)) && ($value = $this->preprocessField($value))) {
         if ($this->storeValue($entity, $value)) {
-          $this->setValue($entity, $value);
-          return TRUE;
+          return $this->setValue($entity, $value);
         } else {
           return FALSE;
         }
@@ -54,20 +54,27 @@ class Address extends Field {
   public function setValue(\EntityMetadataWrapper $entity, $new_address) {
     $stored_multiple_addresses = $entity->{$this->field}->value();
 
+    // Trim all whitespace from start and end of input strings.
+    foreach ($new_address as &$d) {
+      $d = trim($d);
+    }
+    unset($d);
+
     $changed = FALSE;
     foreach($stored_multiple_addresses as &$stored_address) {
       $found = TRUE;
+      // Check if the old address has any different non-NULL fields.
+      // If not we have found a candidate for merging.
       foreach ($new_address as $key => $value) {
-        if (!isset($stored_address[$key]) ||
-            $stored_address[$key] != $value) {
+        if (isset($stored_address[$key]) && $stored_address[$key] != $value) {
           $found = FALSE;
           break;
         }
       }
       if ($found) {
-        // Do nothing if there is no new data in the new address.
         $diff = array_diff($new_address, $stored_address);
         if (empty($diff)) {
+          // If there is no new data in $new_address then we are finished.
           return FALSE;
         }
         $changed = TRUE;
@@ -75,9 +82,11 @@ class Address extends Field {
       }
     }
     if (!$changed) {
+      // We haven't found a matching existing address so we add this as new.
       $stored_multiple_addresses[] = $new_address;
     }
     $entity->{$this->field}->set($stored_multiple_addresses);
+    // If we got here we've either added a new address or modified an old one.
     return TRUE;
   }
 }
