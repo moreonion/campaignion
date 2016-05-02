@@ -10,6 +10,7 @@ use \Drupal\campaignion_newsletters\ApiError;
 use \Drupal\campaignion_newsletters\ApiPersistentError;
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\ProviderBase;
+use \Drupal\campaignion_newsletters\QueueItem;
 use \Drupal\campaignion_newsletters\Subscription;
 
 class Optivo extends ProviderBase {
@@ -116,15 +117,16 @@ class Optivo extends ProviderBase {
    *
    * @return: True on success.
    */
-  public function subscribe($list, $mail, $data, $opt_in = FALSE, $welcome = FALSE) {
+  public function subscribe(NewsletterList $list, QueueItem $item) {
     $this->ensureLogin();
     $service = $this->recipientService;
+    $mail = $item->email;
     $recipientId = $mail;
     $address = $mail;
-    $data += ['names' => [], 'values' => []];
+    $data = $item->data + ['names' => [], 'values' => []];
     $status = $service->add2(
       $list->identifier,
-      $opt_in,
+      $item->optIn(),
       $recipientId,
       $address,
       $data['names'],
@@ -161,10 +163,10 @@ class Optivo extends ProviderBase {
    *
    * @return: True on success.
    */
-  public function unsubscribe($list, $mail) {
+  public function unsubscribe(NewsletterList $list, QueueItem $item) {
     $this->ensureLogin();
     $service = $this->recipientService;
-    $service->remove($list->identifier, $mail);
+    $service->remove($list->identifier, $item->email);
     return TRUE;
   }
 

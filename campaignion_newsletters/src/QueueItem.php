@@ -14,12 +14,13 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
   public $locked = 0;
   public $action;
   public $data;
+  public $optin_info = NULL;
   public $fingerprint;
 
   protected static $table = 'campaignion_newsletters_queue';
-  protected static $key = array('id');
-  protected static $values = array('list_id', 'email', 'created', 'locked', 'action', 'data');
-  protected static $serialize = array('data' => TRUE);
+  protected static $key = ['id'];
+  protected static $values = ['list_id', 'email', 'created', 'locked', 'action', 'data', 'optin_info'];
+  protected static $serialize = ['data' => TRUE, 'optin_info' => TRUE];
   protected static $serial = TRUE;
 
   public static function load($list_id, $email) {
@@ -48,17 +49,20 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     $limit = (int) $limit;
     // This is MySQL specific and there is no abstraction in Drupal for it.
     $result = db_query("SELECT * FROM {{$t}} WHERE LOCKED<$now ORDER BY CREATED LIMIT $limit LOCK IN SHARE MODE");
-    $items = array();
+    $items = [];
+    $ids = [];
     foreach ($result as $row) {
       $row->locked = $now + $time;
       $item = new static($row, FALSE);
       $ids[] = $row->id;
       $items[] = $item;
     }
-    db_update('campaignion_newsletters_queue')
-      ->fields(['locked' => $now + $time])
-      ->condition('id', $ids)
-      ->execute();
+    if ($ids) {
+      db_update('campaignion_newsletters_queue')
+        ->fields(['locked' => $now + $time])
+        ->condition('id', $ids)
+        ->execute();
+    }
     return $items;
   }
 
@@ -87,4 +91,19 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     $this->locked = 0;
     $this->save();
   }
+
+  /**
+   * Check whether an opt-in email should be sent.
+   */
+  public function optIn() {
+    return (bool) ($this->action & self::OPTIN);
+  }
+
+  /**
+   * Check whether a welcome email should besent.
+   */
+  public function welcome() {
+    return (bool) ($this->action & self::WELCOME);
+  }
+
 }

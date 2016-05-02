@@ -5,6 +5,7 @@
  */
 
 use \Drupal\campaignion_newsletters\ProviderFactory;
+use \Drupal\campaignion_newsletters\FormSubmission;
 use \Drupal\campaignion_newsletters\Subscription;
 use \Drupal\campaignion_newsletters\Subscriptions;
 use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
@@ -115,6 +116,7 @@ function campaignion_newsletters_webform_confirm_email_email_confirmed($node, $s
           $subscription->delete = FALSE;
           $subscription->source = $s;
           $subscription->needs_opt_in = $needs_opt_in;
+          $subscription->optin_info = FormSubmission::fromWebformSubmission($s);
           $subscription->save();
         }
       }

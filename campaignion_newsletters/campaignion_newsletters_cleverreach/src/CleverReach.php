@@ -10,8 +10,10 @@ namespace Drupal\campaignion_newsletters_cleverreach;
 
 use \Drupal\campaignion_newsletters\ApiError;
 use \Drupal\campaignion_newsletters\ApiPersistentError;
+use \Drupal\campaignion_newsletters\FormSubmission;
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\ProviderBase;
+use \Drupal\campaignion_newsletters\QueueItem;
 use \Drupal\campaignion_newsletters\Subscription;
 
 class CleverReach extends ProviderBase {
@@ -42,6 +44,7 @@ class CleverReach extends ProviderBase {
     $groups = $this->listGroups();
     foreach ($groups as $group) {
       $details = $this->getGroupDetails($group);
+      $details->forms = $this->getForms($group);
       $id = $this->toIdentifier($details->name);
       $lists[] = NewsletterList::fromData(array(
         'identifier' => $id,
@@ -116,11 +119,15 @@ class CleverReach extends ProviderBase {
    *
    * @return: True on success.
    */
-  public function subscribe($list, $mail, $data, $opt_in = FALSE, $welcome = FALSE) {
+  public function subscribe(NewsletterList $list, QueueItem $item) {
+    $mail = $item->email;
+    $opt_in = $item->optIn();
     $user = array(
       'email'  => $mail,
-      'active' => TRUE,
-      'attributes' => $data,
+      'attributes' => $item->data,
+      'registered' => $item->created,
+      'active' => !$opt_in,
+      'activated' => $opt_in ? FALSE : $item->created,
     );
     $group_id = $list->data->id;
     $result = $this->api->receiverGetByEmail($this->key, $group_id, $mail, 0);
@@ -130,7 +137,35 @@ class CleverReach extends ProviderBase {
     else {
       $result = $this->api->receiverUpdate($this->key, $group_id, $user);
     }
-    return (bool) $this->handleResult($result);
+    $continue = $this->handleResult($result);
+    if ($continue && $opt_in && ($form_id = $this->getFormId($list))) {
+      if (!$item->optin_info) {
+        throw new ApiPersistentError('CleverReach', "Unable to send action email without opt-in data.");
+      }
+      $doidata = $this->formatDOIData($item->optin_info);
+      $result = $this->api->formsSendActivationMail($this->key, $form_id, $mail, $doidata);
+      return (bool) $this->handleResult($result);
+    }
+    return $continue;
+  }
+
+  protected function formatDOIData($optin_info) {
+    $postdata = [];
+    foreach ($optin_info->data as $n => $data) {
+      $postdata[] = "$n:$data";
+    }
+    $doidata = [
+      'user_ip' => $optin_info->ip,
+      'user_agent' => $optin_info->userAgent,
+      'referer' => $optin_info->url,
+      'postdata' => implode(',', $postdata),
+      'info' => format_string('campaignion_newsletters on @site', ['@site' => variable_get('site_name', '')]),
+    ];
+    return $doidata;
+  }
+
+  protected function getFormId(NewsletterList $list) {
+    return !empty($list->data->forms) ? $list->data->forms[0]->id : NULL;
   }
 
   /**
@@ -140,8 +175,8 @@ class CleverReach extends ProviderBase {
    *
    * @return: True on success.
    */
-  public function unsubscribe($list, $mail) {
-    $result = $this->api->receiverDelete($this->key, $list->data->id, $mail);
+  public function unsubscribe(NewsletterList $list, QueueItem $item) {
+    $result = $this->api->receiverDelete($this->key, $list->data->id, $item->email);
     return (bool) $this->handleResult($result);
   }
 
@@ -168,6 +203,14 @@ class CleverReach extends ProviderBase {
    */
   protected function getGroupDetails($group) {
     $result = $this->api->groupGetDetails($this->key, $group->id);
+    return $this->handleResult($result);
+  }
+
+  /**
+   * Get a list of all forms for this group.
+   */
+  protected function getForms($group) {
+    $result = $this->api->formsGetList($this->key, $group->id);
     return $this->handleResult($result);
   }
 
