@@ -29,8 +29,7 @@ function campaignion_action_node_view($node) {
     // Test user permission.
     if (user_access('campaignion view test-mode link')) {
       // Construct URL link.
-      $action = Loader::instance()->actionFromNode($node);
-      if ($link = $action->testLink(t('test-mode link'))) {
+      if (($action = Loader::instance()->actionFromNode($node)) && ($link = $action->testLink(t('test-mode link')))) {
         $link_html = drupal_render($link);
         $link_text = t("You can use !link to view this action in test-mode.", ['!link' => $link_html]);
         drupal_set_message($link_text, 'status', FALSE);
