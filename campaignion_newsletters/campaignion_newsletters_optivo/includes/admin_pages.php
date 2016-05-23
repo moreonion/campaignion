@@ -1,5 +1,8 @@
 <?php
 
+use \Drupal\campaignion_newsletters_optivo\Optivo;
+use \Drupal\campaignion_newsletters\ApiError;
+
 /**
  * Implementation of campaignion_newsletters_optivo_form_campaignion_newsletters_admin_settings_alter().
  */
@@ -27,67 +30,16 @@ function _campaignion_newsletters_optivo_form_campaignion_newsletters_admin_sett
   }
 
   foreach ($keys as $name => $data) {
-    $fs[$name]['mandatorId'] = array(
-      '#type' => 'textfield',
-      '#default_value' => $data['mandatorId'],
-      '#title' => t('Client ID'),
-    );
-    $fs[$name]['name'] = array(
-      '#default_value' => $name,
-      '#disabled' => TRUE,
-      '#type' => 'machine_name',
-      '#title' => t('Machine name'),
-      '#machine_name' => array(
-        'exists' => 'campaignion_newsletters_optivo_get_key',
-        'source' => array('optivo', 'credentials', $name, 'mandatorId')
-      )
-    );
-    $fs[$name]['username'] = array(
-      '#type' => 'textfield',
-      '#default_value' => $data['username'],
-      '#title' => t('User name'),
-    );
-    $fs[$name]['password'] = array(
-      '#type' => 'textfield',
-      '#default_value' => $data['password'],
-      '#title' => t('Password'),
-    );
+    $data['name'] = (string) $name;
+    $parents = ['optivo', 'credentials', $name];
+    $fs[$name] = _campaignion_newsletters_optivo_single_settings($parents, $data);
   }
 
   if (!empty($form_state['optivo_new_credentials'])) {
     for ($i = 1; $i <= $form_state['optivo_new_credentials']; $i++) {
       $name = 'new_' . $i;
-      $fs [$name] ['mandatorId'] = array (
-        '#type' => 'textfield',
-        '#default_value' => '',
-        '#title' => t ( 'Client ID' ),
-        '#description' => t ( 'The Optivo client ID. Go to "API overview" in
-            the Optivo "Administration" menu and switch to the "SOAP API" tab
-            to find out your client ID.' )
-      );
-      $fs[$name]['name'] = array(
-        '#default_value' => '',
-        '#required' => FALSE,
-        '#type' => 'machine_name',
-        '#title' => t('Machine name'),
-        '#machine_name' => array(
-          'exists' => 'campaignion_newsletters_optivo_get_key',
-          'source' => array('optivo', 'credentials', $name, 'mandatorId')
-        )
-      );
-      $fs [$name] ['username'] = array (
-        '#type' => 'textfield',
-        '#default_value' => '',
-        '#title' => t ( 'User name' ),
-        '#description' => t ( 'Name of an Optivo user who has
-            permission to use the API (= "INTERFACE_WEBSERVICE" permission).' )
-      );
-      $fs [$name] ['password'] = array (
-        '#type' => 'textfield',
-        '#default_value' => '',
-        '#title' => t ( 'Password' ),
-        '#description' => t ( 'The password for the Optivo user.' )
-      );
+      $parents = ['optivo', 'credentials', $name];
+      $fs[$name] = _campaignion_newsletters_optivo_single_settings($parents);
     }
   }
   $fs['add_more'] = array(
@@ -109,6 +61,62 @@ function _campaignion_newsletters_optivo_form_campaignion_newsletters_admin_sett
     $form['#validate'],
     'campaignion_newsletters_optivo_admin_validate'
   );
+}
+
+function _campaignion_newsletters_optivo_single_settings($parents, $data = []) {
+  $data += [
+    'mandatorId' => '',
+    'name' => '',
+    'username' => '',
+    'password' => '',
+    'optinprocessId' => NULL,
+  ];
+  $fs['mandatorId'] = array (
+    '#type' => 'textfield',
+    '#default_value' => $data['mandatorId'],
+    '#title' => t ( 'Client ID' ),
+    '#description' => t('The Optivo client ID. Go to "API overview" in the Optivo "Administration" menu and switch to the "SOAP API" tab to find out your client ID.'),
+  );
+  $fs['name'] = array(
+    '#default_value' => $data['name'],
+    '#required' => FALSE,
+    '#type' => 'machine_name',
+    '#title' => t('Machine name'),
+    '#machine_name' => array(
+      'exists' => 'campaignion_newsletters_optivo_get_key',
+      'source' => array_merge($parents, ['mandatorId']),
+    ),
+  );
+  $fs['username'] = [
+    '#type' => 'textfield',
+    '#default_value' => $data['username'],
+    '#title' => t('User name'),
+    '#description' => t('Name of an Optivo user who has permission to use the API (= "INTERFACE_WEBSERVICE" permission).'),
+  ];
+  $fs['password'] = [
+    '#type' => 'textfield',
+    '#default_value' => $data['password'],
+    '#title' => t ('Password'),
+    '#description' => t ('The password for the Optivo user.')
+  ];
+  $optin_processes = [];
+  if (!empty($data['mandatorId']) && !empty($data['username']) && !empty($data['password'])) {
+    $data['key'] = $data;
+    try {
+      $optin_processes = Optivo::fromParameters($data)->getOptinProcessOptions();
+    }
+    catch (ApiError $e) {
+      $e->log();
+      // Do nothing this might happen if the credentials are not yet valid.
+    }
+  }
+  $fs['optinProcessId'] = [
+    '#type' => 'select',
+    '#title' => t('Optin-Process'),
+    '#description' => t('Choose the optin-process that is used for not-yet confirmed subscribers.'),
+    '#options'=> $optin_processes,
+  ];
+  return $fs;
 }
 
 /**
