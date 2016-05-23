@@ -183,10 +183,10 @@ class Optivo extends ProviderBase {
     $values = [];
 
     if ($source = $this->getSource($subscription, 'optivo')) {
-      foreach ($list->data->attributeNames as $name) {
-        $name = strtr(drupal_clean_css_identifier(strtolower($name)), '-', '_');
+      foreach ($list->data->attributeNames as $lname) {
+        $name = strtr(drupal_clean_css_identifier(strtolower($lname)), '-', '_');
         if ($value = $source->value($name)) {
-          $names[] = $name;
+          $names[] = $lname;
           $values[] = $value;
         }
       }
