@@ -37,10 +37,17 @@ function campaignion_newsletters_mailchimp_libraries_info() {
     'name' => 'Mailchimp',
     'vendor url' => 'http://mailchimp.com',
     'download url' => 'https://bitbucket.org/mailchimp/mailchimp-api-php',
-    'version' => '2.0.4',
-    'files' => array(
-      'php' => array('src/Mailchimp.php')
-    ),
+    'version arguments' => [
+      'file' => 'composer.json',
+      'pattern' => '/"version":\\s+"([0-9.]+)"/',
+      'lines' => 5,
+    ],
+    'xautoload' => function($adapter) {
+      /** @var \Drupal\xautoload\Adapter\LocalDirectoryAdapter $adapter */
+      // Scan sites/*/libraries/mailchimp-api-php/composer.json to look for
+      // autoload information.
+      $adapter->composerJson('composer.json');
+    },
   );
   return $libraries;
 }
