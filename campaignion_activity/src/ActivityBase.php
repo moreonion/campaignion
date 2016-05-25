@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_activity;
 
+use \Drupal\campaignion\Contact;
+
 class ActivityBase implements ActivityInterface {
   public $activity_id = NULL;
   protected $contact_id;

@@ -7,6 +7,6 @@ project = campaignion
 
 dependencies[] = campaignion_newsletters
 dependencies[] = libraries
-dependencies[] = xautoload
+dependencies[] = psr0
 
 

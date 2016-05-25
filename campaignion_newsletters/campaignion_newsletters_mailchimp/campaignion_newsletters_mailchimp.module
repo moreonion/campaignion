@@ -28,10 +28,10 @@ function campaignion_newsletters_mailchimp_menu() {
 }
 
 /**
-* Implements hook_libraries_info().
-*
-* for mailchimps php api library.
-*/
+ * Implements hook_libraries_info().
+ *
+ * for mailchimps php api library.
+ */
 function campaignion_newsletters_mailchimp_libraries_info() {
   $libraries['mailchimp-api-php'] = array(
     'name' => 'Mailchimp',
@@ -42,12 +42,9 @@ function campaignion_newsletters_mailchimp_libraries_info() {
       'pattern' => '/"version":\\s+"([0-9.]+)"/',
       'lines' => 5,
     ],
-    'xautoload' => function($adapter) {
-      /** @var \Drupal\xautoload\Adapter\LocalDirectoryAdapter $adapter */
-      // Scan sites/*/libraries/mailchimp-api-php/composer.json to look for
-      // autoload information.
-      $adapter->composerJson('composer.json');
-    },
+    'files' => array(
+      'php' => array('src/Mailchimp.php')
+    ),
   );
   return $libraries;
 }
