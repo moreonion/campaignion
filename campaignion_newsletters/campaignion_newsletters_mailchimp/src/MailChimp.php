@@ -92,14 +92,20 @@ class MailChimp extends ProviderBase {
     return $receivers;
   }
 
+  /**
+   * Get values for all merge tags if possible.
+   */
   protected function attributeData(Subscription $subscription) {
     $list = $subscription->newsletterList();
     $attributes = array();
 
     if ($source = $this->getSource($subscription, 'mailchimp')) {
       foreach ($list->data->merge_vars as $attribute) {
-        if ($value = $source->value($attribute['tag'])) {
-          $attributes[$attribute['tag']] = $value;
+        $tag = $attribute['tag'];
+        // MailChimp's merge tags are all upper-case. Our form-keys are usually
+        // lowercase. Let's try both!
+        if (($v = $source->value($tag)) || ($v = $source->value(strtolower($tag)))) {
+          $attributes[$tag] = $v;
         }
       }
     }
