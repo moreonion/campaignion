@@ -48,17 +48,20 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     $limit = (int) $limit;
     // This is MySQL specific and there is no abstraction in Drupal for it.
     $result = db_query("SELECT * FROM {{$t}} WHERE LOCKED<$now ORDER BY CREATED LIMIT $limit LOCK IN SHARE MODE");
-    $items = array();
+    $items = [];
+    $ids = [];
     foreach ($result as $row) {
       $row->locked = $now + $time;
       $item = new static($row, FALSE);
       $ids[] = $row->id;
       $items[] = $item;
     }
-    db_update('campaignion_newsletters_queue')
-      ->fields(['locked' => $now + $time])
-      ->condition('id', $ids)
-      ->execute();
+    if ($ids) {
+      db_update('campaignion_newsletters_queue')
+        ->fields(['locked' => $now + $time])
+        ->condition('id', $ids)
+        ->execute();
+    }
     return $items;
   }
 

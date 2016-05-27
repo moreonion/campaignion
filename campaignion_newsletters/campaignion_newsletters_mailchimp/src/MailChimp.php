@@ -109,6 +109,8 @@ class MailChimp extends ProviderBase {
         }
       }
     }
+    // Let other modules alter the attributes (ie. for adding groupings).
+    drupal_alter('campaignion_newsletters_mailchimp_attributes', $attributes, $subscription, $source);
     return $attributes;
   }
 
