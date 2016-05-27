@@ -187,8 +187,12 @@ class MailChimp extends ProviderBase {
         return false;
       }
     }
-    else {
+    // This is only for specific API calls and should be taken care fo there.
+    elseif (isset($result['data'])) {
       return $result['data'];
+    }
+    else {
+      return $result;
     }
   }
 
