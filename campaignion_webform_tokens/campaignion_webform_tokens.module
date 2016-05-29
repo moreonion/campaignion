@@ -14,6 +14,12 @@ function campaignion_webform_tokens_token_info() {
     'description' => t('The value of the selected component, e.g. "email_adress".'),
   );
 
+  $submission['text-val'] = array(
+    'name' => t('Component values'),
+    'description' => t('Value of a certain component. Use this followed by a colon and the form-key of the element'),
+    'dynamic' => TRUE,
+  );
+
   return array(
     'types' => $types,
     'tokens' => array(
@@ -64,15 +70,18 @@ function campaignion_webform_tokens_tokens($type, $tokens, array $data = array()
   foreach ($tokens as $name => $original) {
     // Split token name to get the components name. The remainder is our default value.
     $token = explode('/', $name, 2);
-    $component_name = $token[0];
     if (count($token) < 2) {
       $token[] = '';
     }
-    if (isset($webform_submission[$component_name])) {
+    list($token, $default) = $token;
+    if (substr($token, 0, 9) == 'text-val:') {
+      $token = substr($token, 9);
+    }
+    if (isset($webform_submission[$token])) {
       // render webform component.
-      $replacements[$original] = $webform_submission[$component_name];
+      $replacements[$original] = $webform_submission[$token];
     } else {
-      $replacements[$original] = $token[1];
+      $replacements[$original] = $default;
     }
   }
   return $replacements;
