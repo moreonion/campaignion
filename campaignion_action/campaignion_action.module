@@ -136,6 +136,13 @@ function _campaignion_action_webform_share_redirect($form, &$form_state) {
 }
 
 /**
+ * Implements hook_webform_confirm_email_confirmation_redirect_alter().
+ */
+function campaignion_action_webform_confirm_email_confirmation_redirect_alter(&$redirect, $node, $submission) {
+  $redirect['query']['share'] = "node/{$node->nid}";
+}
+
+/**
  * Implements hook_webform_submission_insert().
  */
 function campaignion_action_webform_submission_insert($node, $submission) {
