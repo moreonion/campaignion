@@ -108,7 +108,8 @@ function _campaignion_webform_tokens_get_components($sid, $hash) {
   $webform_submission = array();
   foreach ($submission[$sid]->data as $cid => $component_value) {
     if (!empty($component_value['value'][0])) {
-      $webform_submission[$components[$cid]['form_key']] = campaignion_webform_tokens_render_component($components[$cid], $component_value['value']);
+      $v = campaignion_webform_tokens_render_component($components[$cid], $component_value['value']);
+      $webform_submission[$components[$cid]['form_key']] = trim($v);
     }
   }
   return $webform_submission;
