@@ -114,6 +114,7 @@ function _campaignion_newsletters_optivo_single_settings($parents, $data = []) {
     '#type' => 'select',
     '#title' => t('Optin-Process'),
     '#description' => t('Choose the optin-process that is used for not-yet confirmed subscribers.'),
+    '#default_value' => $data['optinProcessId'],
     '#options'=> $optin_processes,
   ];
   return $fs;

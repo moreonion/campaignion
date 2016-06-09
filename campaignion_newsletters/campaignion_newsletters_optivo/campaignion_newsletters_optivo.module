@@ -33,10 +33,11 @@ function campaignion_newsletters_optivo_menu() {
 function campaignion_newsletters_optivo_campaignion_newsletters_provider_info() {
   $keys = variable_get('optivo_credentials', array());
   $providers = array();
-  foreach ($keys as $name => $key) {
+  foreach ($keys as $name => $params) {
+    $params['name'] = $name;
     $providers['Optivo-' . $name] = array(
       'class' => '\\Drupal\\campaignion_newsletters_optivo\\Optivo',
-      'params' => array('name' => $name, 'key' => $key),
+      'params' => $params,
     );
   }
   return $providers;

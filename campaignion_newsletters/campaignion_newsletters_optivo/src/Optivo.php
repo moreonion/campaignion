@@ -41,8 +41,7 @@ class Optivo extends ProviderBase {
     $this->recipientListService = $recipient_list_service;
     $this->recipientService = $recipient_service;
     $this->optinService = $optin_service;
-    $key = $params['key'];
-    $this->credentials = [$key['mandatorId'], $key['username'], $key['password']];
+    $this->credentials = [$params['mandatorId'], $params['username'], $params['password']];
   }
 
   /**
