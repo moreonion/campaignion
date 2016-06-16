@@ -57,7 +57,7 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
       $items[] = $item;
     }
     if ($ids) {
-      db_update('campaignion_newsletters_queue')
+      db_update($t)
         ->fields(['locked' => $now + $time])
         ->condition('id', $ids)
         ->execute();
