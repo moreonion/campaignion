@@ -29,7 +29,7 @@ interface NewsletterProviderInterface {
    *
    * @return: True on success.
    */
-  public function subscribe($newsletter, $mail, $data, $opt_in = FALSE, $welcome = FALSE);
+  public function subscribe(NewsletterList $newsletter, QueueItem $item);
 
   /**
    * Subscribe a user, given a newsletter identifier and email address.
@@ -38,7 +38,7 @@ interface NewsletterProviderInterface {
    *
    * @return: True on success.
    */
-  public function unsubscribe($newsletter, $mail);
+  public function unsubscribe(NewsletterList $newsletter, QueueItem $item);
 
   /**
    * Get additional data for this subscription and a unique fingerprint.

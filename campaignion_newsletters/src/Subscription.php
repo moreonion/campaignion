@@ -9,6 +9,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
   public $delete = FALSE;
   public $source = NULL;
   public $needs_opt_in = FALSE;
+  public $optin_info = NULL;
 
   public static $lists = array();
 
@@ -76,6 +77,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
           'email' => $this->email,
           'action' => $action,
           'data' => $data,
+          'optin_info' => $this->optin_info,
         ))->save();
       }
     }

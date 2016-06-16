@@ -19,10 +19,10 @@ function campaignion_newsletters_send_queue() {
 
     try {
       if ($item->action & QueueItem::SUBSCRIBE) {
-        $provider->subscribe($list, $item->email, $item->data, (bool) ($item->action & QueueItem::OPTIN));
+        $provider->subscribe($list, $item);
       }
       elseif ($item->action == QueueItem::UNSUBSCRIBE) {
-        $provider->unsubscribe($list, $item->email);
+        $provider->unsubscribe($list, $item);
       }
       $item->delete();
     }

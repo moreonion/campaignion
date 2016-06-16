@@ -129,6 +129,11 @@ function campaignion_newsletters_schema() {
           'type' => 'blob',
           'size' => 'big',
         ),
+        'optin_info' => array(
+          'description' => 'Data about the form-submission to prove the opt-in.',
+          'type' => 'blob',
+          'size' => 'big',
+        ),
       ),
       'primary key' => array('id'),
       'indexes' => [
@@ -160,6 +165,17 @@ function campaignion_newsletters_install() {
  */
 function campaignion_newsletters_uninstall() {
   variable_del('campaignion_newsletters_cleverreach_batch_size');
+}
+
+/**
+ * Add campaignion_newsletters_queue.opt_in column.
+ */
+function campaignion_newsletters_update_11() {
+  db_add_field('campaignion_newsletters_queue', 'optin_info', [
+    'description' => 'Data about the form-submission to prove the opt-in.',
+    'type' => 'blob',
+    'size' => 'big',
+  ]);
 }
 
 /**

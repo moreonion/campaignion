@@ -10,6 +10,7 @@ namespace Drupal\campaignion_newsletters_mailchimp;
 
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\ProviderBase;
+use \Drupal\campaignion_newsletters\QueueItem;
 use \Drupal\campaignion_newsletters\Subscription;
 
 class MailChimp extends ProviderBase {
@@ -127,16 +128,16 @@ class MailChimp extends ProviderBase {
    *
    * @return: True on success.
    */
-  public function subscribe($list, $mail, $data, $opt_in = FALSE, $welcome = FALSE) {
+  public function subscribe(NewsletterList $list, QueueItem $item) {
     $this->call('subscribe',
       $list->identifier,
-      array('email' => $mail),
-      $data,
+      array('email' => $item->email),
+      $item->data,
       'html',
-      $opt_in, // double_optin
+      $item->optIn(), // double_optin
       true, // update_existing
       false, // replace_interests
-      $welcome // send_welcome
+      $item->welcome() // send_welcome
     );
     return true;
   }
@@ -148,11 +149,11 @@ class MailChimp extends ProviderBase {
    *
    * @return: True on success.
    */
-  public function unsubscribe($list, $mail) {
+  public function unsubscribe(NewsletterList $list, QueueItem $item) {
     try {
       $this->call('unsubscribe',
         $list->identifier,
-        array('email' => $mail)
+        array('email' => $item->email)
       );
     }
     catch (\Mailchimp_Email_NotExists $e) { return true; }

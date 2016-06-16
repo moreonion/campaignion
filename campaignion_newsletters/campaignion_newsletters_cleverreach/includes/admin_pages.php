@@ -67,11 +67,6 @@ function _campaignion_newsletters_cleverreach_form_campaignion_newsletters_admin
     ),
     '#submit' => array('campaignion_newsletters_cleverreach_admin_add_more_submit'),
   );
-  $form['cleverreach']['wsdl_url'] = array(
-    '#type' => 'textfield',
-    '#default_value' => variable_get('cleverreach_wsdl_url', 'http://api.cleverreach.com/soap/interface_v5.1.php?wsdl'),
-    '#title' => t('WSDL-URL'),
-  );
 
   array_unshift(
     $form['#submit'],
@@ -125,7 +120,6 @@ function campaignion_newsletters_cleverreach_admin_submit($form, &$form_state) {
     }
   }
   variable_set('cleverreach_api_keys', $keys);
-  variable_set('cleverreach_wsdl_url', $form_state['values']['cleverreach']['wsdl_url']);
   // Hide our values from the general submit handler.
   unset($form_state['values']['cleverreach']);
 }
