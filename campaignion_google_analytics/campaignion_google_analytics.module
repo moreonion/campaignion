@@ -1,6 +1,7 @@
 <?php
 
 use \Drupal\little_helpers\Webform\Webform;
+use \Drupal\campaignion_action\Loader;
 
 function _campaignion_google_analytics_load_payment($nid, $sid) {
   $subquery = db_select('campaignion_activity_webform', 'w')
@@ -20,17 +21,12 @@ function _campaignion_google_analytics_load_payment($nid, $sid) {
   }
 }
 
-
-function _campaignion_google_analytics_is_donation_page($node) {
-  // TODO better check whether the node type is a donation
-  return ($node->type == 'donation' || $node->type == 'donation2' || $node->type == 'sponsorship');
-}
-
 /**
- * Implements hook_init().
+ * Implements hook_node_view().
  */
 function campaignion_google_analytics_node_view($node, $view_mode, $langcode) {
-  if (_campaignion_google_analytics_is_donation_page($node)) {
+  $type = Loader::instance()->type($node->type);
+  if ($type && $type->isDonation()) {
     drupal_add_js(drupal_get_path('module', 'campaignion_google_analytics') . '/tracking.js');
     drupal_add_js(drupal_get_path('module', 'campaignion_google_analytics') . '/donation.js');
 
