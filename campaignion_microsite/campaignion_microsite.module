@@ -29,10 +29,10 @@ function campaignion_microsite_custom_theme() {
 SELECT
   n.nid,
   r.field_reference_to_campaign_nid AS rnid,
-  m.field_microsite_state AS state,
-  m.field_microsite_theme AS theme,
-  m.field_microsite_frontpage AS frontpage,
-  m.field_microsite_logo AS logo
+  m.{$config_field}_state AS state,
+  m.{$config_field}_theme AS theme,
+  m.{$config_field}_frontpage AS frontpage,
+  m.{$config_field}_logo AS logo
 FROM {node} n
 LEFT OUTER JOIN {field_data_$config_field} m ON m.entity_id=n.nid AND m.entity_type='node' AND m.delta=0
 LEFT OUTER JOIN {field_data_$reference_field} r ON r.entity_id=n.nid AND r.entity_type='node' AND r.delta=0
