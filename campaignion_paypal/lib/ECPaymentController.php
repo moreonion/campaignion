@@ -33,4 +33,15 @@ class ECPaymentController extends \PayPalPaymentECPaymentMethodController {
       $payment->setStatus(new \PaymentStatusItem(PAYMENT_STATUS_FAILED));
     }
   }
+
+  /**
+   * Default to credit-card payment.
+   */
+  public function paymentNVP(\Payment $payment) {
+    $nvp = parent::paymentNVP($payment);
+    $nvp['USERSELECTEDFUNDINGSOURCE'] = 'CreditCard';
+    $nvp['LANDINGPAGE'] = 'Billing';
+    $nvp['SOLUTIONTYPE'] = 'Sole';
+    return $nvp;
+  }
 }
