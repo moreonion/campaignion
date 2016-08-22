@@ -58,6 +58,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
   }
 
   public function save($fromProvider = FALSE) {
+    module_invoke_all('campaignion_newsletters_subscription_presave', $this);
     if ($this->delete) {
       return $this->delete($fromProvider);
     }
