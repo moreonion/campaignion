@@ -18,11 +18,17 @@ class ActionBase {
   public function presave() {
     $node = $this->node;
     if (isset($node->translation_source)) {
+      // webform_template-7.x-1.x
       $_SESSION['webform_template'] = $node->translation_source->nid;
+      // webform_template-7.x-4.x
+      $node->webform_template = $node->translation_source->nid;
     } else {
       if (!isset($node->nid) && empty($node->webform['components'])) {
         if ($nid = $this->type->defaultTemplateNid()) {
+          // webform_template-7.x-1.x
           $_SESSION['webform_template'] = $nid;
+          // webform_template-7.x-4.x
+          $node->webform_template = $nid;
         }
       }
     }
