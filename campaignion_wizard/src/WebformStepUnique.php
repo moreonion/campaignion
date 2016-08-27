@@ -24,7 +24,7 @@ class WebformStepUnique extends WebformStep {
       if (empty($c['extra']['unique'])) {
         form_error($form, t('The email field must be unique. Change it by clicking on the field and then on "Validation".'));
       }
-      if (empty($c['mandatory'])) {
+      if (empty($c['mandatory']) && empty($c['required'])) {
         form_error($form, t('The email field must be required. Change it by clicking on the field and then on "Validation".'));
       }
     }
