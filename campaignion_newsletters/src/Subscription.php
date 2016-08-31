@@ -9,6 +9,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
   public $delete = FALSE;
   public $source = NULL;
   public $needs_opt_in = FALSE;
+  public $send_welcome = FALSE;
   public $optin_info = NULL;
 
   public static $lists = array();
@@ -68,7 +69,9 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
       if (!$fromProvider) {
         $action = QueueItem::SUBSCRIBE;
         if ($this->new) {
-          $action |= QueueItem::WELCOME;
+          if ($this->send_welcome) {
+            $action |= QueueItem::WELCOME;
+          }
           if ($this->needs_opt_in) {
             $action |= QueueItem::OPTIN;
           }

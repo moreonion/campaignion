@@ -116,6 +116,7 @@ function campaignion_newsletters_webform_confirm_email_email_confirmed($node, $s
           $subscription->delete = FALSE;
           $subscription->source = $s;
           $subscription->needs_opt_in = $needs_opt_in;
+          $subscription->send_welcome = (bool) $component['extra']['send_welcome'];
           $subscription->optin_info = FormSubmission::fromWebformSubmission($s);
           $subscription->save();
         }

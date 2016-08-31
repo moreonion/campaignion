@@ -24,6 +24,7 @@ function _webform_defaults_newsletter() {
       'private' => FALSE,
       'lists' => array(),
       'opt_in_implied' => 1,
+      'send_welcome' => 0,
       'title_display' => 'none',
       'display' => 'checkbox',
       'radio_labels' => [t('No'), t('Yes, I want to subscribe to the newsletter')],
@@ -85,6 +86,12 @@ function _webform_edit_newsletter($component) {
       0 => t("Newsletter provider: This form doesn't provide double-opt-in functionality the newsletter provider should take care of it."),
       1 => t('Included in this form: This form includes a double-opt-in process no further action is needed'),
     ),
+  );
+
+  $form['extra']['send_welcome'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Send a welcome email (for new subscribers).'),
+    '#default_value' => !empty($component['extra']['send_welcome']),
   );
 
   $display_id = drupal_html_id('newsletter-display');
@@ -208,6 +215,7 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
   $form['newsletter_title'] = $edit['extra']['description'];
   $form['newsletter_value'] = $edit['value'];
   $form['newsletter_opt_in_implied'] = $edit['extra']['opt_in_implied'];
+  $form['newsletter_send_welcome'] = $edit['extra']['send_welcome'];
   $dp['#form_builder']['property_group'] = 'display';
   $form['newsletter_display'] = $edit['extra']['display'] + $dp;
   $form['newsletter_checkbox_label'] = $edit['extra']['checkbox_label'] + $dp;
@@ -244,6 +252,7 @@ function _webform_form_builder_properties_newsletter() {
     ),
     'newsletter_title' => array(),
     'newsletter_opt_in_implied' => array(),
+    'newsletter_send_welcome' => [],
     'newsletter_display' => [],
     'newsletter_radio_labels' => [],
     'newsletter_checkbox_label' => [],
@@ -272,6 +281,9 @@ function _webform_form_builder_map_newsletter() {
     ),
     'newsletter_opt_in_implied' => array(
       'storage_parents' => array('extra', 'opt_in_implied'),
+    ),
+    'newsletter_send_welcome' => array(
+      'storage_parents' => array('extra', 'send_welcome'),
     ),
     'newsletter_value' => array(
       'storage_parents' => array('value'),
