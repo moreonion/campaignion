@@ -203,20 +203,6 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
     '#form_builder' => array('property_group' => 'options'),
     '#tree' => TRUE,
   );
-  // we need to redo the mapping here because storage_parents arent resolved until
-  // the form is saved for good.
-  if (isset($element['#newsletter_lists'])) {
-    $element['#webform_component']['extra']['lists'] = $element['#newsletter_lists'];
-  }
-  if (isset($element['#newsletter_title'])) {
-    $element['#webform_component']['extra']['description'] = $element['#newsletter_title'];
-  }
-  if (isset($element['#newsletter_value'])) {
-    $element['#webform_component']['value'] = $element['#newsletter_value'];
-  }
-  if (isset($element['#newsletter_opt_in_implied'])) {
-    $element['#webform_component']['extra']['opt_in_implied'] = $element['#newsletter_opt_in_implied'];
-  }
   $edit = _webform_edit_newsletter($element['#webform_component']);
   $form['options']['lists'] = $edit['extra']['lists'];
   $form['newsletter_title'] = $edit['extra']['description'];
