@@ -68,7 +68,9 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
       if (!$fromProvider) {
         $action = QueueItem::SUBSCRIBE;
         if ($this->new) {
-          $action |= QueueItem::WELCOME;
+          if (variable_get('campaignion_newsletter_welcome', 1)) {
+            $action |= QueueItem::WELCOME;
+          }
           if ($this->needs_opt_in) {
             $action |= QueueItem::OPTIN;
           }

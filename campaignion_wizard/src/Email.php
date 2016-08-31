@@ -76,10 +76,11 @@ class Email {
     $email_form['template']['template']['#format']       = $email['html'] ? $formats['html'] : $formats['plain'];
     $email_form['template']['template']['#wysiwyg']      = TRUE;
     $email_form['template']['template']['#pre_render'][] = 'wysiwyg_pre_render_text_format';
+
     // needed for ['template']['tokens'] which does not load js via #collapsible
     // tokens it is only html markup
     drupal_add_library("system", "drupal.collapse");
-    
+
     $settings['webform']['textFormat'] = $formats;
     $email_form['#attached']['js'][] = array(
       'type' => 'setting',
@@ -113,6 +114,29 @@ class Email {
         ),
       ),
     ) + $this->getEmailForm($form_state);
+
+    // ********* add help text for the %confirm_url token ************
+    if ($messages['form_id'] == 'confirmation_request') {
+
+      $token_markup = &$form[$this->form_id . '_email']['template']['tokens']['#markup'];
+      $search = '<p>' .
+        t('You may use special tokens in this field that will be replaced with dynamic values.') .
+        '</p>';
+      $confirmation_tokens = array(
+        t(
+          '@confirm_url - URL that is emailed to a submitee that will confirm his/her email address.',
+          array('@confirm_url' => '%confirm_url')
+        )
+      );
+      $replace = $search . theme(
+        'item_list',
+        array(
+          'items' => $confirmation_tokens,
+          'title' => t('Email confirmation variables')
+        )
+      );
+      $token_markup = str_replace($search, $replace, $token_markup);
+    }
 
     return $form;
   }
