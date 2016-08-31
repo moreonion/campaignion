@@ -12,6 +12,7 @@ function _webform_defaults_newsletter() {
     'name' => t('Newsletter Subscription'),
     'form_key' => 'newsletter',
     'mandatory' => 0,
+    'required' => 0,
     'pid' => 0,
     'weight' => 0,
     'value' => serialize(array('subscribed' => 'subscribed')),
