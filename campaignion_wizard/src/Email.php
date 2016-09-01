@@ -125,7 +125,8 @@ class Email {
     foreach ($form_state['values']['template'] as $key => &$val) {
       $form_state['values'][$key] = &$val;
     }
-    webform_email_edit_form_validate($form, $form_state);
+    $subform = $form[$this->form_id . '_email'];
+    webform_email_edit_form_validate($subform, $form_state);
 
     $form_state['values'] = &$values;
   }
@@ -203,7 +204,8 @@ class Email {
       $form_state['values']['eid'] = webform_email_insert($email);
     }
 
-    webform_email_edit_form_submit($form, $form_state);
+    $subform = $form[$this->form_id . '_email'];
+    webform_email_edit_form_submit($subform, $form_state);
 
     db_merge('webform_confirm_email')
       ->key(array(
