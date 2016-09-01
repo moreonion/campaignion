@@ -20,7 +20,7 @@ function _campaignion_form_builder_form_builder_types_textarea() {
 
   $fields['comment'] = $text_element([
     'name' => t('Comment'),
-    'value' => '%get[p13]',
+    'value' => '[current-page:query:p13]',
   ], [], -69);
 
   return $fields;

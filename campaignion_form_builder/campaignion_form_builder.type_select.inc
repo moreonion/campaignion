@@ -27,14 +27,14 @@ function _campaignion_form_builder_form_builder_types_select() {
 
   // Token default-values are not handled properly in webform yet.
   $fields['salutation'] = $select_element(
-    ['name' => t('Salutation'), /*'value' => '%get[p1]'*/],
+    ['name' => t('Salutation'), /*'value' => '[current-page:query:p1]'*/],
     ['other_option' => TRUE],
     ['fam' => t('Family'), 'mrs' => t('Mrs'), 'mr' => t('Mr'), 'org' => t('Organisation')],
     -82
   );
 
   $fields['gender'] = $select_element(
-    ['name' => t('Gender'), /*'value' => '%get[p2]'*/],
+    ['name' => t('Gender'), /*'value' => '[current-page:query:p2]'*/],
     [],
     ['f' => t('female'), 'm' => t('male'), 'o' => t('other')],
     -81
@@ -42,7 +42,7 @@ function _campaignion_form_builder_form_builder_types_select() {
 
   include_once(drupal_get_path('module', 'webform') . '/includes/webform.options.inc');
   $fields['country'] = $select_element(
-    ['name' => t('Country'), /*'value' => '%get[p9]'*/],
+    ['name' => t('Country'), /*'value' => '[current-page:query:p9]'*/],
     [],
     webform_options_countries(NULL, NULL, NULL, NULL),
     -73

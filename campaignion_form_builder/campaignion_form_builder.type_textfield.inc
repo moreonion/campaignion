@@ -20,52 +20,52 @@ function _campaignion_form_builder_form_builder_types_textfield() {
 
   $fields['first_name'] = $text_element([
     'name' => t('First name'),
-    'value' => '%get[p3]',
+    'value' => '[current-page:query:p3]',
   ], [], -80);
 
   $fields['last_name'] = $text_element([
     'name' => t('Last name'),
-    'value' => '%get[p4]',
+    'value' => '[current-page:query:p4]',
   ], [], -79);
 
   $fields['title'] = $text_element([
     'name' => t('Title'),
-    'value' => '%get[p5]',
+    'value' => '[current-page:query:p5]',
   ], [], -77);
 
   $fields['date_of_birth'] = $text_element([
     'name' => t('Date of birth'),
-    'value' => '%get[p6]',
+    'value' => '[current-page:query:p6]',
   ], ['description' => t('Please use the following format: 16/9/1983')], -76);
 
   $fields['street_address'] = $text_element([
     'name' => t('Street address'),
-    'value' => '%get[p7]',
+    'value' => '[current-page:query:p7]',
   ], [], -75);
 
   $fields['zip_code'] = $text_element([
     'name' => t('ZIP code'),
-    'value' => '%get[p8]',
+    'value' => '[current-page:query:p8]',
   ], [], -74);
 
   $fields['state'] = $text_element([
     'name' => t('Region'),
-    'value' => '%get[p9]',
+    'value' => '[current-page:query:p9]',
   ], [], -73);
 
   $fields['city'] = $text_element([
     'name' => t('City'),
-    'value' => '%get[p10]',
+    'value' => '[current-page:query:p10]',
   ], [], -72);
 
   $fields['phone_number'] = $text_element([
     'name' => t('Phone number'),
-    'value' => '%get[p11]',
+    'value' => '[current-page:query:p11]',
   ], [], -71);
 
   $fields['mobile_number'] = $text_element([
     'name' => t('Mobile number'),
-    'value' => '%get[p12]',
+    'value' => '[current-page:query:p12]',
   ], [], -70);
 
   return $fields;
