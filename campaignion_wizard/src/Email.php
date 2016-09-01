@@ -89,13 +89,17 @@ class Email {
       '#type'        => 'fieldset',
     );
 
+    $email_form = $this->getEmailForm($form_state);
+    $email_form['status']['#access'] = FALSE;
+
+    $enabled = !$this->is_new && !empty($email_form['status']['#default_value']);
     $checkbox_id = drupal_html_id($this->form_id . '_checkbox');
     $form[$this->form_id . '_toggle'][$this->form_id . '_check'] = array(
       '#type'          => 'checkbox',
       '#title'         => $messages['toggle_title'],
       '#id'            => $checkbox_id,
       '#return_value'  => 1,
-      '#default_value' => !$this->is_new ? 1 : 0,
+      '#default_value' => $enabled,
     );
 
     $form[$this->form_id . '_email'] = array(
@@ -107,7 +111,7 @@ class Email {
           "#$checkbox_id" => array('checked' => TRUE),
         ),
       ),
-    ) + $this->getEmailForm($form_state);
+    ) + $email_form;
 
     return $form;
   }
@@ -120,6 +124,7 @@ class Email {
     foreach ($form_state['values']['template'] as $key => &$val) {
       $form_state['values'][$key] = &$val;
     }
+    $form_state['values']['status'] = $values[$this->form_id . '_toggle'][$this->form_id . '_check'];
     $subform = $form[$this->form_id . '_email'];
     webform_email_edit_form_validate($subform, $form_state);
 
@@ -129,18 +134,19 @@ class Email {
   public function submit($form, &$form_state, $email_type) {
     $values = &$form_state['values'];
 
-    if ($values[$this->form_id . '_toggle'][$this->form_id . '_check'] == 1) {
-      $values[$this->form_id . '_email']['template'] = &$values[$this->form_id . '_email']['template']['value'];
-      $form_state['values'] =& $values[$this->form_id . '_email'];
+    $values[$this->form_id . '_email']['template'] = &$values[$this->form_id . '_email']['template']['value'];
+    $form_state['values'] =& $values[$this->form_id . '_email'];
+    $enabled = $form_state['values']['status'];
 
-     $this->saveEmail($email_type, $form, $form_state);
-
+    if (!$enabled && $this->is_new) {
+      // Don't save new disabled emails.
       $form_state['values'] = &$values;
-    } else {
-      if (!$this->is_new) {
-        $this->deleteEmail();
-      }
+      return;
     }
+
+    // Save the email.
+    $this->saveEmail($email_type, $form, $form_state);
+    $form_state['values'] = &$values;
   }
 
   /*
