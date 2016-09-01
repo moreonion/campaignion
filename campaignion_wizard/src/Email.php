@@ -19,13 +19,8 @@ class Email {
   }
 
   protected function &getEmailForm(&$form_state) {
-    if ( !$this->is_new ) {
-      $email = webform_email_load($this->eid, $this->node->nid);
-    } else {
-      // if this is a new petition we set email text to be HTML by default
-      $email = webform_email_load('new', $this->node->nid);
-      $email['html'] = TRUE;
-    }
+    $load_eid = $this->is_new ? 'new' : $this->eid;
+    $email = webform_email_load($load_eid, $this->node->nid);
 
     $formats = array(
       'plain' => variable_get('campaignion_wizard_text_format_plain', 'plain_text'),
