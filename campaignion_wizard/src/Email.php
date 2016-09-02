@@ -145,7 +145,8 @@ class Email {
     }
 
     // Save the email.
-    $this->saveEmail($email_type, $form, $form_state);
+    $subform = $form[$this->form_id . '_email'];
+    $this->saveEmail($email_type, $subform, $form_state);
     $form_state['values'] = &$values;
   }
 
@@ -191,7 +192,7 @@ class Email {
   }
 
   /*
-   * save or update an email from form data
+   * Save or update an email from form data.
    */
   protected function saveEmail($email_type, &$form, &$form_state) {
     if ($this->is_new) {
@@ -202,11 +203,11 @@ class Email {
       );
       // if eid is set webform_email_edit_form_submit tries to do a db_update
       // so we insert an empty email first.
-      $form_state['values']['eid'] = webform_email_insert($email);
+      $eid = webform_email_insert($email);
     }
 
-    $subform = $form[$this->form_id . '_email'];
-    webform_email_edit_form_submit($subform, $form_state);
+    $form_state['values']['eid'] = $this->eid;
+    webform_email_edit_form_submit($form, $form_state);
 
     db_merge('webform_confirm_email')
       ->key(array(
