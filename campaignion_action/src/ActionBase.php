@@ -38,12 +38,6 @@ class ActionBase {
    * Called whenever hook_node_prepare is called on this node.
    */
   public function prepare() {
-    $node = $this->node;
-    if (module_exists('webform_ajax') && isset($node->webform)) {
-      $node->webform += array(
-        'webform_ajax' => 1,
-      );
-    }
   }
 
   /**
