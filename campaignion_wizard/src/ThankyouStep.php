@@ -26,13 +26,9 @@ class ThankyouStep extends WizardStep {
   }
 
   protected function hasDoubleOptIn() {
-    return db_query(
-      'SELECT 1 FROM {webform_confirm_email} WHERE nid=:nid AND email_type = :conf_request',
-      array(
-        ':nid'          => $this->wizard->node->nid,
-        ':conf_request' => WEBFORM_CONFIRM_EMAIL_CONFIRMATION_REQUEST,
-      )
-    )->fetchField();
+    $emails = $this->wizard->node->webform['emails'];
+    $eid = EmailStep::WIZARD_CONFIRMATION_REQUEST_EID;
+    return isset($emails[$eid]) && !empty($emails[$eid]['status']);
   }
 
   protected function setConfirmationRedirect($url) {
