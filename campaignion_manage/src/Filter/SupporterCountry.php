@@ -15,6 +15,7 @@ class SupporterCountry extends Base implements FilterInterface {
     $fields =& $query->getFields();
     $fields = array();
     $query->fields('ctr', array('field_address_country'));
+    $query->isNotNull('ctr.field_address_country');
     $query->groupBy('ctr.field_address_country');
 
     $countries_in_use = $query->execute()->fetchCol();
