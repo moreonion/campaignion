@@ -52,7 +52,7 @@ class BatchJob {
     $ids = $this->result->nextIds($context['sandbox']['current_id'], $this->batchSize);
     $contacts = redhen_contact_load_multiple($ids, array(), TRUE);
     foreach ($contacts as $contact) {
-      $batch->apply($contact);
+      $batch->apply($contact, $context['results']);
       $context['sandbox']['current_id'] = $contact->contact_id;
       $context['sandbox']['progress']++;
       $context['message'] = format_string($this->messages['status_message'], array('@current' => $context['sandbox']['progress'], '@total' => $context['sandbox']['max']));
