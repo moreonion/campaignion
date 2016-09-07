@@ -51,6 +51,7 @@ function campaignion_action_template_selector_form_submit($form, &$form_state) {
     // as the _webform_template_attach function will need it
     $template_nid = $form_state['values']['source'];
     $_SESSION['webform_template'] = $template_nid;
+    $form['#node']->webform_template = (int) $template_nid;
     node_save($form['#node']);
 
     // form_builder doesn't realize that the form has changed and would reload the old
