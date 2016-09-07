@@ -207,7 +207,15 @@ class Email {
     }
 
     $form_state['values']['eid'] = $this->eid;
+
+    // webform_email_edit_form_submit() sets messages. We don't want them.
+    // The simplest way seems to be to backup & restore $_SESSION['messages'].
+    $messages = isset($_SESSION['messages']) ? $_SESSION['messages'] : FALSE;
     webform_email_edit_form_submit($form, $form_state);
+    $_SESSION['messages'] = $messages;
+    if (!$_SESSION['messages']) {
+      unset($_SESSION['messages']);
+    }
 
     db_merge('webform_confirm_email')
       ->key(array(
