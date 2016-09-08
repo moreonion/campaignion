@@ -4,4 +4,5 @@ core = 7.x
 package = Campaignion
 project = campaignion
 
+dependencies[] = little_helpers
 dependencies[] = webform

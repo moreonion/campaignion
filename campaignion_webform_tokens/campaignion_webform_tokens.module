@@ -1,31 +1,46 @@
 <?php
 
+use \Drupal\little_helpers\Webform\Submission;
+
 /**
  * Implements hook_token_info().
  */
 function campaignion_webform_tokens_token_info() {
-  $types['submission'] = array(
-    'name' => t('Webform submission data'),
-    'description' => t('Tokens related to data submitted by webforms.'),
-  );
+  $types = [];
+  $submission = [];
 
-  $submission['{component}'] = array(
-    'name' => t('Component value'),
-    'description' => t('The value of the selected component, e.g. "email_adress".'),
-  );
+  // Only webform3.
+  if (!function_exists('webform_token_info')) {
+    $types['submission'] = [
+      'name' => t('Webform submission data'),
+      'description' => t('Tokens related to data submitted by webforms.'),
+    ];
 
-  $submission['text-val'] = array(
-    'name' => t('Component values'),
-    'description' => t('Value of a certain component. Use this followed by a colon and the form-key of the element'),
-    'dynamic' => TRUE,
-  );
+    // Also don't advertise our own token syntax in webform4.
+    $submission['{component}'] = [
+      'name' => t('Component value'),
+      'description' => t('The value of the selected component, e.g. "email_adress".'),
+    ];
 
+    $submission['text-val'] = [
+      'name' => t('Component values'),
+      'description' => t('Value of a certain component. Use this followed by a colon and the form-key of the element'),
+      'dynamic' => TRUE,
+    ];
+  }
   return array(
     'types' => $types,
     'tokens' => array(
       'submission' => $submission,
     ),
   );
+}
+
+/**
+ * Implements hook_token_info_alter().
+ */
+function campaignion_webform_tokens_token_info_alter(&$info) {
+  unset($info['types']['submission']['needs-data']);
 }
 
 /**
@@ -65,9 +80,24 @@ function campaignion_webform_tokens_tokens($type, $tokens, array $data = array()
  
   $sid = (isset($_GET['sid']) && is_numeric($_GET['sid'])) ? (int) $_GET['sid'] : 0;
   $hash = isset($_GET['hash']) ? $_GET['hash'] : NULL;
-  $webform_submission = _campaignion_webform_tokens_get_components($sid, $hash);
+
+  $values = [];
+  if ($submission = _campaignion_webform_tokens_get_submission($sid, $hash)) {
+    $data['webform-submission'] = $submission;
+    if (function_exists('webform_tokens')) {
+      $replacements += webform_tokens($type, $tokens, $data, $options);
+    }
+    $values = _campaignion_webform_tokens_values($submission);
+  }
+  else {
+    return $replacements;
+  }
 
   foreach ($tokens as $name => $original) {
+    // Defer to webform4.
+    if (isset($replacements[$original])) {
+      continue;
+    }
     // Split token name to get the components name. The remainder is our default value.
     $token = explode('/', $name, 2);
     if (count($token) < 2) {
@@ -77,9 +107,9 @@ function campaignion_webform_tokens_tokens($type, $tokens, array $data = array()
     if (substr($token, 0, 9) == 'text-val:') {
       $token = substr($token, 9);
     }
-    if (isset($webform_submission[$token])) {
+    if (isset($values[$token])) {
       // render webform component.
-      $replacements[$original] = $webform_submission[$token];
+      $replacements[$original] = $values[$token];
     } else {
       $replacements[$original] = $default;
     }
@@ -87,32 +117,31 @@ function campaignion_webform_tokens_tokens($type, $tokens, array $data = array()
   return $replacements;
 }
 
-function _campaignion_webform_tokens_get_components($sid, $hash) {
+function _campaignion_webform_tokens_get_submission($sid, $hash) {
   // If hashes are needed:
   //  - check if hash is present and valid
   //  - don't replace anything if hashes don't match.
   if (variable_get('campaignion_webform_tokens_use_hash', '1') == '1') {
     if ($hash !=  drupal_hmac_base64((int) $sid, drupal_get_private_key() . drupal_get_hash_salt()))
-      return array();
+      return FALSE;
   }
 
   module_load_include('inc', 'webform', 'includes/webform.submissions');
 
   $submission = webform_get_submissions(array('sid' => $sid));
-  if (!isset($submission[$sid]))
-    return array();
+  return isset($submission[$sid]) ? $submission[$sid] : FALSE;
+}
 
-  $nid = $submission[$sid]->nid;
-  $subm_node = node_load($nid);
-  $components = $subm_node->webform['components'];
-  $webform_submission = array();
-  foreach ($submission[$sid]->data as $cid => $component_value) {
-    if (!empty($component_value['value'][0])) {
-      $v = campaignion_webform_tokens_render_component($components[$cid], $component_value['value']);
-      $webform_submission[$components[$cid]['form_key']] = trim($v);
+function _campaignion_webform_tokens_values($submission) {
+  $s = new Submission(node_load($submission->nid), $submission);
+  $components = $s->webform->node->webform['components'];
+  $values = array();
+  foreach ($components as $cid => $component) {
+    if ($v = $s->valuesByCid($cid)) {
+      $values[$component['form_key']] = campaignion_webform_tokens_render_component($component, $v);
     }
   }
-  return $webform_submission;
+  return $values;
 }
 
 /**
@@ -128,7 +157,7 @@ function campaignion_webform_tokens_render_component($component, $value, $format
   if (!isset($display_element['#webform_component'])) {
     $display_element['#webform_component'] = $component;
   }
-  return drupal_render($display_element);
+  return trim(drupal_render($display_element));
 }
 
 function campaignion_webform_tokens_node_view($node, $view_mode, $langcode) {
