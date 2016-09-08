@@ -86,26 +86,30 @@ function campaignion_google_analytics_form_webform_client_form_alter(&$form, &$f
     $donation_lang = $node->language;
 
     $webform = Webform::fromNode($form['#node']);
-    $submission = $webform->formStateToSubmission($form_state);
     $paymethod = $webform->componentByKey('paymethod_select');
     $currency_code = isset($paymethod['extra']['currency_code']) ? $paymethod['extra']['currency_code'] : 'EUR';
 
-    $interval = '';
-    switch ($submission->valueByKey('donation_interval')) {
-    case '1':
-      $interval = 'only once';
-      break;
-    case 'm':
-      $interval = 'monthly';
-      break;
-    case 'y':
-      $interval = 'yearly';
-      break;
-    default:
-      $interval = "unknown [" . $submission->valueByKey('donation_interval') . "]";
-    }
+    // Try to get interval and amount if at one step has been submitted.
+    if (isset($form_state['values']['submitted'])) {
+      $submission = $webform->formStateToSubmission($form_state);
 
-    $amount = intval($submission->valueByKey('donation_amount'));
+      $interval = '';
+      switch ($submission->valueByKey('donation_interval')) {
+      case '1':
+        $interval = 'only once';
+        break;
+      case 'm':
+        $interval = 'monthly';
+        break;
+      case 'y':
+        $interval = 'yearly';
+        break;
+      default:
+        $interval = "unknown [" . $submission->valueByKey('donation_interval') . "]";
+      }
+
+      $amount = intval($submission->valueByKey('donation_amount'));
+    }
 
     $ga_product_name = $donation_title . ' [' . $donation_lang . ']';
     // add common product properties
