@@ -89,28 +89,6 @@ function campaignion_google_analytics_form_webform_client_form_alter(&$form, &$f
     $paymethod = $webform->componentByKey('paymethod_select');
     $currency_code = isset($paymethod['extra']['currency_code']) ? $paymethod['extra']['currency_code'] : 'EUR';
 
-    // Try to get interval and amount if at one step has been submitted.
-    if (isset($form_state['values']['submitted'])) {
-      $submission = $webform->formStateToSubmission($form_state);
-
-      $interval = '';
-      switch ($submission->valueByKey('donation_interval')) {
-      case '1':
-        $interval = 'only once';
-        break;
-      case 'm':
-        $interval = 'monthly';
-        break;
-      case 'y':
-        $interval = 'yearly';
-        break;
-      default:
-        $interval = "unknown [" . $submission->valueByKey('donation_interval') . "]";
-      }
-
-      $amount = intval($submission->valueByKey('donation_amount'));
-    }
-
     $ga_product_name = $donation_title . ' [' . $donation_lang . ']';
     // add common product properties
     drupal_add_js(
@@ -134,46 +112,61 @@ function campaignion_google_analytics_form_webform_client_form_alter(&$form, &$f
             ))),
         'setting');
     }
-    // we define the add to cart with completion of the 1st step, usually this
-    // means we have successfully selected the amount and interval
-    if ($form_state['webform']['page_num'] == 2) {
-      drupal_add_js(
-        array(
-          'campaignion_google_analytics' => array(
-            'actions' => ['add'],
-            'product' => array(
-              'price' => $amount,
-              'category' => $interval,
-              'quantity' => '1',
-          ))),
-        'setting');
-    }
-    // we define the checkout begin with the *completion* of the 2nd step or
-    // with the last step
-    if ($form_state['webform']['page_num'] == 3 || $form_state['webform']['page_num'] == $form_state['webform']['page_count']) {
-      drupal_add_js(
-        array(
-          'campaignion_google_analytics' => array(
-            'actions' => ['checkoutBegin'],
-            'product' => array(
-              'price' => $amount,
-              'category' => $interval,
-              'quantity' => '1',
-          ))),
-        'setting');
-    }
-    // we define the checkout end with the last step
-    if ($form_state['webform']['page_num'] == $form_state['webform']['page_count']) {
-      drupal_add_js(
-        array(
-          'campaignion_google_analytics' => array(
-            'actions' => ['checkoutEnd'],
-            'product' => array(
-              'price' => $amount,
-              'category' => $interval,
-              'quantity' => '1',
-          ))),
-        'setting');
+
+    // This data is only available if we already have a submission.
+    if (isset($form_state['values']['submitted']) && ($submission = $webform->formStateToSubmission($form_state))) {
+      $interval = '';
+      switch ($submission->valueByKey('donation_interval')) {
+      case '1':
+        $interval = 'only once';
+        break;
+      case 'm':
+        $interval = 'monthly';
+        break;
+      case 'y':
+        $interval = 'yearly';
+        break;
+      default:
+        $interval = "unknown [" . $submission->valueByKey('donation_interval') . "]";
+      }
+
+      $amount = intval($submission->valueByKey('donation_amount'));
+
+      // We define the add to cart with completion of the 1st step, usually this
+      // means we have successfully selected the amount and interval.
+      if ($form_state['webform']['page_num'] == 2) {
+        drupal_add_js(['campaignion_google_analytics' => [
+          'actions' => ['add'],
+          'product' => [
+            'price' => $amount,
+            'category' => $interval,
+            'quantity' => '1',
+          ],
+        ]], 'setting');
+      }
+      // We define the checkout begin with the *completion* of the 2nd step or
+      // with the last step.
+      if ($form_state['webform']['page_num'] == 3 || $form_state['webform']['page_num'] == $form_state['webform']['page_count']) {
+        drupal_add_js(['campaignion_google_analytics' => [
+          'actions' => ['checkoutBegin'],
+          'product' => [
+            'price' => $amount,
+            'category' => $interval,
+            'quantity' => '1',
+          ],
+        ]], 'setting');
+      }
+      // We define the checkout end with the last step.
+      if ($form_state['webform']['page_num'] == $form_state['webform']['page_count']) {
+        drupal_add_js(['campaignion_google_analytics' => [
+          'actions' => ['checkoutEnd'],
+          'product' => [
+            'price' => $amount,
+            'category' => $interval,
+            'quantity' => '1',
+          ],
+        ]], 'setting');
+      }
     }
     // the purchase has to be on the thanlyou page, because only there we can
     // be sure whether the payment was successful
