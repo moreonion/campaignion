@@ -61,9 +61,8 @@ function campaignion_webform_results_webform_results_download($node, $format = '
     require_once drupal_get_path('module', 'webform') . '/includes/webform.export.inc';
     $options['file_name'] = _webform_export_tempname();
     $batch = webform_results_export_batch($node, $format, $options);
-    $batch['redirect'] = url("node/{$node->nid}/webform-results");
     batch_set($batch);
-    batch_process(url("node/{$node->nid}/webform-results/download-file"));
+    batch_process("node/{$node->nid}/webform-results/download-file");
   }
   else {
     // webform3 + patch.
