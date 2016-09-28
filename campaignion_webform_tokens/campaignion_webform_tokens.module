@@ -15,19 +15,20 @@ function campaignion_webform_tokens_token_info() {
       'name' => t('Webform submission data'),
       'description' => t('Tokens related to data submitted by webforms.'),
     ];
-
-    // Also don't advertise our own token syntax in webform4.
-    $submission['{component}'] = [
-      'name' => t('Component value'),
-      'description' => t('The value of the selected component, e.g. "email_adress".'),
-    ];
-
-    $submission['text-val'] = [
-      'name' => t('Component values'),
-      'description' => t('Value of a certain component. Use this followed by a colon and the form-key of the element'),
-      'dynamic' => TRUE,
-    ];
   }
+
+  // Also don't advertise our own token syntax in webform4.
+  $submission['{component}'] = [
+    'name' => t('Component value'),
+    'description' => t('The value of the selected component, e.g. "email_adress".'),
+  ];
+
+  $submission['text-val'] = [
+    'name' => t('Component values'),
+    'description' => t('Value of a certain component. Use this followed by a colon and the form-key of the element'),
+    'dynamic' => TRUE,
+  ];
+
   return array(
     'types' => $types,
     'tokens' => array(
