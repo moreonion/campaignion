@@ -9,12 +9,13 @@ function theme_campaignion_wizard_email_form($variables) {
   // Loop through fields, rendering them into radio button options.
   foreach (array('from_address', 'from_name') as $field) {
 
-    $form[$field . '_custom']['#attributes']['class'] = array('webform-set-active');
-    $form[$field . '_option']['custom']['#theme_wrappers'] = array('webform_inline_radio');
-    $form[$field . '_option']['custom']['#inline_element'] = drupal_render($form[$field . '_custom']);
+    $form[$field . '_custom']['#attributes']['class'][] = 'webform-set-active';
+    $form[$field . '_custom']['#theme_wrappers'] = [];
+    $form[$field . '_option']['custom']['#theme_wrappers'] = ['webform_inline_radio'];
+    $form[$field . '_option']['custom']['#title'] = t('!title: !field', ['!title' => $form[$field . '_option']['custom']['#title'], '!field' => drupal_render($form[$field . '_custom'])]);
 
     if (isset($form[$field . '_option']['#options']['default'])) {
-      $form[$field . '_option']['default']['#theme_wrappers'] = array('webform_inline_radio');
+      $form[$field . '_option']['default']['#theme_wrappers'] = ['webform_inline_radio'];
     }
   }
 
