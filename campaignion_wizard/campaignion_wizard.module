@@ -13,7 +13,7 @@ function campaignion_wizard_menu() {
       'page callback'    => 'campaignion_wizard_new',
       'page arguments'   => array($url_type),
       'access callback' => 'node_access',
-      'access arguments' => array('create', $url_type),
+      'access arguments' => array('create', $type),
       'type' => MENU_CALLBACK,
     );
   }
