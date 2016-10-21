@@ -70,7 +70,7 @@ SQL;
     }
     $type = $type ? $type : static::defaultType();
     if (!($contact = static::byEmail($email, $type))) {
-      $contact = new static(array('type' => $type));
+      $contact = entity_create('redhen_contact', ['type' => $type]);
       $contact->setEmail($email, 1, 0);
     }
     return $contact;
