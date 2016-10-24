@@ -85,6 +85,7 @@ function campaignion_webform_tokens_tokens($type, $tokens, array $data = array()
   $values = [];
   if ($submission = _campaignion_webform_tokens_get_submission($sid, $hash)) {
     $data['webform-submission'] = $submission;
+    $data['node'] = node_load($submission->nid);
     if (function_exists('webform_tokens')) {
       $replacements += webform_tokens($type, $tokens, $data, $options);
     }
