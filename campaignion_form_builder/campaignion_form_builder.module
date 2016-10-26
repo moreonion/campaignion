@@ -20,6 +20,26 @@ function campaignion_form_builder_form_builder_element_types_alter(&$types, $for
     $field                  = &$types['newsletter'];
     $field['palette_group'] = 'supporter_data';
   }
+
+  if (isset($types['country_list'])) {
+    $types['country'] = $types['country_list'];
+    unset($types['country_list']);
+    $field = &$types['country'];
+    $field['default']['#form_builder']['element_type'] = 'country';
+    $field['palette_group'] = 'supporter_data';
+    $field['unique'] = TRUE;
+    $field['weight'] = -73;
+  }
+  uasort($types, 'drupal_sort_weight');
+}
+
+/**
+ * Implements hook_form_builder_webform_property_map_alter().
+ */
+function campaignion_form_builder_form_builder_webform_property_map_alter(&$map, $type) {
+  if ($type == 'country_list') {
+    $map['form_builder_type'] = 'country';
+  }
 }
 
 /**

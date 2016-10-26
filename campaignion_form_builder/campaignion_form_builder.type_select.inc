@@ -40,15 +40,6 @@ function _campaignion_form_builder_form_builder_types_select() {
     -81
   );
 
-  include_once(drupal_get_path('module', 'webform') . '/includes/webform.options.inc');
-  $fields['country'] = $select_element(
-    ['name' => t('Country'), /*'value' => '[current-page:query:p9]'*/],
-    [],
-    webform_options_countries(NULL, NULL, NULL, NULL),
-    -73
-  );
-
-
   $fields['email_newsletter'] = ['unique' => FALSE] + $select_element(
     ['name' => t('Email Newsletter'), 'value' => 1],
     ['aslist' => FALSE, 'multiple' => TRUE],
