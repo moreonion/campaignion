@@ -9,6 +9,7 @@ use \Drupal\campaignion_newsletters\FormSubmission;
 use \Drupal\campaignion_newsletters\Subscription;
 use \Drupal\campaignion_newsletters\Subscriptions;
 use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+use \Drupal\little_helpers\Submission;
 
 /**
  * Implements hook_cron().
@@ -85,23 +86,10 @@ function campaignion_newsletters_webform_component_info() {
 }
 
 /**
- * Implements hook_webform_submission_insert().
- *
- * If the webform doesn't need confirmation invoke our hook_email_confirmed()
- * immediately.
+ * Implements hook_webform_submission_confirmed().
  */
-function campaignion_newsletters_webform_submission_insert($node, $submission) {
-  $webform = new \Drupal\little_helpers\Webform\Webform($node);
-  if (!$webform->needsConfirmation()) {
-    campaignion_newsletters_webform_confirm_email_email_confirmed($node, $submission);
-  }
-}
-
-/**
- * Implements hook_webform_confirm_email_email_confirmed().
- */
-function campaignion_newsletters_webform_confirm_email_email_confirmed($node, $submission) {
-  $s = new WebformSubmission($node, $submission);
+function campaignion_newsletters_webform_submission_confirmed(Submission $submission) {
+  $s = new WebformSubmission($submission->node, $submission);
   // use value of the component with key 'email' as email address
   if (!($email = $s->value('email'))) {
     return;
