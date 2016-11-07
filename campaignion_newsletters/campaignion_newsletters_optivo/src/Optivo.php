@@ -27,7 +27,7 @@ class Optivo extends ProviderBase {
       $params,
       new Client("https://api.broadmail.de/soap11/RpcSession?wsdl"),
       new SessionClient("https://api.broadmail.de/soap11/RpcRecipientList?wsdl"),
-      new SessionClient("https://api.broadmail.de/soap11/RpcRecipient?wsdl"),
+      new RecipientServiceClient("https://api.broadmail.de/soap11/RpcRecipient?wsdl"),
       new SessionClient("https://api.broadmail.de/soap11/RpcOptinProcess?wsdl")
     );
   }
