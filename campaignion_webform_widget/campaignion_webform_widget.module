@@ -32,6 +32,22 @@ function campaignion_webform_widget_form_webform_client_form_alter(&$form, &$for
 }
 
 /**
+ * Implements hook_node_view_alter().
+ */
+function campaignion_webform_widget_node_view_alter(&$build) {
+  $params = drupal_get_query_parameters();
+  # a thankyou page is either content_type "thank_you_page" or has the GET
+  # params 'sid' and 'share' (when e.g. redirected to a static page)
+  $is_thankyou_page = $build['#node']->type == 'thank_you_page' || (!empty($params['sid']) && !empty($params['share']));
+  # when GET param embed=1
+  $is_embedded = campaignion_webform_widget_context_is_active('embedded') || campaignion_webform_widget_context_is_active('current_webform_embedded');
+  if ($is_thankyou_page && $build['#view_mode'] == 'full' && $is_embedded) {
+    // Override the X-Frame-Options header for this request.
+    drupal_add_http_header('X-Frame-Options', 'allowall');
+  }
+}
+
+/**
  * callback to set the embed query parameter also on the thank you page (the page
  * to which an user gets redirected after submit.
  */
