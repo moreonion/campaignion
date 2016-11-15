@@ -145,7 +145,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
   $component['value'] = unserialize($component['value']);
 
   $element = array(
-    '#required' => $component['mandatory'],
+    '#required' => !empty($component['mandatory']) || !empty($component['required']),
     '#weight' => $component['weight'],
     '#theme_wrappers' => array('webform_element'),
     '#pre_render' => array(),

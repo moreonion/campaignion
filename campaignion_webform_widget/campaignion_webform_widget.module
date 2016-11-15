@@ -24,6 +24,8 @@ function campaignion_webform_widget_form_webform_client_form_alter(&$form, &$for
   // TODO make this optional:
   if (campaignion_webform_widget_context_is_active('embedded') || campaignion_webform_widget_context_is_active('current_webform_embedded')) {
     $form['#attributes']['target'] = '_blank';
+    // Override the X-Frame-Options header for this request.
+    drupal_add_http_header('X-Frame-Options', 'allowall');
     // if user wants, open the redirected page in same iframe with qurey paramter embed=1
     /* $form['#submit'][] = '_campaignion_webform_widget_redirect'; */
   }

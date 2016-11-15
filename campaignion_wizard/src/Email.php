@@ -43,18 +43,21 @@ class Email {
       }
     }
 
+    // Always use a custom subject line.
     $email_form['subject_option']['#default_value'] = 'custom';
     $email_form['subject_option']['#access'] = FALSE;
     $email_form['subject_component']['#access'] = FALSE;
     $email_form['subject_custom']['#title'] = t('Subject');
     $email_form['subject_custom']['#access'] = TRUE;
 
-    $email_form['from_name_option']['component']['#access'] = FALSE;
+    // Disallow selecting a component for those.
     unset($email_form['from_name_option']['#options']['component']);
-    unset($email_form['from_name_component']);
+    $email_form['from_name_component']['#access'] = FALSE;
+    $email_form['from_name_mapping']['#access'] = FALSE;
 
     unset($email_form['from_address_option']['#options']['component']);
-    unset($email_form['from_address_component']);
+    $email_form['from_address_component']['#access'] = FALSE;
+    $email_form['from_address_mapping']['#access'] = FALSE;
 
     $email_form['templates']['#access'] = FALSE;
     $email_form['template']['#collapsible'] = FALSE;
