@@ -26,8 +26,12 @@ function campaignion_webform_widget_form_webform_client_form_alter(&$form, &$for
     $form['#attributes']['target'] = '_blank';
     // Override the X-Frame-Options header for this request.
     drupal_add_http_header('X-Frame-Options', 'allowall');
-    // if user wants, open the redirected page in same iframe with qurey paramter embed=1
-    /* $form['#submit'][] = '_campaignion_webform_widget_redirect'; */
+    // if user wants, open the redirected page in same iframe with qurey parameter embed=1
+    // if the field "field_pass_embed" is present on the action and is on
+    $values = field_get_items('node', $form['#node'], 'field_pass_embed', LANGUAGE_NONE);
+    if (!empty($values) && $values[0]['value'] == "1") {
+      $form['#submit'][] = '_campaignion_webform_widget_redirect';
+    }
   }
 }
 
@@ -211,14 +215,18 @@ function campaignion_webform_widget_permission() {
 }
 
 function campaignion_webform_widget_preprocess_page(&$vars) {
+  $params = drupal_get_query_parameters();
+  $is_thankyou_page = (!empty($vars['node']) && $vars['node']->type == 'thank_you_page') || (!empty($params['sid']) && !empty($params['share']));
   // generic context: embedded
   if (campaignion_webform_widget_context_is_active('embedded')) {
     $vars['theme_hook_suggestions'][] = 'page__embedded';
+    $vars['is_thankyou_page'] = $is_thankyou_page;
     drupal_add_js(drupal_get_path('module', 'campaignion_webform_widget') . '/js/widget.js');
   }
   // more specific context: current_webform_embedded
   if (campaignion_webform_widget_context_is_active('current_webform_embedded')) {
     $vars['theme_hook_suggestions'][] = 'page__current_webform_embedded';
+    $vars['is_thankyou_page'] = $is_thankyou_page;
     drupal_add_js(drupal_get_path('module', 'campaignion_webform_widget') . '/js/widget.js');
   }
 }
