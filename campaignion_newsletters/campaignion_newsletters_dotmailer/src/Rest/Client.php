@@ -123,8 +123,7 @@ class Client {
     $result = drupal_http_request($url, $options);
 
     // Turn errors into exceptions.
-    if ($result->error) {
-      var_dump($result);
+    if (!empty($result->error)) {
       throw new HttpError($result);
     }
     return drupal_json_decode($result->data);
