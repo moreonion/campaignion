@@ -13,13 +13,8 @@ use \Drupal\campaignion_newsletters\ProviderBase;
 use \Drupal\campaignion_newsletters\QueueItem;
 use \Drupal\campaignion_newsletters\Subscription;
 
-use \DotMailer\Api\Container;
-use \DotMailer\Api\DataTypes\ApiContact;
-use \DotMailer\Api\Rest\NotFoundException;
-
 
 class Provider extends ProviderBase {
-  public $resources;
   public $api;
   protected $account;
 
@@ -27,16 +22,8 @@ class Provider extends ProviderBase {
    * Constructor. Configure API client for later use.
    */
   public function __construct(array $params) {
-    libraries_load('dotmailer-api-php');
-
     $this->api = new Api\Client($params['username'], $params['password']);
-
     $this->account = $params['name'];
-    $credentials = [
-      Container::USERNAME => $params['username'],
-      Container::PASSWORD => $params['password'],
-    ];
-    $this->resources = Container::newResources($credentials);
   }
 
   /**

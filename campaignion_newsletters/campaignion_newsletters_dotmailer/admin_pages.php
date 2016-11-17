@@ -4,11 +4,6 @@
  * Implementation of campaignion_newsletters_mailchimp_form_campaignion_newsletters_admin_settings_alter().
  */
 function _campaignion_newsletters_dotmailer_form_campaignion_newsletters_admin_settings_alter(&$form, &$form_state) {
-  $library = libraries_detect('dotmailer-api-php');
-  if (empty($library['installed'])) {
-    drupal_set_message($library['error message'], 'error', FALSE);
-  }
-
 
   $form['dotmailer'] = array(
     '#type' => 'fieldset',
@@ -129,7 +124,6 @@ function campaignion_newsletters_dotmailer_admin_validate($form, &$form_state) {
  */
 function campaignion_newsletters_dotmailer_admin_submit($form, &$form_state) {
   $keys = array();
-  dpm($form_state);
   foreach ($form_state['values']['dotmailer']['api_keys'] as $data) {
     if (!empty($data['username']) && !empty($data['password'])) {
       $keys[$data['name']] = [
