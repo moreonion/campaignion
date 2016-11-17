@@ -9,7 +9,7 @@ use \Drupal\campaignion_newsletters\FormSubmission;
 use \Drupal\campaignion_newsletters\Subscription;
 use \Drupal\campaignion_newsletters\Subscriptions;
 use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
-use \Drupal\little_helpers\Submission;
+use \Drupal\little_helpers\Webform\Submission;
 
 /**
  * Implements hook_cron().
