@@ -156,6 +156,13 @@ function campaignion_action_webform_submission_insert($node, $submission) {
 }
 
 /**
+ * Implements hook_webform_submission_update().
+ */
+function campaignion_action_webform_submission_update($node, $submission) {
+  campaignion_action_webform_submission_insert($node, $submission);
+}
+
+/**
  * Implements hook_cron().
  */
 function campaignion_action_cron() {
