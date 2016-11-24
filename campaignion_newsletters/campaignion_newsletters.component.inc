@@ -69,13 +69,18 @@ function _webform_edit_newsletter($component) {
     '#element_validate' => array('_webform_value_validate_newsletter'),
   );
 
+  natcasesort($newsletters);
   $form['extra']['lists'] = array(
-    '#type' => 'checkboxes',
+    '#type' => module_exists('select2') && count($newsletters) > 5 ? 'select' : 'checkboxes',
     '#title' => t('Newsletter'),
     '#default_value' => $component['extra']['lists'],
     '#description' => t('Which lists should the user be subscribed to?'),
     '#options' => $newsletters,
     '#weight' => 1,
+    // only relevant if type is 'select':
+    '#empty_option' => t('Select newsletters'),
+    '#multiple' => 1,
+    '#select2' => array(),
   );
 
   $form['extra']['opt_in_implied'] = array(
