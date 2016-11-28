@@ -16,14 +16,10 @@ function campaignion_newsletters_send_queue() {
   foreach ($items as $item) {
     $list = $lists[$item->list_id];
     $provider = $list->provider();
+    $method = $item->action;
 
     try {
-      if ($item->action & QueueItem::SUBSCRIBE) {
-        $provider->subscribe($list, $item);
-      }
-      elseif ($item->action == QueueItem::UNSUBSCRIBE) {
-        $provider->unsubscribe($list, $item);
-      }
+      $provider->{$method}($list, $item);
       $item->delete();
     }
     catch (ApiPersistentError $e) {

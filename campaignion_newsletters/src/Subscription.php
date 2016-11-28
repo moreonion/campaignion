@@ -68,18 +68,16 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
       $this->fingerprint = $fingerprint;
       if (!$fromProvider) {
         $action = QueueItem::SUBSCRIBE;
+        $args = [];
         if ($this->new) {
-          if ($this->send_welcome) {
-            $action |= QueueItem::WELCOME;
-          }
-          if ($this->needs_opt_in) {
-            $action |= QueueItem::OPTIN;
-          }
+          $args['send_welcome'] = $this->send_welcome;
+          $args['send_optin'] = $this->needs_opt_in;
         }
         QueueItem::byData(array(
           'list_id' => $this->list_id,
           'email' => $this->email,
           'action' => $action,
+          'args' => $args,
           'data' => $data,
           'optin_info' => $this->optin_info,
         ))->save();

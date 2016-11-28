@@ -3,10 +3,8 @@
 namespace Drupal\campaignion_newsletters;
 
 class QueueItem extends \Drupal\little_helpers\DB\Model {
-  const WELCOME = 4;
-  const OPTIN = 2;
-  const SUBSCRIBE = 1;
-  const UNSUBSCRIBE = 0;
+  const SUBSCRIBE = 'subscribe';
+  const UNSUBSCRIBE = 'unsubscribe';
 
   public $list_id;
   public $email;
@@ -19,8 +17,8 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
 
   protected static $table = 'campaignion_newsletters_queue';
   protected static $key = ['id'];
-  protected static $values = ['list_id', 'email', 'created', 'locked', 'action', 'data', 'optin_info'];
-  protected static $serialize = ['data' => TRUE, 'optin_info' => TRUE];
+  protected static $values = ['list_id', 'email', 'created', 'locked', 'action', 'args', 'data', 'optin_info'];
+  protected static $serialize = ['args' => TRUE, 'data' => TRUE, 'optin_info' => TRUE];
   protected static $serial = TRUE;
 
   public static function load($list_id, $email) {
@@ -96,14 +94,14 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
    * Check whether an opt-in email should be sent.
    */
   public function optIn() {
-    return (bool) ($this->action & self::OPTIN);
+    return !empty($this->args['send_optin']);
   }
 
   /**
    * Check whether a welcome email should besent.
    */
   public function welcome() {
-    return (bool) ($this->action & self::WELCOME);
+    return !empty($this->args['send_welcome']);
   }
 
 }

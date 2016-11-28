@@ -120,9 +120,14 @@ function campaignion_newsletters_schema() {
         ),
         'action' => array(
           'description' => 'Subscribe / unsubscribe flag.',
-          'type' => 'int',
-          'unsigned' => TRUE,
+          'type' => 'varchar',
+          'length' => 32,
           'not null' => TRUE,
+        ),
+        'args' => array(
+          'description' => 'Additional arguments for the provider function',
+          'type' => 'blob',
+          'size' => 'big',
         ),
         'data' => array(
           'description' => 'Random data used by the newsletter provider.',
@@ -165,6 +170,39 @@ function campaignion_newsletters_install() {
  */
 function campaignion_newsletters_uninstall() {
   variable_del('campaignion_newsletters_cleverreach_batch_size');
+}
+
+/**
+ * Make campaignion_newsletters_queue.action a string column + custom args.
+ */
+function campaignion_newsletters_update_12() {
+  db_add_field('campaignion_newsletters_queue', 'action_new', [
+    'description' => 'Subscribe / unsubscribe flag.',
+    'type' => 'varchar',
+    'length' => 32,
+    'default' => '',
+    'not null' => TRUE,
+  ]);
+  db_add_field('campaignion_newsletters_queue', 'args', [
+    'description' => 'Additional arguments for the provider function',
+    'type' => 'blob',
+    'size' => 'big',
+  ]);
+  $sql = <<<SQL
+UPDATE {campaignion_newsletters_queue}
+SET
+ action_new=CASE WHEN action=0 THEN 'unsubscribe' ELSE 'subscribe' END,
+ args=CONCAT('a:2:{s:10:"send_optin";b:', ROUND((action & 2) / 2),';s:12:"send_welcome";b:', ROUND((action & 4) / 4), ';}')
+SQL;
+  db_query($sql);
+
+  db_drop_field('campaignion_newsletters_queue', 'action');
+  db_change_field('campaignion_newsletters_queue', 'action_new', 'action', [
+    'description' => 'Subscribe / unsubscribe flag.',
+    'type' => 'varchar',
+    'length' => 32,
+    'not null' => TRUE,
+  ]);
 }
 
 /**
