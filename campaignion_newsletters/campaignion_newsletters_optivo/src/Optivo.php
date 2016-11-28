@@ -119,8 +119,6 @@ class Optivo extends ProviderBase {
 
   /**
    * Subscribe a user, given a newsletter identifier and email address.
-   *
-   * @return: True on success.
    */
   public function subscribe(NewsletterList $list, QueueItem $item) {
     $this->ensureLogin();
@@ -162,11 +160,20 @@ class Optivo extends ProviderBase {
   }
 
   /**
+   * Update user data.
+   */
+  public function update(NewsletterList $list, QueueItem $item) {
+    $this->ensureLogin();
+    $service = $this->recipientService;
+    $data = $item->data + ['names' => [], 'values' => []];
+    $service->setAttributes($list->identifier, $item->email, $data['names'], $data['values']);
+  }
+
+
+  /**
    * Unsubscribe a user, given a newsletter identifier and email address.
    *
    * Should ignore the request if there is no such subscription.
-   *
-   * @return: True on success.
    */
   public function unsubscribe(NewsletterList $list, QueueItem $item) {
     $this->ensureLogin();

@@ -29,4 +29,12 @@ abstract class ProviderBase implements NewsletterProviderInterface {
 
     return $source;
   }
+
+  /**
+   * Default for backwards compatibility.
+   */
+  public function update(NewsletterList $list, QueueItem $item) {
+    $this->subscribe($list, $item);
+  }
+
 }
