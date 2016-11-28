@@ -11,6 +11,7 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
   public $created;
   public $locked = 0;
   public $action;
+  public $args = [];
   public $data;
   public $optin_info = NULL;
   public $fingerprint;
