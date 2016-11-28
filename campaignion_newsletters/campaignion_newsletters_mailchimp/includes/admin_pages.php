@@ -4,7 +4,7 @@
  * Implementation of campaignion_newsletters_mailchimp_form_campaignion_newsletters_admin_settings_alter().
  */
 function _campaignion_newsletters_mailchimp_form_campaignion_newsletters_admin_settings_alter(&$form, &$form_state) {
-  $library = libraries_detect('mailchimp-api-php');
+  $library = libraries_detect('dotmailer-api-php');
   if (empty($library['installed'])) {
     drupal_set_message($library['error message'], 'error', FALSE);
   }

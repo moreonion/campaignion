@@ -1,0 +1,7 @@
+name = Campaignion Newsletters (dotmailer)
+description = dotmailer Integration for Campaignion Newsletters
+package = Campaignion
+core = 7.x
+
+dependencies[] = campaignion_newsletters
+dependencies[] = psr0

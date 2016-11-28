@@ -28,7 +28,7 @@ class ActionBase {
           // webform_template-7.x-1.x
           $_SESSION['webform_template'] = $nid;
           // webform_template-7.x-4.x
-          $node->webform_template = $nid;
+          $node->webform_template = (int) $nid;
         }
       }
     }
