@@ -5,6 +5,7 @@ namespace Drupal\campaignion_newsletters;
 class QueueItem extends \Drupal\little_helpers\DB\Model {
   const SUBSCRIBE = 'subscribe';
   const UNSUBSCRIBE = 'unsubscribe';
+  const UPDATE = 'update';
 
   public $list_id;
   public $email;

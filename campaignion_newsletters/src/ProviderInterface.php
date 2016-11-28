@@ -6,7 +6,8 @@
 
 namespace Drupal\campaignion_newsletters;
 
-interface NewsletterProviderInterface {
+interface ProviderInterface {
+
   public static function fromParameters(array $params);
   /**
    * Fetches current lists from the provider.
@@ -26,17 +27,18 @@ interface NewsletterProviderInterface {
 
   /**
    * Subscribe a user, given a newsletter identifier and email address.
-   *
-   * @return: True on success.
    */
   public function subscribe(NewsletterList $newsletter, QueueItem $item);
+
+  /**
+   * Update user data without modifying subscription status.
+   */
+  public function update(NewsletterList $newsletter, QueueItem $item);
 
   /**
    * Subscribe a user, given a newsletter identifier and email address.
    *
    * Should ignore the request if there is no such subscription.
-   *
-   * @return: True on success.
    */
   public function unsubscribe(NewsletterList $newsletter, QueueItem $item);
 
@@ -55,4 +57,5 @@ interface NewsletterProviderInterface {
    *     of some subset of $data.
    */
   public function data(Subscription $subscription);
+
 }

@@ -74,11 +74,14 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
         ));
 
         if ($item->isNew()) {
-          $item->action = QueueItem::SUBSCRIBE;
           if ($this->new) {
+            $item->action = QueueItem::SUBSCRIBE;
             $item->args['send_welcome'] = $this->send_welcome;
             $item->args['send_optin'] = $this->needs_opt_in;
             $item->optin_info = $this->optin_info;
+          }
+          else {
+            $item->action = QueueItem::UPDATE;
           }
         }
 
