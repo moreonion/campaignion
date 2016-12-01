@@ -6,7 +6,7 @@ use \Drupal\campaignion_newsletters\Subscription;
 use \Drupal\campaignion\CRM\Import\Source\CombinedSource;
 use \Drupal\campaignion\ContactTypeManager;
 
-abstract class ProviderBase implements NewsletterProviderInterface {
+abstract class ProviderBase implements ProviderInterface {
   public static function fromParameters(array $params) {
     return new static($params);
   }
