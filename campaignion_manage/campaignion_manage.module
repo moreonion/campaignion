@@ -65,6 +65,10 @@ function campaignion_manage_theme() {
     'render element' => 'element',
     'file' => 'campaignion_manage.theme.inc',
   );
+  $theme['campaignion_manage_pager'] = array(
+    'render element' => 'element',
+    'file' => 'campaignion_manage.theme.inc',
+  );
   return $theme;
 }
 

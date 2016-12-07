@@ -31,7 +31,7 @@ abstract class Page {
     $form['listing'] = array();
     $this->listing->build($form['listing'], $form_state, $this->baseQuery);
 
-    $form['pager']['#theme'] = 'pager';
+    $form['pager']['#theme'] = 'campaignion_manage_pager';
     $form['#theme_wrappers'][] = 'form';
     $form['#theme_wrappers'][] = 'campaignion_manage_ajax';
     $form['#attached']['js'] = array(

@@ -81,3 +81,19 @@ function theme_campaignion_manage_ajax($variables) {
   // We need a double wrapper because jquery.replaceWith seems to produce extra-divs.
   return '<div id="campaignion-manage-ajax-wrapper"><div>' . $element['#children'] . '</div></div>';
 }
+
+/**
+ * Workaround for the hardcoded $_GET['q'] in theme_pager_link.
+ */
+function theme_campaignion_manage_pager($variables) {
+  $element = &$variables['element'];
+  $element['#theme'] = 'pager';
+  $old_q = $_GET['q'];
+  if ($old_q == 'system/ajax' && !empty($_SERVER['HTTP_REFERER'])) {
+    $url = drupal_parse_url($_SERVER['HTTP_REFERER']);
+    $_GET['q'] = $url['path'];
+  }
+  $output = drupal_render($element);
+  $_GET['q'] = $old_q;
+  return $output;
+}
