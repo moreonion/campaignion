@@ -48,7 +48,7 @@ function campaignion_webform_results_webform_results_download($node, $format = '
 
   // taken and modified from webform_results_download_form_submit
   $options = array(
-    'type' => 'results',
+    'type' => 'download',
     'delimiter' => ',',
     'components' => array_keys($csv_components),
     'select_keys' => '0',
