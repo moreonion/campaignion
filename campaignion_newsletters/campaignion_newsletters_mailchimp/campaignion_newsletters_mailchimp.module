@@ -28,29 +28,6 @@ function campaignion_newsletters_mailchimp_menu() {
 }
 
 /**
- * Implements hook_libraries_info().
- *
- * for mailchimps php api library.
- */
-function campaignion_newsletters_mailchimp_libraries_info() {
-  $libraries['mailchimp-api-php'] = array(
-    'name' => 'Mailchimp',
-    'vendor url' => 'http://mailchimp.com',
-    'download url' => 'https://bitbucket.org/mailchimp/mailchimp-api-php',
-    'version arguments' => [
-      'file' => 'composer.json',
-      'pattern' => '/"version":\\s+"([0-9.]+)"/',
-      'lines' => 5,
-    ],
-    'files' => array(
-      'php' => array('src/Mailchimp.php')
-    ),
-  );
-  return $libraries;
-}
-
-
-/**
  * Implements hook_campaignion_newsletters_provider_info().
  */
 function campaignion_newsletters_mailchimp_campaignion_newsletters_provider_info() {

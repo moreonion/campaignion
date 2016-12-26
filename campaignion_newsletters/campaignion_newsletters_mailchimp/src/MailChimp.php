@@ -14,23 +14,26 @@ use \Drupal\campaignion_newsletters\QueueItem;
 use \Drupal\campaignion_newsletters\Subscription;
 
 class MailChimp extends ProviderBase {
+
   protected $account;
-  protected $key;
-  protected $url;
   protected $api;
-  protected $merge_vars;
+
+  protected static function key2dc($key) {
+    return substr($key, strrpos($key, '-') + 1);
+  }
+
+  public static function fromParameters(array $params) {
+    $dc = static::key2dc($params['key']);
+    $endpoint = "https://campaignion:{$params['key']}@{$dc}.api.mailchimp.com/3.0";
+    return new static(new Rest\MailChimpClient($endpoint), $params['name']);
+  }
 
   /**
    * Constructor. Gets settings and fetches intial group list.
    */
-  public function __construct(array $params) {
-    libraries_load('mailchimp-api-php');
-
-    $this->account = $params['name'];
-    $this->key = $params['key'];
-
-    $this->api = new \Mailchimp($this->key);
-
+  public function __construct($api, $name) {
+    $this->api = $api;
+    $this->account = $name;
   }
 
   /**
@@ -41,32 +44,68 @@ class MailChimp extends ProviderBase {
    *   (properties: identifier, title, source, language).
    */
   public function getLists() {
-    $mc_lists = $this->call('getList', array());
+    $mc_lists = $this->api->getPaged('/lists', ['fields' => 'lists.id,lists.name']);
     $this->merge_vars = array();
     $lists = array();
     foreach ($mc_lists as $list) {
-      $v = $this->call('mergeVars', array($list['id']))[0]['merge_vars'];
+      $v = $this->api->getPaged("/lists/{$list['id']}/merge-fields", ['fields' => 'merge_fields.tag'], [], 100);
+      // @TODO also get interest groups.
       $list['merge_vars'] = $v ? $v : array();
-      $lists[] = NewsletterList::fromData(
-        array(
-          'identifier' => $list['id'],
-          'title'      => $list['name'],
-          'source'     => 'MailChimp-' . $this->account,
-          'data'       => (object) $list,
-          // @TODO: find a way to get an actual list specific language.
-        ));
+      $lists[] = NewsletterList::fromData([
+        'identifier' => $list['id'],
+        'title'      => $list['name'],
+        'source'     => 'MailChimp-' . $this->account,
+        'data'       => (object) $list,
+      ]);
+    }
 
-      $webhook_url = $GLOBALS['base_url'] . '/' .
-        CAMPAIGNION_NEWSLETTERS_MAILCHIMP_WEBHOOK_URL;
-      $webhook_urls = array();
-      foreach ($this->api->lists->webhooks($list['id']) as $webhook) {
-        $webhook_urls[] = $webhook['url'];
+    // Try refreshing the webhooks. This will fail on test installations with
+    // non-routable addresses (ie. for testing environments) - which is fine.
+    try {
+      $this->setWebhooks($lists);
+    }
+    catch (Rest\ApiError $e) {
+      watchdog_exception('campaignion_newsletters_mailchimp', $e);
+    }
+
+    return $lists;
+  }
+
+  /**
+   * Register webhooks for a set of lists (if needed).
+   *
+   * @param \Drupal\campaignion_newsletters\NewsletterList[] $lists
+   *   Register webhooks for these $lists.
+   * @throws \Drupal\campaignion_newsletters_mailchimp\Rest\ApiError
+   */
+  protected function setWebhooks($lists) {
+    $webhook_url = $GLOBALS['base_url'] . '/'
+      . CAMPAIGNION_NEWSLETTERS_MAILCHIMP_WEBHOOK_URL;
+
+    foreach ($lists as $list) {
+      // Get existing webhook URLs.
+      $webhook_urls = [];
+      foreach ($this->api->getPaged("/lists/{$list->identifier}/webhooks", ['fields' => 'webhooks.url'], [], 100) as $webhook) {
+        $webhook_urls[$webhook['url']] = TRUE;
       }
-      if (!in_array($webhook_url, $webhook_urls)) {
-        $this->call('webhookAdd', $list['id'], $webhook_url);
+      if (!isset($webhook_urls[$webhook_url])) {
+        $this->api->post("/lists/{$list->identifier}/webhooks", [], [
+          'url' => $webhook_url,
+          'events' => [
+            'subscribe' => FALSE,
+            'unsubscribe' => TRUE,
+            'profile' => FALSE,
+            'cleaned' => TRUE,
+            'campaign' => FALSE,
+          ],
+          'sources' => [
+            'user' => TRUE,
+            'admin' => TRUE,
+            'api' => TRUE,
+          ],
+        ]);
       }
     }
-    return $lists;
   }
 
   /**
@@ -80,16 +119,12 @@ class MailChimp extends ProviderBase {
     $receivers = array();
     $list_id = $list->data->id;
 
-    do {
-      $new_receivers = $this->call('members', $list_id, 'subscribed',
-                array(
-                  'start' => $page++,
-                  'limit' => 100,
-                ));
-      foreach ($new_receivers as $new_receiver) {
-        $receivers[] = $new_receiver['email'];
-      }
-    } while ($new_receivers);
+    foreach ($this->api->getPaged("/lists/{$list_id}/members", [
+      'status' => 'subscribed',
+      'fields' => 'members.email',
+    ], [], 1000) as $new_receiver) {
+      $receivers[] = $new_receiver['email'];
+    }
     return $receivers;
   }
 
@@ -125,85 +160,23 @@ class MailChimp extends ProviderBase {
 
   /**
    * Subscribe a user, given a newsletter identifier and email address.
-   *
-   * @return: True on success.
    */
   public function subscribe(NewsletterList $list, QueueItem $item) {
-    $this->call('subscribe',
-      $list->identifier,
-      array('email' => $item->email),
-      $item->data,
-      'html',
-      $item->optIn(), // double_optin
-      true, // update_existing
-      false, // replace_interests
-      $item->welcome() // send_welcome
-    );
-    return true;
+    $this->api->post("/lists/{$list->identifier}/members", [], [
+      'email_address' => $item->email,
+      'status' => $item->optIt() ? 'pending' : 'subscribed',
+      'merge_fields' => $item->data,
+    ]);
   }
 
   /**
    * Unsubscribe a user, given a newsletter identifier and email address.
    *
    * Should ignore the request if there is no such subscription.
-   *
-   * @return: True on success.
    */
   public function unsubscribe(NewsletterList $list, QueueItem $item) {
-    try {
-      $this->call('unsubscribe',
-        $list->identifier,
-        array('email' => $item->email)
-      );
-    }
-    catch (\Mailchimp_Email_NotExists $e) { return true; }
-    return true;
+    $hash = md5(strtolower($item->email));
+    $this->api->delete("/lists/{$list->identifier}/members/$hash");
   }
 
-  /**
-   * Wraps Mailchimp API calls to deal with it's results and errors.
-   */
-  protected function call($function) {
-    $arguments = func_get_args();
-    array_shift($arguments);
-    $result = array('data' => NULL);
-    try {
-      $result = call_user_func_array(
-        array($this->api->lists, $function),
-        $arguments
-      );
-    }
-    catch(\Mailchimp_ValidationError $e) {
-      throw new \Drupal\campaignion_newsletters\ApiPersistentError('MailChimp', $e->getMessage(), array(), $e->getCode(), $e->getFile(), $e);
-    }
-    catch(\Mailchimp_Error $e) {
-      $v['@error'] = $e->getMessage();
-      watchdog('MailChimp', 'Mailchimp API Exception: "@error"', $v, WATCHDOG_INFO);
-    }
-    if (!empty($result['errors'])) {
-      foreach ($result['errors'] as $error) {
-        $v['@error'] = $error['error'];
-        $v['@code'] = $error['code'];
-        watchdog('MailChimp', '@error (@code)', $v);
-        return false;
-      }
-    }
-    // This is only for specific API calls and should be taken care fo there.
-    elseif (isset($result['data'])) {
-      return $result['data'];
-    }
-    else {
-      return $result;
-    }
-  }
-
-  /**
-   * Protected clone method to prevent cloning of the singleton instance.
-   */
-  protected function __clone() {}
-
-  /**
-   * Protected unserialize method to prevent unserializing of singleton.
-   */
-  protected function __wakeup() {}
 }

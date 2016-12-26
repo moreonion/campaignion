@@ -22,13 +22,12 @@ function campaignion_newsletters_send_queue() {
       $provider->{$method}($list, $item);
       $item->delete();
     }
-    catch (ApiPersistentError $e) {
-      $e->log();
-      // There is no point to items with persistent errors in the queue.
-      $item->delete();
-    }
     catch (ApiError $e) {
       $e->log();
+      if ($e->isPersistent()) {
+        // There is no point to items with persistent errors in the queue.
+        $item->delete();
+      }
     }
   }
 }
