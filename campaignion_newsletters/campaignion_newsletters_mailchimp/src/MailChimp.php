@@ -18,7 +18,7 @@ class MailChimp extends ProviderBase {
   protected $account;
   protected $api;
 
-  protected static function key2dc($key) {
+  public static function key2dc($key) {
     return substr($key, strrpos($key, '-') + 1);
   }
 
@@ -44,7 +44,7 @@ class MailChimp extends ProviderBase {
    *   (properties: identifier, title, source, language).
    */
   public function getLists() {
-    $mc_lists = $this->api->getPaged('/lists', ['fields' => 'lists.id,lists.name']);
+    $mc_lists = $this->api->getPaged('/lists', ['fields' => 'lists.id,lists.name'], [], 100);
     $this->merge_vars = array();
     $lists = array();
     foreach ($mc_lists as $list) {
