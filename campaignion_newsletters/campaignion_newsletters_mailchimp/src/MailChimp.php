@@ -187,7 +187,17 @@ class MailChimp extends ProviderBase {
    */
   public function unsubscribe(NewsletterList $list, QueueItem $item) {
     $hash = md5(strtolower($item->email));
-    $this->api->delete("/lists/{$list->identifier}/members/$hash");
+    try {
+      $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
+        'status' => 'unsubscribed',
+      ]);
+    }
+    catch (Rest\ApiError $e) {
+      // Ignore 404 errors.
+      if ($e->getCode() != 404) {
+        throw $e;
+      }
+    }
   }
 
 }

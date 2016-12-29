@@ -11,9 +11,10 @@ class MailChimpTest extends \DrupalUnitTestCase {
     $this->assertEquals('us12', MailChimp::key2dc('testkey-us12'));
   }
 
-  protected function mockChimp() {
+  protected function mockChimp($methods = []) {
+    $methods[] = 'send';
     $api = $this->getMockBuilder(Rest\MailChimpClient::class)
-      ->setMethods(['send'])
+      ->setMethods($methods)
       ->disableOriginalConstructor()
       ->getMock();
     return [$api, new MailChimp($api, 'testname')];
@@ -69,6 +70,32 @@ class MailChimpTest extends \DrupalUnitTestCase {
       'data' => ['FNAME' => 'Test', 'LNAME' => 'Test'],
     ]);
     $provider->subscribe($list_o, $item);
+  }
+
+  public function test_unsubscribe_nonExisting() {
+    $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
+    $list_o = NewsletterList::fromData([
+      'identifier' => $list['id'],
+      'title'      => $list['name'],
+      'source'     => 'MailChimp-testname',
+      'data'       => (object) ($list + ['merge_vars' => []]),
+    ]);
+    list($api, $provider) = $this->mockChimp(['put']);
+    $item = new QueueItem([
+      'email' => 'test@example.com',
+    ]);
+    $hash = md5(strtolower($item->email));
+
+    $api->expects($this->once())->method('put')->with(
+      $this->equalTo("/lists/a1234/members/$hash"),
+      $this->anything(),
+      $this->equalTo(['status' => 'unsubscribed'])
+    )->will($this->throwException(Rest\ApiError::fromHttpError(new Rest\HttpError((object) [
+      'code' => 404,
+      'status_message' => 'Resource not found',
+      'data' => json_encode(['title' => 'Resource not found', 'detail' => '', 'errors' => []]),
+    ]), 'DELETE', "/lists/a1234/members/$hash")));
+    $provider->unsubscribe($list_o, $item);
   }
 
 }
