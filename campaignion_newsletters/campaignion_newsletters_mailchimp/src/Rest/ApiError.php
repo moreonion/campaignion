@@ -15,7 +15,7 @@ class ApiError extends \Drupal\campaignion_newsletters\ApiError {
         '@detail' => $data['detail'],
         '%errors' => '',
       ];
-      if ($data['errors']) {
+      if (!empty($data['errors'])) {
         $errors = [];
         foreach ($data['errors'] as $error) {
           $errors[] = "{$error['field']}: {$error['message']}";
