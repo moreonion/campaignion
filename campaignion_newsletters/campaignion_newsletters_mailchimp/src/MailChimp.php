@@ -162,9 +162,20 @@ class MailChimp extends ProviderBase {
    * Subscribe a user, given a newsletter identifier and email address.
    */
   public function subscribe(NewsletterList $list, QueueItem $item) {
-    $this->api->post("/lists/{$list->identifier}/members", [], [
+    $hash = md5(strtolower($item->email));
+    $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'email_address' => $item->email,
       'status' => $item->optIn() ? 'pending' : 'subscribed',
+      'merge_fields' => $item->data,
+    ]);
+  }
+
+  /**
+   * Update a user's data.
+   */
+  public function update(NewsletterList $list, QueueItem $item) {
+    $hash = md5(strtolower($item->email));
+    $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'merge_fields' => $item->data,
     ]);
   }
