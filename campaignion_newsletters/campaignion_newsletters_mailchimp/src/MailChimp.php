@@ -164,7 +164,7 @@ class MailChimp extends ProviderBase {
   public function subscribe(NewsletterList $list, QueueItem $item) {
     $this->api->post("/lists/{$list->identifier}/members", [], [
       'email_address' => $item->email,
-      'status' => $item->optIt() ? 'pending' : 'subscribed',
+      'status' => $item->optIn() ? 'pending' : 'subscribed',
       'merge_fields' => $item->data,
     ]);
   }

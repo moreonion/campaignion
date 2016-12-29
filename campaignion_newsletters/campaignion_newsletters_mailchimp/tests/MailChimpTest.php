@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_newsletters_mailchimp;
 
 use \Drupal\campaignion_newsletters\NewsletterList;
+use \Drupal\campaignion_newsletters\QueueItem;
 
 class MailChimpTest extends \DrupalUnitTestCase {
 
@@ -52,6 +53,22 @@ class MailChimpTest extends \DrupalUnitTestCase {
       'source'     => 'MailChimp-testname',
       'data'       => (object) ($list + ['merge_vars' => []]),
     ])], $provider->getLists());
+  }
+
+  public function test_subscribe_newContact() {
+    $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
+    $list_o = NewsletterList::fromData([
+      'identifier' => $list['id'],
+      'title'      => $list['name'],
+      'source'     => 'MailChimp-testname',
+      'data'       => (object) ($list + ['merge_vars' => []]),
+    ]);
+    list($api, $provider) = $this->mockChimp();
+    $item = new QueueItem([
+      'args' => ['send_optin' => FALSE],
+      'data' => ['FNAME' => 'Test', 'LNAME' => 'Test'],
+    ]);
+    $provider->subscribe($list_o, $item);
   }
 
 }
