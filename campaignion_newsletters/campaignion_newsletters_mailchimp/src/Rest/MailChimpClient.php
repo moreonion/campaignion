@@ -13,9 +13,16 @@ class MailChimpClient extends Client {
     $items = [];
     $query['count'] = $size;
     $list_key = strtr(substr($path, strrpos($path, '/') + 1), '-', '_');
-    $page = 0;
-    while ($new_items = $this->get($path, ['offset' => $size * $page++] + $query, $options)[$list_key])  {
+    $offset = 0;
+    $next_page = TRUE;
+    while ($next_page)  {
+      $result = $this->get($path, ['offset' => $offset] + $query, $options);
+      $new_items = $result[$list_key];
       $items = array_merge($items, $new_items);
+
+      // Only fetch the next page if there is more items than our next offset.
+      $offset += $size;
+      $next_page = $new_items && ($result['total_items'] > $offset);
     }
     return $items;
   }

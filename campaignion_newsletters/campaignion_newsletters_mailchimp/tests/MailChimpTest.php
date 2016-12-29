@@ -31,17 +31,15 @@ class MailChimpTest extends \DrupalUnitTestCase {
     $list_query = ['fields' => 'lists.id,lists.name'] + $paging;
     $merge_query = ['fields' => 'merge_fields.tag'] + $paging;
     $webhook_query = ['fields' => 'webhooks.url'] + $paging;
-    $api->expects($this->exactly(5))->method('send')->withConsecutive(
+    $api->expects($this->exactly(4))->method('send')->withConsecutive(
       [$this->equalTo('/lists'), $this->equalTo($list_query)],
-      [$this->equalTo('/lists'), $this->equalTo(['offset' => 100] + $list_query)],
       [$this->equalTo('/lists/a1234/merge-fields'), $this->equalTo($merge_query)],
       [$this->equalTo('/lists/a1234/webhooks'), $this->equalTo($webhook_query)],
       [$this->equalTo('/lists/a1234/webhooks')]
     )->will($this->onConsecutiveCalls(
-      ['lists' => [$list]],
-      ['lists' => []],
-      ['merge_fields' => []],
-      ['webhooks' => []],
+      ['lists' => [$list], 'total_items' => 1],
+      ['merge_fields' => [], 'total_items' => 0],
+      ['webhooks' => [], 'total_items' => 0],
       $this->throwException(Rest\ApiError::fromHttpError(new Rest\HttpError((object) [
         'code' => 400,
         'status_message' => 'Bad Request',
