@@ -33,14 +33,16 @@ class MailChimpTest extends \DrupalUnitTestCase {
     $list_query = ['fields' => 'lists.id,lists.name'] + $paging;
     $merge_query = ['fields' => 'merge_fields.tag'] + $paging;
     $webhook_query = ['fields' => 'webhooks.url'] + $paging;
-    $api->expects($this->exactly(4))->method('send')->withConsecutive(
+    $api->expects($this->exactly(5))->method('send')->withConsecutive(
       [$this->equalTo('/lists'), $this->equalTo($list_query)],
       [$this->equalTo('/lists/a1234/merge-fields'), $this->equalTo($merge_query)],
+      [$this->equalTo('/lists/a1234/interest-categories')],
       [$this->equalTo('/lists/a1234/webhooks'), $this->equalTo($webhook_query)],
       [$this->equalTo('/lists/a1234/webhooks')]
     )->will($this->onConsecutiveCalls(
       ['lists' => [$list], 'total_items' => 1],
       ['merge_fields' => [], 'total_items' => 0],
+      ['categories' => [], 'total_items' => 0],
       ['webhooks' => [], 'total_items' => 0],
       $this->throwException(Rest\ApiError::fromHttpError(new Rest\HttpError((object) [
         'code' => 400,
@@ -52,7 +54,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
       'identifier' => $list['id'],
       'title'      => $list['name'],
       'source'     => 'MailChimp-testname',
-      'data'       => (object) ($list + ['merge_vars' => []]),
+      'data'       => (object) ($list + ['merge_vars' => [], 'groups' => []]),
     ])], $provider->getLists());
   }
 
@@ -96,6 +98,30 @@ class MailChimpTest extends \DrupalUnitTestCase {
       'data' => json_encode(['title' => 'Resource not found', 'detail' => '', 'errors' => []]),
     ]), 'DELETE', "/lists/a1234/members/$hash")));
     $provider->unsubscribe($list_o, $item);
+  }
+
+  public function test_getInterestGroups_docExample() {
+    $list_id = '57afe96172';
+    $category_id = 'a1e9f4b7f6';
+    list($api, $provider) = $this->mockChimp(['get']);
+
+    $api->expects($this->exactly(2))->method('get')->withConsecutive(
+      [$this->equalTo("/lists/$list_id/interest-categories")],
+      [$this->equalTo("/lists/$list_id/interest-categories/$category_id/interests")]
+    )->will($this->onConsecutiveCalls(
+      ['categories' => [['id' => $category_id]], 'total_items' => 1],
+      ['interests' => [
+        ['id' => "9143cf3bd1", 'name' => "Sometimes you just gotta 'spress yourself."],
+        ['id' => "3a2a927344", 'name' => "I'm just a poor boy from a poor family."],
+        ['id' => "f9c8f5f0ff", 'name' => "What's with all these cute kittens?"],
+        ['id' => "f231b09abc", 'name' => "I knock your socks off with my beat box."],
+        ['id' => "bd6e66465f", 'name' => "Two chimps walk into a bar. The other chimp ducks."],
+      ], 'total_items' => 5]
+    ));
+
+    $groups = $provider->getInterestGroups($list_id);
+    $this->assertCount(5, $groups);
+    $this->assertArrayHasKey('bd6e66465f', $groups);
   }
 
 }

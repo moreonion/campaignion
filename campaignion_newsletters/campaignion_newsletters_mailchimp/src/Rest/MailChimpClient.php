@@ -9,10 +9,12 @@ namespace Drupal\campaignion_newsletters_mailchimp\Rest;
  */
 class MailChimpClient extends Client {
 
-  public function getPaged($path, $query = [], $options = [], $size = 10) {
+  public function getPaged($path, $query = [], $options = [], $size = 10, $list_key = NULL) {
     $items = [];
     $query['count'] = $size;
-    $list_key = strtr(substr($path, strrpos($path, '/') + 1), '-', '_');
+    if (!$list_key) {
+      $list_key = strtr(substr($path, strrpos($path, '/') + 1), '-', '_');
+    }
     $offset = 0;
     $next_page = TRUE;
     while ($next_page)  {

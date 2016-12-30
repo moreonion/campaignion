@@ -37,6 +37,24 @@ class MailChimp extends ProviderBase {
   }
 
   /**
+   * Get all interest groups for a list.
+   *
+   * @param string $list_id
+   * @return array
+   *   Associative array of interest group names keyed by the group id. Groups
+   *   in different categories are not discerned.
+   */
+  public function getInterestGroups($list_id) {
+    $groups = [];
+    foreach ($this->api->getPaged("/lists/$list_id/interest-categories", ['fields' => 'categories.id'], [], 100, 'categories') as $category) {
+      foreach ($this->api->getPaged("/lists/$list_id/interest-categories/{$category['id']}/interests", ['fields' => 'interests.id,interests.name'], [], 100) as $group) {
+        $groups[$group['id']] = $group['name'];
+      }
+    }
+    return $groups;
+  }
+
+  /**
    * Fetches current lists from the provider.
    *
    * @return array
@@ -48,9 +66,8 @@ class MailChimp extends ProviderBase {
     $this->merge_vars = array();
     $lists = array();
     foreach ($mc_lists as $list) {
-      $v = $this->api->getPaged("/lists/{$list['id']}/merge-fields", ['fields' => 'merge_fields.tag'], [], 100);
-      // @TODO also get interest groups.
-      $list['merge_vars'] = $v ? $v : array();
+      $list['merge_vars'] = $this->api->getPaged("/lists/{$list['id']}/merge-fields", ['fields' => 'merge_fields.tag'], [], 100);
+      $list['groups'] = $this->getInterestGroups($list['id']);
       $lists[] = NewsletterList::fromData([
         'identifier' => $list['id'],
         'title'      => $list['name'],
