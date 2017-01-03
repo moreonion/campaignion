@@ -12,6 +12,10 @@ class MailChimpClient extends Client {
   public function getPaged($path, $query = [], $options = [], $size = 10, $list_key = NULL) {
     $items = [];
     $query['count'] = $size;
+    // We always want to get the total count for paging purposes.
+    if (!empty($query['fields'])) {
+      $query['fields'] .= ',total_items';
+    }
     if (!$list_key) {
       $list_key = strtr(substr($path, strrpos($path, '/') + 1), '-', '_');
     }
