@@ -162,15 +162,14 @@ class MailChimp extends ProviderBase {
         }
       }
     }
-    // Let other modules alter the attributes (ie. for adding groupings).
-    drupal_alter('campaignion_newsletters_mailchimp_attributes', $attributes, $subscription, $source);
     return $attributes;
   }
 
   public function data(Subscription $subscription) {
-    $data = $this->attributeData($subscription);
-    $attr = $data;
-    $fingerprint = sha1(serialize($attr));
+    $data['merge_fields'] = $this->attributeData($subscription);
+    // Let other modules alter the data (ie. for adding interest groups).
+    drupal_alter('campaignion_newsletters_mailchimp_data', $data, $subscription);
+    $fingerprint = sha1(serialize($data));
     return array($data, $fingerprint);
 
   }
@@ -183,8 +182,7 @@ class MailChimp extends ProviderBase {
     $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'email_address' => $item->email,
       'status' => $item->optIn() ? 'pending' : 'subscribed',
-      'merge_fields' => $item->data,
-    ]);
+    ] + $item->data);
   }
 
   /**

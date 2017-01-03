@@ -1,5 +1,8 @@
 <?php
 
+use \Drupal\campaignion\Contact;
+use \Drupal\campaignion_newsletters\Subscription;
+
 /**
  * Implements hook_form_FORM_ID_alter().
  * Implements hook_form_node_form_alter().
@@ -73,4 +76,26 @@ function campaignion_supporter_tags_campaignion_supporter_contact_alter($contact
     $wrappedContact->supporter_tags->set($contact_tids);
   }
   return $changed;
+}
+
+/**
+ * Implements hook_campaignion_newsletters_mailchimp_data_alter().
+ */
+function campaignion_supporter_tags_campaignion_newsletters_mailchimp_data_alter(array &$data, Subscription $subscription) {
+  $list = $subscription->newsletterList();
+
+  $groups = [];
+  if (($contact = Contact::byEmail($subscription->email)) && !empty($contact->supporter_tags)) {
+    $terms = [];
+    foreach ($contact->wrap()->supporter_tags->value() as $term) {
+      $terms[$term->name] = TRUE;
+    }
+
+    foreach ($list->data->groups as $id => $name) {
+      if (isset($terms[$name])) {
+        $groups[$id] = TRUE;
+      }
+    }
+  }
+  $data['interests'] = $groups;
 }
