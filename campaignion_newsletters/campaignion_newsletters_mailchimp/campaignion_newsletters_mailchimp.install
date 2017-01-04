@@ -8,3 +8,53 @@ function campaignion_newsletters_mailchimp_uninstall() {
     'mailchimp_api_keys',
   ));
 }
+
+/**
+ * Migrate old queue items to the new API version.
+ */
+function campaignion_newsletters_mailchimp_update_1() {
+  $factory = \Drupal\campaignion_newsletters\ProviderFactory::getInstance();
+  foreach ($factory->providers() as $source) {
+    if (substr($source, 0, 10) == 'MailChimp-') {
+      $provider = $factory->providerByKey($source);
+      foreach ($provider->getLists() as $list) {
+        $list->save();
+      }
+    }
+  }
+
+  $last_id = 0;
+  $sql = "SELECT id FROM {campaignion_newsletters_lists} INNER JOIN {campaignion_newsletters_queue} USING(list_id) WHERE source LIKE 'MailChimp-%' AND id>:last_id ORDER BY id LIMIT 100";
+
+  $lists = [];
+  $get_list = function ($list_id) use (&$lists) {
+    if (!isset($lists[$list_id])) {
+      $lists[$list_id] = \Drupal\campaignion_newsletters\NewsletterList::load($list_id);
+    }
+    return $lists[$list_id];
+  };
+
+  while ($ids = db_query($sql, [':last_id' => $last_id])->fetchCol()) {
+    foreach ($ids as $id) {
+      $item = \Drupal\campaignion_newsletters\QueueItem::byId($id);
+      $data = $item->data;
+      $new_data = [];
+
+      if (isset($data['groupings'])) {
+        $map = array_flip($get_list($item->list_id)->data->groups);
+        foreach ($data['groupings'] as $grouping) {
+          foreach ($grouping['groups'] as $name) {
+            if (isset($map[$name])) {
+              $new_data['interests'][$map[$name]] = TRUE;
+            }
+          }
+        }
+        unset($data['groupings']);
+      }
+      $new_data['merge_fields'] = $data;
+      $item->data = $new_data;
+      $item->save();
+      $last_id = $item->id;
+    }
+  }
+}
