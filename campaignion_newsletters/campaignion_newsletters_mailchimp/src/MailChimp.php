@@ -15,6 +15,8 @@ use \Drupal\campaignion_newsletters\Subscription;
 
 class MailChimp extends ProviderBase {
 
+  const WEBHOOK_PATH = 'campaignion_newsletters_mailchimp_webhook';
+
   protected $account;
   protected $api;
 
@@ -96,8 +98,7 @@ class MailChimp extends ProviderBase {
    * @throws \Drupal\campaignion_newsletters_mailchimp\Rest\ApiError
    */
   protected function setWebhooks($lists) {
-    $webhook_url = $GLOBALS['base_url'] . '/'
-      . CAMPAIGNION_NEWSLETTERS_MAILCHIMP_WEBHOOK_URL;
+    $webhook_url = $GLOBALS['base_url'] . '/' . static::WEBHOOK_PATH;
 
     foreach ($lists as $list) {
       // Get existing webhook URLs.

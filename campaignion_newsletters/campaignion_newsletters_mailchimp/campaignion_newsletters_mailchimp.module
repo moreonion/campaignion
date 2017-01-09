@@ -7,17 +7,12 @@
 use \Drupal\campaignion_newsletters_mailchimp\MailChimp;
 use \Drupal\campaignion_newsletters\Subscription;
 
-define('CAMPAIGNION_NEWSLETTERS_MAILCHIMP_WEBHOOK_URL',
-  'campaignion_newsletters_mailchimp_webhook');
-
 /**
  * Implements hook_menu().
  */
 function campaignion_newsletters_mailchimp_menu() {
-  $items = array();
-
   // webhook handler
-  $items[CAMPAIGNION_NEWSLETTERS_MAILCHIMP_WEBHOOK_URL] = array(
+  $items[MailChimp::WEBHOOK_PATH] = array(
     'title' => 'Webhook',
     'page callback' => 'campaignion_newsletters_mailchimp_webhook',
     'access callback' => TRUE,
