@@ -30,9 +30,9 @@ class MailChimpTest extends \DrupalUnitTestCase {
     list($api, $provider) = $this->mockChimp();
     $paging = ['offset' => 0, 'count' => 100];
     $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
-    $list_query = ['fields' => 'lists.id,lists.name'] + $paging;
-    $merge_query = ['fields' => 'merge_fields.tag'] + $paging;
-    $webhook_query = ['fields' => 'webhooks.url'] + $paging;
+    $list_query = ['fields' => 'lists.id,lists.name,total_items'] + $paging;
+    $merge_query = ['fields' => 'merge_fields.tag,total_items'] + $paging;
+    $webhook_query = ['fields' => 'webhooks.url,total_items'] + $paging;
     $api->expects($this->exactly(5))->method('send')->withConsecutive(
       [$this->equalTo('/lists'), $this->equalTo($list_query)],
       [$this->equalTo('/lists/a1234/merge-fields'), $this->equalTo($merge_query)],
