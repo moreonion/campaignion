@@ -2,8 +2,6 @@ name = Campaignion Newsletters (Mailchimp)
 description = Mailchimp Integration for Campaignion Newsletters
 package = Campaignion
 core = 7.x
-version = 7.x-1.0
-project = campaignion
 
 dependencies[] = campaignion_newsletters
 dependencies[] = libraries
