@@ -11,12 +11,14 @@ class Client {
   protected $options;
 
   /**
+   * Constructor.
+   *
    * @param string $endpoint
    *   The base-URL for this API.
    * @param array $options
    *   Default options for all requests ie. credentials for Basic Auth.
    */
-  public function __construct($endpoint, $options = []) {
+  public function __construct($endpoint, array $options = []) {
     $this->endpoint = $endpoint;
     $this->options = $options;
   }
@@ -34,7 +36,7 @@ class Client {
    * @return array
    *   The decoded data from the response.
    */
-  public function get($path, $query = [], $options = []) {
+  public function get($path, array $query = [], array $options = []) {
     $options['method'] = 'GET';
     return $this->send($path, $query, NULL, $options);
   }
@@ -44,17 +46,17 @@ class Client {
    *
    * @param string $path
    *   The path to call.
-   * @param mixed $data
-   *   JSON encodeable data.
    * @param array $query
    *   An array of query parameters.
+   * @param mixed $data
+   *   JSON encodeable data.
    * @param array $options
    *   Options for @see drupal_http_request().
    *
    * @return array
    *   The decoded data from the response.
    */
-  public function post($path, $query = [], $data = NULL, $options = []) {
+  public function post($path, array $query = [], $data = NULL, array $options = []) {
     $options['method'] = 'POST';
     return $this->send($path, $query, $data, $options);
   }
@@ -64,17 +66,17 @@ class Client {
    *
    * @param string $path
    *   The path to call.
-   * @param mixed $data
-   *   JSON encodeable data.
    * @param array $query
    *   An array of query parameters.
+   * @param mixed $data
+   *   JSON encodeable data.
    * @param array $options
    *   Options for @see drupal_http_request().
    *
    * @return array
    *   The decoded data from the response.
    */
-  public function put($path, $query = [], $data = NULL, $options = []) {
+  public function put($path, array $query = [], $data = NULL, array $options = []) {
     $options['method'] = 'PUT';
     return $this->send($path, $query, $data, $options);
   }
@@ -92,7 +94,7 @@ class Client {
    * @return array
    *   The decoded data from the response.
    */
-  public function delete($path, $query = [], $options = []) {
+  public function delete($path, array $query = [], array $options = []) {
     $options['method'] = 'DELETE';
     return $this->send($path, $query, NULL, $options);
   }

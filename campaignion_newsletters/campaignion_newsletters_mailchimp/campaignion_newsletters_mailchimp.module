@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Campaignion newsletter Mailchimp integration module.
@@ -11,7 +12,7 @@ use \Drupal\campaignion_newsletters\Subscription;
  * Implements hook_menu().
  */
 function campaignion_newsletters_mailchimp_menu() {
-  // webhook handler
+  // Webhook handler.
   $items[MailChimp::WEBHOOK_PATH] = array(
     'title' => 'Webhook',
     'page callback' => 'campaignion_newsletters_mailchimp_webhook',
@@ -39,6 +40,7 @@ function campaignion_newsletters_mailchimp_campaignion_newsletters_provider_info
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
  * Implements hook_form_campaignion_newsletters_admin_settings_alter().
  */
 function campaignion_newsletters_mailchimp_form_campaignion_newsletters_admin_settings_alter(&$form, &$form_state) {
@@ -57,7 +59,7 @@ function campaignion_newsletters_mailchimp_get_key($name) {
 }
 
 /**
- * Page callback for MailChimps webhooks
+ * Page callback for MailChimps webhooks.
  */
 function campaignion_newsletters_mailchimp_webhook() {
   if (!empty($_POST['data']) && $_POST['data']['action'] === 'unsub') {

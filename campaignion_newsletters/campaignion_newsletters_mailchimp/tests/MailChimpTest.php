@@ -5,13 +5,30 @@ namespace Drupal\campaignion_newsletters_mailchimp;
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\QueueItem;
 
+use \Drupal\campaignion_newsletters_mailchimp\Rest\ApiError;
+use \Drupal\campaignion_newsletters_mailchimp\Rest\HttpError;
+
+/**
+ * Test the MailChimp newsletter provider.
+ */
 class MailChimpTest extends \DrupalUnitTestCase {
 
   public function test_key2dc_validKey() {
     $this->assertEquals('us12', MailChimp::key2dc('testkey-us12'));
   }
 
-  protected function mockChimp($methods = []) {
+  /**
+   * Generate a MailChimpClient instance with a stubbed out send method.
+   *
+   * @param string[] $methods
+   *   Other methods to stub out.
+   *
+   * @return array
+   *   An array with two elements:
+   *     1. The stubbed API.
+   *     2. A MailChimp instance using this API.
+   */
+  protected function mockChimp(array $methods = []) {
     $methods[] = 'send';
     $api = $this->getMockBuilder(Rest\MailChimpClient::class)
       ->setMethods($methods)
@@ -92,7 +109,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
       $this->equalTo("/lists/a1234/members/$hash"),
       $this->anything(),
       $this->equalTo(['status' => 'unsubscribed'])
-    )->will($this->throwException(Rest\ApiError::fromHttpError(new Rest\HttpError((object) [
+    )->will($this->throwException(ApiError::fromHttpError(new HttpError((object) [
       'code' => 404,
       'status_message' => 'Resource not found',
       'data' => json_encode(['title' => 'Resource not found', 'detail' => '', 'errors' => []]),

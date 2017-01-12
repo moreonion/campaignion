@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @file
+ * Document hooks invoked by this module.
+ *
+ * Code in this file only serves documentation purposes and is never executed.
+ */
+
 use \Drupal\campaignion_newsletters\Subscription;
 
 /**

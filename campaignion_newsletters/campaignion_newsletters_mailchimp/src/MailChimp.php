@@ -1,10 +1,4 @@
 <?php
-/**
- * @file
- * implements NewsletterProvider using MailChimps API.
- *
- * See http://apidocs.mailchimp.com/ for documentation.
- */
 
 namespace Drupal\campaignion_newsletters_mailchimp;
 
@@ -13,6 +7,12 @@ use \Drupal\campaignion_newsletters\ProviderBase;
 use \Drupal\campaignion_newsletters\QueueItem;
 use \Drupal\campaignion_newsletters\Subscription;
 
+use \Drupal\campaignion_newsletters_mailchimp\Rest\ApiError;
+use \Drupal\campaignion_newsletters_mailchimp\Rest\MailChimpClient;
+
+/**
+ * Newsletter provider implementation for MailChimp.
+ */
 class MailChimp extends ProviderBase {
 
   const WEBHOOK_PATH = 'campaignion_newsletters_mailchimp_webhook';
@@ -20,14 +20,20 @@ class MailChimp extends ProviderBase {
   protected $account;
   protected $api;
 
+  /**
+   * Extract the DC from a valid API-key.
+   */
   public static function key2dc($key) {
     return substr($key, strrpos($key, '-') + 1);
   }
 
+  /**
+   * Construct instance from an parameters array as produced by the config form.
+   */
   public static function fromParameters(array $params) {
     $dc = static::key2dc($params['key']);
     $endpoint = "https://campaignion:{$params['key']}@{$dc}.api.mailchimp.com/3.0";
-    return new static(new Rest\MailChimpClient($endpoint), $params['name']);
+    return new static(new MailChimpClient($endpoint), $params['name']);
   }
 
   /**
@@ -42,6 +48,8 @@ class MailChimp extends ProviderBase {
    * Get all interest groups for a list.
    *
    * @param string $list_id
+   *   List identifier (MailChimp).
+   *
    * @return array
    *   Associative array of interest group names keyed by the group id. Groups
    *   in different categories are not discerned.
@@ -83,7 +91,7 @@ class MailChimp extends ProviderBase {
     try {
       $this->setWebhooks($lists);
     }
-    catch (Rest\ApiError $e) {
+    catch (ApiError $e) {
       watchdog_exception('campaignion_newsletters_mailchimp', $e);
     }
 
@@ -95,9 +103,10 @@ class MailChimp extends ProviderBase {
    *
    * @param \Drupal\campaignion_newsletters\NewsletterList[] $lists
    *   Register webhooks for these $lists.
+   *
    * @throws \Drupal\campaignion_newsletters_mailchimp\Rest\ApiError
    */
-  protected function setWebhooks($lists) {
+  protected function setWebhooks(array $lists) {
     $webhook_url = $GLOBALS['base_url'] . '/' . static::WEBHOOK_PATH;
 
     foreach ($lists as $list) {
@@ -133,7 +142,6 @@ class MailChimp extends ProviderBase {
    *   an array of subscribers.
    */
   public function getSubscribers($list) {
-    $page = 0;
     $receivers = array();
     $list_id = $list->data->id;
 
@@ -166,13 +174,15 @@ class MailChimp extends ProviderBase {
     return $attributes;
   }
 
+  /**
+   * Generate the QueueItem::data attribute for a given subscription.
+   */
   public function data(Subscription $subscription) {
     $data['merge_fields'] = $this->attributeData($subscription);
     // Let other modules alter the data (ie. for adding interest groups).
     drupal_alter('campaignion_newsletters_mailchimp_data', $data, $subscription);
     $fingerprint = sha1(serialize($data));
     return array($data, $fingerprint);
-
   }
 
   /**
@@ -208,7 +218,7 @@ class MailChimp extends ProviderBase {
         'status' => 'unsubscribed',
       ]);
     }
-    catch (Rest\ApiError $e) {
+    catch (ApiError $e) {
       // Ignore 404 errors.
       if ($e->getCode() != 404) {
         throw $e;

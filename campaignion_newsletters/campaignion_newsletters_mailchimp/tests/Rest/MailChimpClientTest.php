@@ -2,8 +2,14 @@
 
 namespace Drupal\campaignion_newsletters_mailchimp\Rest;
 
+/**
+ * Test the MailChimpClient class.
+ */
 class MailChimpClientTest extends \DrupalUnitTestCase {
 
+  /**
+   * Produce a MailChimpClient class with stubbed get and send methods.
+   */
   protected function mockClient() {
     $api = $this->getMockBuilder(MailChimpClient::class)
       ->setMethods(['get', 'send'])
@@ -49,4 +55,3 @@ class MailChimpClientTest extends \DrupalUnitTestCase {
   }
 
 }
-

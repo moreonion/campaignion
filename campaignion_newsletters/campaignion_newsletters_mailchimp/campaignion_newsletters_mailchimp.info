@@ -6,5 +6,3 @@ core = 7.x
 dependencies[] = campaignion_newsletters
 dependencies[] = libraries
 dependencies[] = psr0
-
-

@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * @file
+ * Define install, update and uninstall functions.
+ */
+
+use \Drupal\campaignion_newsletters\NewsletterList;
+use \Drupal\campaignion_newsletters\ProviderFactory;
+use \Drupal\campaignion_newsletters\QueueItem;
+
+/**
  * Implements hook_uninstall().
  */
 function campaignion_newsletters_mailchimp_uninstall() {
@@ -13,7 +22,7 @@ function campaignion_newsletters_mailchimp_uninstall() {
  * Migrate old queue items to the new API version.
  */
 function campaignion_newsletters_mailchimp_update_1() {
-  $factory = \Drupal\campaignion_newsletters\ProviderFactory::getInstance();
+  $factory = ProviderFactory::getInstance();
   foreach ($factory->providers() as $source) {
     if (substr($source, 0, 10) == 'MailChimp-') {
       $provider = $factory->providerByKey($source);
@@ -29,14 +38,14 @@ function campaignion_newsletters_mailchimp_update_1() {
   $lists = [];
   $get_list = function ($list_id) use (&$lists) {
     if (!isset($lists[$list_id])) {
-      $lists[$list_id] = \Drupal\campaignion_newsletters\NewsletterList::load($list_id);
+      $lists[$list_id] = NewsletterList::load($list_id);
     }
     return $lists[$list_id];
   };
 
   while ($ids = db_query($sql, [':last_id' => $last_id])->fetchCol()) {
     foreach ($ids as $id) {
-      $item = \Drupal\campaignion_newsletters\QueueItem::byId($id);
+      $item = QueueItem::byId($id);
       $data = $item->data;
       $new_data = [];
 

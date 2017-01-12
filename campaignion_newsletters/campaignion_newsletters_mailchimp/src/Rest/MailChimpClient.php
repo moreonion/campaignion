@@ -9,6 +9,13 @@ namespace Drupal\campaignion_newsletters_mailchimp\Rest;
  */
 class MailChimpClient extends Client {
 
+  /**
+   * Get a list of data from the API and page through all pages.
+   *
+   * This function issues multiple get requests to the API to get all items from
+   * a list. It uses the APIs "total_amount" count to decide whether there are
+   * additional items left.
+   */
   public function getPaged($path, $query = [], $options = [], $size = 10, $list_key = NULL) {
     $items = [];
     $query['count'] = $size;
@@ -21,7 +28,7 @@ class MailChimpClient extends Client {
     }
     $offset = 0;
     $next_page = TRUE;
-    while ($next_page)  {
+    while ($next_page) {
       $result = $this->get($path, ['offset' => $offset] + $query, $options);
       $new_items = $result[$list_key];
       $items = array_merge($items, $new_items);
@@ -33,6 +40,9 @@ class MailChimpClient extends Client {
     return $items;
   }
 
+  /**
+   * Wrap the send method to generate ApiError instances in case of an error.
+   */
   protected function send($path, $query = [], $data = NULL, $options = []) {
     try {
       return parent::send($path, $query, $data, $options);
