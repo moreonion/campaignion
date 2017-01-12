@@ -106,16 +106,23 @@ class MailChimp extends ProviderBase {
    *
    * @throws \Drupal\campaignion_newsletters_mailchimp\Rest\ApiError
    */
-  protected function setWebhooks(array $lists) {
-    $webhook_url = $GLOBALS['base_url'] . '/' . static::WEBHOOK_PATH;
+  public function setWebhooks(array $lists) {
+    $base_url = $GLOBALS['base_url'];
+    $webhook_url = $base_url . '/' . static::WEBHOOK_PATH;
 
     foreach ($lists as $list) {
       // Get existing webhook URLs.
       $webhook_urls = [];
-      foreach ($this->api->getPaged("/lists/{$list->identifier}/webhooks", ['fields' => 'webhooks.url'], [], 100) as $webhook) {
-        $webhook_urls[$webhook['url']] = TRUE;
+      foreach ($this->api->getPaged("/lists/{$list->identifier}/webhooks", ['fields' => 'webhooks.id,webhooks.url'], [], 100) as $webhook) {
+        if (substr($webhook['url'], 0, strlen($base_url)) == $base_url) {
+          $webhook_urls[$webhook['url']] = $webhook['id'];
+        }
       }
-      if (!isset($webhook_urls[$webhook_url])) {
+
+      if (isset($webhook_urls[$webhook_url])) {
+        unset($webhook_urls[$webhook_url]);
+      }
+      else {
         $this->api->post("/lists/{$list->identifier}/webhooks", [], [
           'url' => $webhook_url,
           'events' => [
@@ -131,6 +138,11 @@ class MailChimp extends ProviderBase {
             'api' => TRUE,
           ],
         ]);
+      }
+
+      // Now delete all webhooks that we don't need anymore.
+      foreach ($webhook_urls as $id) {
+        $this->api->delete("/lists/{$list->identifier}/webhooks/$id");
       }
     }
   }

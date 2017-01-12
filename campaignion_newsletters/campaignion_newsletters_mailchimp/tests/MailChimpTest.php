@@ -49,7 +49,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
     $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
     $list_query = ['fields' => 'lists.id,lists.name,total_items'] + $paging;
     $merge_query = ['fields' => 'merge_fields.tag,total_items'] + $paging;
-    $webhook_query = ['fields' => 'webhooks.url,total_items'] + $paging;
+    $webhook_query = ['fields' => 'webhooks.id,webhooks.url,total_items'] + $paging;
     $api->expects($this->exactly(5))->method('send')->withConsecutive(
       [$this->equalTo('/lists'), $this->equalTo($list_query)],
       [$this->equalTo('/lists/a1234/merge-fields'), $this->equalTo($merge_query)],
@@ -139,6 +139,31 @@ class MailChimpTest extends \DrupalUnitTestCase {
     $groups = $provider->getInterestGroups($list_id);
     $this->assertCount(5, $groups);
     $this->assertArrayHasKey('bd6e66465f', $groups);
+  }
+
+  /**
+   * Test that obsolete webhooks are deleted when updating webhooks for a list.
+   */
+  public function testSetWebhooksDeletesOldWebhooks() {
+    $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
+    $list_o = NewsletterList::fromData([
+      'identifier' => $list['id'],
+      'title'      => $list['name'],
+      'source'     => 'MailChimp-testname',
+      'data'       => (object) ($list + ['merge_vars' => []]),
+    ]);
+    list($api, $provider) = $this->mockChimp(['post', 'delete', 'getPaged']);
+
+    $api->expects($this->once())->method('getPaged')->with(
+      $this->equalTo('/lists/a1234/webhooks')
+    )->will($this->returnValue([
+      ['url' => $GLOBALS['base_url'] . '/old-webhook', 'id' => 'oldhook'],
+    ]));
+    $api->expects($this->once())->method('delete')->with(
+      $this->equalTo('/lists/a1234/webhooks/oldhook')
+    );
+
+    $provider->setWebhooks([$list_o]);
   }
 
 }
