@@ -13,12 +13,14 @@ use \Drupal\campaignion_newsletters\Subscription;
  */
 function campaignion_newsletters_mailchimp_menu() {
   // Webhook handler.
-  $items[MailChimp::WEBHOOK_PATH] = array(
+  $items[MailChimp::WEBHOOK_PATH . '/%/%'] = [
     'title' => 'Webhook',
     'page callback' => 'campaignion_newsletters_mailchimp_webhook',
-    'access callback' => TRUE,
+    'page arguments' => [1],
+    'access callback' => 'campaignion_newsletters_mailchimp_webhook_access',
+    'access arguments' => [1, 2],
     'type' => MENU_CALLBACK,
-  );
+  ];
 
   return $items;
 }
@@ -59,14 +61,17 @@ function campaignion_newsletters_mailchimp_get_key($name) {
 }
 
 /**
+ * Access callback: MailChimp webhooks.
+ */
+function campaignion_newsletters_mailchimp_webhook_access($list_id, $hash) {
+  return $hash === MailChimp::webhookHash($list_id) && $_SERVER['REQUEST_METHOD'] == 'POST';
+}
+
+/**
  * Page callback for MailChimps webhooks.
  */
-function campaignion_newsletters_mailchimp_webhook() {
+function campaignion_newsletters_mailchimp_webhook($list_id) {
   if (!empty($_POST['data']) && $_POST['data']['action'] === 'unsub') {
-    $list_id = db_query('SELECT list_id FROM {campaignion_newsletters_lists} ' .
-              'WHERE identifier=:identifier', array(
-                ':identifier' => check_plain($_POST['data']['list_id']),
-              ))->fetchField();
-    Subscription::byData($list_id, $_POST['data']['email'])->delete();
+    Subscription::byData($list_id, $_POST['data']['email'])->delete(TRUE);
   }
 }

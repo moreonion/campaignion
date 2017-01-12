@@ -159,6 +159,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
     )->will($this->returnValue([
       ['url' => $GLOBALS['base_url'] . '/old-webhook', 'id' => 'oldhook'],
     ]));
+    $api->expects($this->once())->method('post');
     $api->expects($this->once())->method('delete')->with(
       $this->equalTo('/lists/a1234/webhooks/oldhook')
     );

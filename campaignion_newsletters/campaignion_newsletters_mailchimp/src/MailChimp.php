@@ -15,7 +15,7 @@ use \Drupal\campaignion_newsletters_mailchimp\Rest\MailChimpClient;
  */
 class MailChimp extends ProviderBase {
 
-  const WEBHOOK_PATH = 'campaignion_newsletters_mailchimp_webhook';
+  const WEBHOOK_PATH = 'mailchimp-webhook';
 
   protected $account;
   protected $api;
@@ -25,6 +25,13 @@ class MailChimp extends ProviderBase {
    */
   public static function key2dc($key) {
     return substr($key, strrpos($key, '-') + 1);
+  }
+
+  /**
+   * Generate the correct hash signature for a webhook call.
+   */
+  public static function webhookHash($list_id) {
+    return drupal_hmac_base64("mailchimp:webhook:$list_id", drupal_get_private_key());
   }
 
   /**
@@ -108,7 +115,6 @@ class MailChimp extends ProviderBase {
    */
   public function setWebhooks(array $lists) {
     $base_url = $GLOBALS['base_url'];
-    $webhook_url = $base_url . '/' . static::WEBHOOK_PATH;
 
     foreach ($lists as $list) {
       // Get existing webhook URLs.
@@ -118,6 +124,11 @@ class MailChimp extends ProviderBase {
           $webhook_urls[$webhook['url']] = $webhook['id'];
         }
       }
+
+      $hash = static::webhookHash($list->list_id);
+      $webhook_url = url(static::WEBHOOK_PATH . "/{$list->list_id}/$hash", [
+        'absolute' => TRUE,
+      ]);
 
       if (isset($webhook_urls[$webhook_url])) {
         unset($webhook_urls[$webhook_url]);
