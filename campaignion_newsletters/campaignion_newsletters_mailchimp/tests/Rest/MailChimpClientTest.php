@@ -18,7 +18,10 @@ class MailChimpClientTest extends \DrupalUnitTestCase {
     return $api;
   }
 
-  public function test_getPaged_empty() {
+  /**
+   * Test MailChimpClient::getPaged() for empty result sets.
+   */
+  public function testGetPagedEmpty() {
     $api = $this->mockClient();
     $api->expects($this->once())->method('get')->with(
       $this->equalTo('/lists'),
@@ -29,7 +32,10 @@ class MailChimpClientTest extends \DrupalUnitTestCase {
     $api->getPaged('/lists');
   }
 
-  public function test_getPaged_onePage() {
+  /**
+   * Test MailChimpClient::getPaged() for one page.
+   */
+  public function testGetPagedOnePage() {
     $api = $this->mockClient();
     $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
     $api->expects($this->once())->method('get')->with(
@@ -41,7 +47,10 @@ class MailChimpClientTest extends \DrupalUnitTestCase {
     $api->getPaged('/lists');
   }
 
-  public function test_getPaged_twoPages() {
+  /**
+   * Test MailChimpClient::getPaged() for two pages.
+   */
+  public function testGetPagedTwoPages() {
     $api = $this->mockClient();
     $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
     $api->expects($this->exactly(2))->method('get')->withConsecutive(

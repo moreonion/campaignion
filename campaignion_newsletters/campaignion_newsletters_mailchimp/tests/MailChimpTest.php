@@ -7,13 +7,17 @@ use \Drupal\campaignion_newsletters\QueueItem;
 
 use \Drupal\campaignion_newsletters_mailchimp\Rest\ApiError;
 use \Drupal\campaignion_newsletters_mailchimp\Rest\HttpError;
+use \Drupal\campaignion_newsletters_mailchimp\Rest\MailChimpClient;
 
 /**
  * Test the MailChimp newsletter provider.
  */
 class MailChimpTest extends \DrupalUnitTestCase {
 
-  public function test_key2dc_validKey() {
+  /**
+   * Test MailChimp::key2dc() with a valid key.
+   */
+  public function testKey2dcValidKey() {
     $this->assertEquals('us12', MailChimp::key2dc('testkey-us12'));
   }
 
@@ -30,20 +34,26 @@ class MailChimpTest extends \DrupalUnitTestCase {
    */
   protected function mockChimp(array $methods = []) {
     $methods[] = 'send';
-    $api = $this->getMockBuilder(Rest\MailChimpClient::class)
+    $api = $this->getMockBuilder(MailChimpClient::class)
       ->setMethods($methods)
       ->disableOriginalConstructor()
       ->getMock();
     return [$api, new MailChimp($api, 'testname')];
   }
 
-  public function test_getLists_noLists() {
+  /**
+   * Test MailChimp::getLists() for empty result sets.
+   */
+  public function testGetListsNoLists() {
     list($api, $provider) = $this->mockChimp();
     $api->expects($this->once())->method('send')->willReturn(['lists' => []]);
     $this->assertEquals([], $provider->getLists());
   }
 
-  public function test_getLists_oneList() {
+  /**
+   * Test MailChimp::getLists() when exactly one list is yielded.
+   */
+  public function testGetListsOneList() {
     list($api, $provider) = $this->mockChimp();
     $paging = ['offset' => 0, 'count' => 100];
     $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
@@ -61,21 +71,26 @@ class MailChimpTest extends \DrupalUnitTestCase {
       ['merge_fields' => [], 'total_items' => 0],
       ['categories' => [], 'total_items' => 0],
       ['webhooks' => [], 'total_items' => 0],
-      $this->throwException(Rest\ApiError::fromHttpError(new Rest\HttpError((object) [
+      $this->throwException(ApiError::fromHttpError(new HttpError((object) [
         'code' => 400,
         'status_message' => 'Bad Request',
         'data' => json_encode(['title' => '', 'detail' => '', 'errors' => []]),
       ]), 'POST', '/lists/a1234/webhooks'))
     ));
-    $this->assertEquals([NewsletterList::fromData([
-      'identifier' => $list['id'],
-      'title'      => $list['name'],
-      'source'     => 'MailChimp-testname',
-      'data'       => (object) ($list + ['merge_vars' => [], 'groups' => []]),
-    ])], $provider->getLists());
+    $this->assertEquals([
+      NewsletterList::fromData([
+        'identifier' => $list['id'],
+        'title'      => $list['name'],
+        'source'     => 'MailChimp-testname',
+        'data'       => (object) ($list + ['merge_vars' => [], 'groups' => []]),
+      ]),
+    ], $provider->getLists());
   }
 
-  public function test_subscribe_newContact() {
+  /**
+   * Test MailChimp::subscribe() with a new contact.
+   */
+  public function testSubscribeNewContact() {
     $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
     $list_o = NewsletterList::fromData([
       'identifier' => $list['id'],
@@ -83,15 +98,19 @@ class MailChimpTest extends \DrupalUnitTestCase {
       'source'     => 'MailChimp-testname',
       'data'       => (object) ($list + ['merge_vars' => []]),
     ]);
-    list($api, $provider) = $this->mockChimp();
+    list($api, $provider) = $this->mockChimp(['put']);
     $item = new QueueItem([
       'args' => ['send_optin' => FALSE],
       'data' => ['FNAME' => 'Test', 'LNAME' => 'Test'],
     ]);
+    $api->expects($this->once())->method('put');
     $provider->subscribe($list_o, $item);
   }
 
-  public function test_unsubscribe_nonExisting() {
+  /**
+   * Test MailChimp::unsubscribe() for a non-existing subscription.
+   */
+  public function testUnsubscribeNonExisting() {
     $list = ['id' => 'a1234', 'name' => 'mocknewsletters'];
     $list_o = NewsletterList::fromData([
       'identifier' => $list['id'],
@@ -112,12 +131,19 @@ class MailChimpTest extends \DrupalUnitTestCase {
     )->will($this->throwException(ApiError::fromHttpError(new HttpError((object) [
       'code' => 404,
       'status_message' => 'Resource not found',
-      'data' => json_encode(['title' => 'Resource not found', 'detail' => '', 'errors' => []]),
+      'data' => json_encode([
+        'title' => 'Resource not found',
+        'detail' => '',
+        'errors' => [],
+      ]),
     ]), 'DELETE', "/lists/a1234/members/$hash")));
     $provider->unsubscribe($list_o, $item);
   }
 
-  public function test_getInterestGroups_docExample() {
+  /**
+   * Test MailChimp::getInterestGroups() with the example from the docs.
+   */
+  public function testGetInterestGroupsDocExample() {
     $list_id = '57afe96172';
     $category_id = 'a1e9f4b7f6';
     list($api, $provider) = $this->mockChimp(['get']);
@@ -127,13 +153,16 @@ class MailChimpTest extends \DrupalUnitTestCase {
       [$this->equalTo("/lists/$list_id/interest-categories/$category_id/interests")]
     )->will($this->onConsecutiveCalls(
       ['categories' => [['id' => $category_id]], 'total_items' => 1],
-      ['interests' => [
-        ['id' => "9143cf3bd1", 'name' => "Sometimes you just gotta 'spress yourself."],
-        ['id' => "3a2a927344", 'name' => "I'm just a poor boy from a poor family."],
-        ['id' => "f9c8f5f0ff", 'name' => "What's with all these cute kittens?"],
-        ['id' => "f231b09abc", 'name' => "I knock your socks off with my beat box."],
-        ['id' => "bd6e66465f", 'name' => "Two chimps walk into a bar. The other chimp ducks."],
-      ], 'total_items' => 5]
+      [
+        'interests' => [
+          ['id' => "9143cf3bd1", 'name' => "Sometimes you just gotta 'spress yourself."],
+          ['id' => "3a2a927344", 'name' => "I'm just a poor boy from a poor family."],
+          ['id' => "f9c8f5f0ff", 'name' => "What's with all these cute kittens?"],
+          ['id' => "f231b09abc", 'name' => "I knock your socks off with my beat box."],
+          ['id' => "bd6e66465f", 'name' => "Two chimps walk into a bar. The other chimp ducks."],
+        ],
+        'total_items' => 5,
+      ]
     ));
 
     $groups = $provider->getInterestGroups($list_id);
@@ -168,4 +197,3 @@ class MailChimpTest extends \DrupalUnitTestCase {
   }
 
 }
-
