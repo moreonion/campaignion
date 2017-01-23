@@ -2,8 +2,8 @@
 
 namespace Drupal\campaignion_newsletters_dotmailer\Api;
 
-use \Drupal\campaignion_newsletters_dotmailer\Rest\Client as _Client;
-use \Drupal\campaignion_newsletters_dotmailer\Rest\HttpError;
+use \Drupal\little_helpers\Rest\Client as _Client;
+use \Drupal\little_helpers\Rest\HttpError;
 
 use \Drupal\campaignion_newsletters\ApiPersistentError;
 use \Drupal\campaignion_newsletters\ApiError;
@@ -14,7 +14,7 @@ class Client extends _Client {
     parent::__construct($endpoint);
   }
 
-  protected function send($path, $query = [], $data = NULL, $options = []) {
+  protected function send($path, array $query = [], $data = NULL, array $options = []) {
     try {
       return parent::send($path, $query, $data, $options);
     }

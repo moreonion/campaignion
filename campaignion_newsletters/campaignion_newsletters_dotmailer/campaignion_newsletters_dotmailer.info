@@ -4,4 +4,5 @@ package = Campaignion
 core = 7.x
 
 dependencies[] = campaignion_newsletters
+dependencies[] = little_helpers
 dependencies[] = psr0

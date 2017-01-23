@@ -4,9 +4,9 @@ namespace Drupal\campaignion_newsletters_mailchimp;
 
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\QueueItem;
+use \Drupal\little_helpers\Rest\HttpError;
 
 use \Drupal\campaignion_newsletters_mailchimp\Rest\ApiError;
-use \Drupal\campaignion_newsletters_mailchimp\Rest\HttpError;
 use \Drupal\campaignion_newsletters_mailchimp\Rest\MailChimpClient;
 
 /**

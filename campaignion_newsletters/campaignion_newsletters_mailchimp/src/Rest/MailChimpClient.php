@@ -2,6 +2,9 @@
 
 namespace Drupal\campaignion_newsletters_mailchimp\Rest;
 
+use \Drupal\little_helpers\Rest\Client;
+use \Drupal\little_helpers\Rest\HttpError;
+
 /**
  * MailChimp specific REST-client.
  *
@@ -43,7 +46,7 @@ class MailChimpClient extends Client {
   /**
    * Wrap the send method to generate ApiError instances in case of an error.
    */
-  protected function send($path, $query = [], $data = NULL, $options = []) {
+  protected function send($path, array $query = [], $data = NULL, array $options = []) {
     try {
       return parent::send($path, $query, $data, $options);
     }

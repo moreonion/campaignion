@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_newsletters_mailchimp\Rest;
 
 use \Drupal\campaignion_newsletters\ApiError as _ApiError;
+use \Drupal\little_helpers\Rest\HttpError;
 
 /**
  * An exception that signifies an MailChimp API error.
