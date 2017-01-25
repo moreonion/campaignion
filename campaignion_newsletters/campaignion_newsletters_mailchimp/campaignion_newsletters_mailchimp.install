@@ -15,6 +15,7 @@ use \Drupal\campaignion_newsletters\QueueItem;
 function campaignion_newsletters_mailchimp_uninstall() {
   variable_del(array(
     'mailchimp_api_keys',
+    'campaignion_newsletters_mailchimp_register_webhooks',
   ));
 }
 

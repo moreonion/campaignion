@@ -106,6 +106,13 @@ class MailChimp extends ProviderBase {
   }
 
   /**
+   * Check whether registering webhooks is enabled.
+   */
+  protected function registerWebhooks() {
+    return variable_get('campaignion_newsletters_mailchimp_register_webhooks', TRUE);
+  }
+
+  /**
    * Register webhooks for a set of lists (if needed).
    *
    * @param \Drupal\campaignion_newsletters\NewsletterList[] $lists
@@ -115,6 +122,7 @@ class MailChimp extends ProviderBase {
    */
   public function setWebhooks(array $lists) {
     $base_url = $GLOBALS['base_url'];
+    $register = $this->registerWebhooks();
 
     foreach ($lists as $list) {
       // Get existing webhook URLs.
@@ -133,7 +141,7 @@ class MailChimp extends ProviderBase {
       if (isset($webhook_urls[$webhook_url])) {
         unset($webhook_urls[$webhook_url]);
       }
-      else {
+      elseif($register) {
         $this->api->post("/lists/{$list->identifier}/webhooks", [], [
           'url' => $webhook_url,
           'events' => [
