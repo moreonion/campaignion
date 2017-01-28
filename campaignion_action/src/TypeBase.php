@@ -15,7 +15,9 @@ abstract class TypeBase implements TypeInterface {
 
   public function __construct($type, array $parameters = array()) {
     $this->type = $type;
-    $this->parameters = $parameters;
+    $this->parameters = $parameters + [
+      'action_class' => '\\Drupal\\campaignion_action\\ActionBase',
+    ];
   }
 
   public function defaultTemplateNid() {
@@ -24,8 +26,14 @@ abstract class TypeBase implements TypeInterface {
     return array_shift($ids);
   }
 
+  public function wizard($node = NULL) {
+    $class = $this->parameters['wizard_class'];
+    return new $class($this->parameters, $node, $this->type);
+  }
+
   public function actionFromNode($node) {
-    return new ActionBase($this, $node);
+    $class = $this->parameters['action_class'];
+    return new $class($this, $node);
   }
 
   /**

@@ -26,7 +26,10 @@ class Loader {
 
   public function __construct($types_info) {
     foreach ($types_info as $type => &$info) {
-      $info += array('parameters' => array());
+      $info += [
+        'class' => '\\Drupal\\campaignion_action\\TypeBase',
+        'parameters' => [],
+      ];
     }
     $this->info = $types_info;
     $this->types = &drupal_static(__CLASS__ . '::types', []);
