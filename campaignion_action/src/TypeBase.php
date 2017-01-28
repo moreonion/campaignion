@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_action;
 
 abstract class TypeBase implements TypeInterface {
+
   /**
    * Content-type
    */
@@ -18,7 +19,9 @@ abstract class TypeBase implements TypeInterface {
   }
 
   public function defaultTemplateNid() {
-    return NULL;
+    $uuid = $this->parameters['template_node_uuid'];
+    $ids = \entity_get_id_by_uuid('node', [$uuid]);
+    return array_shift($ids);
   }
 
   public function actionFromNode($node) {
@@ -31,4 +34,5 @@ abstract class TypeBase implements TypeInterface {
   public function isDonation() {
     return FALSE;
   }
+
 }
