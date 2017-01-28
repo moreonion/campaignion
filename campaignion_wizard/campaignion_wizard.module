@@ -89,8 +89,8 @@ function campaignion_wizard_redirect($path) {
  */
 function campaignion_wizard_new($type) {
   $type = str_replace('-', '_', $type);
-  if ($action_type = Loader::instance()->type($type)) {
-    return $action_type->wizard()->run('content');
+  if ($wizard = Loader::instance()->wizard($type)) {
+    return $wizard->run('content');
   }
   return drupal_not_found();
 }
@@ -99,8 +99,8 @@ function campaignion_wizard_new($type) {
  * Page callback for wizard/%node/%step.
  */
 function campaignion_wizard($node = NULL, $step = 'content') {
-  if ($action_type = Loader::instance()->type($node->type)) {
-    return $action_type->wizard($node)->run($step);
+  if ($wizard = Loader::instance()->wizard($node->type, $node)) {
+    return $wizard->run($step);
   }
   else {
     require_once drupal_get_path('module', 'node') . '/node.pages.inc';

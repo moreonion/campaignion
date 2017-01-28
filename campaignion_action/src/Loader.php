@@ -98,10 +98,30 @@ class Loader {
     if (!isset($node->action)) {
       $node->action = NULL;
       if ($type = $this->type($node->type)) {
-        $node->action = $type->actionFromNode($node);
+        $class = $this->info[$node->type]['action_class'];
+        $node->action = $class::fromTypeAnyNode($type, $node);
       }
     }
     return $node->action;
+  }
+
+  /**
+   * Return a wizard object for a node-type.
+   *
+   * @param string $type
+   *   The node-type.
+   * @param object|null $node
+   *   The node to edit. Create a new one if NULL.
+   *
+   * @return \Drupal\oowizard\Wizard
+   *  The wizard responsible for changing/adding actions of this type.
+   */
+  public function wizard($type, $node = NULL) {
+    if ($type_o = $this->type($type)) {
+      $info = $this->info[$type];
+      $class = $info['wizard_class'];
+      return new $class($info, $node, $type_o);
+    }
   }
 
   /**

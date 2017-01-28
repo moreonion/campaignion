@@ -27,17 +27,6 @@ abstract class TypeBase implements TypeInterface {
     return array_shift($ids);
   }
 
-  public function wizard($node = NULL) {
-    $class = $this->parameters['wizard_class'];
-    return new $class($this->parameters, $node, $this->type);
-  }
-
-  public function actionFromNode($node) {
-    $class = $this->parameters['action_class'];
-    return new $class($this, $node);
-  }
-
-
   /**
    * {@inheritdoc}
    */
