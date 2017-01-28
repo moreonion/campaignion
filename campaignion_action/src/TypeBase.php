@@ -17,6 +17,7 @@ abstract class TypeBase implements TypeInterface {
     $this->type = $type;
     $this->parameters = $parameters + [
       'action_class' => '\\Drupal\\campaignion_action\\ActionBase',
+      'donation' => FALSE,
     ];
   }
 
@@ -36,11 +37,12 @@ abstract class TypeBase implements TypeInterface {
     return new $class($this, $node);
   }
 
+
   /**
    * {@inheritdoc}
    */
   public function isDonation() {
-    return FALSE;
+    return $this->parameters['donation'];
   }
 
 }
