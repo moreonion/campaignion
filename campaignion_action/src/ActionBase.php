@@ -9,7 +9,6 @@ class ActionBase {
   public function __construct(TypeInterface $type, $node) {
     $this->type = $type;
     $this->node = $node;
-    $this->node->action = $this;
   }
 
   /**

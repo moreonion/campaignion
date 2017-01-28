@@ -92,9 +92,13 @@ class Loader {
    * Get action instance by node-type.
    */
   public function actionFromNode($node) {
-    if ($type = $this->type($node->type)) {
-      return $type->actionFromNode($node);
+    if (!isset($node->action)) {
+      $node->action = NULL;
+      if ($type = $this->type($node->type)) {
+        $node->action = $type->actionFromNode($node);
+      }
     }
+    return $node->action;
   }
 
   /**
