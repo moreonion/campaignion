@@ -85,7 +85,7 @@ class Loader {
       if (!empty($this->info[$type]['class'])) {
         $info = $this->info[$type];
         $class = $info['class'];
-        $this->types[$type] = new $class($type, $info['parameters']);
+        $this->types[$type] = new $class($type, $info + $info['parameters']);
       }
     }
     return $this->types[$type];
