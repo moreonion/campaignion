@@ -1,10 +1,18 @@
 <?php
 
+/**
+ * @file
+ * Document hooks invoked by this module.
+ *
+ * Code in this file only serves documentation purposes and is never executed.
+ */
+
 use \Drupal\campaignion_newsletters\Subscription;
 
 /**
- * Alter attributes before sending them to MailChimp.
+ * Alter data before sending it to MailChimp.
  */
-function hook_campaignion_newsletters_mailchimp_attributes_alter(array &$attributes, Subscription $subscription, $source) {
-  $attributes['SPECIAL'] = 'value';
+function hook_campaignion_newsletters_mailchimp_data_alter(array &$data, Subscription $subscription) {
+  $data['merge_fields']['SPECIAL'] = 'value';
+  $data['interests']['hashid'] = TRUE;
 }

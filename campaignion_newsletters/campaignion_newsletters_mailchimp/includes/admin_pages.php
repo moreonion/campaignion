@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Define the configuration form for this module's newsletter providers.
+ */
+
+/**
  * Implementation of campaignion_newsletters_mailchimp_form_campaignion_newsletters_admin_settings_alter().
  */
 function _campaignion_newsletters_mailchimp_form_campaignion_newsletters_admin_settings_alter(&$form, &$form_state) {
@@ -8,7 +13,6 @@ function _campaignion_newsletters_mailchimp_form_campaignion_newsletters_admin_s
   if (empty($library['installed'])) {
     drupal_set_message($library['error message'], 'error', FALSE);
   }
-
 
   $form['mailchimp'] = array(
     '#type' => 'fieldset',
@@ -68,8 +72,8 @@ function _campaignion_newsletters_mailchimp_form_campaignion_newsletters_admin_s
     '#value' => t('Add another key'),
     '#limit_validation_errors' => array(),
     '#ajax' => array(
-       'callback' => 'campaignion_newsletters_mailchimp_admin_ajax',
-       'wrapper' => 'mailchimp-api-keys-wrapper',
+      'callback' => 'campaignion_newsletters_mailchimp_admin_ajax',
+      'wrapper' => 'mailchimp-api-keys-wrapper',
     ),
     '#submit' => array('campaignion_newsletters_mailchimp_admin_add_more_submit'),
   );

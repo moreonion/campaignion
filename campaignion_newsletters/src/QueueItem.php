@@ -32,6 +32,15 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     }
   }
 
+  public static function byId($id) {
+    $table = static::$table;
+    $keys = [':id' => $id];
+    $result = db_query("SELECT * FROM {{$table}} WHERE id=:id", $keys);
+    if ($row = $result->fetch()) {
+      return new static($row, FALSE);
+    }
+  }
+
   public static function byData($data) {
     if ($item = static::load($data['list_id'], $data['email'])) {
       $item->__construct($data, FALSE);
