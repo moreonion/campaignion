@@ -1,0 +1,7 @@
+name = Mailchimp interest selector
+description = A webform component that lets users select a MailChimp interest group. The user is then added to the group on subscription.
+core = 7.x
+package = Campaignion
+
+dependencies[] = campaignion_newsletters_mailchimp
+dependencies[] = little_helpers
