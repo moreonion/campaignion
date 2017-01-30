@@ -1,10 +1,18 @@
 <?php
 
+/**
+ * @file
+ * Defines the mc_interest webform component.
+ */
+
 use Drupal\little_helpers\Webform\Webform;
 use Drupal\campaignion_newsletters\NewsletterList;
 
 require_once drupal_get_path('module', 'webform') . '/components/select.inc';
 
+/**
+ * Implements _webform_defaults_component().
+ */
 function _webform_defaults_mc_interests() {
   $component = _webform_defaults_select();
   $component['extra']['multiple'] = TRUE;
@@ -58,7 +66,7 @@ function _webform_edit_mc_interests($component) {
   unset($form['items']['options']['option_settings']);
   // The options_element widget is left in for now although only the default
   // value has any effect. Otherwise there would be no way to select the values.
-  // unset($form['items']);
+  /* unset($form['items']); */
   return $form;
 }
 
@@ -69,7 +77,7 @@ function _webform_display_mc_interests($component, $value, $format = 'html', $su
   return _webform_display_select($component, $value, $format, $submission);
 }
 
-  /**
+/**
  * Implements _webform_submit_component().
  */
 function _webform_submit_mc_interests($component, $value) {

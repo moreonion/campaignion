@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * @file
+ * Main module file. Implement hooks.
+ *
+ * - Webform and form_bulder hooks.
+ * - The actual effect of the component in
+ *   hook_campaignion_newsletters_mailchimp_data_alter().
+ */
+
 use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 
 /**
@@ -42,14 +51,16 @@ function campaignion_newsletters_mailchimp_interests_campaignion_newsletters_mai
  *
  * Defines a new form_builder field:
  * - 'title'
- * - in which ['palette_group'] it appears. @see hook_form_builder_palette_groups().
- * - it's ['default'] representation (is used when dragging it into the preview area) including:
- *   - ['#webform_component'] the component array for webform (most important it's ['#webform_component']['type'].
- *     @see hook_webform_component_info().
- *   - ['#type'] the form-API type is used as the default form_builder element_type.
- *     @see hook_element_info().
+ * - in which ['palette_group'] it appears.
+ *   . @see hook_form_builder_palette_groups()
+ * - it's ['default'] representation (is used when dragging it into the preview
+ *   area) including:
+ *   - ['#webform_component'] the component array for webform (most important
+ *     it's ['#webform_component']['type']. @see hook_webform_component_info()
+ *   - ['#type'] the form-API type is used as the default form_builder
+ *     element_type. @see hook_element_info()
  *   - ['#form_builder'] the form_builder type (again).
- *     @see hook_form_builder_element_types().
+ *     Also @see hook_form_builder_element_types()
  * - whether or not the field is ['unique'].
  *
  * Fields are defined per form_type (so far only 'webform' is relevant for us).
@@ -60,11 +71,10 @@ function campaignion_newsletters_mailchimp_interests_form_builder_element_types(
   }
   require_once dirname(__FILE__) . '/component.php';
   $map = _form_builder_webform_property_map('mc_interests');
-  // default value is handled by the newsletter property.
   $fields['mc_interests'] = array(
     'title' => t('MailChimp interests'),
     'properties' => array_keys($map['properties']),
-    'default' =>  array(
+    'default' => array(
       '#form_builder' => array('element_type' => 'mc_interests'),
     ) + _form_builder_webform_default('mc_interests'),
   );
