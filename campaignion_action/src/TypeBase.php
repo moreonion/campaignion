@@ -11,7 +11,7 @@ class TypeBase implements TypeInterface {
   /**
    * Parameters
    */
-  protected $parameters;
+  public $parameters;
 
   public function __construct($type, array $parameters = array()) {
     $this->type = $type;

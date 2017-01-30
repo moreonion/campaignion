@@ -99,7 +99,7 @@ class Loader {
       $node->action = NULL;
       if ($type = $this->type($node->type)) {
         $class = $this->info[$node->type]['action_class'];
-        $node->action = $class::fromTypeAnyNode($type, $node);
+        $node->action = $class::fromTypeAndNode($type, $node);
       }
     }
     return $node->action;
