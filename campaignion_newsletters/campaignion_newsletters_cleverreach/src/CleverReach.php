@@ -134,13 +134,13 @@ class CleverReach extends ProviderBase {
     $user = array(
       'email'  => $mail,
       'attributes' => $item->data,
-      'registered' => $item->created,
       'active' => !$opt_in,
       'activated' => $opt_in ? FALSE : $item->created,
     );
     $group_id = $list->data->id;
     $result = $this->api->receiverGetByEmail($group_id, $mail, 0);
     if ($result->message === 'data not found') {
+      $user['registered'] = $item->created;
       $result = $this->api->receiverAdd($group_id, $user);
     }
     else {
