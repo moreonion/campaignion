@@ -37,6 +37,7 @@ class EmbeddedNodeForm {
    * @see hook_form_BASE_FORM_ID_alter().
    */
   protected function alterForm(&$form, &$form_state) {
+    $form['#form_id'] = $this->embed_state['build_info']['form_id'];
     $hooks = array('form');
     if (isset($form_state['build_info']['base_form_id'])) {
       $hooks[] = 'form_' . $form_state['build_info']['base_form_id'];
