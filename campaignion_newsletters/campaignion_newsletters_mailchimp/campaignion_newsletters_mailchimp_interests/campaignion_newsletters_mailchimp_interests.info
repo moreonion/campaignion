@@ -5,3 +5,4 @@ package = Campaignion
 
 dependencies[] = campaignion_newsletters_mailchimp
 dependencies[] = little_helpers
+dependencies[] = psr0

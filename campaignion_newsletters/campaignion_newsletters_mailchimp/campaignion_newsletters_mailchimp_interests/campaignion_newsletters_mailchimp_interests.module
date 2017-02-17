@@ -72,6 +72,7 @@ function campaignion_newsletters_mailchimp_interests_form_builder_element_types(
   require_once dirname(__FILE__) . '/component.php';
   $map = _form_builder_webform_property_map('mc_interests');
   $fields['mc_interests'] = array(
+    'class' => '\\Drupal\\campaignion_newsletters_mailchimp_interests\\FormBuilderElement',
     'title' => t('MailChimp interests'),
     'properties' => array_keys($map['properties']),
     'default' => array(
