@@ -221,6 +221,9 @@ class MailChimp extends ProviderBase {
    */
   public function subscribe(NewsletterList $list, QueueItem $item) {
     $hash = md5(strtolower($item->email));
+    if (!$item->data['merge_fields']) {
+      unset($item->data['merge_fields']);
+    }
     $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'email_address' => $item->email,
       'status' => $item->optIn() ? 'pending' : 'subscribed',
@@ -232,6 +235,9 @@ class MailChimp extends ProviderBase {
    */
   public function update(NewsletterList $list, QueueItem $item) {
     $hash = md5(strtolower($item->email));
+    if (!$item->data['merge_fields']) {
+      unset($item->data['merge_fields']);
+    }
     $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'email_address' => $item->email,
     ] + $item->data);
