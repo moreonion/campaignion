@@ -233,8 +233,8 @@ class MailChimp extends ProviderBase {
   public function update(NewsletterList $list, QueueItem $item) {
     $hash = md5(strtolower($item->email));
     $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
-      'merge_fields' => $item->data,
-    ]);
+      'email_address' => $item->email,
+    ] + $item->data);
   }
 
   /**

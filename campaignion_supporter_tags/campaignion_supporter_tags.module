@@ -97,5 +97,7 @@ function campaignion_supporter_tags_campaignion_newsletters_mailchimp_data_alter
       }
     }
   }
-  $data['interests'] = $groups;
+  if (!empty($groups)) {
+    $data['interests'] = $groups;
+  }
 }
