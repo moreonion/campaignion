@@ -71,6 +71,9 @@ function campaignion_newsletters_mailchimp_interests_form_builder_element_types(
   }
   require_once dirname(__FILE__) . '/component.php';
   $map = _form_builder_webform_property_map('mc_interests');
+  // Deactivate the default value widget until there is support for pre-defined
+  // lists in options_element.
+  unset($map['properties']['default_value']);
   $fields['mc_interests'] = array(
     'class' => '\\Drupal\\campaignion_newsletters_mailchimp_interests\\FormBuilderElement',
     'title' => t('MailChimp interests'),
