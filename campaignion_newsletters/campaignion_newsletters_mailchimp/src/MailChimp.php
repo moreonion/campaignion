@@ -107,9 +107,11 @@ class MailChimp extends ProviderBase {
 
   /**
    * Check whether registering webhooks is enabled.
+   *
+   * Staging and development installations should set one of these to FALSE.
    */
   protected function registerWebhooks() {
-    return variable_get('campaignion_newsletters_mailchimp_register_webhooks', TRUE);
+    return variable_get('campaignion_newsletters_mailchimp_register_webhooks', TRUE) && variable_get('webhooks_enabled', TRUE);
   }
 
   /**
