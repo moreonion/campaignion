@@ -64,7 +64,7 @@ function campaignion_newsletters_mailchimp_get_key($name) {
  * Access callback: MailChimp webhooks.
  */
 function campaignion_newsletters_mailchimp_webhook_access($list_id, $hash) {
-  return $hash === MailChimp::webhookHash($list_id) && $_SERVER['REQUEST_METHOD'] == 'POST';
+  return $hash === MailChimp::webhookHash($list_id);
 }
 
 /**

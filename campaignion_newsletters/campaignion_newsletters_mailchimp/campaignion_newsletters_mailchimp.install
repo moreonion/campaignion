@@ -23,6 +23,8 @@ function campaignion_newsletters_mailchimp_uninstall() {
  * Migrate old queue items to the new API version.
  */
 function campaignion_newsletters_mailchimp_update_1() {
+  menu_rebuild();
+
   $factory = ProviderFactory::getInstance();
   $lists = [];
   foreach ($factory->providers() as $source) {
