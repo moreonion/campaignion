@@ -29,6 +29,11 @@ function campaignion_webform_tokens_token_info() {
     'dynamic' => TRUE,
   ];
 
+  $submission['token-hash'] = [
+    'name' => t('Hashed sid'),
+    'description' => t('The hashed session id.'),
+  ];
+
   return array(
     'types' => $types,
     'tokens' => array(
@@ -67,8 +72,12 @@ function campaignion_webform_tokens_redirect($form, &$form_state) {
   $form_state['redirect'][1] += array('query' => array());
   $form_state['redirect'][1]['query'] += array(
     'sid' => $sid,
-    'hash' => drupal_hmac_base64($sid, drupal_get_private_key() . drupal_get_hash_salt()),
+    'hash' => campaignion_webform_tokens_hash_sid($sid),
   );
+}
+
+function campaignion_webform_tokens_hash_sid($sid) {
+  return drupal_hmac_base64((int) $sid, drupal_get_private_key() . drupal_get_hash_salt());
 }
 
 /**
@@ -78,28 +87,28 @@ function campaignion_webform_tokens_tokens($type, $tokens, array $data = array()
   $replacements = array();
   if ($type != 'submission')
     return $replacements;
- 
+
   $sid = (isset($_GET['sid']) && is_numeric($_GET['sid'])) ? (int) $_GET['sid'] : 0;
   $hash = isset($_GET['hash']) ? $_GET['hash'] : NULL;
 
+  $submission = NULL;
   $values = [];
-  if ($submission = _campaignion_webform_tokens_get_submission($sid, $hash)) {
+  if (isset($data['webform-submission'])) {
+    $submission = $data['webform-submission'];
+  }
+  elseif ($submission = _campaignion_webform_tokens_get_submission($sid, $hash)) {
     $data['webform-submission'] = $submission;
     $data['node'] = node_load($submission->nid);
     if (function_exists('webform_tokens')) {
       $replacements += webform_tokens($type, $tokens, $data, $options);
     }
-    $values = _campaignion_webform_tokens_values($submission);
   }
-  else {
+  if (!$submission) {
     return $replacements;
   }
+  $values = _campaignion_webform_tokens_values($submission);
 
   foreach ($tokens as $name => $original) {
-    // Defer to webform4.
-    if (isset($replacements[$original])) {
-      continue;
-    }
     // Split token name to get the components name. The remainder is our default value.
     $token = explode('/', $name, 2);
     if (count($token) < 2) {
@@ -109,13 +118,22 @@ function campaignion_webform_tokens_tokens($type, $tokens, array $data = array()
     if (substr($token, 0, 9) == 'text-val:') {
       $token = substr($token, 9);
     }
-    if (isset($values[$token])) {
-      // render webform component.
-      $replacements[$original] = $values[$token];
-    } else {
-      $replacements[$original] = $default;
+    if (array_key_exists($token, $values)) {
+      if (isset($values[$token])) {
+        // render webform component.
+        $replacements[$original] = $values[$token];
+      }
+      else {
+        $replacements[$original] = $default;
+      }
     }
   }
+
+  // Make the hash available as a token.
+  if (isset($tokens['token-hash'])) {
+    $replacements[$tokens['token-hash']] = campaignion_webform_tokens_hash_sid($submission->sid);
+  }
+
   return $replacements;
 }
 
@@ -124,7 +142,7 @@ function _campaignion_webform_tokens_get_submission($sid, $hash) {
   //  - check if hash is present and valid
   //  - don't replace anything if hashes don't match.
   if (variable_get('campaignion_webform_tokens_use_hash', '1') == '1') {
-    if ($hash !=  drupal_hmac_base64((int) $sid, drupal_get_private_key() . drupal_get_hash_salt()))
+    if ($hash != campaignion_webform_tokens_hash_sid($sid))
       return FALSE;
   }
 
@@ -139,6 +157,7 @@ function _campaignion_webform_tokens_values($submission) {
   $components = $s->webform->node->webform['components'];
   $values = array();
   foreach ($components as $cid => $component) {
+    $values[$component['form_key']] = NULL;
     if ($v = $s->valuesByCid($cid)) {
       $values[$component['form_key']] = campaignion_webform_tokens_render_component($component, $v);
     }
