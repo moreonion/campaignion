@@ -60,3 +60,19 @@ function campaignion_activity_entity_update($entity, $entity_type) {
     $activity->save();
   }
 }
+
+/**
+ * Implements hook_entity_delete().
+ */
+function campaignion_activity_entity_delete($entity, $entity_type) {
+  if ($entity_type == 'redhen_contact') {
+    $sql = <<<SQL
+DELETE ca, caw, cap
+FROM {campaignion_activity} ca
+  LEFT OUTER JOIN {campaignion_activity_webform} caw USING(activity_id)
+  LEFT OUTER JOIN {campaignion_activity_payment} cap USING(activity_id)
+WHERE ca.contact_id=:contact_id
+SQL;
+    db_query($sql, [':contact_id' => $entity->contact_id]);
+  }
+}

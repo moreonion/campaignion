@@ -151,6 +151,21 @@ function campaignion_activity_uninstall() {
 }
 
 /**
+ * Delete orphaned activities.
+ */
+function campaignion_activity_update_3() {
+  $sql = <<<SQL
+DELETE ca, caw, cap
+FROM {campaignion_activity} ca
+  LEFT OUTER JOIN {campaignion_activity_webform} caw USING(activity_id)
+  LEFT OUTER JOIN {campaignion_activity_payment} cap USING(activity_id)
+  LEFT OUTER JOIN {redhen_contact} c USING(contact_id)
+WHERE c.contact_id IS NULL
+SQL;
+  db_query($sql);
+}
+
+/**
  * Fixup unconfirmed webform actvities.
  */
 function campaignion_activity_update_2() {
