@@ -72,7 +72,7 @@ function campaignion_webform_tokens_redirect($form, &$form_state) {
   $form_state['redirect'][1] += array('query' => array());
   $form_state['redirect'][1]['query'] += array(
     'sid' => $sid,
-    'hash' => campaignion_webform_tokens_hash_sid($sid),
+    'sid_hash' => campaignion_webform_tokens_hash_sid($sid),
   );
 }
 
@@ -89,7 +89,7 @@ function campaignion_webform_tokens_tokens($type, $tokens, array $data = array()
     return $replacements;
 
   $sid = (isset($_GET['sid']) && is_numeric($_GET['sid'])) ? (int) $_GET['sid'] : 0;
-  $hash = isset($_GET['hash']) ? $_GET['hash'] : NULL;
+  $hash = isset($_GET['sid_hash']) ? $_GET['sid_hash'] : (isset($_GET['hash']) ? $_GET['hash'] : NULL);
 
   $submission = NULL;
   $values = [];
