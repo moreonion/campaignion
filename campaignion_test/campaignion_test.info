@@ -8,6 +8,7 @@ dependencies[] = campaignion_action
 dependencies[] = campaignion_activity
 dependencies[] = campaignion_newsletters
 dependencies[] = campaignion_supporter_tags
+dependencies[] = campaignion_email_to_target
 dependencies[] = date
 dependencies[] = entity
 dependencies[] = features
