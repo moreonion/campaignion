@@ -5,6 +5,37 @@ function campaignion_uninstall() {
 }
 
 /**
+ * Delete duplicate contacts.
+ */
+function campaignion_update_8() {
+  $sql = <<<SQL
+SELECT f1.entity_id AS did, f2.entity_id AS oid
+FROM {field_data_redhen_contact_email} f1
+  INNER JOIN {field_data_redhen_contact_email} f2 ON f1.entity_id > f2.entity_id AND f1.bundle = f2.bundle AND f1.redhen_contact_email_value=f2.redhen_contact_email_value
+  LEFT OUTER JOIN {field_data_redhen_contact_email} f3 ON f2.entity_id > f3.entity_id AND f2.bundle=f3.bundle AND f3.redhen_contact_email_value=f2.redhen_contact_email_value
+WHERE f3.entity_id IS NULL
+SQL;
+
+  $i = 0;
+  foreach (db_query($sql) as $row) {
+    if (module_exists('campaignion_activity')) {
+      // Remap all activities to the "original" contact.
+      db_query("UPDATE {campaignion_activity} SET contact_id={$row->oid} WHERE contact_id={$row->did}");
+    }
+    if (module_exists('campaignion_newsletters')) {
+      // Avoid deleting subscriptions by feeding an empty Subscriptions object
+      // into campaignion_newsletters_entity_delete().
+      $contact = entity_load_single('redhen_contact', $row->did);
+      $contact->newsletters = new \Drupal\campaignion_newsletters\Subscriptions([], [], []);
+    }
+    entity_delete('redhen_contact', $row->did);
+    $i++;
+  }
+
+  return t("!count duplicate contacts have been deleted.", ['!count' => $i]);
+}
+
+/**
  * Increase weight above i18n. -> switch_links_alter()
  */
 function campaignion_update_7() {
