@@ -101,7 +101,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
     list($api, $provider) = $this->mockChimp(['put']);
     $item = new QueueItem([
       'args' => ['send_optin' => FALSE],
-      'data' => ['FNAME' => 'Test', 'LNAME' => 'Test'],
+      'data' => ['FNAME' => 'Test', 'LNAME' => 'Test', 'merge_fields' => []],
     ]);
     $api->expects($this->once())->method('put');
     $provider->subscribe($list_o, $item);
