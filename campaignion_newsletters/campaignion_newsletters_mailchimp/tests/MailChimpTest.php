@@ -73,7 +73,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
       ['webhooks' => [], 'total_items' => 0],
       $this->throwException(ApiError::fromHttpError(new HttpError((object) [
         'code' => 400,
-        'status_message' => 'Bad Request',
+        'error' => 'Bad Request',
         'data' => json_encode(['title' => '', 'detail' => '', 'errors' => []]),
       ]), 'POST', '/lists/a1234/webhooks'))
     ));
@@ -130,7 +130,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
       $this->equalTo(['status' => 'unsubscribed'])
     )->will($this->throwException(ApiError::fromHttpError(new HttpError((object) [
       'code' => 404,
-      'status_message' => 'Resource not found',
+      'error' => 'Resource not found',
       'data' => json_encode([
         'title' => 'Resource not found',
         'detail' => '',
