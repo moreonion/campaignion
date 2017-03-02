@@ -10,16 +10,19 @@ use \Drupal\little_helpers\Webform\Submission;
 
 /**
  * @return array
- *   class names indexed by (machine readable) content-type names
+ *   Config arrays indexed by (machine readable) content-type names:
+ *     - class: The type class representing actions of this type.
+ *       Defaults to \Drupal\campiagnion_action\TypeBase
+ *     - parameters: For backwards compatibility. The values are merged into
+ *       The main array.
+ *     The whole config array is passed as $parameters to the class constructor.
  */
 function hook_campaignion_action_info() {
   $types['webform'] = array(
     'class' => 'Drupal\\campaignion_action\\FlexibleForm',
-    'parameters' => array(
-      'thank_you_page' => array(
-        'type' => 'thank_you_page',
-        'reference' => 'field_thank_you_pages',
-      ),
+    'thank_you_page' => array(
+      'type' => 'thank_you_page',
+      'reference' => 'field_thank_you_pages',
     ),
   );
   return $types;
