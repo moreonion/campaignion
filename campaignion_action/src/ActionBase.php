@@ -6,10 +6,13 @@ class ActionBase {
   protected $type;
   protected $node;
 
+  public static function fromTypeAndNode(TypeInterface $type, $node) {
+    return new static($type, $node);
+  }
+
   public function __construct(TypeInterface $type, $node) {
     $this->type = $type;
     $this->node = $node;
-    $this->node->action = $this;
   }
 
   /**

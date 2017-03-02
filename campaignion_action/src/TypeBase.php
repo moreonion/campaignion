@@ -2,7 +2,8 @@
 
 namespace Drupal\campaignion_action;
 
-abstract class TypeBase implements TypeInterface {
+class TypeBase implements TypeInterface {
+
   /**
    * Content-type
    */
@@ -10,25 +11,27 @@ abstract class TypeBase implements TypeInterface {
   /**
    * Parameters
    */
-  protected $parameters;
+  public $parameters;
 
   public function __construct($type, array $parameters = array()) {
     $this->type = $type;
-    $this->parameters = $parameters;
+    $this->parameters = $parameters + [
+      'action_class' => '\\Drupal\\campaignion_action\\ActionBase',
+      'donation' => FALSE,
+    ];
   }
 
   public function defaultTemplateNid() {
-    return NULL;
-  }
-
-  public function actionFromNode($node) {
-    return new ActionBase($this, $node);
+    $uuid = $this->parameters['template_node_uuid'];
+    $ids = \entity_get_id_by_uuid('node', [$uuid]);
+    return array_shift($ids);
   }
 
   /**
    * {@inheritdoc}
    */
   public function isDonation() {
-    return FALSE;
+    return $this->parameters['donation'];
   }
+
 }

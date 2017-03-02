@@ -26,7 +26,10 @@ class Loader {
 
   public function __construct($types_info) {
     foreach ($types_info as $type => &$info) {
-      $info += array('parameters' => array());
+      $info += [
+        'class' => '\\Drupal\\campaignion_action\\TypeBase',
+        'parameters' => [],
+      ];
     }
     $this->info = $types_info;
     $this->types = &drupal_static(__CLASS__ . '::types', []);
@@ -82,7 +85,7 @@ class Loader {
       if (!empty($this->info[$type]['class'])) {
         $info = $this->info[$type];
         $class = $info['class'];
-        $this->types[$type] = new $class($type, $info['parameters']);
+        $this->types[$type] = new $class($type, $info + $info['parameters']);
       }
     }
     return $this->types[$type];
@@ -92,8 +95,32 @@ class Loader {
    * Get action instance by node-type.
    */
   public function actionFromNode($node) {
-    if ($type = $this->type($node->type)) {
-      return $type->actionFromNode($node);
+    if (!isset($node->action)) {
+      $node->action = NULL;
+      if ($type = $this->type($node->type)) {
+        $class = $this->info[$node->type]['action_class'];
+        $node->action = $class::fromTypeAndNode($type, $node);
+      }
+    }
+    return $node->action;
+  }
+
+  /**
+   * Return a wizard object for a node-type.
+   *
+   * @param string $type
+   *   The node-type.
+   * @param object|null $node
+   *   The node to edit. Create a new one if NULL.
+   *
+   * @return \Drupal\oowizard\Wizard
+   *  The wizard responsible for changing/adding actions of this type.
+   */
+  public function wizard($type, $node = NULL) {
+    if ($type_o = $this->type($type)) {
+      $info = $this->info[$type];
+      $class = $info['wizard_class'];
+      return new $class($info, $node, $type_o);
     }
   }
 
