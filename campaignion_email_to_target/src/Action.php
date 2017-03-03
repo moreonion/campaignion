@@ -25,8 +25,20 @@ class Action extends ActionBase {
 
   /**
    * Choose an appropriate message for a given target.
+   *
+   * @param array $target
+   *   Target data.
+   * @param array $constituency
+   *   Constituency data.
+   *
+   * @return null|\Drupal\campaignion_email_to_target\Message
+   *   A message object or NULL if no suitable message was found.
    */
   public function getMessage($target, $constituency) {
+    if (empty($target['email'])) {
+      // Skip targets without email.
+      return NULL;
+    }
     $templates = MessageTemplate::byNid($this->node->nid);
     foreach ($templates as $t) {
       if ($t->checkFilters($target, $constituency)) {
