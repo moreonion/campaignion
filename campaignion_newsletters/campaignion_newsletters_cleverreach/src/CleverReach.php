@@ -19,12 +19,26 @@ use \Drupal\campaignion_newsletters\Subscription;
 class CleverReach extends ProviderBase {
   protected $account;
   protected $api;
+
   /**
-   * Constructor. Gets settings and fetches intial group list.
+   * Construct a new instance from config parameters.
    */
-  public function __construct(array $params) {
-    $this->account = $params['name'];
-    $this->api = new ApiClient($params['key']);
+  public static function fromParameters(array $params) {
+    $api = new ApiClient($params['key']);
+    return new static($api, $params['name']);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param \Drupal\campaignion_newsletters_cleverreach\ApiClient $api
+   *   Instance of our SoapClient sub-class.
+   * @param string $name
+   *   Name of this CleverReach account.
+   */
+  public function __construct(ApiClient $api, $name) {
+    $this->account = $name;
+    $this->api = $api;
   }
 
   /**
