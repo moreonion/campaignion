@@ -120,11 +120,16 @@ class Optivo extends ProviderBase {
    * Update user data.
    */
   public function update(NewsletterList $list, QueueItem $item) {
-    $service = $this->factory->getClient('Recipient');
-    $data = $item->data + ['names' => [], 'values' => []];
-    $service->setAttributes($list->identifier, $item->email, $data['names'], $data['values']);
+    // The best way to do this would be to try a setAttributes() call and then
+    // if that fails because the recipient does not yet exist try to subscribe.
+    // However the exception thrown by setAttributes() does not easily provide
+    // the information why it failed.
+    // The only other option would be to call contains() first and then either
+    // subscribe() or setAttributes() which means just as many API-calls.
+    $item->args['send_optin'] = FALSE;
+    $item->args['send_welcome'] = FALSE;
+    $this->subscribe($list, $item);
   }
-
 
   /**
    * Unsubscribe a user, given a newsletter identifier and email address.

@@ -4,6 +4,7 @@ namespace Drupal\campaignion_newsletters_optivo;
 
 use \Drupal\campaignion\CRM\Import\Source\ArraySource;
 use \Drupal\campaignion_newsletters\NewsletterList;
+use \Drupal\campaignion_newsletters\QueueItem;
 use \Drupal\campaignion_newsletters\Subscription;
 
 /**
@@ -14,14 +15,15 @@ class OptivoTest extends \DrupalUnitTestCase {
   /**
    * Construct a partially stubbed Optivo object using a mock Client object.
    */
-  protected function mockProvider() {
+  protected function mockProvider($overrides = []) {
+    $overrides[] = 'getSource';
     $api = $this->getMockBuilder(Client::class)
       ->setMethods([
       ])
       ->disableOriginalConstructor()
       ->getMock();
     $cr = $this->getMockBuilder(Optivo::class)
-      ->setMethods(['getSource'])
+      ->setMethods($overrides)
       ->disableOriginalConstructor()
       ->getMock();
     return [$cr, $api];
@@ -85,6 +87,22 @@ class OptivoTest extends \DrupalUnitTestCase {
       'names' => ['Firstname', 'Lastname'],
       'values' => ['test', 'test'],
     ], $data);
+  }
+
+  /**
+   * Test that the update function simply calls subscribe().
+   */
+  public function testUpdateCallsSubscribe() {
+    list($cr, $api) = $this->mockProvider(['subscribe']);
+    $l = new NewsletterList(['list_id' => 'list-id']);
+    $q = new QueueItem([
+      'list_id' => 'list-id',
+      'email' => 'test@example.com',
+      'data' => ['names' => [], 'values' => []],
+    ]);
+    $cr->expects($this->once())->method('subscribe')
+      ->with($this->equalTo($l), $this->equalTo($q));
+    $cr->update($l, $q);
   }
 
 }
