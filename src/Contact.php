@@ -36,7 +36,8 @@ class Contact extends \RedhenContact {
     $sql = <<<SQL
 SELECT entity_id
 FROM field_data_redhen_contact_email
-WHERE redhen_contact_email_value = :email AND bundle = :bundle
+  INNER JOIN redhen_contact ON entity_id=contact_id
+WHERE redhen_contact_email_value = :email AND type = :bundle AND redhen_state = 1
 SQL;
     return db_query($sql, array(':email' => $email, ':bundle' => $type))->fetchField();
   }

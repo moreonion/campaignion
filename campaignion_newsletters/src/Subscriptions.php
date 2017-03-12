@@ -65,7 +65,9 @@ class Subscriptions {
   public function unsubscribeAll() {
     foreach ($this->subscriptions as $email => $lists) {
       foreach ($lists as $list_id => $subscription) {
-        $subscription->delete = TRUE;
+        if ($subscription) {
+          $subscription->delete = TRUE;
+        }
       }
     }
   }
