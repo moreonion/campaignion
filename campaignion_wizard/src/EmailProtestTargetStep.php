@@ -24,15 +24,12 @@ class EmailProtestTargetStep extends WizardStep {
   public function validateStep($form, &$form_state) {
     $this->fieldForm->validate($form, $form_state);
 
-    $has_target = FALSE;
-    foreach ($form_state['values']['field_protest_target']['und'] as $delta => $values) {
-      if (is_numeric($delta) && !empty($form_state['values']['field_protest_target']['und'][$delta]['email_protest_target']['email'])) {
-        $has_target = TRUE;
-        break;
-      }
-    }
-    if ($has_target == FALSE) {
-      form_error($target['email'], t('You have to specify at least 1 target.'));
+    $targets = $form_state['values']['field_protest_target']['und'];
+    $targets = array_filter($targets, function ($v) {
+      return is_array($v) && !empty($v['target_id']);
+    });
+    if (empty($targets)) {
+      form_error($form['field_protest_target'], t('We need at least one target for this action.'));
     }
   }
 
