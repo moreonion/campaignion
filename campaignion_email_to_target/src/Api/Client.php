@@ -45,7 +45,14 @@ class Client extends _Client {
   protected function sendRequest($url, array $options) {
     $options += ['method' => 'GET'];
     $method = $options['method'];
-    $hawk = $this->hawk->createRequest($this->credentials, $url, $method);
+    $hawk_options = [];
+    if (!empty($options['data']) || in_array($method, ['POST', 'PUT'])) {
+      $options += ['data' => '', 'headers' => []];
+      $options['headers'] += ['Content-Type' => ''];
+      $hawk_options['payload'] = $options['data'];
+      $hawk_options['content_type'] = $options['headers']['Content-Type'];
+    }
+    $hawk = $this->hawk->createRequest($this->credentials, $url, $method, $hawk_options);
     $header = $hawk->header();
     $options['headers'][$header->fieldName()] = $header->fieldValue();
     return parent::sendRequest($url, $options);
