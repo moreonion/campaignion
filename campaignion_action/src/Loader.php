@@ -28,8 +28,15 @@ class Loader {
     foreach ($types_info as $type => &$info) {
       $info += [
         'class' => '\\Drupal\\campaignion_action\\TypeBase',
+        'action_class' => '\\Drupal\\campaignion_action\\ActionBase',
         'parameters' => [],
       ];
+      // Fail early if wizard_class is not defined.
+      if (empty($info['wizard_class'])) {
+        throw new \InvalidArgumentException("wizard_class not defined for action-type '$type'.");
+      }
+      // We explicitly don't check whether the class exists because this would
+      // mean autoloading every class every time the Loader is used.
     }
     $this->info = $types_info;
     $this->types = &drupal_static(__CLASS__ . '::types', []);
