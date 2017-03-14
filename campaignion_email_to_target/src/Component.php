@@ -133,7 +133,7 @@ class Component {
         $no_target_message = t("There don't seem to be any targets for your selection.");
       }
       $element['no_target'] = [
-        '#markup' => _filter_autop($no_target_message),
+        '#markup' => _filter_autop(check_plain($no_target_message)),
       ];
       $element['#attributes']['class'][] = 'email-to-target-no-targets';
       $this->disableSubmits($form);
@@ -162,7 +162,7 @@ class Component {
       ];
       $t['header'] = [
         '#prefix' => '<pre class="email-to-target-header">',
-        '#markup' => $message->header,
+        '#markup' => check_plain($message->header),
         '#suffix' => '</pre>',
       ];
       $t['message'] = [
@@ -173,7 +173,7 @@ class Component {
       ];
       $t['footer'] = [
         '#prefix' => '<pre class="email-to-target-footer">',
-        '#markup' => $message->footer,
+        '#markup' => check_plain($message->footer),
         '#suffix' => '</pre>',
       ];
       $element[$target['id']] = $t;
