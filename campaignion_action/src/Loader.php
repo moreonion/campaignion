@@ -127,7 +127,7 @@ class Loader {
     if ($type_o = $this->type($type)) {
       $info = $this->info[$type];
       $class = $info['wizard_class'];
-      return new $class($info, $node, $type_o);
+      return new $class($info, $node, $type);
     }
   }
 
