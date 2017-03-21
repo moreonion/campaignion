@@ -410,6 +410,8 @@ module.exports = {
         $(window).off('beforeunload.messages-widget')
         $(e.currentTarget).off('submit.messages-widget')
         $clickedButton.prop('disabled', false).off('click.messages-widget')
+        // reset form values for Drupal.behaviors.formSingleSubmit
+        $(e.currentTarget).removeAttr('data-drupal-form-submit-last')
         // let firefox catch up with rendering the button
         setTimeout(function() {
           $clickedButton.click()
