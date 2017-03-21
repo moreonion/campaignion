@@ -396,20 +396,20 @@ module.exports = {
   },
 
   ready() {
-    $("form input[type=submit]").click(function() {
+    $("form input[type=submit]").on('click.messages-widget', function() {
       // Attach a 'clicked' attribute to the specific button
       $("input[type=submit]", $(this).parents("form")).removeAttr("clicked")
       $(this).attr("clicked", "true")
     })
 
-    $('form.wizard-form').on('submit', (e) => {
+    $('form.wizard-form').on('submit.messages-widget', (e) => {
       var $clickedButton = $("input[type=submit][clicked=true]", e.currentTarget)
       var submitVal = $clickedButton.val()
 
       function forceSubmit() {
-        $(window).off('beforeunload')
-        $(e.currentTarget).off('submit')
-        $clickedButton.prop('disabled', false).off('click')
+        $(window).off('beforeunload.messages-widget')
+        $(e.currentTarget).off('submit.messages-widget')
+        $clickedButton.prop('disabled', false).off('click.messages-widget')
         // let firefox catch up with rendering the button
         setTimeout(function() {
           $clickedButton.click()
@@ -442,7 +442,7 @@ module.exports = {
             confirm: forceSubmit
           })
         } else {
-          $(window).off('beforeunload')
+          $(window).off('beforeunload.messages-widget')
         }
         return
       }
@@ -475,7 +475,7 @@ module.exports = {
       putData()
     })
 
-    $(window).on('beforeunload', (e) => {
+    $(window).on('beforeunload.messages-widget', (e) => {
       if (this.unsavedChanges()) {
         var confirmationMessage = 'Careful! You have unsaved changes!'
         e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
