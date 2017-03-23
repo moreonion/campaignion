@@ -180,7 +180,7 @@ function campaignion_newsletters_update_13() {
 UPDATE
   d {webform_submitted_data} d
   INNER JOIN {webform_component} c
-SET d.data=''
+SET d.data='', d.no='0'
 WHERE c.type='newsletter' AND d.data='0';
 SQL;
   db_query($sql);
