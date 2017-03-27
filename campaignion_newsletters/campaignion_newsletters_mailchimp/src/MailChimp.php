@@ -219,17 +219,31 @@ class MailChimp extends ProviderBase {
   }
 
   /**
+   * Prepare data for being sent to MailChimp.
+   *
+   * Make sure everything that needs to be a JSON-object is serialized as such
+   * even if empty.
+   */
+  protected function preprocessData($data) {
+    $data += [
+      'interests' => [],
+      'merge_fields' => [],
+    ];
+    $data['interests'] = (object) $data['interests'];
+    $data['merge_fields'] = (object) $data['merge_fields'];
+    return $data;
+  }
+
+  /**
    * Subscribe a user, given a newsletter identifier and email address.
    */
   public function subscribe(NewsletterList $list, QueueItem $item) {
     $hash = md5(strtolower($item->email));
-    if (!$item->data['merge_fields']) {
-      unset($item->data['merge_fields']);
-    }
+    $data = $this->preprocessData($item->data);
     $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'email_address' => $item->email,
       'status' => $item->optIn() ? 'pending' : 'subscribed',
-    ] + $item->data);
+    ] + $data);
   }
 
   /**
@@ -237,12 +251,10 @@ class MailChimp extends ProviderBase {
    */
   public function update(NewsletterList $list, QueueItem $item) {
     $hash = md5(strtolower($item->email));
-    if (!$item->data['merge_fields']) {
-      unset($item->data['merge_fields']);
-    }
+    $data = $this->preprocessData($item->data);
     $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'email_address' => $item->email,
-    ] + $item->data);
+    ] + $data);
   }
 
   /**
