@@ -127,7 +127,10 @@ class MailChimpTest extends \DrupalUnitTestCase {
     $api->expects($this->once())->method('put')->with(
       $this->equalTo("/lists/a1234/members/$hash"),
       $this->anything(),
-      $this->equalTo(['status' => 'unsubscribed'])
+      $this->equalTo([
+        'status' => 'unsubscribed',
+        'email_address' => $item->email,
+      ])
     )->will($this->throwException(ApiError::fromHttpError(new HttpError((object) [
       'code' => 404,
       'error' => 'Resource not found',

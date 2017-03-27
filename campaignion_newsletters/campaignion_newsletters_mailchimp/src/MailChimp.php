@@ -255,6 +255,7 @@ class MailChimp extends ProviderBase {
     try {
       $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
         'status' => 'unsubscribed',
+        'email_address' => $item->email,
       ]);
     }
     catch (ApiError $e) {
