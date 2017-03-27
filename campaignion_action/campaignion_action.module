@@ -163,6 +163,19 @@ function campaignion_action_webform_submission_update($node, $submission) {
 }
 
 /**
+ * Implements hook_cronapi().
+ */
+function campaignion_action_cronapi($op, $job = NULL) {
+  $items['campaignion_action_cron'] = array(
+    'description' => 'Import webform submission into redhen.',
+    'rule' => '*/2+@ * * * *',
+    'weight' => 100,
+    'callback' => 'campaignion_action_cron',
+  );
+  return $items;
+}
+
+/**
  * Implements hook_cron().
  */
 function campaignion_action_cron() {
