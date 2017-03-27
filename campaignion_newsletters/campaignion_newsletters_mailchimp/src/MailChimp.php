@@ -212,6 +212,7 @@ class MailChimp extends ProviderBase {
    */
   public function data(Subscription $subscription) {
     $data['merge_fields'] = $this->attributeData($subscription);
+    $data['interests'] = [];
     // Let other modules alter the data (ie. for adding interest groups).
     drupal_alter('campaignion_newsletters_mailchimp_data', $data, $subscription);
     $fingerprint = sha1(serialize($data));
