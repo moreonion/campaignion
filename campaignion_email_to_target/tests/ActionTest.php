@@ -91,7 +91,7 @@ class ActionTest extends \DrupalUnitTestCase {
     }));
     list($pairs, $no_target_element) = $action->TargetMessagePairs($submission_o);
     $this->assertEqual([[$contacts[0], $m], [$contacts[2], $m]], $pairs);
-    $this->assertEqual('excluded first!', $no_target_element);
+    $this->assertEqual(['#markup' => "<p>excluded first!</p>\n"], $no_target_element);
   }
 
 }
