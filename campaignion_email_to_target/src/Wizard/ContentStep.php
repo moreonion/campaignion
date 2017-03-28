@@ -12,7 +12,7 @@ class ContentStep extends _ContentStep {
   public function stepForm($form, &$form_state) {
     $form = parent::stepForm($form, $form_state);
     $p = $this->wizard->parameters['email_to_target'];
-    $form[$p['message_field']]['#access'] = FALSE;
+    $form[$p['no_target_message_field']]['#access'] = FALSE;
     $form[$p['options_field']]['#access'] = FALSE;
     return $form;
   }

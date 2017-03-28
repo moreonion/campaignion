@@ -61,6 +61,14 @@ class Action extends ActionBase {
   }
 
   /**
+   * Get configured no target message.
+   */
+  public function noTargetMessage() {
+    $field = $this->type->parameters['email_to_target']['no_target_message_field'];
+    return field_view_field('node', $this->node, $field, ['label' => 'hidden']);
+  }
+
+  /**
    * Get the selected dataset for this action.
    */
   public function dataset() {
@@ -121,7 +129,7 @@ class Action extends ActionBase {
     }
 
     if (!$no_target_message) {
-      $no_target_message = t("There don't seem to be any targets for your selection.");
+      $no_target_message = $this->noTargetMessage();
     }
 
     return [$pairs, $no_target_message];

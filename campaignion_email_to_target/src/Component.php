@@ -105,9 +105,10 @@ class Component {
     }
 
     if (empty($pairs)) {
-      $element['no_target'] = [
-        '#markup' => _filter_autop(check_plain($no_target_message)),
-      ];
+      if (is_string($no_target_message)) {
+        $no_target_message = ['#markup' => _filter_autop(check_plain($no_target_message))];
+      }
+      $element['no_target'] = $no_target_message;
       $element['#attributes']['class'][] = 'email-to-target-no-targets';
       $this->disableSubmits($form);
       return;
