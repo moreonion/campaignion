@@ -3,6 +3,7 @@
 namespace Drupal\campaignion\CRM;
 
 use \Drupal\campaignion\Contact;
+use \Drupal\campaignion\CRM\Import\Source\SourceInterface;
 
 class ExporterBase implements ExporterInterface {
   protected $map;
@@ -23,6 +24,16 @@ class ExporterBase implements ExporterInterface {
     return $this->wrappedContact;
   }
 
+  /**
+   * Check whether the exporter might have data for a given key.
+   */
+  public function hasKey($key) {
+    return isset($this->map[$key]);
+  }
+
+  /**
+   * Get the data for a key.
+   */
   public function value($key) {
     if (isset($this->map[$key])) {
       return $this->map[$key]->value();
