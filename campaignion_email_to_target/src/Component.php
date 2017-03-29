@@ -34,6 +34,22 @@ class Component {
   }
 
   /**
+   * Get a list of parent form keys for this component.
+   *
+   * @return array
+   *   List of parent form keys - just like $element['#parents'].
+   */
+  public function parents($webform) {
+    $parents = [$this->component['form_key']];
+    $parent = $this->component;
+    while ($parent['pid'] != 0) {
+      $parent = $webform->component($parent['pid']);
+      array_unshift($parents, $parent['form_key']);
+    }
+    return $parents;
+  }
+
+  /**
    * Disable submit-buttons for this form.
    */
   protected function disableSubmits(&$form) {
