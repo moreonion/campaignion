@@ -5,6 +5,25 @@ use \Drupal\campaignion_action\SignedLink;
 use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 
 /**
+ * Implements hook_module_implements_alter().
+ */
+function campaignion_action_module_implements_alter(&$impl, $hook) {
+  if ($hook == 'node_delete') {
+    // Add our implementation right before webform's.
+    $new_impl = [];
+    $ours = $impl['campaignion_action'];
+    unset($impl['campaignion_action']);
+    foreach ($impl as $module => $group) {
+      if ($module == 'webform') {
+        $new_impl['campaignion_action'] = $ours;
+      }
+      $new_impl[$module] = $group;
+    }
+    $impl = $new_impl;
+  }
+}
+
+/**
  * Implements hook_permission().
  */
 function campaignion_action_permission() {
@@ -160,6 +179,45 @@ function campaignion_action_webform_submission_insert($node, $submission) {
  */
 function campaignion_action_webform_submission_update($node, $submission) {
   campaignion_action_webform_submission_insert($node, $submission);
+}
+
+/**
+ * Implements hook_webform_submission_delete().
+ *
+ * Log that the submission was deleted and by whom.
+ */
+function campaignion_action_webform_submission_delete($node, $submission) {
+  db_merge('webform_deleted_submissions')
+    ->key(['sid' => $submission->sid])
+    ->fields([
+      'sid' => $submission->sid,
+      'nid' => $submission->nid,
+      'uid' => $GLOBALS['user']->uid,
+      'deleted' => REQUEST_TIME,
+      'reason' => 'webform_submission_delete',
+    ])
+    ->execute();
+}
+
+/**
+ * Implements hook_node_delete().
+ *
+ * Log all deleted submission. This hook is made to be called right before
+ * webform_node_delete() using hook_module_implements_alter().
+ */
+function campaignion_action_node_delete($node) {
+  $sql = <<<SQL
+INSERT INTO {webform_deleted_submissions}
+SELECT sid, nid, :uid, :deleted, :func
+FROM {webform_submissions}
+WHERE nid=:nid
+SQL;
+  db_query($sql, [
+    ':uid' => $GLOBALS['user']->uid,
+    ':deleted' => REQUEST_TIME,
+    ':func' => 'node_delete',
+    ':nid' => $node->nid,
+  ]);
 }
 
 /**
