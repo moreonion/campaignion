@@ -176,7 +176,6 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
         '#type' => 'radios',
         '#default_value' => !empty($component['value']['subscribed']) ? 'yes' : NULL,
         '#options' => $options,
-        '#element_validate' => ['_campaignion_newsletters_radio_values'],
       ];
   }
 
@@ -184,25 +183,26 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
 }
 
 /**
- * Element validate handler for newsletter opt-in as radios.
- *
- * Transform value into whatever the checkbox would evaluate to.
+ * Implements _webform_submit_COMPONENT().
  */
-function _campaignion_newsletters_radio_values($element, &$form_state) {
-  $value = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
-  $value = ['subscribed' => $value == 'yes' ? 'subscribed' : 0];
+function _webform_submit_newsletter($component, $value) {
+  switch ($component['extra']['display']) {
+    case 'checkbox':
+      return empty($value['subscribed']) ? [''] : ['subscribed'];
+      break;
+
+    case 'radios':
+      return $value == 'yes' ? ['subscribed'] : [''];
+      break;
+  }
 }
 
 /**
  * Implements _webform_display_component().
  */
 function _webform_display_newsletter($component, $value, $format = 'html') {
-  if (!empty($value['subscribed'])) {
-    return array('#markup' => t('subscribed'));
-  }
-  else {
-    return array('#markup' => t('not subscribed'));
-  }
+  $v['#markup'] = !empty($value[0]) ? t('subscribed') : t('not subscribed');
+  return $v;
 }
 
 /**
@@ -310,8 +310,7 @@ function _webform_form_builder_map_newsletter() {
  * Implements _webform_table_component().
  */
 function _webform_table_newsletter($component, $value) {
-  $v = empty($value['subscribed']) ? t('not subscribed') : t('subscribed');
-  return $v;
+  return empty($value[0]) ? t('not subscribed') : t('subscribed');
 }
 
 /**
@@ -329,12 +328,5 @@ function _webform_csv_headers_newsletter($component, $export_options) {
  * Implements _webform_csv_data_component().
  */
 function _webform_csv_data_newsletter($component, $export_options, $value) {
-  $v = t('not subscribed');
-  # value of field 'subscribed' set to 'subscribed' if checkbox checked,
-  # '0' otherwise
-  if (!empty($value['subscribed'])) {
-    $v = t('subscribed');
-  }
-  return $v;
+  return empty($value[0]) ? t('not subscribed') : t('subscribed');
 }
-
