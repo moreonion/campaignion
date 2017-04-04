@@ -83,20 +83,28 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
       'group' => 'CSS_DEFAULT',
       'preprocess' => FALSE,
     ];
+    $form['#attached']['css'][] = ['data' => $dir . '/css/message-step.css'];
 
     $field = $this->wizard->parameters['email_to_target']['no_target_message_field'];
     $this->fieldForm = new EntityFieldForm('node', $node, [$field]);
-    $form += $this->fieldForm->formArray($form_state);
+    $form['advanced'] = [
+      '#type' => 'fieldset',
+      '#title' => t('No target available'),
+      '#attributes' => ['class' => ['e2t-col']],
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    ];
+    $form['advanced'] += $this->fieldForm->formArray($form_state);
 
     return $form;
   }
 
   public function validateStep($form, &$form_state) {
-    $this->fieldForm->validate($form, $form_state);
+    $this->fieldForm->validate($form['advanced'], $form_state);
   }
 
   public function submitStep($form, &$form_state) {
-    $this->fieldForm->submit($form, $form_state);
+    $this->fieldForm->submit($form['advanced'], $form_state);
   }
 
   public function checkDependencies() {
