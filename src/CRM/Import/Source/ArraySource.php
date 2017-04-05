@@ -7,7 +7,13 @@ class ArraySource implements SourceInterface {
   public function __construct($data) {
     $this->data = $data;
   }
+
+  public function hasKey($key) {
+    return array_key_exists($this->data[$key]);
+  }
+
   public function value($key) {
     return isset($this->data[$key]) ? $this->data[$key] : NULL;
   }
+
 }

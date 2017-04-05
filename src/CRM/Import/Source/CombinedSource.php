@@ -10,6 +10,10 @@ class CombinedSource implements SourceInterface {
     $this->b = $b;
   }
 
+  public function hasKey($key) {
+    return $this->a->hasKey() || $this->b->hasKey();
+  }
+
   public function value($key) {
     if (!is_null($value = $this->a->value($key))) {
       return $value;
@@ -18,4 +22,5 @@ class CombinedSource implements SourceInterface {
       return $value;
     }
   }
+
 }

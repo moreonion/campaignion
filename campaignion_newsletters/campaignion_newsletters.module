@@ -95,8 +95,7 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
     return;
   }
   foreach ($s->webform->componentsByType('newsletter') as $component) {
-    $value = $s->valuesByCid($component['cid']);
-    if (!empty($value['subscribed'])) {
+    if ($s->valueByCid($component['cid'])) {
       $needs_opt_in = !$component['extra']['opt_in_implied'];
       foreach ($component['extra']['lists'] as $list_id => $value) {
         if (!empty($value)) {
