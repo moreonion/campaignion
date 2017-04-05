@@ -1,11 +1,104 @@
 <?php
 
 /**
+ * Implements hook_schema().
+ */
+function campaignion_action_schema() {
+  $schema['webform_deleted_submissions'] = [
+    'description' => 'Information about when and how a webform submission was deleted.',
+    'fields' => [
+      'sid' => [
+        'description' => 'The unique identifier for the submission.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'nid' => [
+        'description' => 'The node identifier of the webform.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'uid' => [
+        'description' => 'The id of the user that deleted this submission.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'deleted' => [
+        'description' => 'Timestamp when the submission was deleted.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'reason' => [
+        'description' => 'Hint about how this submission was deleted.',
+        'type' => 'varchar',
+        'length' => 255,
+      ],
+    ],
+    'primary key' => ['sid'],
+    'unique keys' => [
+      'sid_nid' => ['sid', 'nid'],
+    ]
+  ];
+  return $schema;
+}
+
+/**
  * Implements hook_install().
  */
 function campaignion_action_install() {
   campaignion_action_update_1();
   DrupalQueue::get('campaignion_action')->createQueue();
+}
+
+/**
+ * Add a table to log information about deleted submissions.
+ */
+function campaignion_action_update_2() {
+  db_create_table('webform_deleted_submissions', [
+    'description' => 'Information about when and how a webform submission was deleted.',
+    'fields' => [
+      'sid' => [
+        'description' => 'The unique identifier for the submission.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'nid' => [
+        'description' => 'The node identifier of the webform.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'uid' => [
+        'description' => 'The id of the user that deleted this submission.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'deleted' => [
+        'description' => 'Timestamp when the submission was deleted.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'reason' => [
+        'description' => 'Hint about how this submission was deleted.',
+        'type' => 'varchar',
+        'length' => 255,
+      ],
+    ],
+    'primary key' => ['sid'],
+    'unique keys' => [
+      'sid_nid' => ['sid', 'nid'],
+    ]
+  ]);
 }
 
 /**
