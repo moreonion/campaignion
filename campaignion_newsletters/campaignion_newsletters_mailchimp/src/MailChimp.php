@@ -146,7 +146,7 @@ class MailChimp extends ProviderBase {
       if (isset($webhook_urls[$webhook_url])) {
         unset($webhook_urls[$webhook_url]);
       }
-      elseif($register) {
+      elseif ($register) {
         $this->api->post("/lists/{$list->identifier}/webhooks", [], [
           'url' => $webhook_url,
           'events' => [
