@@ -1,33 +1,28 @@
 <?php
 
-namespace Drupal\campaignion_newsletters_cleverreach;
+namespace Drupal\campaignion_newsletters_optivo;
 
 use \Drupal\campaignion\CRM\Import\Source\ArraySource;
 use \Drupal\campaignion_newsletters\NewsletterList;
-use \Drupal\campaignion_newsletters\QueueItem;
 use \Drupal\campaignion_newsletters\Subscription;
 
 /**
- * Test the CleverReach API implementation.
+ * Test the Provider implementation.
  */
-class CleverReachTest extends \DrupalUnitTestCase {
+class OptivoTest extends \DrupalUnitTestCase {
 
   /**
-   * Construct a partially stubbed CleverReach object using a mock Api object.
+   * Construct a partially stubbed Optivo object using a mock Client object.
    */
   protected function mockProvider() {
-    $api = $this->getMockBuilder(ApiClient::class)
+    $api = $this->getMockBuilder(Client::class)
       ->setMethods([
-        'receiverGetByEmail',
-        'receiverAdd',
-        'receiverUpdate',
-        'formsSendActivationMail',
       ])
       ->disableOriginalConstructor()
       ->getMock();
-    $cr = $this->getMockBuilder(CleverReach::class)
+    $cr = $this->getMockBuilder(Optivo::class)
       ->setMethods(['getSource'])
-      ->setConstructorArgs([$api, 'test'])
+      ->disableOriginalConstructor()
       ->getMock();
     return [$cr, $api];
   }
@@ -57,36 +52,14 @@ class CleverReachTest extends \DrupalUnitTestCase {
   }
 
   /**
-   * Test that subscribe() does not pass 'registered' when updating subscribers.
-   */
-  public function testSubscribeUpdateNoRegisteredDate() {
-    list($cr, $api) = $this->mockProvider();
-
-    $result = (object) [
-      'status' => 'SUCCESS',
-      'data' => [],
-    ];
-    $item = new QueueItem(['created' => 42]);
-    $list = new NewsletterList(['data' => (object) ['id' => 42]]);
-    $api->expects($this->once())->method('receiverUpdate')
-      ->with($this->anything(), $this->equalTo([
-        'email' => $item->email,
-        'attributes' => NULL,
-        'active' => TRUE,
-        'activated' => 42,
-      ]))->willReturn($result);
-    $api->method('receiverGetByEmail')
-      ->willReturn((object) ['message' => 'found']);
-    $cr->subscribe($list, $item);
-  }
-
-  /**
    * Test generating data for subscriptions.
    */
   public function testData() {
     $subscription = $this->mockSubscription('test@example.com', (object) [
-      'attributes' => [(object) ['key' => 'firstname']],
-      'globalAttributes' => [(object) ['key' => 'lastname']],
+      'attributeNames' => [
+        'Firstname',
+        'Lastname',
+      ],
     ]);
 
     // Test new item.
@@ -97,7 +70,8 @@ class CleverReachTest extends \DrupalUnitTestCase {
     $cr->method('getSource')->willReturn($source1);
     list($data, $fingerprint) = $cr->data($subscription, []);
     $this->assertEqual([
-      ['key' => 'firstname', 'value' => 'test'],
+      'names' => ['Firstname'],
+      'values' => ['test'],
     ], $data);
 
     // Test item with existing data.
@@ -108,8 +82,8 @@ class CleverReachTest extends \DrupalUnitTestCase {
     $cr->method('getSource')->willReturn($source2);
     list($data, $fingerprint) = $cr->data($subscription, $data);
     $this->assertEqual([
-      ['key' => 'firstname', 'value' => 'test'],
-      ['key' => 'lastname', 'value' => 'test'],
+      'names' => ['Firstname', 'Lastname'],
+      'values' => ['test', 'test'],
     ], $data);
   }
 

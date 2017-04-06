@@ -251,7 +251,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
     $provider->expects($this->any())->method('getSource')
       ->will($this->returnValue(new ArraySource([])));
     $subscription = $this->mockSubscription('test@example.com', []);
-    list($data, $fingerprint) = $provider->data($subscription);
+    list($data, $fingerprint) = $provider->data($subscription, []);
     $this->assertEqual(['merge_fields' => [], 'interests' => []], $data);
   }
 
@@ -266,7 +266,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
         'OTHER' => 'Other',
       ])));
     $subscription = $this->mockSubscription('test@example.com', ['FNAME']);
-    list($data, $fingerprint) = $provider->data($subscription);
+    list($data, $fingerprint) = $provider->data($subscription, []);
     $this->assertEqual([
       'merge_fields' => ['FNAME' => 'Fname'],
       'interests' => [],

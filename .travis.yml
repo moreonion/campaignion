@@ -16,7 +16,7 @@ cache:
 
 install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - composer global require drush/drush:6.* 'phpunit/phpunit=5.3.*'
+  - composer global require drush/drush:6.* 'phpunit/phpunit=5.6.*'
 
 before_script:
   - repo=`pwd`

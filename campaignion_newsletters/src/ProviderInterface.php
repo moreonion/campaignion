@@ -47,6 +47,8 @@ interface ProviderInterface {
    *
    * @param Subscription $subscription
    *   The subscription object.
+   * @param mixed|null $old_data
+   *   Data from an existing queue item or NULL if there is none.
    *
    * @return array
    *   An array containing some data object and a fingerprint:
@@ -56,6 +58,6 @@ interface ProviderInterface {
    *   - The $fingerprint must be an sha1-hash. Usually it's a hash
    *     of some subset of $data.
    */
-  public function data(Subscription $subscription);
+  public function data(Subscription $subscription, $old_data);
 
 }

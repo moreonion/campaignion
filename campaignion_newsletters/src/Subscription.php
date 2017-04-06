@@ -63,15 +63,15 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
     if ($this->delete) {
       return $this->delete($fromProvider);
     }
-    list($data, $fingerprint) = $this->providerData();
-    if ($fingerprint != $this->fingerprint) {
-      $this->fingerprint = $fingerprint;
-      if (!$fromProvider) {
-        $item = QueueItem::byData(array(
-          'list_id' => $this->list_id,
-          'email' => $this->email,
-          'data' => $data,
-        ));
+    if (!$fromProvider && ($provider = $this->provider())) {
+      $item = QueueItem::byData(array(
+        'list_id' => $this->list_id,
+        'email' => $this->email,
+      ));
+      list($data, $fingerprint) = $provider->data($this, $item->data);
+      if ($fingerprint != $this->fingerprint) {
+        $this->fingerprint = $fingerprint;
+        $item->data = $data;
 
         if ($item->isNew()) {
           if ($this->new) {
@@ -95,12 +95,15 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
     $this->new = FALSE;
   }
 
-  public function providerData() {
+  /**
+   * Get the newsletter provider for this subscriptions's list.
+   *
+   * @return \Drupal\campaignion_newsletters\ProviderInterface
+   *   The provider object.
+   */
+  protected function provider() {
     if (($l = $this->newsletterList()) && ($p = $l->provider())) {
-      return $p->data($this);
-    }
-    else {
-      return array(array(), '');
+      return $p;
     }
   }
 

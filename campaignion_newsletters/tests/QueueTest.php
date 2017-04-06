@@ -4,22 +4,25 @@ namespace Drupal\campaignion_newsletters;
 
 use \Drupal\campaignion\Contact;
 
-class TestSubscription extends Subscription {
-  public $data = [];
-  public function providerData() {
-    return [$this->data, sha1(serialize($this->data))];
-  }
-}
-
-class QueueTest extends \DrupalWebTestCase {
+class QueueTest extends \DrupalUnitTestCase {
   function test_updateContactWhileCronIsRunnning() {
-    TestSubscription::fromData(4711, 't@e.org')->save();
+    $subscription = $this->getMockBuilder(Subscription::class)
+      ->setMethods(['provider'])
+      ->setConstructorArgs([['email' => 't@e.org', 'list_id' => 4711], TRUE])
+      ->getMock();
+    $provider = $this->createMock(ProviderBase::class);
+    $provider->method('data')
+      ->will($this->onConsecutiveCalls(
+        [['test' => '1'], 'fingerprint1'],
+        [['test' => '2'], 'fingerprint2']
+      ));
+    $subscription->expects($this->any())->method('provider')
+      ->willReturn($provider);
+    $subscription->save();
     $items = QueueItem::claimOldest(2);
     $this->assertCount(1, $items);
 
-    $s = TestSubscription::fromData(4711, 't@e.org');
-    $s->data = ['test' => '1'];
-    $s->save();
+    $subscription->save();
 
     foreach ($items as $item) {
       $item->delete();
