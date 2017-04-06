@@ -38,7 +38,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
       ->setMethods($methods)
       ->disableOriginalConstructor()
       ->getMock();
-    return [$api, new MailChimp($api, 'testname')];
+    return [$api, new MailChimp($api, 'testname', TRUE)];
   }
 
   /**

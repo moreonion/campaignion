@@ -19,6 +19,7 @@ class MailChimp extends ProviderBase {
 
   protected $account;
   protected $api;
+  protected $registerWebhooks;
 
   /**
    * Extract the DC from a valid API-key.
@@ -40,15 +41,17 @@ class MailChimp extends ProviderBase {
   public static function fromParameters(array $params) {
     $dc = static::key2dc($params['key']);
     $endpoint = "https://campaignion:{$params['key']}@{$dc}.api.mailchimp.com/3.0";
-    return new static(new MailChimpClient($endpoint), $params['name']);
+    $webhooks = variable_get('campaignion_newsletters_mailchimp_register_webhooks', TRUE) && variable_get('webhooks_enabled', TRUE);
+    return new static(new MailChimpClient($endpoint), $params['name'], $webhooks);
   }
 
   /**
    * Constructor. Gets settings and fetches intial group list.
    */
-  public function __construct($api, $name) {
+  public function __construct($api, $name, $register_webhooks) {
     $this->api = $api;
     $this->account = $name;
+    $this->registerWebhooks = $register_webhooks;
   }
 
   /**
@@ -111,7 +114,7 @@ class MailChimp extends ProviderBase {
    * Staging and development installations should set one of these to FALSE.
    */
   protected function registerWebhooks() {
-    return variable_get('campaignion_newsletters_mailchimp_register_webhooks', TRUE) && variable_get('webhooks_enabled', TRUE);
+    return $this->registerWebhooks;
   }
 
   /**
