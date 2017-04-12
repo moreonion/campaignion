@@ -19,67 +19,24 @@ use \Drupal\campaignion_newsletters\Subscription;
 class Optivo extends ProviderBase {
   protected $account;
   protected $optinProcessId;
-  protected $sessionService;
-  protected $recipientListService;
-  protected $recipientService;
-  protected $sessionId = NULL;
-  protected $credentials = [];
+  protected $factory;
 
   public static function fromParameters(array $params) {
-    return new static(
-      $params,
-      new Client("https://api.broadmail.de/soap11/RpcSession?wsdl"),
-      new SessionClient("https://api.broadmail.de/soap11/RpcRecipientList?wsdl"),
-      new RecipientServiceClient("https://api.broadmail.de/soap11/RpcRecipient?wsdl"),
-      new SessionClient("https://api.broadmail.de/soap11/RpcOptinProcess?wsdl")
-    );
+    $factory = ClientFactory::fromCredentials([
+      $params['mandatorId'],
+      $params['username'],
+      $params['password'],
+    ]);
+    return new static($params, $factory);
   }
 
   /**
    * Constructor. Creates an active session with Optivo.
    */
-  public function __construct(array $params, $session_service, $recipient_list_service, $recipient_service, $optin_service) {
+  public function __construct(array $params, ClientFactory $factory) {
     $this->account = $params['name'];
+    $this->factory = $factory;
     $this->optinProcessId = $params['optinProcessId'];
-    $this->sessionService = $session_service;
-    $this->recipientListService = $recipient_list_service;
-    $this->recipientService = $recipient_service;
-    $this->optinService = $optin_service;
-    $this->credentials = [$params['mandatorId'], $params['username'], $params['password']];
-  }
-
-  /**
-   * Login using stored credentials. If needed.
-   */
-  protected function ensureLogin() {
-    if (!$this->sessionId) {
-      list($m, $u, $p) = $this->credentials;
-      $this->sessionId = $this->login($m, $u, $p);
-    }
-  }
-
-  /**
-   * Log out at the end of the object's life-time.
-   */
-  public function __destruct() {
-    if ($this->sessionId) {
-      $this->logout($this->sessionId);
-    }
-  }
-
-  public function login($mandatorId, $username, $password) {
-    $session_id = $this->sessionService->login($mandatorId, $username, $password);
-    $this->recipientListService->setSessionId($session_id);
-    $this->recipientService->setSessionId($session_id);
-    $this->optinService->setSessionId($session_id);
-    return $session_id;
-  }
-
-  public function logout($session_id) {
-    $this->sessionService->logout($session_id);
-    $this->recipientListService->setSessionId(NULL);
-    $this->recipientService->setSessionId(NULL);
-    $this->optinService->setSessionId(NULL);
   }
 
   /**
@@ -90,8 +47,7 @@ class Optivo extends ProviderBase {
    *   (properties: identifier, title, source, language).
    */
   public function getLists() {
-    $this->ensureLogin();
-    $service = $this->recipientListService;
+    $service = $this->factory->getClient('RecipientList');
     $list_ids = $service->getAllIds();
     $lists = [];
     foreach ( $list_ids as $id ) {
@@ -114,8 +70,7 @@ class Optivo extends ProviderBase {
    *   an array of subscribers.
    */
   public function getSubscribers($list) {
-    $this->ensureLogin();
-    $service = $this->recipientService;
+    $service = $this->factory->getClient('Recipient');
     $receivers = $service->getAll($list->identifier, 'email');
     return $receivers;
   }
@@ -124,8 +79,7 @@ class Optivo extends ProviderBase {
    * Subscribe a user, given a newsletter identifier and email address.
    */
   public function subscribe(NewsletterList $list, QueueItem $item) {
-    $this->ensureLogin();
-    $service = $this->recipientService;
+    $service = $this->factory->getClient('Recipient');
     $mail = $item->email;
     $recipientId = $mail;
     $address = $mail;
@@ -166,8 +120,7 @@ class Optivo extends ProviderBase {
    * Update user data.
    */
   public function update(NewsletterList $list, QueueItem $item) {
-    $this->ensureLogin();
-    $service = $this->recipientService;
+    $service = $this->factory->getClient('Recipient');
     $data = $item->data + ['names' => [], 'values' => []];
     $service->setAttributes($list->identifier, $item->email, $data['names'], $data['values']);
   }
@@ -179,8 +132,7 @@ class Optivo extends ProviderBase {
    * Should ignore the request if there is no such subscription.
    */
   public function unsubscribe(NewsletterList $list, QueueItem $item) {
-    $this->ensureLogin();
-    $service = $this->recipientService;
+    $service = $this->factory->getClient('Recipient');
     $service->remove($list->identifier, $item->email);
     return TRUE;
   }
@@ -231,8 +183,7 @@ class Optivo extends ProviderBase {
    * Get a list of all optin processes for this account.
    */
   public function getOptinProcessOptions() {
-    $this->ensureLogin();
-    $service = $this->optinService;
+    $service = $this->factory->getClient('Optin');
     $ids = $service->getIds();
     $options = [];
     foreach ($ids as $id) {
