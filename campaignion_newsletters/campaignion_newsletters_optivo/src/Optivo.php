@@ -205,4 +205,40 @@ class Optivo extends ProviderBase {
     return $source;
   }
 
+  /**
+   * Poll modified subscribers and import them.
+   *
+   * @TODO this should perhaps be in it's own class.
+   */
+  public function pollSubscribers($lists) {
+    $times = variable_get('campaignion_newsletters_optivo_poll_times', []);
+    // Default to 0 for every list.
+    $times += array_combine(array_keys($lists), array_fill(0, count($lists), 0));
+
+    $filter_service = $this->factory->getClient('RecipientFilter');
+    $recipient_service = $this->factory->getClient('Recipient');
+    $page_size = variable_get('campaignion_newsletters_optivo_subscriber_poll_page_size', 20);
+
+    foreach ($lists as $list_id => $list); {
+      $m = $times[$list_id];
+      $fid = $filter_service->createTemporary(FALSE, 'Modified', '>=', [date('c', $m)]);
+      $subscribers = $recipient_service->getAllAdvanced($list->identifier, $list->data->attributeNames, $fid, 'Modified', TRUE, 0, $page_size);
+      foreach ($subscribers as $subscriber) {
+        $data = array_combine($list->data->attributeNames, $subscriber);
+        $m = strtotime($data['Modified']);
+      }
+      $times[$list_id] = $m;
+      variable_set('campaignion_newsletters_optivo_poll_times', $times);
+    }
+
+    /*
+    Each step consists of:
+    1. Create a filter for Modified >= (x)
+    2. Query recipients using this filter.
+    3. Remove the filter.
+    4. Import all recipients.
+    4. x = The newest modified date queried.
+    */
+  }
+
 }
