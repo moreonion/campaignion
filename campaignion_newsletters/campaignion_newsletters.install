@@ -178,7 +178,7 @@ function campaignion_newsletters_uninstall() {
 function campaignion_newsletters_update_13() {
   $sql = <<<SQL
 UPDATE
-  d {webform_submitted_data} d
+  {webform_submitted_data} d
   INNER JOIN {webform_component} c
 SET d.data='', d.no='0'
 WHERE c.type='newsletter' AND d.data='0';
