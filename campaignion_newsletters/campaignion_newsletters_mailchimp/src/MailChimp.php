@@ -19,6 +19,7 @@ class MailChimp extends ProviderBase {
 
   protected $account;
   protected $api;
+  protected $registerWebhooks;
 
   /**
    * Extract the DC from a valid API-key.
@@ -40,15 +41,17 @@ class MailChimp extends ProviderBase {
   public static function fromParameters(array $params) {
     $dc = static::key2dc($params['key']);
     $endpoint = "https://campaignion:{$params['key']}@{$dc}.api.mailchimp.com/3.0";
-    return new static(new MailChimpClient($endpoint), $params['name']);
+    $webhooks = variable_get('campaignion_newsletters_mailchimp_register_webhooks', TRUE) && variable_get('webhooks_enabled', TRUE);
+    return new static(new MailChimpClient($endpoint), $params['name'], $webhooks);
   }
 
   /**
    * Constructor. Gets settings and fetches intial group list.
    */
-  public function __construct($api, $name) {
+  public function __construct($api, $name, $register_webhooks) {
     $this->api = $api;
     $this->account = $name;
+    $this->registerWebhooks = $register_webhooks;
   }
 
   /**
@@ -111,7 +114,7 @@ class MailChimp extends ProviderBase {
    * Staging and development installations should set one of these to FALSE.
    */
   protected function registerWebhooks() {
-    return variable_get('campaignion_newsletters_mailchimp_register_webhooks', TRUE) && variable_get('webhooks_enabled', TRUE);
+    return $this->registerWebhooks;
   }
 
   /**
@@ -143,7 +146,7 @@ class MailChimp extends ProviderBase {
       if (isset($webhook_urls[$webhook_url])) {
         unset($webhook_urls[$webhook_url]);
       }
-      elseif($register) {
+      elseif ($register) {
         $this->api->post("/lists/{$list->identifier}/webhooks", [], [
           'url' => $webhook_url,
           'events' => [
@@ -212,6 +215,7 @@ class MailChimp extends ProviderBase {
    */
   public function data(Subscription $subscription) {
     $data['merge_fields'] = $this->attributeData($subscription);
+    $data['interests'] = [];
     // Let other modules alter the data (ie. for adding interest groups).
     drupal_alter('campaignion_newsletters_mailchimp_data', $data, $subscription);
     $fingerprint = sha1(serialize($data));
@@ -219,17 +223,31 @@ class MailChimp extends ProviderBase {
   }
 
   /**
+   * Prepare data for being sent to MailChimp.
+   *
+   * Make sure everything that needs to be a JSON-object is serialized as such
+   * even if empty.
+   */
+  protected function preprocessData($data) {
+    $data += [
+      'interests' => [],
+      'merge_fields' => [],
+    ];
+    $data['interests'] = (object) $data['interests'];
+    $data['merge_fields'] = (object) $data['merge_fields'];
+    return $data;
+  }
+
+  /**
    * Subscribe a user, given a newsletter identifier and email address.
    */
   public function subscribe(NewsletterList $list, QueueItem $item) {
     $hash = md5(strtolower($item->email));
-    if (!$item->data['merge_fields']) {
-      unset($item->data['merge_fields']);
-    }
+    $data = $this->preprocessData($item->data);
     $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'email_address' => $item->email,
       'status' => $item->optIn() ? 'pending' : 'subscribed',
-    ] + $item->data);
+    ] + $data);
   }
 
   /**
@@ -237,12 +255,10 @@ class MailChimp extends ProviderBase {
    */
   public function update(NewsletterList $list, QueueItem $item) {
     $hash = md5(strtolower($item->email));
-    if (!$item->data['merge_fields']) {
-      unset($item->data['merge_fields']);
-    }
+    $data = $this->preprocessData($item->data);
     $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'email_address' => $item->email,
-    ] + $item->data);
+    ] + $data);
   }
 
   /**

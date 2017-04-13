@@ -2,8 +2,10 @@
 
 namespace Drupal\campaignion_newsletters_mailchimp;
 
+use \Drupal\campaignion\CRM\Import\Source\ArraySource;
 use \Drupal\campaignion_newsletters\NewsletterList;
 use \Drupal\campaignion_newsletters\QueueItem;
+use \Drupal\campaignion_newsletters\Subscription;
 use \Drupal\little_helpers\Rest\HttpError;
 
 use \Drupal\campaignion_newsletters_mailchimp\Rest\ApiError;
@@ -38,7 +40,38 @@ class MailChimpTest extends \DrupalUnitTestCase {
       ->setMethods($methods)
       ->disableOriginalConstructor()
       ->getMock();
-    return [$api, new MailChimp($api, 'testname')];
+    $provider = $this->getMockBuilder(MailChimp::class)
+      ->setMethods(['getSource'])
+      ->setConstructorArgs([$api, 'testname', TRUE])
+      ->getMock();
+    return [$api, $provider];
+  }
+
+  /**
+   * Generate a mock subscription with an accompanying list.
+   *
+   * @param string $email
+   *   An email address.
+   * @param string[] $merge_tags
+   *   A list of uppercase MailChimp merge tags.
+   *
+   * @return \Drupal\campaignion_newsletters\Subscription
+   *   A newly created subscription object.
+   */
+  protected function mockSubscription($email, array $merge_tags) {
+    $merge_vars = array_map(function ($tag) {
+      return ['tag' => $tag];
+    }, $merge_tags);
+    $subscription = $this->getMockBuilder(Subscription::class)
+      ->setMethods(['newsletterList'])
+      ->setConstructorArgs([['email' => $email], TRUE])
+      ->getMock();
+    $subscription->expects($this->any())->method('newsletterList')
+      ->will($this->returnValue(new NewsletterList([
+        'list_id' => 2048,
+        'data' => (object) ['merge_vars' => $merge_vars],
+      ])));
+    return $subscription;
   }
 
   /**
@@ -100,10 +133,21 @@ class MailChimpTest extends \DrupalUnitTestCase {
     ]);
     list($api, $provider) = $this->mockChimp(['put']);
     $item = new QueueItem([
+      'email' => 'test@example.com',
       'args' => ['send_optin' => FALSE],
-      'data' => ['FNAME' => 'Test', 'LNAME' => 'Test', 'merge_fields' => []],
+      'data' => [
+        'merge_fields' => ['FNAME' => 'Test', 'LNAME' => 'Test'],
+        'interests' => [],
+      ],
     ]);
-    $api->expects($this->once())->method('put');
+    $post_data = [
+      'email_address' => 'test@example.com',
+      'status' => 'subscribed',
+      'merge_fields' => (object) ['FNAME' => 'Test', 'LNAME' => 'Test'],
+      'interests' => (object) [],
+    ];
+    $api->expects($this->once())->method('put')
+      ->with($this->anything(), $this->anything(), $post_data, $this->anything());
     $provider->subscribe($list_o, $item);
   }
 
@@ -197,6 +241,36 @@ class MailChimpTest extends \DrupalUnitTestCase {
     );
 
     $provider->setWebhooks([$list_o]);
+  }
+
+  /**
+   * Test format of the data array.
+   */
+  public function testDataEmpty() {
+    list($api, $provider) = $this->mockChimp();
+    $provider->expects($this->any())->method('getSource')
+      ->will($this->returnValue(new ArraySource([])));
+    $subscription = $this->mockSubscription('test@example.com', []);
+    list($data, $fingerprint) = $provider->data($subscription);
+    $this->assertEqual(['merge_fields' => [], 'interests' => []], $data);
+  }
+
+  /**
+   * Test data with merge tags.
+   */
+  public function testDataWithTags() {
+    list($api, $provider) = $this->mockChimp();
+    $provider->expects($this->any())->method('getSource')
+      ->will($this->returnValue(new ArraySource([
+        'FNAME' => 'Fname',
+        'OTHER' => 'Other',
+      ])));
+    $subscription = $this->mockSubscription('test@example.com', ['FNAME']);
+    list($data, $fingerprint) = $provider->data($subscription);
+    $this->assertEqual([
+      'merge_fields' => ['FNAME' => 'Fname'],
+      'interests' => [],
+    ], $data);
   }
 
 }
