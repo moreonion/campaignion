@@ -19,11 +19,19 @@ class Provider extends ProviderBase {
   protected $account;
 
   /**
-   * Constructor. Configure API client for later use.
+   * Construct a new instance from config parameters.
    */
-  public function __construct(array $params) {
-    $this->api = new Api\Client($params['username'], $params['password']);
-    $this->account = $params['name'];
+  public static function fromParameters(array $params) {
+    $api = new Api\Client($params['username'], $params['password']);
+    return new static($api, $params['name']);
+  }
+
+  /**
+   * Constructor.
+   */
+  public function __construct(Api\Client $api, $name) {
+    $this->api = $api;
+    $this->account = $name;
   }
 
   /**
@@ -82,9 +90,8 @@ class Provider extends ProviderBase {
   /**
    * Get values for all merge tags if possible.
    */
-  protected function attributeData(Subscription $subscription) {
+  protected function attributeData(Subscription $subscription, $field_data = []) {
     $list = $subscription->newsletterList();
-    $field_data = array();
 
     if ($source = $this->getSource($subscription, 'dotmailer')) {
       foreach ($list->data->fields as $field) {
@@ -101,12 +108,13 @@ class Provider extends ProviderBase {
     return $field_data;
   }
 
-  public function data(Subscription $subscription) {
-    $data = $this->attributeData($subscription);
-    $attr = $data;
-    $fingerprint = sha1(serialize($attr));
+  /**
+   * {@inheritdocs}
+   */
+  public function data(Subscription $subscription, $old_data) {
+    $data = $this->attributeData($subscription, $old_data ? $old_data : []);
+    $fingerprint = sha1(serialize($data));
     return array($data, $fingerprint);
-
   }
 
   /**

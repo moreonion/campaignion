@@ -193,9 +193,8 @@ class MailChimp extends ProviderBase {
   /**
    * Get values for all merge tags if possible.
    */
-  protected function attributeData(Subscription $subscription) {
+  protected function attributeData(Subscription $subscription, $attributes) {
     $list = $subscription->newsletterList();
-    $attributes = array();
 
     if ($source = $this->getSource($subscription, 'mailchimp')) {
       foreach ($list->data->merge_vars as $attribute) {
@@ -213,9 +212,13 @@ class MailChimp extends ProviderBase {
   /**
    * Generate the QueueItem::data attribute for a given subscription.
    */
-  public function data(Subscription $subscription) {
-    $data['merge_fields'] = $this->attributeData($subscription);
-    $data['interests'] = [];
+  public function data(Subscription $subscription, $old_data) {
+    $data = $old_data ? $old_data : [];
+    $data += [
+      'merge_fields' => [],
+      'interests' => [],
+    ];
+    $data['merge_fields'] = $this->attributeData($subscription, $data['merge_fields']);
     // Let other modules alter the data (ie. for adding interest groups).
     drupal_alter('campaignion_newsletters_mailchimp_data', $data, $subscription);
     $fingerprint = sha1(serialize($data));

@@ -8,6 +8,9 @@
 
 namespace Drupal\campaignion_newsletters_cleverreach;
 
+use \Drupal\campaignion\CRM\Import\Source\ArraySource;
+use \Drupal\campaignion\CRM\Import\Source\CombinedSource;
+
 use \Drupal\campaignion_newsletters\ApiError;
 use \Drupal\campaignion_newsletters\ApiPersistentError;
 use \Drupal\campaignion_newsletters\FormSubmission;
@@ -97,12 +100,28 @@ class CleverReach extends ProviderBase {
     return $receivers;
   }
 
-  protected function attributeData(Subscription $subscription) {
+  /**
+   * Get a source object for exporting data.
+   */
+  protected function getCombinedSource(Subscription $subscription, $target, $old_data) {
+    $source = $this->getSource($subscription, $target);
+    if ($old_data) {
+      $data = [];
+      foreach ($old_data as $i) {
+        $data[$i['key']] = $i['value'];
+      }
+      $old_source = new ArraySource($data);
+      $source = new CombinedSource($source, $old_source);
+    }
+    return $source;
+  }
+
+  protected function attributeData(Subscription $subscription, $old_data) {
     $list = $subscription->newsletterList();
     $attributes = array();
 
     $listAttributes = array_merge($list->data->attributes, $list->data->globalAttributes);
-    if ($source = $this->getSource($subscription, 'cleverreach')) {
+    if ($source = $this->getCombinedSource($subscription, 'cleverreach', $old_data)) {
       foreach ($listAttributes as $attribute) {
         if ($value = $source->value($attribute->key)) {
           $attributes[] = array(
@@ -115,8 +134,8 @@ class CleverReach extends ProviderBase {
     return $attributes;
   }
 
-  public function data(Subscription $subscription) {
-    $data = $this->attributeData($subscription);
+  public function data(Subscription $subscription, $old_data) {
+    $data = $this->attributeData($subscription, $old_data);
     $attr = $data;
     unset($attr['updated']);
     $fingerprint = sha1(serialize($attr));

@@ -6,6 +6,9 @@
 
 namespace Drupal\campaignion_newsletters_optivo;
 
+use \Drupal\campaignion\CRM\Import\Source\ArraySource;
+use \Drupal\campaignion\CRM\Import\Source\CombinedSource;
+
 use \Drupal\campaignion_newsletters\ApiError;
 use \Drupal\campaignion_newsletters\ApiPersistentError;
 use \Drupal\campaignion_newsletters\NewsletterList;
@@ -183,16 +186,29 @@ class Optivo extends ProviderBase {
   }
 
   /**
+   * Apply transformations to map an attribute name to form keys.
+   *
+   * @param string $lname
+   *   The attribute name.
+   *
+   * @return string
+   *   The cleaned name.
+   */
+  protected static function cleanName($lname) {
+    return strtr(drupal_clean_css_identifier(strtolower($lname)), '-', '_');
+  }
+
+  /**
    * Get the subscriber-data for a subscription object.
    */
-  protected function attributeData($subscription) {
+  protected function attributeData($subscription, $old_data) {
     $list = $subscription->newsletterList();
     $names = [];
     $values = [];
 
-    if ($source = $this->getSource($subscription, 'optivo')) {
+    if ($source = $this->getCombinedSource($subscription, 'optivo', $old_data)) {
       foreach ($list->data->attributeNames as $lname) {
-        $name = strtr(drupal_clean_css_identifier(strtolower($lname)), '-', '_');
+        $name = self::cleanName($lname);
         if ($value = $source->value($name)) {
           $names[] = $lname;
           $values[] = $value;
@@ -205,8 +221,8 @@ class Optivo extends ProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function data(Subscription $subscription) {
-    $data = $this->attributeData($subscription);
+  public function data(Subscription $subscription, $old_data = NULL) {
+    $data = $this->attributeData($subscription, $old_data);
     $fingerprint = sha1(serialize($data));
     return array($data, $fingerprint);
   }
@@ -223,6 +239,19 @@ class Optivo extends ProviderBase {
       $options[$id] = $service->getName($id);
     }
     return $options;
+  }
+
+  /**
+   * Get a source object for exporting data.
+   */
+  protected function getCombinedSource(Subscription $subscription, $target, $old_data) {
+    $source = $this->getSource($subscription, $target);
+    if ($old_data) {
+      $names = array_map([self::class, 'cleanName'], $old_data['names']);
+      $old_source = new ArraySource(array_combine($names, $old_data['values']));
+      $source = new CombinedSource($source, $old_source);
+    }
+    return $source;
   }
 
 }
