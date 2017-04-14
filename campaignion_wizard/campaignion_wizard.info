@@ -8,3 +8,4 @@ dependencies[] = campaignion_action
 dependencies[] = form_builder_webform (>=7.x-1.14)
 dependencies[] = oowizard
 dependencies[] = psr0
+dependencies[] = webform_confirm_email (>7.x-2.5)

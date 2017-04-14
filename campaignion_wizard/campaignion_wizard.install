@@ -27,6 +27,24 @@ function campaignion_wizard_schema() {
 }
 
 /**
+ * Implements hook_update_dependencies().
+ */
+function campaignion_wizard_update_dependencies() {
+  $deps['campaignion_wizard'][3]['webform_confirm_email'] = 7205;
+  return $deps;
+}
+
+/**
+ * Update the request_lifetime of all confirmation emails.
+ */
+function campaignion_wizard_update_3() {
+  db_update('webform')
+    ->fields(['confirm_email_request_lifetime' => 60 * 60 * 24 * 30 * 3])
+    ->condition('confirm_email_request_lifetime', NULL, 'IS')
+    ->execute();
+}
+
+/**
  * Create campaignion_wizard_status table.
  */
 function campaignion_wizard_update_2() {

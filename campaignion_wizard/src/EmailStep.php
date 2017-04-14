@@ -75,6 +75,13 @@ class EmailStep extends WizardStep {
       $form += $email->form($this->emailInfo[$name], $form_state);
     }
 
+    form_load_include($form_state, 'module', 'webform_confirm_email', 'admin.inc');
+    $e = webform_confirm_email_settings($form, $form_state, $node);
+    $e['request_lifetime']['#collapsed'] = TRUE;
+    $e['request_lifetime']['#weight'] = 10;
+    unset($e['actions']);
+    $form += $e;
+
     return $form;
   }
 
@@ -86,6 +93,7 @@ class EmailStep extends WizardStep {
     foreach ($this->emails as $email) {
       $email->validate($form, $form_state);
     }
+    webform_confirm_email_settings_validate($form, $form_state);
   }
 
   public function submitStep($form, &$form_state) {
@@ -102,6 +110,16 @@ class EmailStep extends WizardStep {
 
     foreach ($this->emailInfo as $name => $info) {
       $this->emails[$name]->submit($form, $form_state, $info['type']);
+    }
+
+    // Silence the message set by webform_confirm_email_settings_submit().
+    $messages = isset($_SESSION['messages']) ? $_SESSION['messages'] : NULL;
+    webform_confirm_email_settings_submit($form, $form_state);
+    if (is_null($messages)) {
+      unset($_SESSION['messages']);
+    }
+    else {
+      $_SESSION['messages'] = $messages;
     }
   }
 
