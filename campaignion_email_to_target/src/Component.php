@@ -21,7 +21,7 @@ class Component {
    * Static constructor to inject dependencies based on a component array.
    */
   public static function fromComponent(array $component) {
-    $node = node_load($this->component['nid']);
+    $node = node_load($component['nid']);
     $webform = new Webform($node);
     $action = Loader::instance()->actionFromNode($node);
     return new static($component, $webform, $action);
