@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_email_to_target;
 
 use \Drupal\campaignion_action\ActionBase;
+use \Drupal\campaignion_action\TypeInterface;
 use \Drupal\campaignion_email_to_target\Api\Client;
 
 /**
@@ -11,6 +12,19 @@ use \Drupal\campaignion_email_to_target\Api\Client;
  * Mainly deals with the configuration and with selecting messages / exclusion.
  */
 class Action extends ActionBase {
+
+  protected $options;
+  protected $api;
+
+  public static function fromTypeAndNode(TypeInterface $type, $node) {
+    return new static($type, $node, Client::fromConfig());
+  }
+
+  public function __construct(TypeInterface $type, $node, $api) {
+    parent::__construct($type, $node);
+    $this->options = $this->getOptions();
+    $this->api = $api;
+  }
 
   /**
    * Choose an appropritae exclusion for a given target.
@@ -50,8 +64,7 @@ class Action extends ActionBase {
    * Get the selected dataset for this action.
    */
   public function dataset() {
-    $api = Client::fromConfig();
-    return $api->getDataset($this->getOptions()['dataset_name']);
+    return $this->api->getDataset($this->getOptions()['dataset_name']);
   }
 
   /**
@@ -60,5 +73,59 @@ class Action extends ActionBase {
   public function testLink($title, $query = [], $options = []) {
     return $this->_testLink($title, $query, $options);
   }
+
+  /**
+   * Generate target message pairs for a submission.
+   */
+  public function targetMessagePairs($submission_o, $test_mode = FALSE) {
+    $dataset = $this->options['dataset_name'];
+    $email_override = $test_mode ? $submission_o->valueByKey('email') : NULL;
+    $postcode = str_replace(' ', '', $submission_o->valueByKey('postcode'));
+    $constituencies = $this->api->getTargets($dataset, $postcode);
+
+    $pairs = [];
+    $no_target_message = NULL;
+    foreach ($constituencies as $constituency) {
+      if ($exclusion = $this->getExclusion($constituency)) {
+        $exclusion->replaceTokens([], $constituency, $submission_o);
+        if (!$no_target_message) {
+          $no_target_message = $exclusion->message;
+        }
+        continue;
+      }
+      $targets = $constituency['contacts'];
+      foreach ($targets as $target) {
+        if ($message = $this->getMessage($target, $constituency)) {
+          if ($email_override) {
+            $target['email'] = $email_override;
+          }
+          $message->replaceTokens($target, $constituency, $submission_o);
+          if ($message->type == 'exclusion') {
+            // The first exclusion-message is used.
+            if (!$no_target_message) {
+              $no_target_message = $message->message;
+            }
+          }
+          else {
+            $pairs[] = [$target, $message];
+          }
+        }
+      }
+    }
+
+    if (empty($pairs)) {
+      watchdog('campaignion_email_to_target', 'The API found no targets (dataset=@dataset, postcode=@postcode).', [
+        '@dataset' => $this->options['dataset_name'],
+        '@postcode' => $postcode,
+      ], WATCHDOG_WARNING);
+    }
+
+    if (!$no_target_message) {
+      $no_target_message = t("There don't seem to be any targets for your selection.");
+    }
+
+    return [$pairs, $no_target_message];
+  }
+
 
 }

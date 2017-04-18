@@ -38,8 +38,12 @@ class Message {
     $data['email-to-target'] = $target;
     $data['email-to-target-constituency'] = $constituency;
     $data['webform-submission'] = $submission;
+    // It's ok to not sanitize values here. We will sanitize them later
+    // when it's clear whether we use it in a plain text email (no escaping)
+    // or in HTML output (check_plain).
+    $options['sanitize'] = FALSE;
     foreach ($this->tokenEnabledFields as $f) {
-      $this->$f = token_replace($this->$f, $data);
+      $this->{$f} = token_replace($this->{$f}, $data, $options);
     }
   }
 

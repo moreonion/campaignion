@@ -11,27 +11,26 @@ use \Drupal\campaignion_email_to_target\Api\Client;
  * Implement behavior for the email to target message webform component.
  */
 class Component {
-  protected $component;
-  protected $payment = NULL;
 
-  public function __construct(array $component) {
-    $this->component = $component;
-  }
+  protected $component;
+  protected $webform;
+  protected $action;
+  protected $options;
 
   /**
-   * Get a list of parent form keys for this component.
-   *
-   * @return array
-   *   List of parent form keys - just like $element['#parents'].
+   * Static constructor to inject dependencies based on a component array.
    */
-  public function parents($webform) {
-    $parents = array($this->component['form_key']);
-    $parent = $this->component;
-    while ($parent['pid'] != 0) {
-      $parent = $webform->component($parent['pid']);
-      array_unshift($parents, $parent['form_key']);
-    }
-    return $parents;
+  public static function fromComponent(array $component) {
+    $node = node_load($this->component['nid']);
+    $webform = new Webform($node);
+    $action = Loader::instance()->actionFromNode($node);
+    return new static($component, $webform, $action);
+  }
+
+  public function __construct(array $component, Webform $webform, Action $action) {
+    $this->component = $component;
+    $this->webform = $webform;
+    $this->action = $action;
   }
 
   /**
@@ -46,13 +45,9 @@ class Component {
    */
   public function render(&$element, &$form, &$form_state) {
     // Get list of targets for this node.
-    $node = node_load($this->component['nid']);
-    $webform = new Webform($node);
-    $action = Loader::instance()->actionFromNode($node);
-    $options = $action->getOptions();
-    $submission_o = $webform->formStateToSubmission($form_state);
+    $submission_o = $this->webform->formStateToSubmission($form_state);
+    $options = $this->action->getOptions();
 
-    $postcode = str_replace(' ', '', $submission_o->valueByKey('postcode'));
     $test_mode = !empty($form_state['test_mode']);
     $email = $submission_o->valueByKey('email');
 
@@ -80,8 +75,7 @@ class Component {
     $element['#attributes']['class'][] = 'webform-prefill-exclude';
 
     try {
-      $api = Client::fromConfig();
-      $constituencies = $api->getTargets($options['dataset_name'], $postcode);
+      list($pairs, $no_target_message) = $this->action->targetMessagePairs($submission_o, $test_mode);
     }
     catch (\Exception $e) {
       watchdog_exception('campaignion_email_to_target', $e);
@@ -94,46 +88,9 @@ class Component {
       return;
     }
 
-    $pairs = [];
-    $no_target_message = NULL;
-    foreach ($constituencies as $constituency) {
-      if ($exclusion = $action->getExclusion($constituency)) {
-        $exclusion->replaceTokens([], $constituency, $submission_o->unwrap());
-        if (!$no_target_message) {
-          $no_target_message = $exclusion->message;
-        }
-        continue;
-      }
-      $targets = $constituency['contacts'];
-      foreach ($targets as $target) {
-        if ($message = $action->getMessage($target, $constituency)) {
-          if ($test_mode) {
-            $target['email'] = $email;
-          }
-          $message->replaceTokens($target, $constituency, $submission_o->unwrap());
-          if ($message->type == 'exclusion') {
-            // The first exclusion-message is used.
-            if (!$no_target_message) {
-              $no_target_message = $message->message;
-            }
-          }
-          else {
-            $pairs[] = [$target, $message];
-          }
-        }
-      }
-    }
-
     if (empty($pairs)) {
-      watchdog('campaignion_email_to_target', 'The API found no targets (dataset=@dataset, postcode=@postcode).', [
-        '@dataset' => $options['dataset_name'],
-        '@postcode' => $postcode,
-      ], WATCHDOG_WARNING);
-      if (!$no_target_message) {
-        $no_target_message = t("There don't seem to be any targets for your selection.");
-      }
       $element['no_target'] = [
-        '#markup' => _filter_autop($no_target_message),
+        '#markup' => _filter_autop(check_plain($no_target_message)),
       ];
       $element['#attributes']['class'][] = 'email-to-target-no-targets';
       $this->disableSubmits($form);
@@ -162,7 +119,7 @@ class Component {
       ];
       $t['header'] = [
         '#prefix' => '<pre class="email-to-target-header">',
-        '#markup' => $message->header,
+        '#markup' => check_plain($message->header),
         '#suffix' => '</pre>',
       ];
       $t['message'] = [
@@ -173,7 +130,7 @@ class Component {
       ];
       $t['footer'] = [
         '#prefix' => '<pre class="email-to-target-footer">',
-        '#markup' => $message->footer,
+        '#markup' => check_plain($message->footer),
         '#suffix' => '</pre>',
       ];
       $element[$target['id']] = $t;
