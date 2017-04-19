@@ -21,6 +21,7 @@ function _campaignion_newsletters_optivo_form_campaignion_newsletters_admin_sett
     '#title' => t('Credentials'),
     '#prefix' => '<div id="optivo-credentials-wrapper">',
     '#suffix' => '</div>',
+    '#description' => t('Note that in additon to these you also need to have your IP-address whitelisted.'),
   );
 
   $fs = &$form['optivo']['credentials'];
