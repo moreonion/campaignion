@@ -41,8 +41,10 @@ class ActionBase {
    * Called whenever hook_node_prepare is called on this node.
    */
   public function prepare() {
-    $s90days = 90 * 24 * 3600;
-    $this->node->webform['confirm_email_request_lifetime'] = $s90days;
+    if (!isset($this->node->webform['confirm_email_request_lifetime'])) {
+      $s90days = 90 * 24 * 3600;
+      $this->node->webform['confirm_email_request_lifetime'] = $s90days;
+    }
   }
 
   /**
