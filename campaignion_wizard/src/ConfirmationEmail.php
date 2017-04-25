@@ -39,6 +39,9 @@ class ConfirmationEmail extends Email {
     // Silence the message set by webform_confirm_email_settings_submit().
     $messages = isset($_SESSION['messages']) ? $_SESSION['messages'] : NULL;
     $element = $form[$this->form_id . '_email'];
+    // Update the node with the modified email otherwise node_save() reverts our
+    // changes immediately.
+    $this->node->webform['emails'][$this->eid] = webform_email_load($this->eid, $this->node->nid);
     webform_confirm_email_settings_submit($element, $form_state);
     if (is_null($messages)) {
       unset($_SESSION['messages']);
