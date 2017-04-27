@@ -19,7 +19,7 @@
     ]
   },
   "dependencies": {
-    "vue": "^1.0.0"
+    "vue": "git+https://github.com/moreonion/vue.git#b692e671be052e5303a55b512c8fb8f19659810a"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.1",
