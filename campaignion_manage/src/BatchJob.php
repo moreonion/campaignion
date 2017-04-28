@@ -51,6 +51,7 @@ class BatchJob {
     }
     $ids = $this->result->nextIds($context['sandbox']['current_id'], $this->batchSize);
     $contacts = redhen_contact_load_multiple($ids, array(), TRUE);
+    $batch->start($context);
     foreach ($contacts as $contact) {
       $batch->apply($contact, $context['results']);
       $context['sandbox']['current_id'] = $contact->contact_id;

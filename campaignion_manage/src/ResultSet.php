@@ -105,7 +105,7 @@ class ResultSet extends \Drupal\little_helpers\DB\Model {
 
   public function nextIds($start, $limit) {
     $filter = array(':id' => $this->id, ':start' => $start);
-    $result = db_query_range('SELECT contact_id FROM {campaignion_manage_result} WHERE meta_id=:id AND contact_id>:start', 0, $limit, $filter);
+    $result = db_query_range('SELECT contact_id FROM {campaignion_manage_result} WHERE meta_id=:id AND contact_id>:start ORDER BY contact_id', 0, $limit, $filter);
     return $result->fetchCol();
   }
 }
