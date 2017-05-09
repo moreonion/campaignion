@@ -72,9 +72,17 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
     ];
 
     $settings = ['campaignion_email_to_target' => $settings];
+    $dir = drupal_get_path('module', 'campaignion_email_to_target');
     $form['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
-    $form['#attached']['js'][] = ['data' => drupal_get_path('module', 'campaignion_email_to_target') . '/js/messages_widget.js', 'scope' => 'footer'];
-    $form['#attached']['css'][] = ['data' => drupal_get_path('module', 'campaignion_email_to_target') . '/css/messages_widget.min.css', 'group' => 'CSS_DEFAULT', 'preprocess' => FALSE];
+    $form['#attached']['js'][] = [
+      'data' => $dir . '/js/messages_widget.js',
+      'scope' => 'footer',
+    ];
+    $form['#attached']['css'][] = [
+      'data' => $dir . '/css/messages_widget.min.css',
+      'group' => 'CSS_DEFAULT',
+      'preprocess' => FALSE,
+    ];
 
     $field = $this->wizard->parameters['email_to_target']['no_target_message_field'];
     $this->fieldForm = new EntityFieldForm('node', $node, [$field]);
