@@ -61,6 +61,14 @@ class Action extends ActionBase {
   }
 
   /**
+   * Get configured no target message.
+   */
+  public function noTargetMessage() {
+    $field = $this->type->parameters['email_to_target']['no_target_message_field'];
+    return field_view_field('node', $this->node, $field, ['label' => 'hidden']);
+  }
+
+  /**
    * Get the selected dataset for this action.
    */
   public function dataset() {
@@ -76,6 +84,16 @@ class Action extends ActionBase {
 
   /**
    * Generate target message pairs for a submission.
+   *
+   * @param \Drupal\little_helpers\Webform\Submission $submission_o
+   *   A submisson object.
+   * @param bool $test_mode
+   *   Whether to replace all target email addresses.
+   *
+   * @return array
+   *   Array with two members:
+   *   1. An array of target / message pairs.
+   *   2. The element that should be rendered if no target was found.
    */
   public function targetMessagePairs($submission_o, $test_mode = FALSE) {
     $dataset = $this->options['dataset_name'];
@@ -120,11 +138,14 @@ class Action extends ActionBase {
       ], WATCHDOG_WARNING);
     }
 
-    if (!$no_target_message) {
-      $no_target_message = t("There don't seem to be any targets for your selection.");
+    if ($no_target_message) {
+      $no_target_element = ['#markup' => _filter_autop(check_plain($no_target_message))];
+    }
+    else {
+      $no_target_element = $this->noTargetMessage();
     }
 
-    return [$pairs, $no_target_message];
+    return [$pairs, $no_target_element];
   }
 
 

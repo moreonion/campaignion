@@ -10,6 +10,7 @@ use \Drupal\campaignion_email_to_target\Api\Client;
 class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
   protected $step  = 'message';
   protected $title = 'Message';
+  protected $fieldForm;
 
   public function stepForm($form, &$form_state) {
     $node = $this->wizard->node;
@@ -71,10 +72,39 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
     ];
 
     $settings = ['campaignion_email_to_target' => $settings];
+    $dir = drupal_get_path('module', 'campaignion_email_to_target');
     $form['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
-    $form['#attached']['js'][] = ['data' => drupal_get_path('module', 'campaignion_email_to_target') . '/js/messages_widget.js', 'scope' => 'footer'];
-    $form['#attached']['css'][] = ['data' => drupal_get_path('module', 'campaignion_email_to_target') . '/css/messages_widget.min.css', 'group' => 'CSS_DEFAULT', 'preprocess' => FALSE];
+    $form['#attached']['js'][] = [
+      'data' => $dir . '/js/messages_widget.js',
+      'scope' => 'footer',
+    ];
+    $form['#attached']['css'][] = [
+      'data' => $dir . '/css/messages_widget.min.css',
+      'group' => 'CSS_DEFAULT',
+      'preprocess' => FALSE,
+    ];
+    $form['#attached']['css'][] = ['data' => $dir . '/css/message-step.css'];
+
+    $field = $this->wizard->parameters['email_to_target']['no_target_message_field'];
+    $this->fieldForm = new EntityFieldForm('node', $node, [$field]);
+    $form['advanced'] = [
+      '#type' => 'fieldset',
+      '#title' => t('No target available'),
+      '#attributes' => ['class' => ['e2t-col']],
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    ];
+    $form['advanced'] += $this->fieldForm->formArray($form_state);
+
     return $form;
+  }
+
+  public function validateStep($form, &$form_state) {
+    $this->fieldForm->validate($form['advanced'], $form_state);
+  }
+
+  public function submitStep($form, &$form_state) {
+    $this->fieldForm->submit($form['advanced'], $form_state);
   }
 
   public function checkDependencies() {

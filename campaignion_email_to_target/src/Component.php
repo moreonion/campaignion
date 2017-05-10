@@ -91,7 +91,7 @@ class Component {
     $element['#attributes']['class'][] = 'webform-prefill-exclude';
 
     try {
-      list($pairs, $no_target_message) = $this->action->targetMessagePairs($submission_o, $test_mode);
+      list($pairs, $no_target_element) = $this->action->targetMessagePairs($submission_o, $test_mode);
     }
     catch (\Exception $e) {
       watchdog_exception('campaignion_email_to_target', $e);
@@ -105,9 +105,7 @@ class Component {
     }
 
     if (empty($pairs)) {
-      $element['no_target'] = [
-        '#markup' => _filter_autop(check_plain($no_target_message)),
-      ];
+      $element['no_target'] = $no_target_element;
       $element['#attributes']['class'][] = 'email-to-target-no-targets';
       $this->disableSubmits($form);
       return;
