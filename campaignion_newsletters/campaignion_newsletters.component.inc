@@ -310,7 +310,7 @@ function _webform_form_builder_map_newsletter() {
  * Implements _webform_table_component().
  */
 function _webform_table_newsletter($component, $value) {
-  return empty($value[0]) ? t('not subscribed') : t('subscribed');
+  return $value && reset($value) ? t('subscribed') : t('not subscribed');
 }
 
 /**
@@ -328,5 +328,5 @@ function _webform_csv_headers_newsletter($component, $export_options) {
  * Implements _webform_csv_data_component().
  */
 function _webform_csv_data_newsletter($component, $export_options, $value) {
-  return empty($value[0]) ? t('not subscribed') : t('subscribed');
+  return $value && reset($value) ? t('subscribed') : t('not subscribed');
 }
