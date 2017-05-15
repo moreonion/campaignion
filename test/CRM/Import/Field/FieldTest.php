@@ -17,7 +17,9 @@ class FieldTest extends RedhenEntityTest {
 
   function testCallPreprocess(){
     $field = 'first_name'; $string = 'Somename';
-    $importer = $this->getMock(__NAMESPACE__ . '\\Field', array('preprocessField'), array($field));
+    $importer = $this->getMockBuilder(Field::class)
+      ->setMethods(['preprocessField'])->setConstructorArgs([$field])
+      ->getMock();
     $data[$field] = $string;
     $entity = $this->newRedhenContact();
     $importer->expects($this->once())->method('preprocessField')->with($this->identicalTo($data[$field]));
