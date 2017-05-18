@@ -76,6 +76,14 @@ function campaignion_webform_tokens_redirect($form, &$form_state) {
   );
 }
 
+/**
+ * Returns a safe HMAC value for a submission ID used for authentication.
+ *
+ * @param int $sid
+ *   The submission ID.
+ * @return string
+ *   The HMAC signature.
+ */
 function campaignion_webform_tokens_hash_sid($sid) {
   return drupal_hmac_base64((int) $sid, drupal_get_private_key() . drupal_get_hash_salt());
 }
@@ -85,8 +93,9 @@ function campaignion_webform_tokens_hash_sid($sid) {
  */
 function campaignion_webform_tokens_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $replacements = array();
-  if ($type != 'submission')
+  if ($type != 'submission') {
     return $replacements;
+  }
 
   $sid = (isset($_GET['sid']) && is_numeric($_GET['sid'])) ? (int) $_GET['sid'] : 0;
   $hash = isset($_GET['hash']) ? $_GET['hash'] : NULL;
