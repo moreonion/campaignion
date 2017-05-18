@@ -119,7 +119,7 @@ function _webform_csv_headers_mc_interests($component, $export_options) {
 /**
  * Implements _webform_csv_headers_component.
  */
-function _webform_csv_data_mc_interests($component, $export_options) {
+function _webform_csv_data_mc_interests($component, $export_options, $value) {
   _webform_set_options_mc_interests($component);
-  return _webform_csv_data_select($component, $export_options);
+  return _webform_csv_data_select($component, $export_options, $value);
 }
