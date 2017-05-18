@@ -42,15 +42,13 @@ class BatchJob {
   }
 
   public function apply(&$context) {
-    static $batch = NULL;
     if (!isset($context['sandbox']['progress'])) {
       $this->init($context);
     }
-    if (!$batch) {
-      $batch = $this->bulkOp->getBatch($this->data);
-    }
     $ids = $this->result->nextIds($context['sandbox']['current_id'], $this->batchSize);
     $contacts = redhen_contact_load_multiple($ids, array(), TRUE);
+    $batch = $this->bulkOp->getBatch($this->data);
+    $batch->start($context);
     foreach ($contacts as $contact) {
       $batch->apply($contact, $context['results']);
       $context['sandbox']['current_id'] = $contact->contact_id;

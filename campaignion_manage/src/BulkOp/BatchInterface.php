@@ -10,6 +10,7 @@ interface BatchInterface {
    *   Parameters for the bulk-operation.
    */
   public function getBatch(&$data);
+
   /**
    * @param array $data
    *   Parameters for the bulk-operation.

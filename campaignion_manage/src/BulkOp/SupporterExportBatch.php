@@ -6,14 +6,19 @@ use \Drupal\campaignion\ContactTypeManager;
 
 class SupporterExportBatch extends BatchBase {
   protected $exporter;
-  protected $file;
+  protected $file = NULL;
   protected $fields;
+  protected $filename;
 
   public function __construct(&$data) {
     $this->fields = $data['fields'];
-    $manager = ContactTypeManager::instance();
-    $this->exporter = $manager->exporter('campaignion_manage');
-    if (!($handle = fopen($data['csv_name'], 'a'))) {
+    $this->filename = $data['csv_name'];
+    $this->exporter = ContactTypeManager::instance()
+      ->exporter('campaignion_manage');
+  }
+
+  public function start(&$context) {
+    if (!($handle = fopen($this->filename, 'a'))) {
       $context['results']['errors'] = t('Couldn\'t open temporary file to export supporters.');
     }
     $this->file = $handle;
