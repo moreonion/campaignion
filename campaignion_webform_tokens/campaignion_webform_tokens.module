@@ -168,7 +168,7 @@ function _campaignion_webform_tokens_values($node, $submission) {
   $values = array();
   foreach ($components as $cid => $component) {
     $values[$component['form_key']] = NULL;
-    if ($v = $s->valuesByCid($cid)) {
+    if (($v = $s->valuesByCid($cid)) && (count($v) > 1 || reset($v))) {
       $values[$component['form_key']] = campaignion_webform_tokens_render_component($component, $v);
     }
   }
