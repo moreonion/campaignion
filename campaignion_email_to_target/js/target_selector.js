@@ -6,7 +6,9 @@ Drupal.behaviors.email_to_target_selector = {
       $('.email-to-target-target', this).each(function() {
         var $send = $('.form-type-checkbox', this).first();
         var $siblings = $send.siblings();
-        var $edit = $('<span class="email-to-target-edit"><a href="#">' + Drupal.t('personalise this email') + '</a></span>');
+        var editable = $('.form-type-textarea.form-disabled', this).length <= 0;
+        var link_text = editable ? Drupal.t('personalise this email') : Drupal.t('review message');
+        var $edit = $('<span class="email-to-target-edit"><a href="#">' + link_text + '</a></span>');
         $siblings.hide();
         var visible = false;
 
