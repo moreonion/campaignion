@@ -115,7 +115,8 @@ function campaignion_webform_tokens_tokens($type, $tokens, array $data = array()
   if (!$submission) {
     return $replacements;
   }
-  $values = _campaignion_webform_tokens_values($submission);
+  $node = !empty($data['node']) ? $data['node'] : node_load($submission->nid);
+  $values = _campaignion_webform_tokens_values($node, $submission);
 
   foreach ($tokens as $name => $original) {
     // Split token name to get the components name. The remainder is our default value.
@@ -161,8 +162,8 @@ function _campaignion_webform_tokens_get_submission($sid, $hash) {
   return isset($submission[$sid]) ? $submission[$sid] : FALSE;
 }
 
-function _campaignion_webform_tokens_values($submission) {
-  $s = new Submission(node_load($submission->nid), $submission);
+function _campaignion_webform_tokens_values($node, $submission) {
+  $s = new Submission($node, $submission);
   $components = $s->webform->node->webform['components'];
   $values = array();
   foreach ($components as $cid => $component) {
