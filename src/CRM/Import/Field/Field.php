@@ -26,7 +26,7 @@ class Field {
     }
   }
   protected function getValue(SourceInterface $source) {
-    return self::valueFromSource($source, $this->source);
+    return static::valueFromSource($source, $this->source);
   }
 
   /**
