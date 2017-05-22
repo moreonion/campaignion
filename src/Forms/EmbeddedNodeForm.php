@@ -7,7 +7,6 @@ class EmbeddedNodeForm {
   protected $form;
   protected $parents;
   public function __construct($node, &$form_state, $parents = array(), $embedState = array()) {
-    node_object_prepare($node);
     form_load_include($form_state, 'inc', 'node', 'node.pages');
     $form_state += array('embedded' => array(), 'field' => array());
     $a = &$form_state['embedded'];
