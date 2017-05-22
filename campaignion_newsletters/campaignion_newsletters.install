@@ -173,6 +173,20 @@ function campaignion_newsletters_uninstall() {
 }
 
 /**
+ * Replace 'subscribed' in webform_submitted_data.no with 0.
+ */
+function campaignion_newsletters_update_14() {
+  $sql = <<<SQL
+UPDATE
+  {webform_submitted_data} d
+  INNER JOIN {webform_component} c
+SET d.no='0'
+WHERE c.type='newsletter' AND d.no='subscribed';
+SQL;
+  db_query($sql);
+}
+
+/**
  * Replace '0' entries for not-subscribed submissions with ''.
  */
 function campaignion_newsletters_update_13() {
