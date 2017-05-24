@@ -53,6 +53,22 @@ function field_reference_or_redirect_field_is_empty($item, $field) {
 }
 
 /**
+ * Implements hook_field_presave().
+ */
+function field_reference_or_redirect_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  foreach ($items as &$item) {
+    if (!empty($item['node'])) {
+      $node = $item['node'];
+      if (empty($node->nid)) {
+        node_save($node);
+        $item['node_reference_nid'] = $node->nid;
+        unset($item['node']);
+      }
+    }
+  }
+}
+
+/**
  * Prepare new node as a translation of an existing one
  * just like i18n_node/translation would do it.
  *
@@ -100,8 +116,7 @@ function field_reference_or_redirect_field_prepare_translation($entity_type, $en
         } else {
           $new_node = _field_reference_or_redirect_copy_node_for_translation($reference_node, $entity->language);
           $new_node->status = $entity->status;
-          node_save($new_node);
-          $item['node_reference_nid'] = $new_node->nid;
+          $item['node'] = $new_node;
         }
       }
       if (isset($item['redirect_url'])) {

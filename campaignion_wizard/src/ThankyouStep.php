@@ -99,6 +99,7 @@ class ThankyouStep extends WizardStep {
       '#wizard_node' => $this->wizard->node,
     );
     $parents = array($prefix, 'node_form');
+    node_object_prepare($node);
     $formObj = new EmbeddedNodeForm($node, $form_state, $parents, $embedState);
     $node_form = array(
       '#type'    => 'container',

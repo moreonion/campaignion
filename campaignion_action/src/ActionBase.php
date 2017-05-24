@@ -51,6 +51,18 @@ class ActionBase {
    * Called whenever the node is saved (either by update or insert).
    */
   public function save() {
+    $status = $this->node->status;
+    $field = $this->type->parameters['thank_you_page']['reference'];
+    if ($items = field_get_items('node', $this->node, $field)) {
+      foreach ($items as $item) {
+        if ($nid = $item['node_reference_nid']) {
+          if (($node = node_load($nid)) && $node->status != $status) {
+            $node->status = $status;
+            node_save($node);
+          }
+        }
+      }
+    }
   }
 
   /**
