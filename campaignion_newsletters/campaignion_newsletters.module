@@ -4,6 +4,7 @@
  * Campaignion newsletter module.
  */
 
+use \Drupal\campaignion_newsletters\CronRunner;
 use \Drupal\campaignion_newsletters\ProviderFactory;
 use \Drupal\campaignion_newsletters\FormSubmission;
 use \Drupal\campaignion_newsletters\Subscription;
@@ -207,8 +208,7 @@ function campaignion_newsletters_cronapi($op, $job = NULL) {
     'description' => 'Send queue data to newsletter providers',
     'rule' => '*/2 * * * *',
     'weight' => 100,
-    'file' => 'includes/cron.php',
-    'callback' => 'campaignion_newsletters_send_queue',
+    'callback' => [CronRunner::class, 'cronSendQueue'],
   );
   return $items;
 }
