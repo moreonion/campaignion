@@ -16,30 +16,47 @@ class NewsletterList extends \Drupal\little_helpers\DB\Model {
   protected static $serial = TRUE;
   protected static $serialize = array('data' => TRUE);
 
-  public static function listAll() {
-    $result = db_query('SELECT * FROM {campaignion_newsletters_lists} ORDER BY title');
-    $lists = array();
-    foreach ($result as $row) {
+  /**
+   * Load all lists from one source.
+   */
+  public static function bySource($source) {
+    return static::loadQuery(['source' => $source]);
+  }
+
+  /**
+   * Generic function to load using conditions and order criteria.
+   */
+  protected static function loadQuery($conditions = [], $order_by = []) {
+    $q = db_select(static::$table, 'l')->fields('l');
+    foreach ($conditions as $field => $value) {
+      $q->condition($field, $value);
+    }
+    foreach ($order_by as $field => $direction) {
+      $q->orderBy($field, $direction);
+    }
+    $lists = [];
+    foreach ($q->execute() as $row) {
       $lists[$row->list_id] = new static($row);
     }
     return $lists;
   }
 
+  public static function listAll() {
+    return static::loadQuery([], ['title' => 'ASC']);
+  }
+
   public static function load($id) {
-    $result = db_query('SELECT * FROM {campaignion_newsletters_lists} WHERE list_id=:id', array(':id' => $id));
-    if ($row = $result->fetch()) {
-      return new static($row);
+    if ($rows = static::loadQuery(['list_id' => $id])) {
+      return $rows[$id];
     }
   }
 
   public static function byIdentifier($source, $identifier) {
-    $result = db_query('SELECT * FROM {campaignion_newsletters_lists} WHERE source=:source AND identifier=:identifier', array(
-      ':source' => $source,
-      ':identifier' => $identifier,
-    ));
-    if ($row = $result->fetch()) {
-      return new static($row);
-    }
+    $rows = static::loadQuery([
+      'source' => $source,
+      'identifier' => $identifier,
+    ]);
+    return reset($rows);
   }
 
   public static function fromData($data) {
