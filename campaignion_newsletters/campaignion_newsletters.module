@@ -210,5 +210,10 @@ function campaignion_newsletters_cronapi($op, $job = NULL) {
     'weight' => 100,
     'callback' => [CronRunner::class, 'cronSendQueue'],
   );
+  $items['campaignion_newsletters_poll_subscriptions'] = [
+    'descriptions' => 'Let providers poll their subscriptions in order to cach changes from the provider side.',
+    'rule' => '*/2 * * * *',
+    'callback' => [CronRunner::class, 'cronPoll'],
+  ];
   return $items;
 }

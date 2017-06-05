@@ -60,4 +60,12 @@ interface ProviderInterface {
    */
   public function data(Subscription $subscription, $old_data);
 
+  /**
+   * Get a provider polling object if this provider uses polling.
+   *
+   * @return \Drupal\campaignion_newsletters\PollingInterface|null
+   *   A polling object or NULL if the provider doesn’t implement polling.
+   */
+  public function polling();
+
 }

@@ -205,4 +205,11 @@ class Optivo extends ProviderBase {
     return $source;
   }
 
+  /**
+   * Get subscriber polling object.
+   */
+  public function polling() {
+    return SubscriberPolling::create('Optivo-' . $this->account, $this->factory);
+  }
+
 }

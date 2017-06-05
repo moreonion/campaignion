@@ -2,13 +2,14 @@
 
 namespace Drupal\campaignion_newsletters_optivo;
 
+use \Drupal\campaignion_newsletters\PollingInterface;
 use \Drupal\campaignion_newsletters\Subscription;
 
 
 /**
  * Handles polling and importing of modified subscribers.
  */
-class SubscriberPolling {
+class SubscriberPolling implements PollingInterface {
 
   /**
    * Machine name of the newsletters provider that we are polling.
@@ -89,17 +90,10 @@ SQL;
   }
 
   /**
-   * Poll list subscribers for a specified maximum time.
-   *
-   * @param float $timeout
-   *   The maximum number of seconds to poll for.
+   * {@inheritdoc}
    */
-  public function poll($timeout) {
-    $start = microtime(TRUE);
-    $continue = TRUE;
-    while ($continue && (microtime(TRUE) - $start < $timeout)) {
-      $continue = $this->pollUnsubscribes();
-    }
+  public function poll() {
+    return $this->pollUnsubscribes();
   }
 
 }

@@ -5,13 +5,15 @@ namespace Drupal\campaignion_newsletters;
 class CronRunner {
 
   protected $sendBatchSize;
+  protected $pollTime;
 
   /**
    * Create a CronRunner instance based on configuration variables.
    */
   public static function fromConfig() {
     $batch_size = variable_get('campaignion_newsletters_batch_size', 50);
-    return new static($batch_size);
+    $poll_time = variable_get('campaignion_newsletters_poll_time', 10);
+    return new static($batch_size, $poll_time);
   }
 
   /**
@@ -21,8 +23,16 @@ class CronRunner {
     static::fromConfig()->sendQueue();
   }
 
-  public function __construct($batch_size) {
+  /**
+   * Instantiate and run poll job.
+   */
+  public static function cronPoll() {
+    static::fromConfig()->poll();
+  }
+
+  public function __construct($batch_size, $poll_time) {
     $this->sendBatchSize = $batch_size;
+    $this->pollTime = $poll_time;
   }
 
   /**
@@ -47,6 +57,31 @@ class CronRunner {
           // There is no point to items with persistent errors in the queue.
           $item->delete();
         }
+      }
+    }
+  }
+
+  /**
+   * Generator to loop over all providers.
+   */
+  protected function getProviders() {
+    $f = ProviderFactory::getInstance();
+    foreach ($f->providers() as $key) {
+      yield $f->providerByKey($key);
+    }
+  }
+
+  /**
+   * Let the provider(s) poll their subscriber lists for a given amount of time.
+   */
+  public function poll() {
+    $end = microtime(TRUE) + $this->pollTime;
+
+    foreach ($this->getProviders() as $provider) {
+      $continue = TRUE;
+      while ($continue && microtime(TRUE) < $end) {
+        $poll = $provider->polling();
+        $continue = $poll && $poll->poll();
       }
     }
   }
