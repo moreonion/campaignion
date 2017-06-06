@@ -60,28 +60,23 @@ class SubscriberPolling implements PollingInterface {
    */
   public function pollUnsubscribes() {
     $sql = <<<SQL
-SELECT email
+SELECT list_id, email, identifier
 FROM {campaignion_newsletters_subscriptions}
   INNER JOIN {campaignion_newsletters_lists} USING(list_id)
 WHERE source=:source AND last_sync<=:most_recent
-GROUP BY email
-ORDER BY MAX(last_sync)
 SQL;
     $args[':source'] = $this->provider;
     $args[':most_recent'] = REQUEST_TIME - $this->pollInterval;
-    if ($emails = db_query_range($sql, 0, $this->batchSize, $args)->fetchCol()) {
+    if ($rows = db_query_range($sql, 0, $this->batchSize, $args)->fetchAll()) {
       $client = $this->factory->getClient('Unsubscribe');
-      foreach ($emails as $email) {
-        if ($client->contains($email)) {
-          foreach (Subscription::byEmail($email) as $subscription) {
-            $subscription->delete(TRUE);
-          }
+      foreach ($rows as $row) {
+        $subscription = Subscription::byData($row->list_id, $row->email);
+        if ($client->containsByRecipientList($row->identifier, $row->email)) {
+          $subscription->delete(TRUE);
         }
         else {
-          db_update('campaignion_newsletters_subscriptions')
-            ->condition('email', $email)
-            ->fields(['last_sync' => time()])
-            ->execute();
+          $subscription->last_sync = time();
+          $subscription->save(TRUE, FALSE);
         }
       }
       return TRUE;
