@@ -182,7 +182,8 @@ function campaignion_newsletters_install() {
  * Implements hook_uninstall().
  */
 function campaignion_newsletters_uninstall() {
-  variable_del('campaignion_newsletters_cleverreach_batch_size');
+  variable_del('campaignion_newsletters_batch_size');
+  variable_del('campaignion_newsletters_poll_time');
 }
 
 /**
