@@ -1,0 +1,5 @@
+name = Campaignion Vue
+description = Shared Vue.js libraries
+core = 7.x
+package = Campaignion
+project = campaignion
