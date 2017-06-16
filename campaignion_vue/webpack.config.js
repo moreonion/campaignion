@@ -3,9 +3,9 @@
 const webpack = require('webpack');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const path = require('path');
-const env  = require('yargs').argv.env; // use --env with webpack 2
+const env = require('yargs').argv.env; // use --env with webpack 2
 
-let libraryName = 'Library';
+let libraryName = 'campaignion_vue';
 
 let plugins = [], outputFile;
 
@@ -41,7 +41,10 @@ const config = {
     ]
   },
   resolve: {
-    modules: [path.resolve('./src')],
+    modules: [
+      'node_modules',
+      path.resolve('./src')
+    ],
     extensions: ['.json', '.js']
   },
   plugins: plugins

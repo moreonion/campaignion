@@ -4,10 +4,15 @@
   "description": "A bundle of libraries shared by the Vue apps in Campaignion.",
   "main": "lib/library.js",
   "scripts": {
-    "build": "webpack --env build",
+    "build": "npm run build-js && npm run build-min-js",
+    "build-js": "webpack --env dev",
+    "build-min-js": "webpack --env build",
     "dev": "webpack --progress --colors --watch --env dev",
-    "test": "mocha --compilers js:babel-core/register --colors ./test/*.spec.js",
-    "test:watch": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js"
+    "test": "mocha --compilers js:babel-core/register --colors ./test/*.spec.js"
+  },
+  "dependencies": {
+    "axios": "0.16.2",
+    "vue": "2.3.4"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",

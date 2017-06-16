@@ -1,4 +1,6 @@
 {
+  "root": true,
+
   "ecmaFeatures": {
     "globalReturn": true,
     "jsx": true,

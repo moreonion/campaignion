@@ -1,8 +1,7 @@
-export default class Library {
-  constructor() {
-    this._name = 'Library';
-  }
-  get name() {
-    return this._name;
-  }
-}
+import Vue from 'vue';
+import axios from 'axios';
+
+export default {
+  Vue,
+  axios
+};
