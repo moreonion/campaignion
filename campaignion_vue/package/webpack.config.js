@@ -41,6 +41,9 @@ const config = {
     ]
   },
   resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.common.js'
+    },
     modules: [
       'node_modules',
       path.resolve('./src')
