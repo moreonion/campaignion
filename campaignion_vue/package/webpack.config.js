@@ -20,7 +20,7 @@ const config = {
   entry: __dirname + '/src/index.js',
   devtool: 'source-map',
   output: {
-    path: __dirname + '/lib',
+    path: path.resolve(__dirname, '../js'),
     filename: outputFile,
     library: libraryName,
     libraryTarget: 'umd',

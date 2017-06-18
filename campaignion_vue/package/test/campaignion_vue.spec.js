@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 import chai from 'chai';
-import campVue from '../lib/campaignion_vue.js';
+import campVue from '../../js/campaignion_vue.js';
 
 const expect = chai.expect;
 
