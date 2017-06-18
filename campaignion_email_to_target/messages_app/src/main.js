@@ -7,7 +7,7 @@ Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: '#email-to-target-messages-widget',
   template: '<App/>',
   components: { App }
 })

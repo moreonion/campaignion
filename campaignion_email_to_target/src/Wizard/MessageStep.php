@@ -21,9 +21,6 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
       '#title' => t('Message that will be sent to target(s)'),
       '#id' => drupal_html_id('email-to-target-messages-widget'),
       '#attributes' => ['class' => ['email-to-target-messages-widget', 'e2tmw']],
-      'app-tag' => [
-        '#markup' => '<app></app>'
-      ],
     ];
 
     $info = token_get_info();
@@ -75,8 +72,15 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
     $dir = drupal_get_path('module', 'campaignion_email_to_target');
     $form['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
     $form['#attached']['js'][] = [
-      'data' => $dir . '/js/messages_widget.js',
+      'data' => drupal_get_path('module', 'campaignion_vue') . '/js/campaignion_vue.min.js',
       'scope' => 'footer',
+      'preprocess' => FALSE,
+    ];
+    $form['#attached']['js'][] = [
+        'data' => $dir . '/js/messages_app/app.min.js',
+//      'data' => $dir . '/js/messages_widget.js',
+      'scope' => 'footer',
+      'preprocess' => FALSE,
     ];
     $form['#attached']['css'][] = [
       'data' => $dir . '/css/messages_widget.min.css',
