@@ -1,8 +1,8 @@
 {
   "name": "campaignion_vue",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A bundle of libraries shared by the Vue apps in Campaignion.",
-  "main": "lib/library.js",
+  "main": "src/index.js",
   "scripts": {
     "build": "npm run build-js && npm run build-min-js",
     "build-js": "webpack --env dev",
