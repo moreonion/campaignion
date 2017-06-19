@@ -29,6 +29,7 @@ var webpackConfig = merge(baseWebpackConfig, {
   },
   externals: {
     vue: 'campaignion_vue.Vue',
+    vuex: 'campaignion_vue.Vuex',
     axios: 'campaignion_vue.axios'
   },
   plugins: [

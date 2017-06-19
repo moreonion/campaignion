@@ -17,6 +17,8 @@
       <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
     </ul>
+    <h2>Test vuex</h2>
+    Count: {{ count }} <a href="#" @click="add10">add 10</a>
   </div>
 </template>
 
@@ -26,6 +28,19 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
+    }
+  },
+  computed: {
+    count () {
+      return this.$store.state.count
+    }
+  },
+  methods: {
+    add10 () {
+      this.$store.dispatch({
+        type: 'incrementAsync',
+        amount: 10
+      })
     }
   }
 }

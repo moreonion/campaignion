@@ -2,6 +2,7 @@
 // standalone) has been set in webpack.dev.conf and webpack.test.conf with an alias.
 import Vue from 'vue'
 import App from './App'
+import store from './store'
 
 Vue.config.productionTip = false
 
@@ -9,5 +10,6 @@ Vue.config.productionTip = false
 new Vue({
   el: '#email-to-target-messages-widget',
   template: '<App/>',
+  store,
   components: { App }
 })
