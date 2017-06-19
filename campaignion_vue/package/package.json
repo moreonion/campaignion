@@ -1,6 +1,6 @@
 {
   "name": "campaignion_vue",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "A bundle of libraries shared by the Vue apps in Campaignion.",
   "main": "src/index.js",
   "scripts": {
@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "axios": "0.16.2",
-    "vue": "2.3.4"
+    "vue": "2.3.4",
+    "vuex": "2.3.1"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",

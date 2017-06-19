@@ -24,4 +24,9 @@ describe('campaignion_vue', () => {
     expect(typeof campVue.axios.get).to.be.equal('function');
   });
 
+  it('provides a Vuex object', () => {
+    expect(typeof campVue.Vuex).to.be.equal('object');
+    expect(typeof campVue.Vuex.Store).to.be.equal('function');
+  });
+
 });
