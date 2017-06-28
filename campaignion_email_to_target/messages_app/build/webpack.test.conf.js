@@ -24,6 +24,9 @@ var webpackConfig = merge(baseConfig, {
     }
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      'Drupal.settings.campaignion_email_to_target': ['../test/unit/fixtures/initial-data', 'default']
+    }),
     new webpack.DefinePlugin({
       'process.env': require('../config/test.env')
     })
