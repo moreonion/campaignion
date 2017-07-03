@@ -69,7 +69,7 @@ class MailChimpTest extends \DrupalUnitTestCase {
     $subscription->expects($this->any())->method('newsletterList')
       ->will($this->returnValue(new NewsletterList([
         'list_id' => 2048,
-        'data' => (object) ['merge_vars' => $merge_vars],
+        'data' => (object) ['merge_vars' => $merge_vars, 'groups' => []],
       ])));
     return $subscription;
   }
@@ -271,6 +271,31 @@ class MailChimpTest extends \DrupalUnitTestCase {
       'merge_fields' => ['FNAME' => 'Fname'],
       'interests' => [],
     ], $data);
+  }
+
+  /**
+   * Test updating a contact.
+   */
+  public function testUpdate() {
+    list($api, $provider) = $this->mockChimp(['put']);
+    $item = new QueueItem([
+      'email' => 'test@example.com',
+      'data' => [],
+    ]);
+    $list = new NewsletterList([
+      'identifier' => 'test-list',
+    ]);
+    $api->expects($this->once())->method('put')->with(
+      $this->equalTo('/lists/test-list/members/55502f40dc8b7c769880b10874abc9d0'),
+      $this->equalTo([]),
+      $this->equalTo([
+        'email_address' => 'test@example.com',
+        'interests' => (object) [],
+        'merge_fields' => (object) [],
+        'status_if_new' => 'subscribed',
+      ])
+    );
+    $provider->update($list, $item);
   }
 
 }
