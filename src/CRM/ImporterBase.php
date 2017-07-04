@@ -41,10 +41,12 @@ class ImporterBase {
         lock_wait($lock, 30);
       }
       $contact = Contact::fromEmail($source->value('email'), $this->contactType);
+      $contact->isNew = FALSE;
       if (!$contact->contact_id) {
         // Create contact immediately, so that successive calls to this function
         // will return the same contact.
         $contact->save();
+        $contact->isNew = TRUE;
       }
       return $contact;
     }
