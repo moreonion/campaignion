@@ -261,6 +261,7 @@ class MailChimp extends ProviderBase {
     $data = $this->preprocessData($item->data);
     $this->api->put("/lists/{$list->identifier}/members/$hash", [], [
       'email_address' => $item->email,
+      'status_if_new' => 'subscribed', // Updates don’t trigger opt-in emails.
     ] + $data);
   }
 
