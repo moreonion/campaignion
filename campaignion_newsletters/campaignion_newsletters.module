@@ -4,6 +4,7 @@
  * Campaignion newsletter module.
  */
 
+use \Drupal\campaignion_newsletters\CronRunner;
 use \Drupal\campaignion_newsletters\ProviderFactory;
 use \Drupal\campaignion_newsletters\FormSubmission;
 use \Drupal\campaignion_newsletters\Subscription;
@@ -205,10 +206,14 @@ function campaignion_newsletters_entity_delete($entity, $entity_type) {
 function campaignion_newsletters_cronapi($op, $job = NULL) {
   $items['campaignion_newsletters_send_queue'] = array(
     'description' => 'Send queue data to newsletter providers',
-    'rule' => '*/2 * * * *',
+    'rule' => '*/2+@ * * * *',
     'weight' => 100,
-    'file' => 'includes/cron.php',
-    'callback' => 'campaignion_newsletters_send_queue',
+    'callback' => [CronRunner::class, 'cronSendQueue'],
   );
+  $items['campaignion_newsletters_poll_subscriptions'] = [
+    'descriptions' => 'Let providers poll their subscriptions in order to cach changes from the provider side.',
+    'rule' => '*/2+@ * * * *',
+    'callback' => [CronRunner::class, 'cronPoll'],
+  ];
   return $items;
 }

@@ -78,11 +78,24 @@ function campaignion_newsletters_schema() {
           // some impossible hash so that newly added values always need update.
           'default' => '123456789x123456789x123456789x123456789x',
         ),
+        'updated' => [
+          'description' => 'The timestamp of the last update to this subscription.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+        ],
+        'last_sync' => [
+          'description' => 'Timestamp for when this subscription was last synced with the provider',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'default' => 0,
+          'not null' => TRUE,
+        ],
       ),
       'primary key' => array('email', 'list_id'),
       'indexes' => array(
         'campaignion_newsletters_subscriptions_list' => array('list_id'),
         'campaignion_newsletters_subscriptions_email' => array('email'),
+        'last_sync' => ['last_sync'],
       ),
     ),
     'campaignion_newsletters_queue' => array(
@@ -169,7 +182,26 @@ function campaignion_newsletters_install() {
  * Implements hook_uninstall().
  */
 function campaignion_newsletters_uninstall() {
-  variable_del('campaignion_newsletters_cleverreach_batch_size');
+  variable_del('campaignion_newsletters_batch_size');
+  variable_del('campaignion_newsletters_poll_time');
+}
+
+/**
+ * Add an updated and last_sync timestamps to newsletter subscriptions.
+ */
+function campaignion_newsletters_update_15() {
+  db_add_field('campaignion_newsletters_subscriptions', 'updated', [
+    'description' => 'The timestamp of the last update to this subscription.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+  ]);
+  db_add_field('campaignion_newsletters_subscriptions', 'last_sync', [
+    'description' => 'Timestamp for when this subscription was last synced from the provider',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'default' => 0,
+    'not null' => TRUE,
+  ], ['indexes' => ['last_sync' => ['last_sync']]]);
 }
 
 /**

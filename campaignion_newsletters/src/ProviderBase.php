@@ -38,4 +38,13 @@ abstract class ProviderBase implements ProviderInterface {
     $this->subscribe($list, $item);
   }
 
+  /**
+   * Get a provider polling object if this provider uses polling.
+   *
+   * @return \Drupal\campaignion_newsletters\PollingInterface|null
+   *   A polling object or NULL if the provider doesn’t implement polling.
+   */
+  public function polling() {
+  }
+
 }

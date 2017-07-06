@@ -4,7 +4,9 @@
  * Implements hook_uninstall().
  */
 function campaignion_newsletters_optivo_uninstall() {
-  variable_del(array(
+  variable_del([
     'optivo_credentials',
-  ));
+    'campaignion_newsletters_optivo_unsubscribe_poll_batch_size',
+    'campaignion_newsletters_optivo_unsubscribe_poll_interval',
+  ]);
 }

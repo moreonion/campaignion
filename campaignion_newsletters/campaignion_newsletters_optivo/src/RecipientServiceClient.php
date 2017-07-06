@@ -5,7 +5,7 @@ namespace Drupal\campaignion_newsletters_optivo;
 /**
  *
  */
-class RecipientServiceClient extends SessionClient {
+class RecipientServiceClient extends Client {
 
   /**
    * Override exception handling to add specific behavior.
