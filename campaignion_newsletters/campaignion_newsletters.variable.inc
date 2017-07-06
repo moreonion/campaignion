@@ -18,7 +18,7 @@ function campaignion_newsletters_variable_info($options) {
   ];
   $v['campaignion_newsletters_poll_time'] = [
     'title' => t('Polling duration (seconds)', [], $options),
-    'description' => t('The amount of time spent to for polling newsletter provider data each cron run.', [], $options),
+    'description' => t('The amount of time spent for polling newsletter provider data each cron run.', [], $options),
     'type' => 'number',
     'default' => 5,
     'localize' => FALSE,

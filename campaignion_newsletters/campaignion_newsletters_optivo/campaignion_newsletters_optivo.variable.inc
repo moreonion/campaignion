@@ -15,7 +15,7 @@ function campaignion_newsletters_optivo_variable_info($options) {
   ];
   $v['campaignion_newsletters_optivo_unsubscribe_poll_size'] = [
     'title' => t('Unsubscribe batch size', [], $options),
-    'description' => t('The number of subscriptions that checked for unsubscribes in one batch.', [], $options),
+    'description' => t('The number of subscriptions being checked for unsubscribes in one batch.', [], $options),
     'type' => 'number',
     'default' => 20,
     'localize' => FALSE,
