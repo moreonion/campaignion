@@ -23,14 +23,15 @@ var webpackConfig = merge(baseWebpackConfig, {
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   output: {
     path: path.resolve(__dirname, '../../js/messages_app'),
-    filename: '[name].min.js',
+    filename: '[name].vue.min.js',
     chunkFilename: '[id].min.js',
-    sourceMapFilename: '[name].js.map'
+    sourceMapFilename: '[name].vue.js.map'
   },
   externals: {
+    axios: 'campaignion_vue.axios',
+    'element-ui': 'campaignion_vue.element',
     vue: 'campaignion_vue.Vue',
     vuex: 'campaignion_vue.Vuex',
-    axios: 'campaignion_vue.axios'
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
@@ -39,7 +40,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     }),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: utils.assetsPath('../../../css/messages_app/[name].css')
+      filename: utils.assetsPath('../../../css/messages_app/[name].min.css')
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.

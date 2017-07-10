@@ -3,8 +3,19 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu
+} from 'element-ui';
+
 export default {
   Vue,
   Vuex,
-  axios
+  axios,
+  element: {
+    Dropdown,
+    DropdownItem,
+    DropdownMenu
+  }
 };

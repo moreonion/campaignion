@@ -1,9 +1,16 @@
 /* global describe, it, before */
 
 import chai from 'chai';
-import campVue from '../../js/campaignion_vue.js';
 
 const expect = chai.expect;
+const MockBrowser = require('mock-browser').mocks.MockBrowser;
+
+// Mock globals for element-ui.
+global.window = new MockBrowser().getWindow();
+global.document = global.window.document;
+global.navigator = global.window.navigator;
+
+const campVue = require('../../js/campaignion_vue.js');
 
 describe('campaignion_vue', () => {
 
@@ -27,6 +34,12 @@ describe('campaignion_vue', () => {
   it('provides a Vuex object', () => {
     expect(typeof campVue.Vuex).to.be.equal('object');
     expect(typeof campVue.Vuex.Store).to.be.equal('function');
+  });
+
+  it('provides element components', () => {
+    expect(campVue.element.Dropdown).to.exist;
+    expect(campVue.element.DropdownMenu).to.exist;
+    expect(campVue.element.DropdownItem).to.exist;
   });
 
 });
