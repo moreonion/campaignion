@@ -6,7 +6,9 @@ import axios from 'axios';
 import {
   Dropdown,
   DropdownItem,
-  DropdownMenu
+  DropdownMenu,
+  Option,
+  Select
 } from 'element-ui';
 
 export default {
@@ -16,6 +18,8 @@ export default {
   element: {
     Dropdown,
     DropdownItem,
-    DropdownMenu
+    DropdownMenu,
+    Option,
+    Select
   }
 };

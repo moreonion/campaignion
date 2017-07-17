@@ -40,6 +40,8 @@ describe('campaignion_vue', () => {
     expect(campVue.element.Dropdown).to.exist;
     expect(campVue.element.DropdownMenu).to.exist;
     expect(campVue.element.DropdownItem).to.exist;
+    expect(campVue.element.Option).to.exist;
+    expect(campVue.element.Select).to.exist;
   });
 
 });
