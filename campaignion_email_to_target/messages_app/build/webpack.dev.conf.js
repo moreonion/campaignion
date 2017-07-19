@@ -1,3 +1,4 @@
+var path = require('path')
 var utils = require('./utils')
 var webpack = require('webpack')
 var config = require('../config')
@@ -24,7 +25,7 @@ module.exports = merge(baseWebpackConfig, {
   devtool: '#cheap-module-eval-source-map',
   plugins: [
     new webpack.ProvidePlugin({
-      'Drupal.settings.campaignion_email_to_target': ['../test/unit/fixtures/example-data', 'default']
+      'Drupal': [path.resolve(__dirname, './drupal-fixture'), 'default']
     }),
     new webpack.DefinePlugin({
       'process.env': config.dev.env
