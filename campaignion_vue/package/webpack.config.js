@@ -7,7 +7,14 @@ const env = require('yargs').argv.env; // use --env with webpack 2
 
 let libraryName = 'campaignion_vue';
 
-let plugins = [], outputFile;
+let plugins = [
+  // element-ui: replace default Chinese strings with English strings.
+  new webpack.NormalModuleReplacementPlugin(
+    /element-ui[\/\\]lib[\/\\]locale[\/\\]lang[\/\\]zh-CN/,
+    'element-ui/lib/locale/lang/en'
+  )
+];
+let outputFile;
 
 if (env === 'build') {
   plugins.push(new UglifyJsPlugin({ minimize: true }));

@@ -36,12 +36,16 @@ describe('campaignion_vue', () => {
     expect(typeof campVue.Vuex.Store).to.be.equal('function');
   });
 
-  it('provides element components', () => {
+  it('provides element-ui components', () => {
     expect(campVue.element.Dropdown).to.exist;
     expect(campVue.element.DropdownMenu).to.exist;
     expect(campVue.element.DropdownItem).to.exist;
     expect(campVue.element.Option).to.exist;
     expect(campVue.element.Select).to.exist;
+  });
+
+  it('provides element-ui locale', () => {
+    expect(typeof campVue.elementLocale).to.be.equal('object');
   });
 
 });
