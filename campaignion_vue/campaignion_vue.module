@@ -18,10 +18,10 @@ function _campaignion_vue_add_assets() {
 
   // Add element-ui locale.
   $lang = $GLOBALS['language']->language;
-  if ($lang != 'en') {
+  if (substr($lang, 0, 2) != 'en') {
     $strings = file_get_contents($module_path . 'locale/' . $lang . '.json');
   }
-  if ($strings) {
+  if (!empty($strings)) {
     drupal_add_js(
       array(
         'campaignion_vue' => array(
