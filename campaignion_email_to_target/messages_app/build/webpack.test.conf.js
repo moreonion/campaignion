@@ -30,7 +30,12 @@ var webpackConfig = merge(baseConfig, {
     }),
     new webpack.DefinePlugin({
       'process.env': require('../config/test.env')
-    })
+    }),
+    // element-ui: replace default Chinese strings with English strings.
+    new webpack.NormalModuleReplacementPlugin(
+      /element-ui[\/\\]lib[\/\\]locale[\/\\]lang[\/\\]zh-CN/,
+      'element-ui/lib/locale/lang/en'
+    )
   ]
 })
 

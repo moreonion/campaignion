@@ -9,7 +9,7 @@ export default {
       ? exampleData
       : initialData
   },
-  t: string => {
+  t: function (string) {
     return string
   }
 }
