@@ -32,7 +32,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     'element-ui': 'campaignion_vue.element',
     'element-ui/lib/locale': 'campaignion_vue.elementLocale',
     vue: 'campaignion_vue.Vue',
-    vuex: 'campaignion_vue.Vuex',
+    vuex: 'campaignion_vue.Vuex'
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
