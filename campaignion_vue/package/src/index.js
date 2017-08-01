@@ -5,9 +5,11 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import {
+  Dialog,
   Dropdown,
   DropdownItem,
   DropdownMenu,
+  MessageBox,
   Option,
   Select
 } from 'element-ui';
@@ -18,9 +20,11 @@ export default {
   Vuex,
   axios,
   element: {
+    Dialog,
     Dropdown,
     DropdownItem,
     DropdownMenu,
+    MessageBox,
     Option,
     Select
   },
