@@ -5,6 +5,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import {
+  Button,
   Dialog,
   Dropdown,
   DropdownItem,
@@ -20,6 +21,7 @@ export default {
   Vuex,
   axios,
   element: {
+    Button,
     Dialog,
     Dropdown,
     DropdownItem,

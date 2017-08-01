@@ -1,6 +1,6 @@
 {
   "name": "campaignion_vue",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "A bundle of libraries shared by the Vue apps in Campaignion.",
   "main": "src/index.js",
   "scripts": {

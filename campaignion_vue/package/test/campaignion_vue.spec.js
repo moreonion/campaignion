@@ -37,6 +37,7 @@ describe('campaignion_vue', () => {
   });
 
   it('provides element-ui components', () => {
+    expect(campVue.element.Button).to.exist;
     expect(campVue.element.Dialog).to.exist;
     expect(campVue.element.Dropdown).to.exist;
     expect(campVue.element.DropdownMenu).to.exist;
