@@ -140,6 +140,7 @@ export default {
     },
     updateSpec () {
       this.$store.commit({type: 'updateSpec', spec: this.currentSpec})
+      this.$store.commit('validateSpecs')
       this.close()
     },
     close () {

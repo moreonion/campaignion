@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import {clone, isEmptyMessage} from '@/utils'
-import {emptySpec} from '@/utils/defaults'
+import {emptySpec, exclusionMessageObj} from '@/utils/defaults'
 import {find} from 'lodash'
 
 export default {
@@ -22,11 +22,15 @@ export default {
     if (tokens) state.tokenCategories = clone(tokens)
     if (typeof hardValidation !== 'undefined') state.hardValidation = hardValidation
 
-    // add attributeLabel property to filters
     for (let i = 0, j = state.specs.length; i < j; i++) {
+      // add attributeLabel property to filters
       for (let ii = 0, jj = state.specs[i].filters.length; ii < jj; ii++) {
         var targetAttribute = find(targetAttributes, {name: state.specs[i].filters[ii].attributeName})
         state.specs[i].filters[ii].attributeLabel = targetAttribute && targetAttribute.label || state.specs[i].filters[ii].attributeName
+      }
+      // add empty message to exclusions saved without a message in version 1
+      if (state.specs[i].type === 'exclusion' && typeof state.specs[i].message === 'undefined') {
+        Vue.set(state.specs[i], 'message', exclusionMessageObj())
       }
     }
 
@@ -122,6 +126,10 @@ export default {
 
   updateSpec (state, {spec}) {
     if (state.currentSpecIndex === null) return
-    Vue.set(state.specs, state.currentSpecIndex, clone(spec))
+    if (state.currentSpecIndex === -1) {
+      state.specs.push(spec)
+    } else {
+      Vue.set(state.specs, state.currentSpecIndex, clone(spec))
+    }
   }
 }

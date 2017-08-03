@@ -34,16 +34,9 @@
 </template>
 
 <script>
-function emptyMessage () {
-  return {
-    subject: null,
-    header: null,
-    body: null,
-    footer: null
-  }
-}
+import {defaultMessageObj} from '@/utils/defaults'
 
-module.exports = {
+export default {
 
   data () {
     return {
@@ -60,9 +53,7 @@ module.exports = {
   props: {
     value: {
       type: Object,
-      default () {
-        return emptyMessage()
-      }
+      default: () => defaultMessageObj()
     },
     type: String
   },
