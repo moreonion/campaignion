@@ -4,29 +4,29 @@
     <template v-if="type == 'message-template'">
       <div class="form-group">
         <label :for="'message-subject-' + _uid">{{ text('subject label') }} <a href="#" @click.prevent="toggleHelpText('subject')" class="show-help-text"><span>?</span></a></label>
-        <input type="text" v-model="msg.subject" data-token-insertable class="form-control" :id="'message-subject-' + _uid">
+        <input type="text" v-model="subject" data-token-insertable class="form-control" :id="'message-subject-' + _uid">
         <small v-if="helpText['subject']" class="text-muted">{{ text('subject help') }}</small>
       </div>
       <div class="form-group">
         <label :for="'message-header-' + _uid">{{ text('header label') }} <a href="#" @click.prevent="toggleHelpText('header')" class="show-help-text"><span>?</span></a></label>
-        <textarea rows="3" v-model="msg.header" data-token-insertable class="form-control" :id="'message-header-' + _uid"></textarea>
+        <textarea rows="3" v-model="header" data-token-insertable class="form-control" :id="'message-header-' + _uid"></textarea>
         <small v-if="helpText['header']" class="text-muted">{{ text('header help') }}</small>
       </div>
       <div class="form-group">
         <label :for="'message-body-' + _uid">{{ text('body label') }} <a href="#" @click.prevent="toggleHelpText('body')" class="show-help-text"><span>?</span></a></label>
-        <textarea rows="6" v-model="msg.body" data-token-insertable class="form-control" :id="'message-body-' + _uid"></textarea>
+        <textarea rows="6" v-model="body" data-token-insertable class="form-control" :id="'message-body-' + _uid"></textarea>
         <small v-if="helpText['body']" class="text-muted">{{ text('body help') }}</small>
       </div>
       <div class="form-group">
         <label :for="'message-footer-' + _uid">{{ text('footer label') }} <a href="#" @click.prevent="toggleHelpText('footer')" class="show-help-text"><span>?</span></a></label>
-        <textarea rows="3" v-model="msg.footer" data-token-insertable class="form-control" :id="'message-footer-' + _uid"></textarea>
+        <textarea rows="3" v-model="footer" data-token-insertable class="form-control" :id="'message-footer-' + _uid"></textarea>
         <small v-if="helpText['footer']" class="text-muted">{{ text('footer help') }}</small>
       </div>
     </template>
     <template v-if="type == 'exclusion'">
       <div class="form-group">
         <label :for="'message-body-' + _uid">{{ text('exclusion label') }} <a href="#" @click.prevent="toggleHelpText('body')" class="show-help-text"><span>?</span></a></label>
-        <textarea rows="6" v-model="msg.body" data-token-insertable class="form-control" :id="'message-body-' + _uid"></textarea>
+        <textarea rows="6" v-model="body" data-token-insertable class="form-control" :id="'message-body-' + _uid"></textarea>
         <small v-if="helpText['body']" class="text-muted">{{ text('exclusion help') }}</small>
       </div>
     </template>
@@ -40,7 +40,10 @@ export default {
 
   data () {
     return {
-      msg: this.value,
+      subject: this.value.subject,
+      header: this.value.header,
+      body: this.value.body,
+      footer: this.value.footer,
       helpText: {
         subject: false,
         header: false,
@@ -59,11 +62,18 @@ export default {
   },
 
   watch: {
-    msg (val) {
-      this.$emit('input', val)
-    },
-    value (val) {
-      if (this.msg !== val) this.msg = val
+    subject: 'updateValue',
+    header: 'updateValue',
+    body: 'updateValue',
+    footer: 'updateValue',
+    value: {
+      handler (val) {
+        this.subject = val.subject
+        this.header = val.header
+        this.body = val.body
+        this.footer = val.footer
+      },
+      deep: true
     }
   },
 
@@ -84,6 +94,16 @@ export default {
     },
     toggleHelpText (which) {
       this.helpText[which] = !this.helpText[which]
+    },
+    updateValue () {
+      // Exclusions only have a body.
+      const val = {body: this.body}
+      if (this.type === 'message-template') {
+        val.subject = this.subject
+        val.header = this.header
+        val.footer = this.footer
+      }
+      this.$emit('input', val)
     }
   },
 

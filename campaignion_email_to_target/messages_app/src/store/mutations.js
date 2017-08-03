@@ -131,5 +131,9 @@ export default {
     } else {
       Vue.set(state.specs, state.currentSpecIndex, clone(spec))
     }
+  },
+
+  updateDefaultMessage (state, {message}) {
+    Vue.set(state.defaultMessage, 'message', message)
   }
 }

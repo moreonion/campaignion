@@ -80,6 +80,11 @@ export default {
         txtarea.focus()
       }
       txtarea.scrollTop = scrollPos
+
+      // Trigger input for the MessageEditor component to update.
+      const event = document.createEvent('Event')
+      event.initEvent('input', true, true)
+      txtarea.dispatchEvent(event)
     }
   }
 }
