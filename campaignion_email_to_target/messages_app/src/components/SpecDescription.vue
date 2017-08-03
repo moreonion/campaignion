@@ -1,8 +1,8 @@
 <template lang="html">
   <span>
     {{ specDescription }}
-    <template v-if="spec.filters.length" v-for="(filter, $index) in spec.filters">
-      <template v-if="$index">&nbsp;{{ text('and') }}&nbsp;</template>
+    <template v-if="spec.filters.length" v-for="(filter, index) in spec.filters">
+      <template v-if="index">&nbsp;{{ text('and') }}&nbsp;</template>
       <span v-if="filter.value" class="filter-condition">{{ filterDescription(filter) }}</span>
       <span v-else class="value-missing">[&nbsp;{{ text('missing value') }}&nbsp;]</span>
     </template>

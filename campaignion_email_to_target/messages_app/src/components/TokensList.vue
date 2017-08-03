@@ -1,18 +1,18 @@
 <template>
   <section class="tokens-list">
-      <table v-for="(cat, $index) in tokenCategories" class="table table-sm">
+      <table v-for="(cat, index) in tokenCategories" class="table table-sm">
         <thead>
           <tr class="token-category">
             <th colspan="2">
-              <a href="#" @mousedown.prevent="toggle($index)" @click.prevent>
-                <span class="category-expand">{{ expanded[$index] ? '–' : '+' }}</span>
+              <a href="#" @mousedown.prevent="toggle(index)" @click.prevent>
+                <span class="category-expand">{{ expanded[index] ? '–' : '+' }}</span>
                 <strong class="category-title" v-html="cat.title"></strong>
               </a>
             </th>
             <th class="category-description" v-html="cat.description"></th>
           </tr>
         </thead>
-        <tbody v-if="cat.tokens.length && expanded[$index]">
+        <tbody v-if="cat.tokens.length && expanded[index]">
           <tr v-for="token in cat.tokens">
             <td class="token-title" v-html="token.title"></td>
             <td class="token-token">

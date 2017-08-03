@@ -13,9 +13,9 @@
     </header>
 
     <ul class="filters">
-      <li v-for="(filter, $index) in filters" class="filter">
+      <li v-for="(filter, index) in f" class="filter">
 
-        <span v-if="$index === 0" class="logical-connective">{{ text('If') }}</span>
+        <span v-if="index === 0" class="logical-connective">{{ text('If') }}</span>
         <span v-else class="logical-connective">{{ text('and') }}</span>
 
         <span class="attribute-label">{{ filter.attributeLabel }}</span>
@@ -27,7 +27,7 @@
         <template v-if="filter.operator == 'regexp'">/&nbsp;</template>
         <type-ahead
           v-model="filter.value"
-          :placeholder="filter.operator == 'regexp' ? 'regular expression' : 'type to browse values'"
+          :placeholder="filter.operator == 'regexp' ? text('regular expression') : text('type to browse values')"
           :show-dropdown-on-focus="true"
           data-key="values"
           :async="e2tApi.url + '/' + e2tApi.dataset + '/attributes/' + filter.attributeName + '/values'"
@@ -42,7 +42,7 @@
         </type-ahead>
         <template v-if="filter.operator == 'regexp'">&nbsp;/</template>
 
-        <a href="#" @click="removeFilter($index)" class="remove-filter" :title="text('Remove filter')"><span>{{ text('Delete') }}</span></a>
+        <a href="#" @click="removeFilter(index)" class="remove-filter" :title="text('Remove filter')"><span>{{ text('Delete') }}</span></a>
 
       </li>
     </ul>
@@ -58,22 +58,20 @@ export default {
     typeAhead: require('./Typeahead.vue')
   },
 
+  data () {
+    return {
+      f: this.filters,
+      e2tApi: clone(Drupal.settings.campaignion_email_to_target.endpoints['e2t-api']) || {}
+    }
+  },
+
   props: {
     fields: Array,
-    filters: {
-      type: Array,
-      twoWay: true
-    },
+    filters: Array,
     filterDefault: Object,
     operators: {
       type: Object,
       required: true
-    }
-  },
-
-  data () {
-    return {
-      e2tApi: clone(Drupal.settings.campaignion_email_to_target.endpoints['e2t-api']) || {}
     }
   },
 
@@ -90,12 +88,24 @@ export default {
       return arr
     }
   },
+
+  watch: {
+    f (val) {
+      this.$emit('update:filters', val)
+    },
+    filters (val) {
+      this.f = this.filters
+    }
+  },
+
   methods: {
     text (text) {
       switch (text) {
         case 'Add filter': return Drupal.t('Add filter')
         case 'If': return Drupal.t('If')
         case 'and': return Drupal.t('and')
+        case 'regular expression': return Drupal.t('regular expression')
+        case 'type to browse values': return Drupal.t('type to browse values')
         case 'Remove filter': return Drupal.t('Remove filter')
         case 'Delete': return Drupal.t('Delete')
       }
@@ -107,10 +117,10 @@ export default {
       filter.attributeLabel = field.label
       filter.operator = '==' // default
       filter.value = ''
-      this.filters.push(filter)
+      this.f.push(filter)
     },
     removeFilter (index) {
-      this.filters.splice(index, 1)
+      this.f.splice(index, 1)
     }
   }
 

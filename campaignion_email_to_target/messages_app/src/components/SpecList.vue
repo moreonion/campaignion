@@ -1,21 +1,21 @@
 <template lang="html">
   <ul class="specs">
-    <li v-for="(spec, $index) in specs" class="spec row">
+    <li v-for="(spec, index) in specs" class="spec row">
       <div class="card">
         <span dragula-handle></span>
         <div class="spec-info">
           <div class="spec-label">
             <template v-if="spec.label">{{ spec.label }}</template>
-            <spec-description v-else :spec="spec" :index="$index"></spec-description>
+            <spec-description v-else :spec="spec" :index="index"></spec-description>
           </div>
-          <spec-description v-if="spec.label" :spec="spec" :index="$index" class="spec-description"></spec-description>
+          <spec-description v-if="spec.label" :spec="spec" :index="index" class="spec-description"></spec-description>
         </div>
 
-        <el-dropdown split-button trigger="click" @click="editSpec($index)" class="spec-actions">
+        <el-dropdown split-button trigger="click" @click="editSpec(index)" class="spec-actions">
           Edit
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="duplicateSpec($index)">Duplicate</el-dropdown-item>
-            <el-dropdown-item @click.native="removeSpec($index)">Delete</el-dropdown-item>
+            <el-dropdown-item @click.native="duplicateSpec(index)">Duplicate</el-dropdown-item>
+            <el-dropdown-item @click.native="removeSpec(index)">Delete</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
 

@@ -1,10 +1,10 @@
 <template>
   <div style="position: relative"
-       v-bind:class="{
-         'typeahead': true,
-         'open': showDropdown
-       }"
-  >
+    :class="{
+     'typeahead': true,
+     'open': showDropdown
+    }"
+    >
     <input type="text" class="form-control typeahead-input"
       ref="input"
       :placeholder="placeholder"
@@ -18,10 +18,10 @@
       @keydown.esc="showDropdown = false"
       @blur="showDropdown = false"
     />
-    <ul class="dropdown-menu" ref="dropdown" @scroll="scroll">
-      <li v-for="item in items" v-bind:class="{'active': isActive($index)}">
-        <a class="dropdown-item" @mousedown.prevent="hit" @mousemove="setActive($index)">
-          <partial :name="templateName"></partial>
+    <ul v-if="showDropdown" @scroll="scroll" ref="dropdown" class="dropdown-menu">
+      <li v-for="(item, index) in items" :class="{'active': isActive(index)}">
+        <a class="dropdown-item" @mousedown.prevent="hit" @mousemove="setActive(index)">
+          <component :is="templateComp" :item="item" :value="val"></component>
         </a>
       </li>
     </ul>
@@ -29,20 +29,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
-
 const _DELAY_ = 200
-
-const coerce = {
-  // Convert a string to booleam. Otherwise, return the value without modification, so if is not boolean, Vue throw a warning.
-  boolean: val => (typeof val === 'string' ? val === '' || val === 'true' ? true : (val === 'false' || val === 'null' || val === 'undefined' ? false : val) : val),
-  // Attempt to convert a string value to a Number. Otherwise, return 0.
-  number: (val, alt = null) => (typeof val === 'number' ? val : val === undefined || val === null || isNaN(Number(val)) ? alt : Number(val)),
-  // Attempt to convert to string any value, except for null or undefined.
-  string: val => (val === undefined || val === null ? '' : val + ''),
-  // Pattern accept RegExp, function, or string (converted to RegExp). Otherwise return null.
-  pattern: val => (val instanceof Function || val instanceof RegExp ? val : typeof val === 'string' ? new RegExp(val) : null)
-}
 
 function paramReadyUrl (url) {
   if (!url.match(/\?[^=]+=[^&]*/)) {
@@ -59,51 +46,37 @@ function fixedEncodeURIComponent (str) {
 }
 
 export default {
+
   created () {
     this.items = this.primitiveData
   },
-  partials: {
-    default: '<span v-html="item | highlight value"></span>'
-  },
+
   props: {
     value: {
       type: String,
       default: ''
     },
-    data: {
-      type: Array
-    },
+    data: Array,
     count: {
       type: Number,
       default: 8
     },
-    async: {
-      type: String,
-      coerce: paramReadyUrl
-    },
+    async: String,
     headers: {
       type: Object,
       default: {}
     },
-    template: {
-      type: String
-    },
-    templateName: {
-      type: String,
-      default: 'default'
-    },
+    template: String,
     dataKey: {
       type: String,
       default: null
     },
     matchCase: {
       type: Boolean,
-      coerce: coerce.boolean,
       default: false
     },
     matchStart: {
       type: Boolean,
-      coerce: coerce.boolean,
       default: false
     },
     onHit: {
@@ -115,29 +88,21 @@ export default {
         }
       }
     },
-    placeholder: {
-      type: String
-    },
+    placeholder: String,
     delay: {
       type: Number,
-      default: _DELAY_,
-      coerce: coerce.number
+      default: _DELAY_
     },
     showDropdownOnFocus: { // display the dropdown immediately when focusing the input
       type: Boolean,
-      coerce: coerce.boolean,
       default: false
     },
     lazyLoad: { // allow the user to request more items from the server
       type: Boolean,
-      coerce: coerce.boolean,
       default: false
     },
     pageMode: { // whether the API uses paging or offset. allowed: 'page'  or 'offset'
       type: String,
-      coerce: val => {
-        return (val === 'page' || val === 'offset') ? val : 'page'
-      },
       default: 'page'
     },
     pageParam: { // query parameter for page or offset
@@ -146,9 +111,6 @@ export default {
     },
     firstPage: { // the page that pagination starts with. allowed: 0 or 1
       type: Number,
-      coerce: val => {
-        return (val === 0 || val === '0') ? 0 : 1
-      },
       default: 1
     },
     searchParam: { // query parameter for the search term
@@ -160,6 +122,7 @@ export default {
       default: 'n'
     }
   },
+
   data () {
     return {
       val: this.value,
@@ -171,7 +134,22 @@ export default {
       queryOnTheWay: false
     }
   },
+
   computed: {
+    templateComp () {
+      return {
+        template: typeof this.template === 'string' ? '<span v-html="this.template"></span>' : '<span v-html="highlight(item, value)"></span>',
+        props: {
+          item: {default: null},
+          value: String
+        },
+        methods: {
+          highlight (string, phrase) {
+            return (string && phrase && string.replace(new RegExp('(' + phrase + ')', 'gi'), '<strong>$1</strong>')) || string
+          }
+        }
+      }
+    },
     primitiveData () {
       if (this.data) {
         return this.data.filter(value => {
@@ -182,26 +160,30 @@ export default {
       } else {
         return []
       }
+    },
+    url () {
+      return paramReadyUrl(this.async)
+    },
+    coercedPageMode () {
+      return (this.pageMode === 'page' || this.pageMode === 'offset') ? this.pageMode : 'page'
+    },
+    coercedFirstPage () {
+      return (this.firstPage === 0 || this.firstPage === '0') ? 0 : 1
     }
   },
-  ready () {
-    // register a partial:
-    if (this.templateName && this.templateName !== 'default') {
-      Vue.partial(this.templateName, this.template)
-    }
-  },
+
   watch: {
     val (val, old) {
       this.$emit('input', val)
-      if (val !== old) this.update()
     },
     value (val) {
       if (this.val !== val) { this.val = val }
     }
   },
+
   methods: {
     update () {
-      if (!this.showDropdownOnFocus && !this.value) {
+      if (!this.showDropdownOnFocus && !this.val) {
         this.reset()
         return false
       }
@@ -211,26 +193,24 @@ export default {
       }
       if (this.async) {
         this.reset()
-        var lastVal = this.value
+        var lastVal = this.val
         setTimeout(() => {
           // only query if the value didn’t change during the delay period
-          if (this.value === lastVal) this.query()
+          if (this.val === lastVal) this.query()
         }, this.delay)
       }
     },
     query () {
-      var url = this.async + '?' + this.searchParam + '=' + fixedEncodeURIComponent(this.value) + '&' + this.countParam + '=' + this.count
-      if (this.lazyLoad) url += '&' + this.pageParam + '=' + (this.pageMode === 'page' ? this.lastLoadedPage + this.firstPage : this.lastLoadedPage * this.count)
-      console.log(this.headers)
+      var url = this.url + this.searchParam + '=' + fixedEncodeURIComponent(this.val) + '&' + this.countParam + '=' + this.count
+      if (this.lazyLoad) url += '&' + this.pageParam + '=' + (this.coercedPageMode === 'page' ? this.lastLoadedPage + this.coercedFirstPage : this.lastLoadedPage * this.count)
       this.$http.get(url, {
         headers: this.headers
       }).then(response => {
-        console.log(response)
         // get the search term from the url
         const re = new RegExp('[&|?]search=([^&]*)')
         const searchVal = response.config.url.match(re)[1]
         // throw the response away if the typeahead value has changed in the meantime
-        if (fixedEncodeURIComponent(this.value) !== searchVal) return
+        if (fixedEncodeURIComponent(this.val) !== searchVal) return
 
         var data = response.data
         if (this.lazyLoad) {
@@ -263,7 +243,6 @@ export default {
       this.lastLoadedPage = 0
       this.showDropdown = false
       this.moreItemsLoadable = true
-      this.$refs.dropdown.scrollTop = 0
     },
     setActive (index) {
       this.current = index
@@ -273,10 +252,14 @@ export default {
     },
     hit (e) {
       e.preventDefault()
-      this.onHit(this.items[this.current], this)
+      if (this.showDropdown) this.onHit(this.items[this.current], this)
     },
     up (e) {
       e.preventDefault()
+      if (!this.showDropdown) {
+        this.showCachedOrUpdate()
+        return
+      }
       if (this.current > 0) {
         this.current--
         const d = this.$refs.dropdown
@@ -288,6 +271,10 @@ export default {
     },
     down (e) {
       e.preventDefault()
+      if (!this.showDropdown) {
+        this.showCachedOrUpdate()
+        return
+      }
       if (this.current < this.items.length - 1) {
         this.current++
         const d = this.$refs.dropdown
@@ -304,11 +291,6 @@ export default {
         if (!this.queryOnTheWay && this.items.length) this.query()
         this.queryOnTheWay = true
       }
-    }
-  },
-  filters: {
-    highlight (value, phrase) {
-      return value.replace(new RegExp('(' + phrase + ')', 'gi'), '<strong>$1</strong>')
     }
   }
 }
