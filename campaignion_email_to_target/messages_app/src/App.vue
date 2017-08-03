@@ -1,39 +1,27 @@
 <template>
   <div id="app">
+    <el-button @click="newSpec('message-template')">Create message</el-button>
+    <el-button @click="newSpec('exclusion')">Create exclusion</el-button>
     <spec-list></spec-list>
-    <img src="./assets/logo.png">
-    <hello></hello>
-    <el-dropdown>
-      <span class="el-dropdown-link">
-        Dropdown List<i class="el-icon-caret-bottom el-icon--right"></i>
-      </span>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item>Action 1</el-dropdown-item>
-        <el-dropdown-item>Action 2</el-dropdown-item>
-        <el-dropdown-item>Action 3</el-dropdown-item>
-        <el-dropdown-item disabled>Action 4</el-dropdown-item>
-        <el-dropdown-item divided>Action 5</el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
-
-    Select with localized placeholder:
-    <el-select>
-      <el-option>foo</el-option>
-      <el-option>bar</el-option>
-    </el-select>
-
+    <spec-dialog></spec-dialog>
   </div>
 </template>
 
 <script>
-import Hello from './components/Hello'
+import SpecDialog from './components/SpecDialog'
 import SpecList from './components/SpecList'
 
 export default {
   name: 'app',
   components: {
-    Hello,
+    SpecDialog,
     SpecList
+  },
+
+  methods: {
+    newSpec (type) {
+      this.$bus.$emit('newSpec', type)
+    }
   },
 
   created () {
@@ -41,18 +29,9 @@ export default {
     console.log(Drupal.settings.campaignion_email_to_target)
     this.$store.commit('initializeData', Drupal.settings.campaignion_email_to_target)
     this.$store.commit('validateSpecs')
-    this.$store.commit('updateFilterStrings')
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>

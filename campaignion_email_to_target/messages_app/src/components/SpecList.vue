@@ -1,41 +1,38 @@
 <template lang="html">
   <ul class="specs">
     <li v-for="(spec, $index) in specs" class="spec row">
-      <div class="col-md-9 col-lg-8 col-xl-6">
-        <div class="card">
-          <span dragula-handle></span>
-          <div class="spec-info">
-            <div class="spec-label">
-              <template v-if="spec.label">{{ spec.label }}</template>
-              <template v-else>{{ filterStrPrefix(spec.type) }} all {{ $index !== 0 ? 'remaining ' : null}}targets where <span v-html="spec.filterStr"></span></template>
-            </div>
-            <div v-if="spec.label" class="spec-description">{{ filterStrPrefix(spec.type) }} all {{ $index !== 0 ? 'remaining ' : null}}targets where <span v-html="spec.filterStr"></span></div>
+      <div class="card">
+        <span dragula-handle></span>
+        <div class="spec-info">
+          <div class="spec-label">
+            <template v-if="spec.label">{{ spec.label }}</template>
+            <spec-description v-else :spec="spec" :index="$index"></spec-description>
           </div>
-          <dropdown class="spec-actions">
-            <button type="button" class="btn" @click="editSpec($index)">Edit</button>
-            <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div name="dropdown-menu" class="dropdown-menu">
-              <a class="dropdown-item" href="#" @click="duplicateSpec($index)">Duplicate</a>
-              <a class="dropdown-item" href="#" @click="removeSpec(spec)">Delete</a>
-            </div>
-          </dropdown>
+          <spec-description v-if="spec.label" :spec="spec" :index="$index" class="spec-description"></spec-description>
         </div>
+
+        <el-dropdown split-button trigger="click" @click="editSpec($index)" class="spec-actions">
+          Edit
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item @click.native="duplicateSpec($index)">Duplicate</el-dropdown-item>
+            <el-dropdown-item @click.native="removeSpec($index)">Delete</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+
       </div>
-      <div class="spec-notice col-md-3 col-lg-4 col-xl-6">
-        <ul class="spec-errors">
-          <li v-for="error in spec.errors" class="spec-error">{{ error.message }}</li>
-        </ul>
-      </div>
+      <ul class="spec-errors">
+        <li v-for="error in spec.errors" class="spec-error">{{ error.message }}</li>
+      </ul>
     </li>
   </ul>
 </template>
 
 <script>
+import SpecDescription from './SpecDescription'
+
 export default {
   components: {
-
+    SpecDescription
   },
   computed: {
     specs () {
@@ -44,19 +41,27 @@ export default {
   },
   methods: {
     editSpec (index) {
-
+      this.$bus.$emit('editSpec', index)
+      // this.$store.commit({type: 'editSpec', index})
     },
     duplicateSpec (index) {
-
+      this.$bus.$emit('duplicateSpec', index)
+      // this.$store.commit({type: 'duplicateSpec', index})
     },
-    removeSpec (spec) {
-
-    },
-    filterStrPrefix (type) {
-      switch (type) {
-        case 'message-template': return 'Send this mail to'
-        case 'exclusion': return 'Exclude'
-      }
+    removeSpec (index) {
+      this.$confirm(
+        this.specs[index].label
+          ? Drupal.t('Do you really want to remove "@itemName"?', {'@itemName': this.specs[index].label})
+          : Drupal.t('Do you really want to remove this item?'),
+        this.specs[index].type === 'message-template' ? Drupal.t('Remove message') : Drupal.t('Remove exclusion'),
+        {
+          confirmButtonText: 'Remove',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      ).then(() => {
+        this.$store.commit({type: 'removeSpec', index})
+      }, () => {})
     }
   }
 }

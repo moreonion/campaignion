@@ -1,14 +1,9 @@
 import Vue from 'vue'
-import {clone, isEmptyMessage, composeFilterStr} from '@/utils'
+import {clone, isEmptyMessage} from '@/utils'
 import {emptySpec} from '@/utils/defaults'
 import {find} from 'lodash'
 
 export default {
-
-  increment (state, payload) {
-    state.count += payload.amount
-  },
-
   initializeData (state, {messageSelection, targetAttributes, tokens, hardValidation}) {
     if (messageSelection && messageSelection.length) {
       // The default message is the last message in the messageSelection array and has no filters
@@ -55,19 +50,19 @@ export default {
       let thisSpecsFilters = thisSpec.filters
 
       if (!thisSpecsFilters.length) {
-        errors.push({type: 'filter', message: 'No filter selected'})
+        errors.push({type: 'filter', message: Drupal.t('No filter selected')})
       } else {
         // Cycle through filters
         for (let ii = 0, jj = thisSpecsFilters.length; ii < jj; ii++) {
           if (!thisSpecsFilters[ii].value) {
-            errors.push({type: 'filter', message: 'A filter value is missing'})
+            errors.push({type: 'filter', message: Drupal.t('A filter value is missing')})
             break
           }
         }
       }
 
       if (thisSpec.type === 'message-template' && isEmptyMessage(thisSpec.message)) {
-        errors.push({type: 'message', message: 'Message is empty'})
+        errors.push({type: 'message', message: Drupal.t('Message is empty')})
       }
 
       // Check this spec’s filters against the sets of filters used by preceding specs.
@@ -87,10 +82,10 @@ export default {
           if (found === thisSpec.filters.length) {
             switch (thisSpec.type) {
               case 'message-template':
-                errors.push({type: 'filter', message: 'This message won’t be sent. The same filter has been applied above.'})
+                errors.push({type: 'filter', message: Drupal.t('This message won’t be sent. The same filter has been applied above.')})
                 break
               case 'exclusion':
-                errors.push({type: 'filter', message: 'This exclusion won’t be taken into account. The same filter has been applied above.'})
+                errors.push({type: 'filter', message: Drupal.t('This exclusion won’t be taken into account. The same filter has been applied above.')})
                 break
             }
             break
@@ -109,9 +104,24 @@ export default {
     }
   },
 
-  updateFilterStrings (state) {
-    for (let i = 0, j = state.specs.length; i < j; i++) {
-      Vue.set(state.specs[i], 'filterStr', composeFilterStr(state.specs[i].filters))
-    }
+  editNewSpec (state) {
+    state.currentSpecIndex = -1
+  },
+
+  editSpec (state, {index}) {
+    state.currentSpecIndex = index
+  },
+
+  removeSpec (state, {index}) {
+    state.specs.splice(index, 1)
+  },
+
+  leaveSpec (state) {
+    state.currentSpecIndex = null
+  },
+
+  updateSpec (state, {spec}) {
+    if (state.currentSpecIndex === null) return
+    Vue.set(state.specs, state.currentSpecIndex, clone(spec))
   }
 }

@@ -82,6 +82,10 @@ amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
 
+animated-scrollto@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/animated-scrollto/-/animated-scrollto-1.1.0.tgz#735012da38bf97d337087f969d9bbe6a24c4acbc"
+
 ansi-escapes@^1.1.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-1.4.0.tgz#d3a8a83b319aa67793662b13e761c7911422306e"
@@ -1093,15 +1097,14 @@ camelcase@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-3.0.0.tgz#32fc4b9fcdaf845fcdf7e73bb97cac2261f0ab0a"
 
-campaignion_vue@1.2.4:
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/campaignion_vue/-/campaignion_vue-1.2.4.tgz#898e9bdf9c4bf8bb61d530b4549cb5ef1fee58c2"
+campaignion_vue@1.2.6:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/campaignion_vue/-/campaignion_vue-1.2.6.tgz#2e2dfd39d1c4fe07f0ea99161543d19bb7cd24ca"
   dependencies:
     axios "0.16.2"
     element-ui "^1.3.7"
     es6-promise "4.1.0"
     vue "2.3.4"
-    vue-i18n "^7.0.5"
     vuex "2.3.1"
 
 caniuse-api@^1.5.2:
@@ -5831,10 +5834,6 @@ void-elements@^2.0.0:
 vue-hot-reload-api@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.1.0.tgz#9ca58a6e0df9078554ce1708688b6578754d86de"
-
-vue-i18n@^7.0.5:
-  version "7.0.5"
-  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-7.0.5.tgz#f603962bff98a75f75ef1d46d26ecc8551ea68cf"
 
 vue-loader@^12.1.0:
   version "12.2.1"

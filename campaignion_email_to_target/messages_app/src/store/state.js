@@ -1,7 +1,6 @@
 const state = {
-  count: 0,
-
   specs: [],
+  currentSpecIndex: null, // the item in the specs array that is currently edited or -1 for a new item
   defaultMessage: {},
   targetAttributes: [],
   tokenCategories: [],

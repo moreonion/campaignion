@@ -1,11 +1,20 @@
 export const VALID_SPECIFICATION_TYPES = ['message-template', 'exclusion']
 // TODO: synchronize types with backend: 'message'?
 
-export const OPERATORS = new Map([
-  ['==', 'is'],
-  ['!=', 'is not'],
-  ['regexp', 'matches']
-])
+export const OPERATORS = {
+  '==': {
+    label: Drupal.t('is'),
+    phrase: Drupal.t('@attribute is @value')
+  },
+  '!=': {
+    label: Drupal.t('is not'),
+    phrase: Drupal.t('@attribute is not @value')
+  },
+  'regexp': {
+    label: Drupal.t('matches'),
+    phrase: Drupal.t('@attribute matches @value')
+  }
+}
 
 export function defaultMessageObj () {
   return {
