@@ -1,5 +1,4 @@
 export const VALID_SPECIFICATION_TYPES = ['message-template', 'exclusion']
-// TODO: synchronize types with backend: 'message'?
 
 export const OPERATORS = {
   '==': {

@@ -28,11 +28,12 @@ var webpackConfig = merge(baseWebpackConfig, {
     sourceMapFilename: '[name].vue.js.map'
   },
   externals: {
-    axios: 'campaignion_vue.axios',
+    'axios': 'campaignion_vue.axios',
     'element-ui': 'campaignion_vue.element',
     'element-ui/lib/locale': 'campaignion_vue.elementLocale',
-    vue: 'campaignion_vue.Vue',
-    vuex: 'campaignion_vue.Vuex'
+    'vue': 'campaignion_vue.Vue',
+    'vuedraggable': 'campaignion_vue.draggable',
+    'vuex': 'campaignion_vue.Vuex'
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html

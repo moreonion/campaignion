@@ -82,7 +82,7 @@ amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
 
-animated-scrollto@^1.1.0:
+animated-scrollto@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/animated-scrollto/-/animated-scrollto-1.1.0.tgz#735012da38bf97d337087f969d9bbe6a24c4acbc"
 
@@ -1097,14 +1097,15 @@ camelcase@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-3.0.0.tgz#32fc4b9fcdaf845fcdf7e73bb97cac2261f0ab0a"
 
-campaignion_vue@1.2.6:
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/campaignion_vue/-/campaignion_vue-1.2.6.tgz#2e2dfd39d1c4fe07f0ea99161543d19bb7cd24ca"
+campaignion_vue@1.2.8:
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/campaignion_vue/-/campaignion_vue-1.2.8.tgz#c92ae91938de974ca541218edfcbaea0cfbca529"
   dependencies:
     axios "0.16.2"
-    element-ui "^1.3.7"
+    element-ui "1.3.7"
     es6-promise "4.1.0"
     vue "2.3.4"
+    vuedraggable "2.14.1"
     vuex "2.3.1"
 
 caniuse-api@^1.5.2:
@@ -1889,7 +1890,7 @@ electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.11:
   version "1.3.14"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.14.tgz#64af0f9efd3c3c6acd57d71f83b49ca7ee9c4b43"
 
-element-ui@^1.3.7:
+element-ui@1.3.7:
   version "1.3.7"
   resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.3.7.tgz#ed6e2e371b767fd7b8a8015dc284e4af5e940026"
   dependencies:
@@ -5336,6 +5337,10 @@ sort-keys@^1.0.0:
   dependencies:
     is-plain-obj "^1.0.0"
 
+sortablejs@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/sortablejs/-/sortablejs-1.6.0.tgz#097cc19267218af2ca1cd455ed858f380136ab68"
+
 source-list-map@^0.1.7, source-list-map@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/source-list-map/-/source-list-map-0.1.8.tgz#c550b2ab5427f6b3f21f5afead88c4f5587b2106"
@@ -5874,6 +5879,12 @@ vue-template-es2015-compiler@^1.2.2:
 vue@2.3.4:
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.3.4.tgz#5ec3b87a191da8090bbef56b7cfabd4158038171"
+
+vuedraggable@2.14.1:
+  version "2.14.1"
+  resolved "https://registry.yarnpkg.com/vuedraggable/-/vuedraggable-2.14.1.tgz#034e1e052e25b9388429ae96db9eb6f2c3b10d87"
+  dependencies:
+    sortablejs "^1.6.0"
 
 vuex@2.3.1:
   version "2.3.1"

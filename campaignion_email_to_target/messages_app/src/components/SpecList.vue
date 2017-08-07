@@ -1,8 +1,8 @@
 <template lang="html">
-  <ul class="specs">
+  <draggable v-model="specs" element="ul" class="specs" :options="{handle: '.drag-handle'}">
     <li v-for="(spec, index) in specs" class="spec row">
       <div class="card">
-        <span dragula-handle></span>
+        <span class="drag-handle"></span>
         <div class="spec-info">
           <div class="spec-label">
             <template v-if="spec.label">{{ spec.label }}</template>
@@ -24,21 +24,32 @@
         <li v-for="error in spec.errors" class="spec-error">{{ error.message }}</li>
       </ul>
     </li>
-  </ul>
+  </draggable>
 </template>
 
 <script>
+import Draggable from 'vuedraggable'
 import SpecDescription from './SpecDescription'
 
 export default {
+
   components: {
-    SpecDescription
+    SpecDescription,
+    Draggable
   },
+
   computed: {
-    specs () {
-      return this.$store.state.specs
+    specs: {
+      get () {
+        return this.$store.state.specs
+      },
+      set (val) {
+        this.$store.commit({type: 'updateSpecs', specs: val})
+        this.$store.commit('validateSpecs')
+      }
     }
   },
+
   methods: {
     editSpec (index) {
       this.$bus.$emit('editSpec', index)
@@ -68,4 +79,13 @@ export default {
 </script>
 
 <style lang="css">
+.drag-handle {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0.5rem;
+  height: 1.3rem;
+  margin-right: 0.5rem;
+  border-left: 0.2rem solid #aaa;
+  border-right: 0.2rem solid #aaa;
+}
 </style>

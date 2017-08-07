@@ -133,6 +133,10 @@ export default {
     }
   },
 
+  updateSpecs (state, {specs}) {
+    state.specs = specs
+  },
+
   updateDefaultMessage (state, {message}) {
     Vue.set(state.defaultMessage, 'message', message)
   }
