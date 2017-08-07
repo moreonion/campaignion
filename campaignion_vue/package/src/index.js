@@ -15,6 +15,7 @@ import {
   Select
 } from 'element-ui';
 import elementLocale from 'element-ui/lib/locale';
+import dragula from 'vue2-dragula';
 
 export default {
   Vue,
@@ -30,5 +31,6 @@ export default {
     Option,
     Select
   },
-  elementLocale
+  elementLocale,
+  dragula
 };
