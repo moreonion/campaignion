@@ -15,7 +15,7 @@ import {
   Select
 } from 'element-ui';
 import elementLocale from 'element-ui/lib/locale';
-import dragula from 'vue2-dragula';
+import draggable from 'vuedraggable';
 
 export default {
   Vue,
@@ -32,5 +32,5 @@ export default {
     Select
   },
   elementLocale,
-  dragula
+  draggable
 };

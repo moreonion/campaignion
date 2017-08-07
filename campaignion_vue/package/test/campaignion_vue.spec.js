@@ -51,8 +51,8 @@ describe('campaignion_vue', () => {
     expect(typeof campVue.elementLocale).to.be.equal('object');
   });
 
-  it('provides vue2-dragula', () => {
-    expect(typeof campVue.dragula).to.be.equal('object');
+  it('provides vuedraggable', () => {
+    expect(typeof campVue.draggable).to.be.equal('object');
   });
 
 });
