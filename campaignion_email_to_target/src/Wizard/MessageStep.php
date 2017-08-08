@@ -20,7 +20,7 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
       '#type' => 'container',
       '#title' => t('Message that will be sent to target(s)'),
       '#id' => drupal_html_id('email-to-target-messages-widget'),
-      '#attributes' => ['class' => ['email-to-target-messages-widget', 'e2tmw']],
+      '#attributes' => ['class' => ['email-to-target-messages-widget']],
     ];
 
     $info = token_get_info();

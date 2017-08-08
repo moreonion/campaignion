@@ -89,3 +89,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.e2tmw th {
+  text-align: left;
+}
+</style>

@@ -7,8 +7,10 @@
     :before-close="dialogCancelHandler"
     >
 
-    <label for="spec-label">{{ text('spec label') }}<small>{{ text('seen only by you') }}</small></label>
-    <input type="text" v-model="currentSpec.label" id="spec-label">
+    <section class="spec-label-field">
+      <label for="spec-label">{{ text('spec label') }}<small>{{ text('seen only by you') }}</small></label>
+      <input type="text" v-model="currentSpec.label" id="spec-label">
+    </section>
 
     <filter-editor
       :fields="targetAttributes"
@@ -18,7 +20,7 @@
       >
     </filter-editor>
 
-    <section>
+    <section class="spec-message-fields">
       <a href="#" @click="prefillMessage()" class="prefill-message" v-if="currentSpec.type == 'message-template'">{{ text('prefill') }}</a>
       <message-editor v-model="currentSpec.message" :type="currentSpec.type"></message-editor>
     </section>
@@ -147,6 +149,16 @@ export default {
       this.modalDirty = false
       this.$store.commit('leaveSpec')
       this.$bus.$emit('closeSpecDialog')
+    },
+    prefillMessage () {
+      if (!this.currentSpec.message) return
+      for (var field in this.currentSpec.message) {
+        if (this.currentSpec.message.hasOwnProperty(field)) {
+          if (!this.currentSpec.message[field].trim()) {
+            this.currentSpec.message[field] = this.$store.state.defaultMessage.message[field]
+          }
+        }
+      }
     }
   },
 
@@ -171,5 +183,13 @@ export default {
 }
 </script>
 
-<style lang="css">
+<style lang="scss">
+.e2tmw {
+
+  section {
+    margin-bottom: 1rem;
+
+    &.spec-message-fields { margin-bottom: 0; }
+  }
+}
 </style>

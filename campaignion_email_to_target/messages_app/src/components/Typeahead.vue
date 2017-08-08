@@ -14,8 +14,8 @@
       @focus="showCachedOrUpdate"
       @keydown.up="up"
       @keydown.down="down"
-      @keydown.enter= "hit"
-      @keydown.esc="showDropdown = false"
+      @keydown.stop.enter= "hit"
+      @keydown.stop.esc="showDropdown = false"
       @blur="showDropdown = false"
     />
     <ul v-if="showDropdown" @scroll="scroll" ref="dropdown" class="dropdown-menu">
@@ -126,6 +126,7 @@ export default {
   data () {
     return {
       val: this.value,
+      cachedQuery: null,
       showDropdown: false,
       current: 0,
       items: [],
@@ -224,6 +225,7 @@ export default {
         } else {
           this.items = (this.dataKey ? data[this.dataKey] : data).slice(0, this.count)
         }
+        this.cachedQuery = searchVal
         this.showDropdown = this.items.length > 0
       })
     },
@@ -231,7 +233,7 @@ export default {
       if (!this.showDropdownOnFocus) {
         return
       }
-      if (this.items.length) {
+      if (this.items.length && this.val === this.cachedQuery) {
         this.showDropdown = true
       } else {
         this.update()
@@ -239,6 +241,7 @@ export default {
     },
     reset () {
       this.items = []
+      this.cachedQuery = null
       this.current = 0
       this.lastLoadedPage = 0
       this.showDropdown = false
@@ -296,15 +299,40 @@ export default {
 }
 </script>
 
-<style>
-.dropdown-menu > li > a {
-  cursor: pointer;
-}
-.typeahead .dropdown-menu {
-  max-height: 12rem;
-  overflow-y: auto;
-}
-.typeahead.open .dropdown-menu {
-  display: block;
+<style lang="scss">
+.typeahead {
+  display: inline-block;
+
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 100%;
+    max-height: 12rem;
+    overflow-y: auto;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    & > li {
+      display: inline-block;
+      width: 100%;
+
+      &.active {
+        color: #fff;
+        background-color: #aaa;
+      }
+    }
+
+    & > li > a {
+      width: 100%;
+      cursor: pointer;
+    }
+  }
+
+  &.open .dropdown-menu {
+    display: block;
+  }
 }
 </style>

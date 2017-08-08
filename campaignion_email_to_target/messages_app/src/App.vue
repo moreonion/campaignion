@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="email-to-target-messages-widget e2tmw">
     <el-button @click="newSpec('message-template')">{{ text('Create message') }}</el-button>
     <el-button @click="newSpec('exclusion')">{{ text('Create exclusion') }}</el-button>
     <spec-list></spec-list>
@@ -74,5 +74,28 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+.e2tmw {
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+
+  input, textarea {
+    min-height: 1.5rem;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+  }
+
+  ul, li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .default-message .message-editor {
+    width: 60%;
+    display: inline-block;
+    vertical-align: top;
+  }
+}
 </style>

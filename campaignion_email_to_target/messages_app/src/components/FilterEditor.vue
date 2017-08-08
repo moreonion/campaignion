@@ -13,7 +13,7 @@
     </header>
 
     <ul class="filters">
-      <li v-for="(filter, index) in f" class="filter">
+      <li v-for="(filter, index) in f" :key="index" class="filter">
 
         <span v-if="index === 0" class="logical-connective">{{ text('If') }}</span>
         <span v-else class="logical-connective">{{ text('and') }}</span>

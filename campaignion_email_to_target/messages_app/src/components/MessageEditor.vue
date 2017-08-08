@@ -4,30 +4,30 @@
     <template v-if="type == 'message-template'">
       <div class="form-group">
         <label :for="'message-subject-' + _uid">{{ text('subject label') }} <a href="#" @click.prevent="toggleHelpText('subject')" class="show-help-text"><span>?</span></a></label>
-        <input type="text" v-model="subject" data-token-insertable class="form-control" :id="'message-subject-' + _uid">
-        <small v-if="helpText['subject']" class="text-muted">{{ text('subject help') }}</small>
+        <input type="text" v-model="subject" data-token-insertable class="field-input" :id="'message-subject-' + _uid">
+        <small v-if="helpText['subject']" class="help-text">{{ text('subject help') }}</small>
       </div>
       <div class="form-group">
         <label :for="'message-header-' + _uid">{{ text('header label') }} <a href="#" @click.prevent="toggleHelpText('header')" class="show-help-text"><span>?</span></a></label>
-        <textarea rows="3" v-model="header" data-token-insertable class="form-control" :id="'message-header-' + _uid"></textarea>
-        <small v-if="helpText['header']" class="text-muted">{{ text('header help') }}</small>
+        <textarea rows="3" v-model="header" data-token-insertable class="field-input" :id="'message-header-' + _uid"></textarea>
+        <small v-if="helpText['header']" class="help-text">{{ text('header help') }}</small>
       </div>
       <div class="form-group">
         <label :for="'message-body-' + _uid">{{ text('body label') }} <a href="#" @click.prevent="toggleHelpText('body')" class="show-help-text"><span>?</span></a></label>
-        <textarea rows="6" v-model="body" data-token-insertable class="form-control" :id="'message-body-' + _uid"></textarea>
-        <small v-if="helpText['body']" class="text-muted">{{ text('body help') }}</small>
+        <textarea rows="6" v-model="body" data-token-insertable class="field-input" :id="'message-body-' + _uid"></textarea>
+        <small v-if="helpText['body']" class="help-text">{{ text('body help') }}</small>
       </div>
       <div class="form-group">
         <label :for="'message-footer-' + _uid">{{ text('footer label') }} <a href="#" @click.prevent="toggleHelpText('footer')" class="show-help-text"><span>?</span></a></label>
-        <textarea rows="3" v-model="footer" data-token-insertable class="form-control" :id="'message-footer-' + _uid"></textarea>
-        <small v-if="helpText['footer']" class="text-muted">{{ text('footer help') }}</small>
+        <textarea rows="3" v-model="footer" data-token-insertable class="field-input" :id="'message-footer-' + _uid"></textarea>
+        <small v-if="helpText['footer']" class="help-text">{{ text('footer help') }}</small>
       </div>
     </template>
     <template v-if="type == 'exclusion'">
       <div class="form-group">
         <label :for="'message-body-' + _uid">{{ text('exclusion label') }} <a href="#" @click.prevent="toggleHelpText('body')" class="show-help-text"><span>?</span></a></label>
-        <textarea rows="6" v-model="body" data-token-insertable class="form-control" :id="'message-body-' + _uid"></textarea>
-        <small v-if="helpText['body']" class="text-muted">{{ text('exclusion help') }}</small>
+        <textarea rows="6" v-model="body" data-token-insertable class="field-input" :id="'message-body-' + _uid"></textarea>
+        <small v-if="helpText['body']" class="help-text">{{ text('exclusion help') }}</small>
       </div>
     </template>
   </fieldset>
@@ -119,3 +119,28 @@ export default {
 
 }
 </script>
+
+<style lang="scss">
+.e2tmw {
+
+  fieldset.message-editor {
+    border: 0 none;
+    padding: 0;
+    margin: 0.75rem 0 0;
+
+    legend {
+      font-weight: bold;
+    }
+
+    label {
+      display: block;
+    }
+
+    input, textarea {
+      &:not([id^=message-footer]) {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}
+</style>
