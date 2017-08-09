@@ -4,18 +4,18 @@
   box-sizing: border-box;
 }
 
-.e2tmw ul,
-.e2tmw li {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
 .e2tmw input,
 .e2tmw textarea {
   min-height: 1.5rem;
   border: 1px solid #aaa;
   border-radius: 3px;
+}
+
+.e2tmw ul,
+.e2tmw li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .e2tmw .default-message .message-editor {

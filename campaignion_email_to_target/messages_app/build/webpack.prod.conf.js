@@ -42,7 +42,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     }),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: utils.assetsPath('../../../css/messages_app/[name].min.css')
+      filename: utils.assetsPath('../../../css/messages_app/[name].css')
     }),
     // copy custom static assets
     new CopyWebpackPlugin([
