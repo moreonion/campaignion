@@ -72,14 +72,13 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
     $dir = drupal_get_path('module', 'campaignion_email_to_target');
     $form['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
     $form['#attached']['js'][] = [
-      'data' => $dir . '/js/messages_app/app.vue.min.js',
+      'data' => $dir . '/js/messages_app/e2t_messages_app.vue.min.js',
       'scope' => 'footer',
       'preprocess' => FALSE,
     ];
     $form['#attached']['css'][] = [
-      'data' => $dir . '/css/messages_app/app.min.css',
+      'data' => $dir . '/css/messages_app/e2t_messages_app.min.css',
       'group' => 'CSS_DEFAULT',
-      'preprocess' => FALSE,
     ];
     $form['#attached']['css'][] = ['data' => $dir . '/css/message-step.css'];
 

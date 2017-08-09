@@ -9,7 +9,7 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    app: './src/main.js'
+    e2t_messages_app: './src/main.js'
   },
   output: {
     path: config.build.assetsRoot,

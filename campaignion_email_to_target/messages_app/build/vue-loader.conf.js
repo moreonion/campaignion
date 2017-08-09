@@ -8,5 +8,13 @@ module.exports = {
       ? config.build.productionSourceMap
       : config.dev.cssSourceMap,
     extract: isProduction
-  })
+  }),
+  postcss: {
+    plugins: [
+      require('postcss-discard-overridden'),
+      require('postcss-discard-duplicates'),
+      require('postcss-normalize-whitespace'),
+      require('postcss-prettify')
+    ]
+  }
 }

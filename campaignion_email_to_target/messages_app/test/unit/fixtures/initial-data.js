@@ -109,7 +109,7 @@ export default {
     'messages': '/node/8/email-to-target-messages',
     'e2t-api': {
       'url': 'https://e2t-api.more-onion.com/v2',
-      'token': 'xxxx',
+      'token': process.env.E2T_API_TOKEN || 'xxxx', // token injected by webpack.DefinePlugin
       'dataset': 'mp'
     }
   }
