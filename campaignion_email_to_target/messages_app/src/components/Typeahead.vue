@@ -316,7 +316,6 @@ export default {
     padding: 0;
 
     & > li {
-      display: inline-block;
       width: 100%;
 
       &.active {
@@ -326,6 +325,7 @@ export default {
     }
 
     & > li > a {
+      display: inline-block;
       width: 100%;
       cursor: pointer;
     }
