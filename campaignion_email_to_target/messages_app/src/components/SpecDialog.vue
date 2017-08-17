@@ -178,6 +178,12 @@ export default {
       this.currentSpec = duplicate
       this.$store.commit('editNewSpec')
     })
+    document.addEventListener('keyup', e => {
+      if (this.visible && !this.currentSpecIsEmpty && e.keyCode === 13 && document.activeElement.tagName.toLowerCase() !== 'textarea') {
+        e.preventDefault()
+        this.updateSpec()
+      }
+    })
   }
 
 }
