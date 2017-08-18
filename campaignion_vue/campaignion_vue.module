@@ -15,6 +15,7 @@ function _campaignion_vue_add_assets() {
     'group' => JS_LIBRARY,
     'preprocess' => FALSE,
   ]);
+  drupal_add_js($module_path . '/js/interrupt-submit.js');
 
   // Add element-ui locale.
   $lang = $GLOBALS['language']->language;

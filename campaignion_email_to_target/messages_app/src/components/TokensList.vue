@@ -27,6 +27,7 @@
 
 <script>
 import Vue from 'vue'
+import {dispatch} from '@/utils'
 
 export default {
   props: {
@@ -82,9 +83,7 @@ export default {
       txtarea.scrollTop = scrollPos
 
       // Trigger input for the MessageEditor component to update.
-      const event = document.createEvent('Event')
-      event.initEvent('input', true, true)
-      txtarea.dispatchEvent(event)
+      dispatch(txtarea, 'input')
     }
   }
 }

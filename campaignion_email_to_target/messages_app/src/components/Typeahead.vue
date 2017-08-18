@@ -14,8 +14,8 @@
       @focus="showCachedOrUpdate"
       @keydown.up="up"
       @keydown.down="down"
-      @keydown.stop.enter= "hit"
-      @keydown.stop.esc="showDropdown = false"
+      @keyup.enter= "hit"
+      @keydown.esc="esc"
       @blur="showDropdown = false"
     />
     <ul v-if="showDropdown" @scroll="scroll" ref="dropdown" class="dropdown-menu">
@@ -254,8 +254,11 @@ export default {
       return this.current === index
     },
     hit (e) {
-      e.preventDefault()
-      if (this.showDropdown) this.onHit(this.items[this.current], this)
+      if (this.showDropdown) {
+        e.preventDefault()
+        e.stopPropagation()
+        this.onHit(this.items[this.current], this)
+      }
     },
     up (e) {
       e.preventDefault()
@@ -285,6 +288,12 @@ export default {
         if (i.offsetTop + i.clientHeight > d.scrollTop + d.clientHeight) {
           d.scrollTop += i.clientHeight
         }
+      }
+    },
+    esc (e) {
+      if (this.showDropdown) {
+        e.stopPropagation()
+        this.showDropdown = false
       }
     },
     scroll () {
