@@ -13,6 +13,7 @@
     }
   };
 
+Drupal.behaviors.campaignion_ux_webform_ajax_scroll = {};
 Drupal.behaviors.campaignion_ux_webform_ajax_scroll.attach = function(context) {
   // Scroll to top of the form + padding if we are below or more than the
   // toleratedOffset above it.
