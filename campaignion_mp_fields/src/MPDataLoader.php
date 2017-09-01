@@ -102,7 +102,7 @@ class MPDataLoader {
       $data = $api->getTargets('mp', str_replace(' ', '', $postcode));
       if ($data) {
         $constituency = !empty($data[0]) ? $data[0] : NULL;
-        $target = !empty($constituency['targets'][0]) ? $constituency['targets'][0] : NULL;
+        $target = !empty($constituency['contacts'][0]) ? $constituency['contacts'][0] : NULL;
         $wrapped = entity_metadata_wrapper($entity_type, $entity);
         foreach ($target_fields as $field_name => $field) {
           $this->setters[$field_name]($wrapped->{$field_name}, $constituency, $target);

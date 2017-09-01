@@ -104,7 +104,7 @@ class Tagger {
       $tid = $term->tid;
     }
 
-    if ($new_tid = $this->map[$tag]) {
+    if ($new_tid = $this->mapTag($tag, $add)) {
       if ($new_tid != $tid) {
         $changed = TRUE;
         $field->set($new_tid);
