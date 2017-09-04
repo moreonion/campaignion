@@ -27,7 +27,7 @@
         </el-dropdown>
 
       </div>
-      <ul class="spec-errors">
+      <ul v-if="spec.errors.length" class="spec-errors">
         <li v-for="error in spec.errors" class="spec-error">{{ error.message }}</li>
       </ul>
     </li>
@@ -100,7 +100,6 @@ export default {
 
   .spec-card {
     display: inline-block;
-    width: 60%;
     padding: 1rem;
     border: 1px solid #aaa;
     background-color: #fff;
@@ -114,7 +113,10 @@ export default {
     margin-right: 0.5rem;
     border-left: 0.2rem solid #aaa;
     border-right: 0.2rem solid #aaa;
-    cursor: move;
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
   }
 
   .spec-info {
@@ -158,6 +160,8 @@ export default {
 }
 
 body.dragging, body.dragging * {
-  cursor: move;
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
 }
 </style>

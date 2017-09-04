@@ -8,8 +8,8 @@
     >
 
     <section class="spec-label-field">
-      <label for="spec-label">{{ text('spec label') }}<small>{{ text('seen only by you') }}</small></label>
-      <input type="text" v-model="currentSpec.label" id="spec-label">
+      <label for="spec-label">{{ text('spec label') }} <small>{{ text('seen only by you') }}</small></label>
+      <input type="text" v-model="currentSpec.label" class="field-input" id="spec-label">
     </section>
 
     <filter-editor
@@ -31,8 +31,8 @@
       {{ text('exclusion warning') }}
     </section>
 
-    <span slot="footer" :class="{'dialog-footer': true, 'modal-alert': modalDirty}">
-      <span v-if="modalDirty" class="modal-alert-message">{{ text('unsaved changes') }}</span>
+    <span slot="footer" :class="{'dialog-footer': true, 'dialog-alert': modalDirty}">
+      <span v-if="modalDirty" class="dialog-alert-message">{{ text('unsaved changes') }}</span>
       <el-button @click="cancelButtonHandler()" class="js-modal-cancel">{{ text('Cancel') }}</el-button>
       <el-button type="primary" :disabled="currentSpecIsEmpty" @click="updateSpec" class="js-modal-save">{{ text('Done') }}</el-button>
     </span>

@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import {defaultMessageObj} from '@/utils/defaults'
+import {messageObj} from '@/utils/defaults'
 
 export default {
 
@@ -56,7 +56,7 @@ export default {
   props: {
     value: {
       type: Object,
-      default: () => defaultMessageObj()
+      default: () => messageObj()
     },
     type: String
   },
@@ -96,14 +96,12 @@ export default {
       this.helpText[which] = !this.helpText[which]
     },
     updateValue () {
-      // Exclusions only have a body.
-      const val = {body: this.body}
-      if (this.type === 'message-template') {
-        val.subject = this.subject
-        val.header = this.header
-        val.footer = this.footer
-      }
-      this.$emit('input', val)
+      this.$emit('input', {
+        subject: this.subject,
+        header: this.header,
+        body: this.body,
+        footer: this.footer
+      })
     }
   },
 
@@ -122,25 +120,8 @@ export default {
 
 <style lang="scss">
 .e2tmw {
-
-  fieldset.message-editor {
-    border: 0 none;
-    padding: 0;
-    margin: 0.75rem 0 0;
-
-    legend {
-      font-weight: bold;
-    }
-
-    label {
-      display: block;
-    }
-
-    input, textarea {
-      &:not([id^=message-footer]) {
-        margin-bottom: 0.5rem;
-      }
-    }
+  fieldset.message-editor label {
+    display: block;
   }
 }
 </style>

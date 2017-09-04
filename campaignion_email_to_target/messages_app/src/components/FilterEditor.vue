@@ -2,7 +2,7 @@
   <section class="filter-editor">
 
     <header>
-      <el-dropdown trigger="click">
+      <el-dropdown trigger="click" menu-align="start">
         <el-button>
           {{ text('Add filter') }}<i class="el-icon-caret-bottom el-icon--right"></i>
         </el-button>

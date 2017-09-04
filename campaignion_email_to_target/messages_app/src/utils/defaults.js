@@ -15,7 +15,7 @@ export const OPERATORS = {
   }
 }
 
-export function defaultMessageObj () {
+export function messageObj () {
   return {
     subject: '',
     header: '',
@@ -24,34 +24,21 @@ export function defaultMessageObj () {
   }
 }
 
-export function exclusionMessageObj () {
-  return {
-    body: ''
-  }
-}
-
 export function emptySpec (type) {
   if (VALID_SPECIFICATION_TYPES.indexOf(type) === -1) return
-  var spec = {
+  return {
     id: null,
     type: type,
     label: '',
     filters: [],
-    filterStr: '', // Verbal expression of a specification’s filters
+    message: messageObj(),
     errors: []
   }
-  if (type === 'message-template') {
-    spec.message = defaultMessageObj()
-  } else if (type === 'exclusion') {
-    spec.message = exclusionMessageObj()
-  }
-  return spec
 }
 
 export default {
   VALID_SPECIFICATION_TYPES,
   OPERATORS,
-  defaultMessageObj,
-  exclusionMessageObj,
+  messageObj,
   emptySpec
 }

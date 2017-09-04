@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import {clone, isEmptyMessage} from '@/utils'
-import {emptySpec, exclusionMessageObj} from '@/utils/defaults'
+import {emptySpec, messageObj} from '@/utils/defaults'
 import {find} from 'lodash'
 
 export default {
@@ -30,7 +30,7 @@ export default {
       }
       // add empty message to exclusions saved without a message in version 1
       if (state.specs[i].type === 'exclusion' && typeof state.specs[i].message === 'undefined') {
-        Vue.set(state.specs[i], 'message', exclusionMessageObj())
+        Vue.set(state.specs[i], 'message', messageObj())
       }
     }
 

@@ -64,8 +64,8 @@ export default {
   methods: {
     text (text) {
       switch (text) {
-        case 'Create message': return Drupal.t('Create message')
-        case 'Create exclusion': return Drupal.t('Create exclusion')
+        case 'Create message': return Drupal.t('Add specific message')
+        case 'Create exclusion': return Drupal.t('Add exclusion')
         case 'message to remaining targets': return Drupal.t('Message to all remaining targets')
         case 'default message': return Drupal.t('Default message that will be sent to target(s)')
         case 'service unavailable title': return Drupal.t('Service unavailable')
@@ -172,22 +172,10 @@ export default {
     box-sizing: border-box;
   }
 
-  input, textarea {
-    min-height: 1.5rem;
-    border: 1px solid #aaa;
-    border-radius: 3px;
-  }
-
   ul, li {
     list-style: none;
     padding: 0;
     margin: 0;
-  }
-
-  .default-message .message-editor {
-    width: 60%;
-    display: inline-block;
-    vertical-align: top;
   }
 }
 </style>

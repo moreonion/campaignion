@@ -77,10 +77,9 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
       'preprocess' => FALSE,
     ];
     $form['#attached']['css'][] = [
-      'data' => $dir . '/css/messages_app/e2t_messages_app.min.css',
+      'data' => $dir . '/css/messages_app/e2t_messages_app.css',
       'group' => 'CSS_DEFAULT',
     ];
-    $form['#attached']['css'][] = ['data' => $dir . '/css/message-step.css'];
 
     $field = $this->wizard->parameters['email_to_target']['no_target_message_field'];
     $this->fieldForm = new EntityFieldForm('node', $node, [$field]);

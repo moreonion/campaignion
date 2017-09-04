@@ -5,7 +5,7 @@
      'open': showDropdown
     }"
     >
-    <input type="text" class="form-control typeahead-input"
+    <input type="text" class="field-input typeahead-input"
       ref="input"
       :placeholder="placeholder"
       autocomplete="off"
@@ -323,6 +323,7 @@ export default {
     list-style: none;
     margin: 0;
     padding: 0;
+    z-index: 2000;
 
     & > li {
       width: 100%;
