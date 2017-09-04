@@ -131,6 +131,19 @@ function campaignion_email_to_target_enable() {
 }
 
 /**
+ * Update stored submitted data fields to new format.
+ */
+function campaignion_email_to_target_update_5() {
+  $sql = <<<SQL
+UPDATE {webform_submitted_data} d
+  INNER JOIN {webform_component} c USING(nid, cid)
+SET data=CONCAT(:pfx, data, :sfx)
+WHERE c.type='e2t_selector'
+SQL;
+  db_query($sql, [':pfx' => 'a:1:{s:7:"message";', ':sfx' => '}']);
+}
+
+/**
  * Enable the feature.
  */
 function campaignion_email_to_target_update_4() {

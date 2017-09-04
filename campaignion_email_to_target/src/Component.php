@@ -113,11 +113,12 @@ class Component {
 
     $last_id = NULL;
     foreach ($pairs as $p) {
-      list($target, $message) = $p;
+      list($target, $constituency, $message) = $p;
       $t = [
         '#type' => 'container',
         '#attributes' => ['class' => ['email-to-target-target']],
         '#target' => $target,
+        '#constituency' => $constituency,
         '#message' => $message->toArray(),
       ];
       $t['send'] = [
@@ -175,7 +176,11 @@ class Component {
     foreach ($original_values as $id => $edited_message) {
       if (!empty($edited_message['send']) || $only_one) {
         $e = &$element[$id];
-        $values[] = serialize($edited_message + $e['#message']);
+        $values[] = serialize([
+          'message' => $edited_message + $e['#message'],
+          'target' => $e['#target'],
+          'constituency' => $e['#constituency'],
+        ]);
       }
     }
     if (empty($values)) {
