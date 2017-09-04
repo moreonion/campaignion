@@ -67,17 +67,4 @@ describe('mutations', function () {
       expect(s.errors).not.to.deep.include({type: 'filter', message: 'This message won’t be sent. The same filter has been applied above.'})
     })
   })
-
-  describe('updateFilterStrings', function () {
-    beforeEach(() => {
-      mutations.initializeData(state, testData)
-      mutations.validateSpecs(state)
-      mutations.updateFilterStrings(state)
-    })
-
-    it('renders a filter string', function () {
-      expect(state.specs[0].filterStr).to.include('Political Affiliation')
-      expect(state.specs[0].filterStr).to.include('Green Party')
-    })
-  })
 })

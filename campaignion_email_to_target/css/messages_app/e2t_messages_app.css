@@ -4,24 +4,11 @@
   box-sizing: border-box;
 }
 
-.e2tmw input,
-.e2tmw textarea {
-  min-height: 1.5rem;
-  border: 1px solid #aaa;
-  border-radius: 3px;
-}
-
 .e2tmw ul,
 .e2tmw li {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-.e2tmw .default-message .message-editor {
-  width: 60%;
-  display: inline-block;
-  vertical-align: top;
 }.e2tmw ul.specs {
   margin: 1rem 0;
 }
@@ -32,7 +19,6 @@
 
 .e2tmw .spec-card {
   display: inline-block;
-  width: 60%;
   padding: 1rem;
   border: 1px solid #aaa;
   background-color: #fff;
@@ -47,6 +33,9 @@
   border-left: 0.2rem solid #aaa;
   border-right: 0.2rem solid #aaa;
   cursor: move;
+  /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -webkit-grab;
 }
 
 .e2tmw .spec-info {
@@ -88,24 +77,10 @@
 
 body.dragging,
 body.dragging * {
-  cursor: move;
-}.e2tmw fieldset.message-editor {
-  border: 0 none;
-  padding: 0;
-  margin: 0.75rem 0 0;
-}
-
-.e2tmw fieldset.message-editor legend {
-  font-weight: bold;
-}
-
-.e2tmw fieldset.message-editor label {
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+}.e2tmw fieldset.message-editor label {
   display: block;
-}
-
-.e2tmw fieldset.message-editor input:not([id^=message-footer]),
-.e2tmw fieldset.message-editor textarea:not([id^=message-footer]) {
-  margin-bottom: 0.5rem;
 }.e2tmw th {
   text-align: left;
 }.e2tmw section {
@@ -129,6 +104,7 @@ body.dragging * {
   list-style: none;
   margin: 0;
   padding: 0;
+  z-index: 2000;
 }
 
 .typeahead .dropdown-menu > li {

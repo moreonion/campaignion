@@ -4,7 +4,7 @@
 import exampleData from '../test/unit/fixtures/example-data'
 import initialData from '../test/unit/fixtures/initial-data'
 
-const Drupal = {
+var Drupal = {
   settings: {
     campaignion_email_to_target: (process.env.NODE_ENV === 'development')
       ? exampleData
