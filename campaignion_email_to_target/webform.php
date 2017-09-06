@@ -67,7 +67,23 @@ function _webform_display_e2t_selector($component, $value, $format = 'html') {
  * Implements _webform_table_component().
  */
 function _webform_table_e2t_selector($component, $value) {
-  return check_plain(empty($value[0]) ? '' : $value[0]);
+  if (_webform_show_single_target_e2t_selector($component['nid']) && !empty($value[0])) {
+    $data = (array) unserialize($value[0]);
+    ArrayConfig::mergeDefaults($data, [
+      'message' => [],
+      'target' => ['salutation' => NULL, 'political_affiliation' => NULL],
+      'constituency' => ['name' => NULL, 'country' => ['name' => NULL]],
+    ]);
+    $data['message'] = new Message($data['message']);
+    return ['data' => [
+      '#theme' => 'campaignion_email_to_target_results_table_entry',
+      '#data' => $data,
+      '#component' => $component,
+    ]];
+  }
+  else {
+    return check_plain(empty($value[0]) ? '' : $value[0]);
+  }
 }
 
 function _webform_show_single_target_e2t_selector($nid) {

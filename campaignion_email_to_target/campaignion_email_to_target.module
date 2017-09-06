@@ -294,6 +294,9 @@ function campaignion_email_to_target_theme() {
     ],
     'template' => 'campaignion-email-to-target-mail',
   ];
+  $hooks['campaignion_email_to_target_results_table_entry'] = [
+    'template' => 'campaignion-email-to-target-results-table-entry',
+  ] + $options;
   return $hooks;
 }
 

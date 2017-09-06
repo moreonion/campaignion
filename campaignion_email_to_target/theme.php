@@ -39,3 +39,14 @@ function theme_campaignion_email_to_target_selector_placeholder(&$variables) {
 
   return render($render);
 }
+
+/**
+ * Preprocess callback.
+ */
+function template_preprocess_campaignion_email_to_target_results_table_entry(&$variables) {
+  $e = $variables['element'];
+  $t = 'campaignion_email_to_target_mail';
+  $variables['message'] = theme([$t, $t . '_' . $e['#component']['nid']], [
+    'message' => $e['#data']['message'],
+  ]);
+}
