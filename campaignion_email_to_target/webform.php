@@ -43,12 +43,18 @@ function _webform_edit_e2t_selector($component) {
  * Implements _webform_render_[component]().
  */
 function _webform_render_e2t_selector($component, $value = NULL, $filter = TRUE) {
+  $component['extra'] += [
+    'title_display' => 'before',
+  ];
   $element = [
     '#type' => 'container',
     '#theme' => 'campaignion_email_to_target_selector_placeholder',
+    '#theme_wrappers' => ['webform_element'],
     '#title' => $component['name'],
+    '#title_display' => $component['extra']['title_display'],
     '#required' => TRUE,
     '#weight' => isset($component['weight']) == TRUE ? $component['weight'] : 0,
+    '#webform_component' => $component,
   ];
   return $element;
 }
