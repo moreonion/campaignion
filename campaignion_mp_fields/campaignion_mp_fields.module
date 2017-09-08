@@ -4,6 +4,7 @@
  * Code for the campaignion_mp_fields feature.
  */
 
+use \Drupal\campaignion\Contact;
 use \Drupal\campaignion_mp_fields\MPDataLoader;
 
 include_once 'campaignion_mp_fields.features.inc';
@@ -19,9 +20,19 @@ function campaignion_mp_fields_entity_presave($entity, $entity_type) {
  * Implements hook_campaignion_manage_filter_info().
  */
 function campaignion_mp_fields_campaignion_manage_filter_info() {
-  $filter['supporter']['mp_constituency'] = \Drupal\campaignion_mp_fields\ConstituencyFilter::class;
-  $filter['supporter']['mp_country'] = \Drupal\campaignion_mp_fields\CountryFilter::class;
-  $filter['supporter']['mp_party'] = \Drupal\campaignion_mp_fields\PartyFilter::class;
-  $filter['supporter']['mp_salutation'] = \Drupal\campaignion_mp_fields\SalutationFilter::class;
+  $filters['mp_constituency'] = \Drupal\campaignion_mp_fields\ConstituencyFilter::class;
+  $filters['mp_country'] = \Drupal\campaignion_mp_fields\CountryFilter::class;
+  $filters['mp_party'] = \Drupal\campaignion_mp_fields\PartyFilter::class;
+  $filters['mp_salutation'] = \Drupal\campaignion_mp_fields\SalutationFilter::class;
+  $bundle = Contact::defaultType();
+  $target_fields = field_read_fields([
+    'entity_type' => 'redhen_contacts',
+    'bundle' => $bundle,
+    'field_name' => array_keys($filters),
+  ]);
+  $filter = [];
+  foreach ($target_fields as $name => $field) {
+    $filter['supporter'][$name] = $filters[$name];
+  }
   return $filter;
 }
