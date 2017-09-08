@@ -55,4 +55,5 @@ class ConstituencyFilter extends Base {
     $options = $this->getOptions();
     return ['mp_constituency' => NULL];
   }
+
 }

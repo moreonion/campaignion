@@ -55,4 +55,5 @@ class SalutationFilter extends Base {
     $options = $this->getOptions();
     return ['mp_salutation' => NULL];
   }
+
 }

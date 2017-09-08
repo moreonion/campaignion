@@ -59,6 +59,8 @@ class CountryFilter extends Base {
     return ['mp_country' => NULL];
   }
 
-  public function title() { return t('Devolved country'); }
+  public function title() {
+    return t('Devolved country');
+  }
 
 }

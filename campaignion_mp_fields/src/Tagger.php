@@ -27,9 +27,10 @@ class Tagger {
    *   of newly created terms.
    * @param bool $reset
    *   Forces creation of a new instance if TRUE.
+   *
    * @return static
    */
-  public static function byNameAndParentUUID($vocabulary_name, $parent_uuid = NULL, $reset = FALSE) {
+  public static function byNameAndParentUuid($vocabulary_name, $parent_uuid = NULL, $reset = FALSE) {
     if (!isset(static::$instances[$vocabulary_name][$parent_uuid]) || $reset) {
       $ptid = 0;
       if ($parent_uuid) {
@@ -64,7 +65,7 @@ class Tagger {
    *
    * @var int
    */
-  protected $parent_tid;
+  protected $parentTid;
 
   /**
    * Create new instance.
@@ -73,7 +74,6 @@ class Tagger {
    *   Taxonomy vocabulary id.
    * @param int $parent_tid
    *   Parent taxonomy term id.
-   * @return static
    */
   public function __construct($vid, $parent_tid) {
     $this->map = [];
@@ -86,7 +86,7 @@ class Tagger {
       $this->map[$row->name] = $row->tid;
     }
     $this->vid = $vid;
-    $this->parent_tid = $parent_tid;
+    $this->parentTid = $parent_tid;
   }
 
   /**
@@ -96,6 +96,7 @@ class Tagger {
    *   Name of the tag that should be mapped or created.
    * @param bool $add
    *   If TRUE tags that are not found will be created.
+   *
    * @return int|null
    *   The taxonomy term id of the tag with this name or NULL if none was found
    *   and $add is FALSE.
@@ -103,7 +104,11 @@ class Tagger {
   protected function mapTag($tag, $add) {
     if (!isset($this->map[$tag])) {
       if ($add) {
-        $term = entity_create('taxonomy_term', ['name' => $tag, 'vid' => $this->vid, 'parent' => $this->parent_tid]);
+        $term = entity_create('taxonomy_term', [
+          'name' => $tag,
+          'vid' => $this->vid,
+          'parent' => $this->parentTid,
+        ]);
         entity_save('taxonomy_term', $term);
         $this->map[$tag] = $term->tid;
       }
@@ -117,7 +122,7 @@ class Tagger {
   /**
    * Add tags to a multi-value taxonomy term reference field.
    *
-   * @param \EntityMetadataWrapper $field
+   * @param \EntityListWrapper $field
    *   Entity metadata wrapper of the field.
    * @param string[] $tags
    *   List of tag names to add to the $field.
@@ -127,7 +132,7 @@ class Tagger {
    * @return bool
    *   TRUE if the field values were changed otherwise FALSE.
    */
-  public function tag(\EntityListWrapper $field, $tags, $add = FALSE) {
+  public function tag(\EntityListWrapper $field, array $tags, $add = FALSE) {
     $changed = FALSE;
 
     $items = [];
@@ -181,4 +186,3 @@ class Tagger {
   }
 
 }
-

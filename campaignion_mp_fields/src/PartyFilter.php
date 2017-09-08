@@ -59,6 +59,8 @@ class PartyFilter extends Base {
     return ['mp_party' => NULL];
   }
 
-  public function title() { return t('MP party'); }
+  public function title() {
+    return t('MP party');
+  }
 
 }

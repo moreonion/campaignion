@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Code for the campaignion_mp_fields feature.
@@ -6,6 +7,10 @@
 
 use \Drupal\campaignion\Contact;
 use \Drupal\campaignion_mp_fields\MPDataLoader;
+use \Drupal\campaignion_mp_fields\ConstituencyFilter;
+use \Drupal\campaignion_mp_fields\CountryFilter;
+use \Drupal\campaignion_mp_fields\PartyFilter;
+use \Drupal\campaignion_mp_fields\SalutationFilter;
 
 include_once 'campaignion_mp_fields.features.inc';
 
@@ -20,10 +25,10 @@ function campaignion_mp_fields_entity_presave($entity, $entity_type) {
  * Implements hook_campaignion_manage_filter_info().
  */
 function campaignion_mp_fields_campaignion_manage_filter_info() {
-  $filters['mp_constituency'] = \Drupal\campaignion_mp_fields\ConstituencyFilter::class;
-  $filters['mp_country'] = \Drupal\campaignion_mp_fields\CountryFilter::class;
-  $filters['mp_party'] = \Drupal\campaignion_mp_fields\PartyFilter::class;
-  $filters['mp_salutation'] = \Drupal\campaignion_mp_fields\SalutationFilter::class;
+  $filters['mp_constituency'] = ConstituencyFilter::class;
+  $filters['mp_country'] = CountryFilter::class;
+  $filters['mp_party'] = PartyFilter::class;
+  $filters['mp_salutation'] = SalutationFilter::class;
   $bundle = Contact::defaultType();
   $target_fields = field_read_fields([
     'entity_type' => 'redhen_contacts',

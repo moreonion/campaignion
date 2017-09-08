@@ -2,7 +2,6 @@ name = Campaignion MP fields
 description = CRM fields for MP data (based on postcode)
 core = 7.x
 package = Campaignion
-project = campaignion
 dependencies[] = campaignion_email_to_target
 dependencies[] = ctools
 dependencies[] = features

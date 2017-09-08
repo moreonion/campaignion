@@ -5,7 +5,7 @@ namespace Drupal\campaignion_mp_fields;
 use \Drupal\campaignion_email_to_target\Api\Client;
 
 /**
- * Extract UK postcodes from address fields and add additional data to an entity.
+ * Extract UK postcodes from address fields and add MP data to an entity.
  */
 class MPDataLoader {
 
@@ -24,13 +24,13 @@ class MPDataLoader {
       },
       'mp_country' => function ($field, $constituency, $target) {
         if (!empty($constituency['country']['name'])) {
-          $tagger = Tagger::byNameAndParentUUID('mp_country');
+          $tagger = Tagger::byNameAndParentUuid('mp_country');
           $tagger->tagSingle($field, $constituency['country']['name'], TRUE);
         }
       },
       'mp_party' => function ($field, $constituency, $target) {
         if (!empty($target['political_affiliation'])) {
-          $tagger = Tagger::byNameAndParentUUID('mp_party');
+          $tagger = Tagger::byNameAndParentUuid('mp_party');
           $tagger->tagSingle($field, $target['political_affiliation'], TRUE);
         }
       },
@@ -54,7 +54,7 @@ class MPDataLoader {
    *   - target: The target data from the API (or NULL).
    *   The functions should set their field’s value if available.
    */
-  public function __construct($setters) {
+  public function __construct(array $setters) {
     $this->setters = $setters;
   }
 
