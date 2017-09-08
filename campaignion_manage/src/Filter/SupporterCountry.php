@@ -10,10 +10,8 @@ class SupporterCountry extends Base implements FilterInterface {
   }
 
   protected function getOptions() {
-    $query = clone $this->query;
-    $query->innerJoin('field_data_field_address', 'ctr', "r.contact_id = ctr.entity_id AND ctr.entity_type = 'redhen_contact'");
-    $fields =& $query->getFields();
-    $fields = array();
+    $query = db_select('field_data_field_address', 'ctr')
+      ->condition('ctr.entity_type', 'redhen_contact');
     $query->fields('ctr', array('field_address_country'));
     $query->isNotNull('ctr.field_address_country');
     $query->groupBy('ctr.field_address_country');

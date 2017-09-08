@@ -40,7 +40,7 @@ class ComponentTest extends \DrupalUnitTestCase {
    */
   public function testRenderEscaping() {
     list($component, $submission_o) = $this->mockComponent([
-      [['id' => 't1', 'salutation' => 'T1'], new Message([
+      [['id' => 't1', 'salutation' => 'T1'], ['name' => 'C1'], new Message([
         'subject' => "Subject's string",
         'header' => "Header's string",
         'message' => "Message's string",

@@ -154,3 +154,16 @@ function campaignion_manage_activity_how_many_validate($element, &$form_state) {
     form_error($element, t('The number of times has to be a positive integer value.'));
   }
 }
+
+/**
+ * Implements hook_campaignion_manage_filter_info().
+ */
+function campaignion_manage_campaignion_manage_filter_info() {
+  $filters['supporter']['name'] = cm\Filter\SupporterName::class;
+  if (module_exists('campaignion_supporter_tags')) {
+    $filters['supporter']['tags'] = cm\Filter\SupporterTag::class;
+  }
+  $filters['supporter']['country']  = cm\Filter\SupporterCountry::class;
+  $filters['supporter']['activity'] = cm\Filter\SupporterActivity::class;
+  return $filters;
+}

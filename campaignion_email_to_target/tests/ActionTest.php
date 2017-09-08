@@ -50,11 +50,12 @@ class ActionTest extends \DrupalUnitTestCase {
       ['first_name' => 'Bob'],
       ['first_name' => 'Claire'],
     ];
+    $c1 = [
+      'name' => 'Constituency 1',
+      'contacts' => $contacts,
+    ];
     list($action, $api, $submission_o) = $this->mockAction([
-      [
-        'name' => 'Constituency 1',
-        'contacts' => $contacts,
-      ],
+      $c1,
       [
         'name' => 'Excluded',
         'contacts' => [
@@ -90,7 +91,7 @@ class ActionTest extends \DrupalUnitTestCase {
       }
     }));
     list($pairs, $no_target_element) = $action->TargetMessagePairs($submission_o);
-    $this->assertEqual([[$contacts[0], $m], [$contacts[2], $m]], $pairs);
+    $this->assertEqual([[$contacts[0], $c1, $m], [$contacts[2], $c1, $m]], $pairs);
     $this->assertEqual(['#markup' => "<p>excluded first!</p>\n"], $no_target_element);
   }
 

@@ -125,7 +125,7 @@ class Action extends ActionBase {
             }
           }
           else {
-            $pairs[] = [$target, $message];
+            $pairs[] = [$target, $constituency, $message];
           }
         }
       }
