@@ -20,10 +20,7 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
       '#type' => 'container',
       '#title' => t('Message that will be sent to target(s)'),
       '#id' => drupal_html_id('email-to-target-messages-widget'),
-      '#attributes' => ['class' => ['email-to-target-messages-widget', 'e2tmw']],
-      'app-tag' => [
-        '#markup' => '<app></app>'
-      ],
+      '#attributes' => ['class' => ['email-to-target-messages-widget']],
     ];
 
     $info = token_get_info();
@@ -75,15 +72,14 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
     $dir = drupal_get_path('module', 'campaignion_email_to_target');
     $form['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
     $form['#attached']['js'][] = [
-      'data' => $dir . '/js/messages_widget.js',
+      'data' => $dir . '/js/messages_app/e2t_messages_app.vue.min.js',
       'scope' => 'footer',
-    ];
-    $form['#attached']['css'][] = [
-      'data' => $dir . '/css/messages_widget.min.css',
-      'group' => 'CSS_DEFAULT',
       'preprocess' => FALSE,
     ];
-    $form['#attached']['css'][] = ['data' => $dir . '/css/message-step.css'];
+    $form['#attached']['css'][] = [
+      'data' => $dir . '/css/messages_app/e2t_messages_app.css',
+      'group' => 'CSS_DEFAULT',
+    ];
 
     $field = $this->wizard->parameters['email_to_target']['no_target_message_field'];
     $this->fieldForm = new EntityFieldForm('node', $node, [$field]);
