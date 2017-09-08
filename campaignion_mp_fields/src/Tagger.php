@@ -3,12 +3,32 @@
 namespace Drupal\campaignion_mp_fields;
 
 /**
- * Object that tags entities and is capable of adding tags as needed.
+ * Allows conveniently adding terms to taxonomy term reference fields.
+ *
+ * Each instance of the class is configured for using tags of a specific
+ * vocabulary and (optionally) a parent term.
  */
 class Tagger {
 
+  /**
+   * Static cache for instances of this class.
+   *
+   * @var static[]
+   */
   protected static $instances = [];
 
+  /**
+   * Create or get a new Tagger instance.
+   *
+   * @param string $vocabulary_name
+   *   Vocabulary machine name that should be used for tagging.
+   * @param string|null $parent_uuid
+   *   UUID of the taxonomy term in the vocabulary that should be the parent tag
+   *   of newly created terms.
+   * @param bool $reset
+   *   Forces creation of a new instance if TRUE.
+   * @return static
+   */
   public static function byNameAndParentUUID($vocabulary_name, $parent_uuid = NULL, $reset = FALSE) {
     if (!isset(static::$instances[$vocabulary_name][$parent_uuid]) || $reset) {
       $ptid = 0;
@@ -22,10 +42,39 @@ class Tagger {
     return static::$instances[$vocabulary_name][$parent_uuid];
   }
 
+  /**
+   * Map of tag names to their tids.
+   *
+   * @var int[]
+   */
   protected $map;
+
+  /**
+   * The vocabulary id used by this class.
+   *
+   * @var int
+   */
   protected $vid;
+
+  /**
+   * The parent term tid used by this class.
+   *
+   * Only tags that are children of this term are used and new tags are created
+   * as children of this term.
+   *
+   * @var int
+   */
   protected $parent_tid;
 
+  /**
+   * Create new instance.
+   *
+   * @param int $vid
+   *   Taxonomy vocabulary id.
+   * @param int $parent_tid
+   *   Parent taxonomy term id.
+   * @return static
+   */
   public function __construct($vid, $parent_tid) {
     $this->map = [];
     $sql = 'SELECT tid, name FROM {taxonomy_term_data} INNER JOIN {taxonomy_term_hierarchy} USING(tid) WHERE vid=:vid AND parent=:parent';
@@ -42,6 +91,14 @@ class Tagger {
 
   /**
    * Map tag to it’s tid and optionally create it if it doesn’t exist.
+   *
+   * @param string $tag
+   *   Name of the tag that should be mapped or created.
+   * @param bool $add
+   *   If TRUE tags that are not found will be created.
+   * @return int|null
+   *   The taxonomy term id of the tag with this name or NULL if none was found
+   *   and $add is FALSE.
    */
   protected function mapTag($tag, $add) {
     if (!isset($this->map[$tag])) {
@@ -58,17 +115,17 @@ class Tagger {
   }
 
   /**
-   * Add tags to a contact.
+   * Add tags to a multi-value taxonomy term reference field.
    *
    * @param \EntityMetadataWrapper $field
-   *   The contact to add the tags to.
+   *   Entity metadata wrapper of the field.
    * @param string[] $tags
-   *   List of tags to add.
+   *   List of tag names to add to the $field.
    * @param bool $add
-   *   Whether or not to create not (yet) existing tags.
+   *   Whether or not to create not yet existing tags.
    *
    * @return bool
-   *   Whether the contact was changed or not.
+   *   TRUE if the field values were changed otherwise FALSE.
    */
   public function tag(\EntityListWrapper $field, $tags, $add = FALSE) {
     $changed = FALSE;
@@ -94,7 +151,17 @@ class Tagger {
   }
 
   /**
-   * Tag single-tag field.
+   * Set the value of a single-value taxonomy term reference field.
+   *
+   * @param \EntityStructureWrapper $field
+   *   Entity metadata wrapper of the field.
+   * @param string $tag
+   *   Name of the taxonomy term.
+   * @param bool $add
+   *   Whether or not to create not yet existing tags.
+   *
+   * @return bool
+   *   TRUE if the field value was changed otherwise FALSE.
    */
   public function tagSingle(\EntityStructureWrapper $field, $tag, $add = FALSE) {
     $changed = FALSE;
