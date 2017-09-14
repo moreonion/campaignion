@@ -78,7 +78,7 @@ function campaignion_newsletters_webform_component_info() {
       'label' => t('Newsletter Subscription'),
       'description' => t('Offers a user to subscribe to a given newsletter.'),
       'features' => array(
-        'conditional' => FALSE,
+        'conditional' => TRUE,
         'description' => FALSE,
       ),
       'file' => 'campaignion_newsletters.component.inc',
