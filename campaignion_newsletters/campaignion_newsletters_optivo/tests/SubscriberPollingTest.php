@@ -44,8 +44,14 @@ class SubscriberPollingTest extends \DrupalUnitTestCase {
     ]);
     $this->list->save();
     $s = Subscription::fromData($this->list->list_id, 'test@example.com');
-    $s->updated = REQUEST_TIME - 30;
-    $s->save(TRUE, FALSE);
+    $s->save(TRUE);
+    // Set time so that last_sync is in the past.
+    $t = REQUEST_TIME - 30;
+    db_update('campaignion_newsletters_subscriptions')
+      ->fields(['updated' => $t, 'last_sync' => $t])
+      ->condition('email', $s->email)
+      ->condition('list_id', $s->list_id)
+      ->execute();
   }
 
   public function tearDown() {
