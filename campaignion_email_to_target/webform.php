@@ -50,7 +50,7 @@ function _webform_render_e2t_selector($component, $value = NULL, $filter = TRUE)
   $element = [
     '#type' => 'container',
     '#theme' => 'campaignion_email_to_target_selector_placeholder',
-    '#theme_wrappers' => ['webform_element'],
+    '#theme_wrappers' => ['container', 'webform_element'],
     '#title' => $component['name'],
     '#title_display' => $component['extra']['title_display'],
     '#required' => TRUE,
