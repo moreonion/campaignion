@@ -108,7 +108,9 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
       ->key($this->values(static::$key))
       ->fields($this->values(static::$values))
       ->execute();
+    $was_new = $this->new;
     $this->new = FALSE;
+    module_invoke_all('campaignion_newsletters_subscription_saved', $this, $from_provider, $was_new);
   }
 
   /**
@@ -123,8 +125,15 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
     }
   }
 
-  public function delete($fromProvider = FALSE) {
-    if (!$this->isNew() && !$fromProvider) {
+  /**
+   * Delete the subscription from the database.
+   *
+   * @param bool $from_provider
+   *   TRUE if this is an unsubscribe from the provider and thus needs not be
+   *   forwarded to provider again.
+   */
+  public function delete($from_provider = FALSE) {
+    if (!$this->isNew() && !$from_provider) {
       QueueItem::byData(array(
         'list_id' => $this->list_id,
         'email' => $this->email,
@@ -132,5 +141,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
       ))->save();
     }
     parent::delete();
+    module_invoke_all('campaignion_newsletters_subscription_deleted', $this, $from_provider);
   }
+
 }
