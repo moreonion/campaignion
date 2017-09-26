@@ -136,8 +136,7 @@ class Loader {
    */
   protected function thankYouPageTypes() {
     $tyTypes = [];
-    foreach ($this->info as $type => $info) {
-      $p = &$info['parameters'];
+    foreach ($this->info as $type => $p) {
       if (isset($p['thank_you_page'])) {
         $tyTypes[$p['thank_you_page']['type']][$p['thank_you_page']['reference']] = TRUE;
       }
