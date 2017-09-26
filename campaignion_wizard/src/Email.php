@@ -227,6 +227,10 @@ class Email {
       ))
       ->fields(array('email_type' => $email_type))
       ->execute();
+    // Update the node with the modified email otherwise a subsequent
+    // node_save() reverts our changes immediately.
+    $email = webform_email_load($this->eid, $this->node->nid);
+    $this->node->webform['emails'][$this->eid] = $email;
   }
 
   protected function deleteEmail() {
