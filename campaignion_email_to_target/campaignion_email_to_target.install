@@ -131,6 +131,16 @@ function campaignion_email_to_target_enable() {
 }
 
 /**
+ * Enable campaignion_vue.
+ */
+function campaignion_email_to_target_update_6() {
+  if (!module_enable(['campaignion_vue'])) {
+    $err = 'Could not enable campaignion_vue.';
+    throw new \DrupalUpdateException($err);
+  }
+}
+
+/**
  * Update stored submitted data fields to new format.
  */
 function campaignion_email_to_target_update_5() {
