@@ -200,7 +200,7 @@ class Component {
 
     foreach ($data as $serialized) {
       $m = unserialize($serialized);
-      $message = new Message($m);
+      $message = new Message($m['message']);
       $message->replaceTokens(NULL, NULL, $submission->unwrap());
       unset($m);
 

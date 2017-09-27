@@ -10,6 +10,7 @@ class Message {
   public $to;
   public $from;
   public $subject;
+  public $header;
   public $message;
   public $footer;
   protected $tokenEnabledFields = ['to', 'from', 'subject', 'header', 'message', 'footer'];
