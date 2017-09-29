@@ -146,4 +146,17 @@ class MessageTemplate extends Model {
     return TRUE;
   }
 
+  /**
+   * Clear out all IDs in order to create a real copy.
+   */
+  public function __clone() {
+    $this->id = NULL;
+    $this->new = TRUE;
+    $filters = [];
+    foreach ($this->filters as $f) {
+      $filters[] = clone $f;
+    }
+    $this->filters = $filters;
+  }
+
 }

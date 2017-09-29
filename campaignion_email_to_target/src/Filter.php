@@ -102,4 +102,11 @@ class Filter extends Model {
     return FALSE;
   }
 
+  /**
+   * Clear out all IDs in order to create a real copy.
+   */
+  public function __clone() {
+    $this->id = NULL;
+  }
+
 }
