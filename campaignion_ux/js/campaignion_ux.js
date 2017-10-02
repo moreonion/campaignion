@@ -13,6 +13,10 @@
     }
   };
 
+$(document).ready(function() {
+
+// Behaviors are executed in the order they are added to the behaviors object.
+// We want this behavior to execute last.
 Drupal.behaviors.campaignion_ux_webform_ajax_scroll = {};
 Drupal.behaviors.campaignion_ux_webform_ajax_scroll.attach = function(context) {
   // Scroll to top of the form + padding if we are below or more than the
@@ -29,6 +33,8 @@ Drupal.behaviors.campaignion_ux_webform_ajax_scroll.attach = function(context) {
     }
   }
 };
+
+});
 
 }(jQuery));
 
