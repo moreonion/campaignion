@@ -17,8 +17,6 @@ use \Drupal\little_helpers\Webform\Submission;
 use \Drupal\little_helpers\Webform\Webform;
 
 use \Drupal\campaignion_action\Loader;
-use \Drupal\campaignion_activity\ActivityInterface;
-use \Drupal\campaignion_activity\WebformSubmission;
 use \Drupal\campaignion_email_to_target\Component;
 use \Drupal\campaignion_email_to_target\MessageEndpoint;
 use \Drupal\campaignion_email_to_target\Api\Client;
@@ -249,22 +247,15 @@ function campaignion_email_to_target_form_webform_client_form_alter(&$form, &$fo
 }
 
 /**
- * Implements hook_campaignion_activity_save().
+ * Implements hook_webform_submission_confirmed().
  *
  * Send emails for newly confirmed webform submissions.
  */
-function campaignion_email_to_target_campaignion_activity_save(ActivityInterface $activity, ActivityInterface $original = NULL) {
-  if (!($activity instanceof WebformSubmission)) {
-    return;
-  }
-
-  if (!empty($activity->confirmed) && (empty($original) || empty($original->confirmed))) {
-    $submission = $activity->submission();
-    $components = $submission->webform->componentsByType('e2t_selector');
-    foreach ($components as $cid => $component) {
-      $component_o = Component::fromComponent($component);
-      $component_o->sendEmails($submission->valuesByCid($cid), $submission);
-    }
+function campaignion_email_to_target_webform_submission_confirmed(Submission $submission) {
+  $components = $submission->webform->componentsByType('e2t_selector');
+  foreach ($components as $cid => $component) {
+    $component_o = Component::fromComponent($component);
+    $component_o->sendEmails($submission->valuesByCid($cid), $submission);
   }
 }
 
