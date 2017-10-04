@@ -31,10 +31,39 @@ class WebformStep extends WizardStep {
     $build['#attached']['js'][] = drupal_get_path('module', 'campaignion_wizard') . '/js/form-builder-submit.js';
     $build['#attached']['library'][] = array('system', 'ui.datepicker');
 
+    // Remove #title from custom submit buttons fieldset.
+    if (module_exists('webform_custom_buttons')) {
+      $form['submit_buttons']['#title'] = '';
+    }
+
     // Build form for webform_template select box.
     if (module_exists('campaignion_action_template')) {
-      $build[] = drupal_get_form('campaignion_action_template_selector_form', $this->wizard->node)
-        + array('#weight' => -99);
+      $node = $this->wizard->node;
+      // Check if there are existing form submissions.
+      $sql = "SELECT 1 FROM {webform_submissions} WHERE nid=:nid LIMIT 1";
+      $has_submissions = db_query($sql, [':nid' => $node->nid])->fetchField();
+      $webform_template_form = drupal_get_form('campaignion_action_template_selector_form', $node);
+      $webform_template_form['#weight'] = 1;
+
+      if ($has_submissions) {
+        $warning_msg = t('Applying form templates is not possible on forms that have already captured data. ' .
+          'If you want to apply a form template you have to <a href="@delete-submissions">delete all form data first</a>.');
+        $o['query']['destination'] = url("node/$node->nid/wizard/form");
+        $delete_submissions_url = url("node/$node->nid/webform-results/clear", $o);
+
+        $webform_template = &$webform_template_form['webform_template'];
+        $webform_template['webform_template_warning'] = [
+          '#markup' => '<p id="action-template-warning">' .
+          t($warning_msg, ['@delete-submissions' => $delete_submissions_url]) .
+          '</p>',
+        ];
+
+        $webform_template['source']['#access'] = FALSE;
+        $webform_template['submit-template']['#access'] = FALSE;
+        $webform_template['#title'] = '';
+      }
+
+      $build[] = $webform_template_form;
     }
 
     // Load all components.

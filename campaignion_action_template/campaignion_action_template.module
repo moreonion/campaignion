@@ -21,6 +21,7 @@ SQL;
     '#type'        => 'fieldset',
     '#collapsible' => FALSE,
     '#collapsed'   => FALSE,
+    '#title'       => t('Form Templates'),
   );
 
   $form['webform_template']['source'] = array(
@@ -38,7 +39,7 @@ SQL;
   // add a submit function before the usual submit
   $form['#submit'] = array('campaignion_action_template_selector_form_submit');
   // define the submit button
-  $form['submit-template'] = array(
+  $form['webform_template']['submit-template'] = array(
     '#type'  => 'submit',
     '#value' => t('Apply template'),
   );
