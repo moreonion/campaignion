@@ -41,14 +41,25 @@ function campaignion_email_to_target_counter_tokens($type, array $tokens, array 
   $counts = (new CountPolling($data['node']->nid))->getData()['campaignion_email_to_target_counter'];
   $url = UrlGenerator::instance()->entityUrl('node', $data['node']->nid);
   $replacements = [];
+  $default_options = [
+    'animated' => FALSE,
+  ];
   foreach ($tokens as $name => $original) {
+    $p = explode(':', $name);
+    $target_id = array_shift($p);
+    $options = $default_options;
+    foreach ($p as $flag) {
+      $options[$flag] = TRUE;
+    }
     $html_id = drupal_html_id('e2t-counter');
-    $count = isset($counts[$name]) ? $counts[$name]['count'] : 0;
-    $settings['campaignion_email_to_target_counter'][$html_id] = [
-      'target_id' => $name,
-      'pollingURL' => $url,
-      'current' => $count,
-    ];
+    $count = isset($counts[$target_id]) ? $counts[$target_id]['count'] : 0;
+    if ($options['animated']) {
+      $settings['campaignion_email_to_target_counter'][$html_id] = [
+        'target_id' => $target_id,
+        'pollingURL' => $url,
+        'current' => $count,
+      ];
+    }
     $replacements[$original] = "<span class=\"campaignion-email-to-target-counter\" data-counter-id=\"$html_id\">" . $count . "</span>";
   }
   if ($settings) {
