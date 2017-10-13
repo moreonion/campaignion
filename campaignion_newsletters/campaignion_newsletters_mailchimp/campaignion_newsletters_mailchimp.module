@@ -71,7 +71,17 @@ function campaignion_newsletters_mailchimp_webhook_access($list_id, $hash) {
  * Page callback for MailChimps webhooks.
  */
 function campaignion_newsletters_mailchimp_webhook($list_id) {
-  if (!empty($_POST['data']) && $_POST['data']['action'] === 'unsub') {
-    Subscription::byData($list_id, $_POST['data']['email'])->delete(TRUE);
+  if (!empty($_POST['type'])) {
+    switch ($_POST['type']) {
+      case 'unsubscribe':
+      case 'cleaned':
+        if (!empty($_POST['data']['email'])) {
+          Subscription::byData($list_id, $_POST['data']['email'])->delete(TRUE);
+        }
+        break;
+    }
   }
+  echo 'OK';
+  drupal_page_footer();
+  drupal_exit();
 }
