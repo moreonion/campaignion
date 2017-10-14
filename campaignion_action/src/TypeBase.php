@@ -34,4 +34,11 @@ class TypeBase implements TypeInterface {
     return $this->parameters['donation'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isEmailProtest() {
+    return !empty($this->parameters['email_protest']);
+  }
+
 }

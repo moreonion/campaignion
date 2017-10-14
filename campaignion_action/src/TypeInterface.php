@@ -15,4 +15,11 @@ interface TypeInterface {
    */
   public function isDonation();
 
+  /**
+   * Check whether or not this action-type is an email protest.
+   *
+   * @return bool
+   *   TRUE if this action type should be considered an email protest.
+   */
+  public function isEmailProtest();
 }
