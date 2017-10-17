@@ -23,6 +23,11 @@ var formatNumber = function(now) {
   return num.slice(0, num.length - 1);
 };
 
+/**
+ * Counter object constructor.
+ *
+ * @constructor
+ */
 var Counter = (function() {
   function Counter(settings1, elements) {
     this.settings = settings1;
@@ -30,6 +35,9 @@ var Counter = (function() {
     this.counter = elements;
   }
 
+  /**
+   * Register a callback for the polling registry.
+   */
   Counter.prototype.poll = function() {
     var callback, registry;
     registry = Drupal.behaviors.polling.registry;
@@ -45,6 +53,9 @@ var Counter = (function() {
     return registry.registerUrl(this.settings.pollingURL, this.settings.id, callback);
   };
 
+  /**
+   * Animate values for a new value.
+   */
   Counter.prototype.animate = function(to_abs, from_abs) {
     var diff, duration, resetCounters;
     if (from_abs == null) {
@@ -67,6 +78,9 @@ var Counter = (function() {
     return this.current = to_abs;
   };
 
+  /**
+   * Trigger the initial animation (counting up from 0).
+   */
   Counter.prototype.animateInitially = function() {
     var animation;
     this.counter.html(formatNumber(this.current));
@@ -82,6 +96,13 @@ var Counter = (function() {
 
 })();
 
+/**
+ * Static constructor for a Counter object.
+ *
+ * Finds configuration based on a HTML element and builds the counter object.
+ *
+ * @constructor
+ */
 Counter.fromElement = function($element) {
   var id, settings;
   id = $element.attr('data-counter-id');
@@ -90,7 +111,15 @@ Counter.fromElement = function($element) {
   return new Counter(settings, $element);
 };
 
-
+/**
+ * Attaches counter objects to HTML elements.
+ *
+ * @type {Drupal~behavior}
+ *
+ * @prop {Drupal~behaviorAttach} attach
+ *   Search for matching elements, attach counter objects and trigger initial
+ *   animation.
+ */
 Drupal.behaviors.campaignion_email_to_target_counter = {};
 Drupal.behaviors.campaignion_email_to_target_counter.attach = function(context, settings) {
   var ids = {};
