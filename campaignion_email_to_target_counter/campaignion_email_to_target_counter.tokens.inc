@@ -8,7 +8,7 @@ use Drupal\campaignion_email_to_target_counter\CountPolling;
  * Implements hook_token_info().
  */
 function campaignion_email_to_target_counter_token_info() {
-  if (!($node = menu_get_object())) {
+  if (!drupal_static('menu_get_item') || !($node = menu_get_object())) {
     return;
   }
   $targets = new CountPolling($node->nid);
