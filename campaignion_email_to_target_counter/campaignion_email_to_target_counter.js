@@ -28,7 +28,6 @@ var Counter = (function() {
     this.settings = settings1;
     this.current = 0;
     this.counter = elements;
-    console.log(this.counter);
   }
 
   Counter.prototype.poll = function() {
