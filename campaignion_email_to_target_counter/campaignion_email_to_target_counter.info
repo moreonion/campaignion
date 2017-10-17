@@ -1,0 +1,6 @@
+name = Campaignion email to target counter
+description = Counts number of emails sent per target
+core = 7.x
+dependencies[] = campaignion_email_to_target
+dependencies[] = polling
+dependencies[] = token
