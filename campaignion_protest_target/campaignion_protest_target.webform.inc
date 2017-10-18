@@ -77,7 +77,6 @@ function _webform_render_protest_target($component, $value = NULL, $filter = TRU
   ];
   // We have to add those in any case - form_builder expects those.
   $element = array(
-    '#theme_wrappers' => ['webform_element'],
     '#webform_component' => $component,
     '#title_display' => $component['extra']['title_display'],
     '#title'         => $component['name'],
@@ -107,12 +106,12 @@ function _webform_render_protest_target($component, $value = NULL, $filter = TRU
       }
       reset($options);
       $element += array(
+        '#theme_wrappers' => ['webform_element'],
         '#type'     => 'select',
         '#options'  => $options,
         '#multiple' => FALSE,
         '#other'    => FALSE,
       );
-      $element['#theme_wrappers'][] = 'form_element';
     }
   }
   else {
