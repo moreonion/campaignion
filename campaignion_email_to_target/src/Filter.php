@@ -107,6 +107,7 @@ class Filter extends Model {
    */
   public function __clone() {
     $this->id = NULL;
+    $this->new = TRUE;
   }
 
 }
