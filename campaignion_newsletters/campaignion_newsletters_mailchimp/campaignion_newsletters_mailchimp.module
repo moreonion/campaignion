@@ -20,6 +20,7 @@ function campaignion_newsletters_mailchimp_menu() {
     'access callback' => 'campaignion_newsletters_mailchimp_webhook_access',
     'access arguments' => [1, 2],
     'type' => MENU_CALLBACK,
+    'delivery callback' => 'little_helpers_deliver_json',
   ];
 
   return $items;
@@ -71,7 +72,15 @@ function campaignion_newsletters_mailchimp_webhook_access($list_id, $hash) {
  * Page callback for MailChimps webhooks.
  */
 function campaignion_newsletters_mailchimp_webhook($list_id) {
-  if (!empty($_POST['data']) && $_POST['data']['action'] === 'unsub') {
-    Subscription::byData($list_id, $_POST['data']['email'])->delete(TRUE);
+  if (!empty($_POST['type'])) {
+    switch ($_POST['type']) {
+      case 'unsubscribe':
+      case 'cleaned':
+        if (!empty($_POST['data']['email'])) {
+          Subscription::byData($list_id, $_POST['data']['email'])->delete(TRUE);
+        }
+        break;
+    }
   }
+  return ['status' => 'OK'];
 }

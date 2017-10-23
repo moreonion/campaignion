@@ -7,6 +7,7 @@ dependencies[] = campaignion
 dependencies[] = campaignion_action
 dependencies[] = campaignion_activity
 dependencies[] = campaignion_newsletters
+dependencies[] = campaignion_newsletters_mailchimp
 dependencies[] = campaignion_supporter_tags
 dependencies[] = campaignion_email_to_target
 dependencies[] = campaignion_email_to_target_counter
