@@ -30,10 +30,40 @@ function campaignion_email_to_target_counter_token_info() {
 }
 
 /**
+ * Recursively look at the parents of a field_collection_item to find a node.
+ *
+ * @param \FielCollectionItemEntity $item
+ *   The field collection item to start with.
+ *
+ * @return null|object
+ *   The first node found or NULL if there is no node.
+ */
+function _campaignion_email_to_target_field_collection_node(FieldCollectionItemEntity $item) {
+  while ($item) {
+    switch ($item->hostEntityType()) {
+      case 'field_collection_item':
+        $item = $item->hostEntity();
+        break;
+      case 'node':
+        return $item->hostEntity();
+      default:
+        return NULL;
+    }
+  }
+}
+
+/**
  * Implements hook_tokens().
  */
 function campaignion_email_to_target_counter_tokens($type, array $tokens, array $data = [], array $options = []) {
-  if ($type != 'email-to-target-counter' || empty($data['node'])) {
+  if ($type != 'email-to-target-counter') {
+    return;
+  }
+  // Support for field_collection.
+  if (!isset($data['node']) && isset($data['field_collection_item'])) {
+    $data['node'] = _campaignion_email_to_target_field_collection_node($data['field_collection_item']);
+  }
+  if (!isset($data['node'])) {
     return;
   }
 
