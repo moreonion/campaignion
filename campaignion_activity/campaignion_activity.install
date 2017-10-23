@@ -106,6 +106,7 @@ function campaignion_activity_schema() {
         'columns' => array('pid' => 'pid'),
       ),
     ),
+    'primary key' => ['activity_id'],
   );
   $schema['campaignion_activity_comment'] = array(
     'description' => 'Link an activity to a payment object.',
@@ -139,6 +140,7 @@ function campaignion_activity_schema() {
         'columns' => array('cid' => 'cid'),
       ),
     ),
+    'primary key' => ['activity_id'],
   );
 
   $schema['campaignion_activity_newsletter_subscription'] = [
@@ -185,6 +187,14 @@ function campaignion_activity_schema() {
  */
 function campaignion_activity_uninstall() {
   variable_del('campaignion_activity_log_contact_save');
+}
+
+/**
+ * Add primary keys for all activity tables.
+ */
+function campaignion_activity_update_5() {
+  db_add_primary_key('campaignion_activity_payment', ['activity_id']);
+  db_add_primary_key('campaignion_activity_comment', ['activity_id']);
 }
 
 /**
