@@ -20,6 +20,7 @@ function campaignion_newsletters_mailchimp_menu() {
     'access callback' => 'campaignion_newsletters_mailchimp_webhook_access',
     'access arguments' => [1, 2],
     'type' => MENU_CALLBACK,
+    'delivery callback' => 'little_helpers_deliver_json',
   ];
 
   return $items;
@@ -81,7 +82,5 @@ function campaignion_newsletters_mailchimp_webhook($list_id) {
         break;
     }
   }
-  echo 'OK';
-  drupal_page_footer();
-  drupal_exit();
+  return ['status' => 'OK'];
 }
