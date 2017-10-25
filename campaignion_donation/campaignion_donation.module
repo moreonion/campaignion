@@ -4,6 +4,7 @@
  * Hook implementations for the donation functionality in campaignion.
  */
 
+use \Drupal\campaignion_action\Loader;
 use \Drupal\little_helpers\Webform\Webform;
 
 /**
