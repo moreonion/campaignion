@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_email_protest;
 
 use Drupal\campaignion_action\ActionBase;
+use Drupal\campaignion_wizard\EmailProtestEmailStep;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
