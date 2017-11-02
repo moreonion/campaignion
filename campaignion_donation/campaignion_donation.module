@@ -31,7 +31,7 @@ function campaignion_donation_webform_paymethod_select_method_list_alter(&$metho
       }
     }
   }
-  else {
+  elseif (!variable_get_value('campaignion_donation_manual_direct_debit_one_off')) {
     foreach ($methods as $pmid => $method) {
       if ($method->name == 'manual_direct_debit') {
         unset($methods[$pmid]);
