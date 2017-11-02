@@ -7,6 +7,15 @@
  */
 
 /**
+ * Introduce a variable.
+ */
+function campaignion_donation_update_2() {
+  if (!module_enable(['variable'], TRUE)) {
+    throw new DrupalUpdateException('Could not enable the variable module.');
+  }
+}
+
+/**
  * Enable the campaignion_donation_type.
  */
 function campaignion_donation_update_1() {
