@@ -9,7 +9,7 @@ class ArraySource implements SourceInterface {
   }
 
   public function hasKey($key) {
-    return array_key_exists($this->data[$key]);
+    return array_key_exists($key, $this->data);
   }
 
   public function value($key) {
