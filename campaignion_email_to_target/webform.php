@@ -25,7 +25,7 @@ function _webform_defaults_e2t_selector() {
       'width' => '',
       'unique' => 0,
       'disabled' => 0,
-      'title_display' => 0,
+      'title_display' => 'none',
       'description' => '',
       'attributes' => array(),
       'private' => FALSE,

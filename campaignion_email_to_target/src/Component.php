@@ -71,7 +71,6 @@ class Component {
       '#type' => 'fieldset',
       '#theme' => 'campaignion_email_to_target_selector_component',
     ] + $element + [
-      '#type' => 'fieldset',
       '#theme_wrappers' => ['fieldset', 'webform_element'],
       '#title' => $this->component['name'],
       '#description' => $this->component['extra']['description'],
