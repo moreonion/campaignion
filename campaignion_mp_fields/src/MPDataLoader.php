@@ -90,10 +90,12 @@ class MPDataLoader {
     }
     $postcode = NULL;
     foreach ($fields as $field) {
-      foreach (field_get_items($entity_type, $entity, $field['field_name']) as $item) {
-        if ($item['postal_code'] && $item['country'] == 'GB') {
-          $postcode = $item['postal_code'];
-          break 2;
+      if ($items = field_get_items($entity_type, $entity, $field['field_name'])) {
+        foreach ($items as $item) {
+          if ($item['postal_code'] && $item['country'] == 'GB') {
+            $postcode = $item['postal_code'];
+            break 2;
+          }
         }
       }
     }
