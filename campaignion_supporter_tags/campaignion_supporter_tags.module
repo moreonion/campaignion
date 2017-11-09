@@ -45,12 +45,7 @@ function campaignion_supporter_tags_campaignion_supporter_contact_alter($contact
 
   if (module_exists('webform_tracking')) {
     $tagger = Tagger::byNameAndParentUuid('supporter_tags');
-    $sql = 'SELECT tags FROM {webform_tracking} WHERE nid = :nid AND sid = :sid';
-    $tags = array_filter(explode(',', db_query_range($sql, 0, 1, [
-      ':nid' => $submission->nid,
-      ':sid' => $submission->sid,
-    ])->fetchField()));
-    $changed = $tagger->tag($contact->supporter_tags, $tags);
+    $changed = $tagger->tag($contact->supporter_tags, $submission->tracking->tags);
   }
 
   $contact_tids = array();
