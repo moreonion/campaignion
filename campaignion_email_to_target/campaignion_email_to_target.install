@@ -119,6 +119,10 @@ function campaignion_email_to_target_field_schema($field) {
       'type' => 'varchar',
       'length' => 64,
     ];
+    $columns['selection_mode'] = [
+      'type' => 'varchar',
+      'length' => 64,
+    ];
     return ['columns' => $columns];
   }
 }
@@ -128,6 +132,27 @@ function campaignion_email_to_target_field_schema($field) {
  */
 function campaignion_email_to_target_enable() {
   variable_set('cache_class_cache_token', '\\Drupal\\campaignion_email_to_target\\NullCacheBin');
+}
+
+/**
+ * Add selection_mode column to all fields.
+ */
+function campaignion_email_to_target_update_7() {
+  foreach (field_read_fields(['type' => 'email_to_target_options']) as $field) {
+    if ($field['storage']['type'] == 'field_sql_storage') {
+      foreach (['data', 'revision'] as $t) {
+        $table = "field_{$t}_{$field['field_name']}";
+        $value = "{$field['field_name']}_selection_mode";
+        db_add_field($table, $value, [
+          'type' => 'varchar',
+          'length' => 64,
+        ]);
+        db_update($table)
+          ->fields([$value => 'one_or_more'])
+          ->execute();
+      }
+    }
+  }
 }
 
 /**
