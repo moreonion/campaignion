@@ -6,7 +6,8 @@
  * invoked by this module.
  */
 
-use \Drupal\little_helpers\Webform\Submission;
+use Drupal\campaignion\Contact;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * @return array
@@ -41,4 +42,20 @@ function hook_campaignion_action_info() {
  */
 function hook_campaignion_action_taken($node, Submission $submissionObj) {
   $myCRM->import($node, $submissionObj);
+}
+
+/**
+ * Change a contact after a submission has been imported.
+ *
+ * @param Drupal\campaignion\Contact $contact
+ *   The contact that is modified/created during the import.
+ * @param Drupal\campaignion\Submission $submission
+ *   The submission being imported.
+ * @param object $node
+ *   The action.
+ *
+ * @return boolean
+ *   TRUE if contact was changed by this hook implementation.
+ */
+function hook_campaignion_action_contact_alter(Contact $contact, Submission $submission, $node) {
 }

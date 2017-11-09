@@ -9,18 +9,16 @@ use Drupal\campaignion_supporter_tags\Tagger;
 include_once 'campaignion_source_tags.features.inc';
 
 /**
- * Implements hook_campaignion_supporter_contact_alter().
- *
- * @TODO: This is not a hook known by the modules!
+ * Implements hook_campaignion_action_contact_alter().
  */
-function campaignion_source_tags_campaignion_supporter_contact_alter($contact, $submissionObj, $action_node) {
+function campaignion_source_tags_campaignion_action_contact_alter($contact, $submission, $action_node) {
   if (!isset($contact->supporter_tags)) {
     return FALSE;
   }
 
   $changed = FALSE;
-  if (!empty($submissionObj->tracking->source)) {
-    $tag = $submissionObj->tracking->source;
+  if (!empty($submission->tracking->source)) {
+    $tag = $submission->tracking->source;
     $tagger = Tagger::byNameAndParentUuid('supporter_tags', '0fd2977e-9927-4de7-b4c2-e0bde71fc605');
     $changed = $tagger->tag($contact->supporter_tags, [$tag], TRUE) || $changed;
   }
