@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * Code for the campaignion_supporter_tags feature.
+ */
+
+include_once 'campaignion_supporter_tags.features.inc';
 
 /**
  * @file

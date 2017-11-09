@@ -1,0 +1,15 @@
+name = Campaignion source tags
+description = Auto-tagging based on utm_source parameters.
+core = 7.x
+package = Campaignion
+dependencies[] = campaignion_supporter_tags
+dependencies[] = ctools
+dependencies[] = features
+dependencies[] = strongarm
+dependencies[] = taxonomy
+dependencies[] = uuid
+dependencies[] = uuid_features
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
+features[field_base][] = source_tag
+features[uuid_term][] = 0fd2977e-9927-4de7-b4c2-e0bde71fc605
