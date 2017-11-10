@@ -15,12 +15,13 @@ function campaignion_source_tags_campaignion_action_contact_alter($contact, $sub
   if (!isset($contact->supporter_tags)) {
     return FALSE;
   }
+  $add_tags = variable_get_value('campaignion_source_tags_new_tags');
 
   $changed = FALSE;
   if (!empty($submission->tracking->source)) {
     $tag = $submission->tracking->source;
     $tagger = Tagger::byNameAndParentUuid('supporter_tags', '0fd2977e-9927-4de7-b4c2-e0bde71fc605');
-    $changed = $tagger->tag($contact->supporter_tags, [$tag], TRUE) || $changed;
+    $changed = $tagger->tag($contact->supporter_tags, [$tag], $add_tags) || $changed;
   }
 
   return $changed;
@@ -44,4 +45,20 @@ function campaignion_source_tags_entity_presave($entity, $entity_type) {
       }
     }
   }
+}
+
+/**
+ * Implements hook_redhen_settings().
+ */
+function campaignion_action_redhen_settings() {
+  $form['tags'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Tags'),
+  ];
+  $form['tags']['campaignion_source_tags_new_tags'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Allow new tags to be added using source URL parameters.'),
+    '#default_value' => variable_get_value('campaignion_source_tags_new_tags'),
+  ];
+  return $form;
 }

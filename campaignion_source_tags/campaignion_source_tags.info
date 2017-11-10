@@ -7,6 +7,7 @@ dependencies[] = ctools
 dependencies[] = features
 dependencies[] = strongarm
 dependencies[] = taxonomy
+dependencies[] = variable
 dependencies[] = uuid
 dependencies[] = uuid_features
 features[ctools][] = strongarm:strongarm:1
