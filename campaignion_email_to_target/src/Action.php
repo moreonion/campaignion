@@ -57,7 +57,11 @@ class Action extends ActionBase {
   public function getOptions() {
     $field = $this->type->parameters['email_to_target']['options_field'];
     $items = field_get_items('node', $this->node, $field);
-    return $items ? $items[0] : ['dataset_name' => 'mp'];
+    return ($items ? $items[0] : []) + [
+      'dataset_name' => 'mp',
+      'users_may_edit' => '',
+      'selection_mode' => 'one_or_more',
+    ];
   }
 
   /**

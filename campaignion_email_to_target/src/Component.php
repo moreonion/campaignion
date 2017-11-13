@@ -71,7 +71,6 @@ class Component {
       '#type' => 'fieldset',
       '#theme' => 'campaignion_email_to_target_selector_component',
     ] + $element + [
-      '#type' => 'fieldset',
       '#theme_wrappers' => ['fieldset', 'webform_element'],
       '#title' => $this->component['name'],
       '#description' => $this->component['extra']['description'],
@@ -153,16 +152,19 @@ class Component {
       $last_id = $target['id'];
     }
 
-    if (count($pairs) == 1) {
-      $c = &$element[$last_id];
-      $c['#attributes']['class'][] = 'email-to-target-single';
-      $c['send']['#type'] = 'markup';
-      $c['send']['#markup'] = "<p class=\"target\">{$c['send']['#title']}</p>";
+    $form_state['send_all'] = FALSE;
+    if (count($pairs) == 1 || $options['selection_mode'] == 'all') {
+      $form_state['send_all'] = TRUE;
+      foreach (element_children($element) as $k) {
+        $c = &$element[$k];
+        $c['#attributes']['class'][] = 'email-to-target-single';
+        $c['send']['#type'] = 'markup';
+        $c['send']['#markup'] = "<p class=\"target\">{$c['send']['#title']} </p>";
+      }
     }
-    else {
+    if (count($pairs) > 1) {
       $element['#attached']['js'] = [drupal_get_path('module', 'campaignion_email_to_target') . '/js/target_selector.js'];
     }
-
   }
 
   /**
@@ -173,9 +175,8 @@ class Component {
 
     $original_values = $values;
     $values = [];
-    $only_one = count($original_values) == 1;
     foreach ($original_values as $id => $edited_message) {
-      if (!empty($edited_message['send']) || $only_one) {
+      if (!empty($edited_message['send']) || $form_state['send_all']) {
         $e = &$element[$id];
         $values[] = serialize([
           'message' => $edited_message + $e['#message'],

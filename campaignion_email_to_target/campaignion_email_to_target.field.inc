@@ -68,6 +68,7 @@ function _campaignion_email_to_target_options_field_widget_form($item) {
   $defaults = [
     'dataset_name' => '',
     'users_may_edit' => '',
+    'selection_mode' => 'one_or_more',
   ];
   $item = drupal_array_merge_deep($defaults, $item);
 
@@ -92,6 +93,15 @@ function _campaignion_email_to_target_options_field_widget_form($item) {
     '#type' => 'checkbox',
     '#title' => t('Supporters may edit the message sent to the target(s).'),
     '#default_value' => $item['users_may_edit'],
+  ];
+  $element['selection_mode'] = [
+    '#type' => 'radios',
+    '#title' => t('Target selection mode'),
+    '#default_value' => $item['selection_mode'],
+    '#options' => [
+      'one_or_more' => t('Let users deselect specific targets. (default)'),
+      'all' => t('Send email to all the targets.'),
+    ],
   ];
   return $element;
 }
