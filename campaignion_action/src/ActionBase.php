@@ -27,7 +27,7 @@ class ActionBase {
       $node->webform_template = $node->translation_source->nid;
     } else {
       if (!isset($node->nid) && empty($node->webform['components'])) {
-        if ($nid = $this->type->defaultTemplateNid()) {
+        if ($nid = $this->type->defaultTemplateNid($node)) {
           // webform_template-7.x-1.x
           $_SESSION['webform_template'] = $nid;
           // webform_template-7.x-4.x
