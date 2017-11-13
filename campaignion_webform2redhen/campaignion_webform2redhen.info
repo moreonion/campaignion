@@ -1,7 +1,0 @@
-name = Webform 2 RedHen
-description = Automatically import data from submitted webforms into the RedHen CRM
-core = 7.x
-package = Campaignion
-project = campaignion
-
-dependencies[] = campaignion_supporter
