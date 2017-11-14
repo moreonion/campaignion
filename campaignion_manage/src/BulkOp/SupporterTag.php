@@ -27,9 +27,13 @@ class SupporterTag implements BatchInterface {
       $options[$term->tid] = $term->name;
     }
     $element['tag'] = array(
-      '#type'    => 'checkboxes',
+      '#type' => 'select',
       '#title'   => t('Select one or more tags'),
       '#options' => $options,
+      '#multiple' => TRUE,
+      '#select2' => [
+        'allowClear' => TRUE,
+      ],
     );
   }
 

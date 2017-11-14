@@ -1,8 +1,11 @@
 <?php
 
+use Drupal\campaignion\ContactTypeManager;
+use Drupal\campaignion\NoEmailException;
 use \Drupal\campaignion_action\Loader;
 use \Drupal\campaignion_action\SignedLink;
 use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Implements hook_module_implements_alter().
@@ -249,4 +252,47 @@ function campaignion_action_cron() {
     }
     $queue->deleteItem($item);
   }
+}
+
+/**
+ * Implements hook_campaignion_action_taken().
+ *
+ * Import supporter data into the CRM if possible.
+ */
+function campaignion_action_campaignion_action_taken($node, Submission $submission) {
+  // Backwards compatiblity: Don’t run import twice if campaignion_supporter
+  // does it already.
+  if (function_exists('campaignion_supporter_campaignion_action_taken')) {
+    return;
+  }
+  // Don’t import drafts or forms without email address.
+  if ($submission->is_draft || !$submission->webform->componentByKey('email')) {
+    return;
+  }
+  $m = ContactTypeManager::instance();
+  if (!$m->crmEnabled()) {
+    return;
+  }
+  $importer = $m->importer('campaignion_action_taken');
+  try {
+    $contact = $importer->findOrCreateContact($submission);
+  }
+  catch (NoEmailException $e) {
+    // Log the missing email address.
+    $ids = $submission->ids();
+    $args = array('@nid' => $ids['nid'], '@sid' => $ids['sid']);
+    $msg = "Can't import supporter without email-address for Submission(@nid, @sid).";
+    watchdog_exception('campaignion_supporter', $e, $msg, $args);
+    return;
+  }
+  $changed = $importer->import($submission, $contact);
+  // Allow other modules to change the contact.
+  foreach (module_implements('campaignion_action_contact_alter') as $module) {
+    $function = $module . '_campaignion_action_contact_alter';
+    $changed |= $function($contact, $submission, $node);
+  }
+  if ($changed) {
+    $contact->save();
+  }
+  return $contact;
 }

@@ -22,6 +22,7 @@ dependencies[] = options
 dependencies[] = redhen_contact
 dependencies[] = redhen_fields
 dependencies[] = taxonomy
+dependencies[] = uuid
 features[features_api][] = api:2
 features[field_base][] = field_address
 features[field_base][] = field_date_of_birth

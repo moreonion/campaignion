@@ -1,9 +1,11 @@
-name = Campaignion Supporter Tags
 description = Adds field for handling supporter tags with actions pages.
 core = 7.x
 package = Campaignion
-project = campaignion
-
+dependencies[] = ctools
+dependencies[] = features
 dependencies[] = i18n_taxonomy
 dependencies[] = little_helpers
+dependencies[] = strongarm
 dependencies[] = taxonomy
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
