@@ -50,7 +50,7 @@ class Field {
         }
       }
     } catch (\EntityMetadataWrapperException $e) {
-      watchdog('campaignion_webform2redhen', 'Tried to import into a non-existing field "!field".', array('!field' => $this->field), WATCHDOG_WARNING);
+      watchdog('campaignion', 'Tried to import into a non-existing field "!field".', array('!field' => $this->field), WATCHDOG_WARNING);
     }
     return FALSE;
   }
