@@ -133,7 +133,10 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
    *   forwarded to provider again.
    */
   public function delete($from_provider = FALSE) {
-    if (!$this->isNew() && !$from_provider) {
+    if ($this->isNew()) {
+      return;
+    }
+    if (!$from_provider) {
       QueueItem::byData(array(
         'list_id' => $this->list_id,
         'email' => $this->email,

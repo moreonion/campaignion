@@ -5,6 +5,7 @@
  * Hook implementations for tracking newsletters subscription changes.
  */
 
+use Drupal\campaignion\Contact;
 use \Drupal\campaignion_activity\NewsletterSubscription;
 use \Drupal\campaignion_newsletters\Subscription;
 
@@ -21,5 +22,7 @@ function campaignion_activity_campaignion_newsletters_subscription_saved(Subscri
  * Implements campaignion_newsletters_subscription_deleted().
  */
 function campaignion_activity_campaignion_newsletters_subscription_deleted(Subscription $subscription, $from_provider) {
-  NewsletterSubscription::fromSubscription($subscription, 'unsubscribe', $from_provider)->save();
+  if ($contact = Contact::byEmail($subscription->email)) {
+    NewsletterSubscription::fromSubscription($subscription, 'unsubscribe', $from_provider)->save();
+  }
 }
