@@ -12,7 +12,7 @@ class Date extends Field {
     } elseif (($date = strtotime($value)) != FALSE) {
       return $date;
     } else {
-      watchdog('campaignion_webform2redhen', 'Tried to import date with an invalid format "!field".', array('!field' => $value), WATCHDOG_WARNING);
+      watchdog('campaignion', 'Tried to import date with an invalid format "!field".', array('!field' => $value), WATCHDOG_WARNING);
       return NULL;
     }
   }
