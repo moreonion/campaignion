@@ -18,7 +18,7 @@ function campaignion_paypal_payment_method_controller_info_alter(&$info) {
 function campaignion_paypal_payment_method_form(array $element, array &$form_state) {
   $form = array();
   $form['info_text'] = array(
-    '#markup'    => '<p class="payment-method-info-text">' . t('You will be redirected to PayPal to make your donation.') . '</p>',
+    '#markup' => '<p class="payment-method-info-text">' . t('Please click on the button to proceed with the payment. You will be redirected to PayPal.') . '</p>',
   );
   return $form;
 }
