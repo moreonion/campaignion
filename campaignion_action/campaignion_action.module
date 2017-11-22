@@ -289,7 +289,7 @@ function campaignion_action_campaignion_action_taken($node, Submission $submissi
   // Allow other modules to change the contact.
   foreach (module_implements('campaignion_action_contact_alter') as $module) {
     $function = $module . '_campaignion_action_contact_alter';
-    $changed |= $function($contact, $submission, $node);
+    $changed = $function($contact, $submission, $node) || $changed;
   }
   if ($changed) {
     $contact->save();
