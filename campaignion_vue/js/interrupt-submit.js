@@ -48,22 +48,34 @@
         $submitButtons.prop('disabled', true);
         submitEvent.preventDefault();
 
-        $apps.attr('data-interrupt-submit', 'waiting').one('resume-leave-page.interrupt-submit cancel-leave-page.interrupt-submit', function (appEvent) {
-          $(this).attr('data-interrupt-submit', 'ready');
-          if (appEvent.type === 'resume-leave-page') {
-            // App says: I don’t mind, you can leave the page.
-            if (!$('[data-interrupt-submit=waiting]').length) {
-              Drupal.behaviors.campaignionVueInterruptSubmit.forceSubmit(submitEvent.originalEvent.target);
+        var askingApp = 0;
+        askApp(askingApp);
+
+        function askApp(index) {
+          $apps
+          .eq(index).attr('data-interrupt-submit', 'waiting')
+          .one('resume-leave-page.interrupt-submit cancel-leave-page.interrupt-submit', function (appEvent) {
+            $(this).attr('data-interrupt-submit', 'ready');
+            if (appEvent.type === 'resume-leave-page') {
+              // App says: I don’t mind, you can leave the page.
+              askNextApp();
+            } else {
+              // App responds: Don’t leave tha page! I still have to interact with the user.
+              $submitButtons.prop('disabled', false);
+              $apps.off('.interrupt-submit');
+              $apps.attr('data-interrupt-submit', 'ready');
             }
+          })
+          dispatch($apps[index], leavingPageWithoutSaving ? 'request-leave-page' : 'request-submit-page');
+        }
+
+        function askNextApp() {
+          if (++askingApp < $apps.length) {
+            askApp(askingApp);
           } else {
-            // App responds: Don’t leave tha page! I still have to interact with the user.
-            $submitButtons.prop('disabled', false);
-            $apps.off('.interrupt-submit');
-            $apps.attr('data-interrupt-submit', 'ready');
+            Drupal.behaviors.campaignionVueInterruptSubmit.forceSubmit(submitEvent.originalEvent.target);
           }
-        }).each(function () {
-          dispatch(this, leavingPageWithoutSaving ? 'request-leave-page' : 'request-submit-page');
-        });
+        }
       });
 
       $(window).off('beforeunload.interrupt-submit').on('beforeunload.interrupt-submit', function (e) {
