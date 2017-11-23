@@ -1,7 +1,7 @@
 <template>
-  <div id="app">
+  <div class="redirect-app">
     <img src="./assets/logo.png">
-    <hello></hello>
+    <Hello/>
     <el-dropdown>
       <span class="el-dropdown-link">
         Dropdown List<i class="el-icon-caret-bottom el-icon--right"></i>

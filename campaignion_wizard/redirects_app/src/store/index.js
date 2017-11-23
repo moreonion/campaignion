@@ -8,9 +8,11 @@ Vue.use(Vuex)
 
 const debug = process.env.NODE_ENV !== 'production'
 
-export default new Vuex.Store({
-  state,
-  actions,
-  mutations,
-  strict: debug
-})
+export function createStore () {
+  return new Vuex.Store({
+    state: Object.assign({}, state),
+    actions: Object.assign({}, actions),
+    mutations: Object.assign({}, mutations),
+    strict: debug
+  })
+}
