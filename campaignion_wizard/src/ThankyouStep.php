@@ -77,12 +77,33 @@ class ThankyouStep extends WizardStep {
       '#default_value' => $type == 'redirect' ? 'redirect' : NULL,
       '#parents'       => array($prefix, 'type'),
     );
-    $form['redirect_url'] = array(
-      '#type'          => 'textfield',
-      '#title'         => t('Redirect URL'),
-      '#states'        => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'redirect'))),
-      '#default_value' => $old['redirect_url'],
+//    $form['redirect_url'] = array(
+//      '#type'          => 'textfield',
+//      '#title'         => t('Redirect URL'),
+//      '#states'        => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'redirect'))),
+//      '#default_value' => $old['redirect_url'],
+//    );
+
+    // Personalized redirects widget
+    $redirect_container_id = drupal_html_id('personalized-redirects-widget');
+    $form['redirects'] = array(
+      '#type'       => 'container',
+      '#title'      => t('Manage redirects'),
+      '#states'     => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'redirect'))),
+      '#id'         => $redirect_container_id,
+      '#attributes' => ['class' => ['personalized-redirects-widget']],
     );
+    $settings = array(
+      'default_redirect_url' => $old['redirect_url'],
+      // ...
+    );
+    $settings = array(
+      'campaignion_wizard' => array(
+        $redirect_container_id => $settings,
+      ),
+    );
+    $form['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
+
     $form['or2'] = array(
       '#type'   => 'markup',
       '#markup' => '<div class="thank-you-outer-or"><span class="thank-you-line-or"><span class="thank-you-text-or">' . t('or') . '</span></span></div>',
@@ -138,6 +159,17 @@ class ThankyouStep extends WizardStep {
 
     $form['thank_you_node'] = $this->pageForm($form_state, 1, t('Thank you page'), 'thank_you_node');
     $form['thank_you_node']['#attributes']['class'][] = $thank_you_class;
+
+    $dir = drupal_get_path('module', 'campaignion_wizard');
+    $form['#attached']['js'][] = [
+      'data' => $dir . '/js/redirects_app/redirects_app.vue.min.js',
+      'scope' => 'footer',
+      'preprocess' => FALSE,
+    ];
+    $form['#attached']['css'][] = [
+      'data' => $dir . '/css/redirects_app/redirects_app.css',
+      'group' => 'CSS_DEFAULT',
+    ];
 
     $form['#tree'] = TRUE;
     $form['wizard_head']['#tree'] = FALSE;
