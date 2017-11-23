@@ -49,8 +49,6 @@ containers.forEach(drupalContainer => {
     drupalContainer,
     template: '<App/>',
     store: createStore(),
-    components: {
-      App: Object.assign({}, App)
-    }
+    components: {App}
   })
 })

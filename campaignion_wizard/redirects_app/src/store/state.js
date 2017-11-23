@@ -1,5 +1,5 @@
-const state = {
-  count: 0
+export function createState () {
+  return {
+    count: 0
+  }
 }
-
-export default state
