@@ -41,6 +41,9 @@ Vue.config.productionTip = false
 
 const containers = document.querySelectorAll('.personalized-redirects-widget')
 containers.forEach(drupalContainer => {
+  // Don’t replace the container with the app, because Drupal
+  // conditional fields are in control of the container.
+  // To check if the app is visible or not, use the drupalContainer option.
   const el = document.createElement('div')
   drupalContainer.appendChild(el)
   /* eslint-disable no-new */

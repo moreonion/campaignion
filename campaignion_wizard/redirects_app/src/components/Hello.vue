@@ -1,22 +1,12 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://gitter.im/vuejs/vue" target="_blank">Gitter Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-      <br>
-      <li><a href="http://vuejs-templates.github.io/webpack/" target="_blank">Docs for This Template</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <h2>Submit handling</h2>
+    <div v-if="askingToLeave">
+      May I leave?
+      <button type="button" @click="leave">Go for it!</button>
+      <button type="button" @click="stay">No way!</button>
+    </div>
     <h2>Test vuex</h2>
     Count: {{ count }} <a href="#" @click="add10">add 10</a>
     <h2>This instance lives in {{ containerId }}</h2>
@@ -24,11 +14,14 @@
 </template>
 
 <script>
+import {dispatch} from '@/utils'
+
 export default {
   name: 'hello',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Your Vue.js App',
+      askingToLeave: false
     }
   },
   computed: {
@@ -39,12 +32,32 @@ export default {
       return this.$root.$options.drupalContainer.id
     }
   },
+  mounted () {
+    const listener = e => {
+      if (e.type === 'request-leave-page') {
+        // User wants to go back - ask: lose data?
+      } else {
+        // User wants to submit: valildate and save data.
+      }
+      this.askingToLeave = true
+    }
+    this.$root.$el.addEventListener('request-submit-page', listener)
+    this.$root.$el.addEventListener('request-leave-page', listener)
+  },
   methods: {
     add10 () {
       this.$store.dispatch({
         type: 'incrementAsync',
         amount: 10
       })
+    },
+    leave () {
+      this.askingToLeave = false
+      dispatch(this.$root.$el, 'resume-leave-page')
+    },
+    stay () {
+      this.askingToLeave = false
+      dispatch(this.$root.$el, 'cancel-leave-page')
     }
   }
 }

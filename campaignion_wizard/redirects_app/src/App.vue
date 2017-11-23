@@ -1,5 +1,5 @@
 <template>
-  <div class="redirect-app">
+  <div class="redirect-app" data-interrupt-submit>
     <img src="./assets/logo.png">
     <Hello/>
     <el-dropdown>
