@@ -7,7 +7,7 @@ function _campaignion_vue_filter_css($filename) {
 
 // Add scripts, settings and styles needed by vue apps.
 function _campaignion_vue_add_assets() {
-  $module_path = drupal_get_path('module', 'campaignion_vue') . '/';
+  $module_path = drupal_get_path('module', 'campaignion_vue');
 
   // Add javascript.
   drupal_add_js($module_path . '/js/campaignion_vue.min.js', [
@@ -20,7 +20,7 @@ function _campaignion_vue_add_assets() {
   // Add element-ui locale.
   $lang = $GLOBALS['language']->language;
   if (substr($lang, 0, 2) != 'en') {
-    $strings = file_get_contents($module_path . 'locale/' . $lang . '.json');
+    $strings = file_get_contents($module_path . '/locale/' . $lang . '.json');
   }
   if (!empty($strings)) {
     drupal_add_js(
@@ -34,9 +34,9 @@ function _campaignion_vue_add_assets() {
   }
 
   // Add element-ui stylesheets.
-  $stylesheets = array_filter(scandir($module_path . 'css'), '_campaignion_vue_filter_css');
+  $stylesheets = array_filter(scandir($module_path . '/css'), '_campaignion_vue_filter_css');
   foreach ($stylesheets as $stylesheet) {
-    drupal_add_css($module_path . 'css/' . $stylesheet);
+    drupal_add_css($module_path . '/css/' . $stylesheet);
   }
 }
 
