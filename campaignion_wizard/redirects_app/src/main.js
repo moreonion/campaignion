@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import axios from 'axios'
-import store from './store'
+import {createStore} from './store'
 
 import {
   Button,
@@ -22,10 +22,6 @@ if (Drupal.settings.campaignion_vue && Drupal.settings.campaignion_vue.element_u
   locale.use(Drupal.settings.campaignion_vue.element_ui_strings)
 }
 
-// Create a central event bus.
-const bus = new Vue()
-Vue.prototype.$bus = bus
-
 // Register element-ui components.
 Vue.use(Button)
 Vue.use(Dialog)
@@ -43,10 +39,18 @@ Vue.prototype.$prompt = MessageBox.prompt
 
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
-new Vue({
-  el: '.redirects_app',
-  template: '<App/>',
-  store,
-  components: { App }
+const containers = document.querySelectorAll('.personalized-redirects-widget')
+containers.forEach(drupalContainer => {
+  const el = document.createElement('div')
+  drupalContainer.appendChild(el)
+  /* eslint-disable no-new */
+  new Vue({
+    el,
+    drupalContainer,
+    template: '<App/>',
+    store: createStore(),
+    components: {
+      App: Object.assign({}, App)
+    }
+  })
 })

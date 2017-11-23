@@ -19,6 +19,7 @@
     </ul>
     <h2>Test vuex</h2>
     Count: {{ count }} <a href="#" @click="add10">add 10</a>
+    <h2>This instance lives in {{ containerId }}</h2>
   </div>
 </template>
 
@@ -33,6 +34,9 @@ export default {
   computed: {
     count () {
       return this.$store.state.count
+    },
+    containerId () {
+      return this.$root.$options.drupalContainer.id
     }
   },
   methods: {

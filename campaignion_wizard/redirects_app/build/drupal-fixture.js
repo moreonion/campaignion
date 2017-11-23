@@ -1,9 +1,6 @@
 // This module is used to provide the Drupal global in development and test mode.
 // Functions taken from drupal.js.
 
-import exampleData from '../test/unit/fixtures/example-data'
-import initialData from '../test/unit/fixtures/initial-data'
-
 const Drupal = {
   settings: {
     // My settings here...
