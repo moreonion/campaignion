@@ -3,7 +3,6 @@ import {clone} from '@/utils'
 
 export default {
   editNewRedirect (state) {
-    console.log('mutation: editNewRedirect')
     state.currentRedirectIndex = -1
   },
 

@@ -14,7 +14,6 @@ export default {
     return new Promise().resolve()
   },
   getNodes: function ({url, queryParam, queryString, headers}) {
-    console.log('api - url: ' + url)
     // Mock server response:
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
