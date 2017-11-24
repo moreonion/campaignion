@@ -1,27 +1,21 @@
 <template lang="html">
-  <div style="position: relative"
-    :class="{
+  <div :class="{
      'typeahead': true,
      'open': showDropdown
-    }"
-    >
+    }">
     <input type="text" class="field-input typeahead-input"
       ref="input"
       :placeholder="placeholder"
       autocomplete="off"
       v-model="val"
       @input="update"
-      @focus="update"
+      @focus="focus"
       @keydown.up="up"
       @keydown.down="down"
       @keyup.enter= "hit"
       @keydown.esc="esc"
+      @blur="showDropdown = false"
     />
-    <!--
-    TODO:
-    @blur="showDropdown = false"
-
-    -->
     <ul v-if="showDropdown" ref="dropdown" class="dropdown-menu">
       <li v-for="(item, index) in items" :class="{'active': isActive(index)}">
         <a class="dropdown-item" @mousedown.prevent="hit" @mousemove="setActive(index)">
@@ -48,15 +42,25 @@ function escapeRegExp (str) {
 
 export default {
   props: {
-    value: { // prettyDestination
-      type: String,
-      default: ''
+    value: {
+      type: Object,
+      default () {
+        // When the user types a custom value into the field, value and label are
+        // identical. They only differ if a suggestion has been selected.
+        return {
+          value: '',
+          label: ''
+        }
+      }
     },
     count: {
       type: Number,
       default: 8
     },
-    url: String,
+    url: {
+      type: String,
+      required: true
+    },
     headers: {
       type: Object,
       default () {
@@ -64,15 +68,15 @@ export default {
       }
     },
     template: String,
-    dataKey: {
+    dataKey: { // in the http response
       type: String,
       default: null
     },
-    labelKey: {
+    labelKey: { // in the list of suggestions
       type: String,
       default: 'label'
     },
-    valueKey: {
+    valueKey: { // in the list of suggestions
       type: String,
       default: 'value'
     },
@@ -83,16 +87,6 @@ export default {
     matchStart: {
       type: Boolean,
       default: false
-    },
-    onHit: {
-      type: Function,
-      default (item) {
-        console.log('onHit: item:', item)
-        if (item) {
-          this.reset()
-          this.$emit('input', item)
-        }
-      }
     },
     placeholder: String,
     delay: {
@@ -111,11 +105,10 @@ export default {
 
   data () {
     return {
-      val: this.value,
+      val: this.value.label,
       showDropdown: false,
       current: 0,
-      items: [],
-      queryOnTheWay: false
+      items: []
     }
   },
 
@@ -133,47 +126,61 @@ export default {
           }
         }
       }
+    },
+    urlMode () {
+      // true if user entered a url or a path
+      return !!this.val.match(/^(ww|ht|\/)/i)
     }
   },
 
   watch: {
-//    val (val) {
-//      this.$emit('input', val)
-//    },
-//    value (val) {
-//      console.log('value watcher')
-//      if (this.val !== val) { this.val = val }
-//    }
+    value: {
+      handler (val) {
+        if (this.val !== val.label) {
+          this.val = val.label
+        }
+      },
+      deep: true
+    }
   },
 
   methods: {
-    update () {
-      console.log('update')
-      if (!this.showDropdownOnFocus && !this.val) {
-        this.reset()
-        return false
-      }
-      if (this.url) {
-        this.reset()
-        var lastVal = this.val
-        setTimeout(() => {
-          // only query if the value didn’t change during the delay period
-          if (this.val === lastVal) this.query()
-        }, this.delay)
+    focus () {
+      if (!this.val && this.showDropdownOnFocus) {
+        // Show suggestions when field is blank.
+        this.update()
       }
     },
+    update () {
+      // If a suggestion has been selected, value and label are not identical.
+      // We clear the field if a suggestion had been selected, so the user gets
+      // feedback that they deselected the suggestion by typing something else.
+      if (this.value.label !== this.value.value) {
+        this.val = ''
+      }
+      this.$emit('input', {
+        value: this.val,
+        label: this.val
+      })
+      this.reset()
+      if (this.urlMode) {
+        return false
+      }
+      var lastVal = this.val
+      setTimeout(() => {
+        // only query if the value didn’t change during the delay period
+        if (this.val === lastVal) this.query()
+      }, this.delay)
+    },
     query () {
-      console.log('query')
       api.getNodes({
         url: this.url,
         headers: this.headers,
         queryParam: this.searchParam,
         queryString: fixedEncodeURIComponent(this.val)
       }).then(response => {
-        console.log('dealing with response')
         // get the search term from the url
         const re = new RegExp('[&|?]' + this.searchParam + '=([^&]*)')
-        console.log(response)
         var searchVal
         try {
           searchVal = response.config.url.match(re)[1]
@@ -204,7 +211,11 @@ export default {
         e.preventDefault()
         e.stopPropagation()
         this.val = this.items[this.current][this.labelKey]
-        this.onHit(this.items[this.current], this)
+        this.$emit('input', {
+          value: this.items[this.current][this.valueKey],
+          label: this.items[this.current][this.labelKey]
+        })
+        this.reset()
       }
     },
     up (e) {
@@ -248,4 +259,41 @@ export default {
 </script>
 
 <style lang="css">
+.typeahead {
+  display: inline-block;
+  position: relative;
+}
+
+.typeahead .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 100%;
+  max-height: 12rem;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: 2000;
+}
+
+.typeahead.open .dropdown-menu {
+  display: block;
+}
+
+.typeahead .dropdown-menu > li {
+  width: 100%;
+}
+
+.typeahead .dropdown-menu > li.active {
+  color: #fff;
+  background-color: #aaa;
+}
+
+.typeahead .dropdown-menu > li > a {
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+}
 </style>

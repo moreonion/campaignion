@@ -13,7 +13,7 @@
       <label :for="'pra-redirect-destination-' + _uid">{{ text('Redirect destination') }} <small>{{ text('type a node title or ID or paste a URL') }}</small></label>
       <DestinationField
         :id="'pra-redirect-destination-' + _uid"
-        :v-model="destination"
+        :value="destination"
         :placeholder="text('Type to search nodes')"
         :show-dropdown-on-focus="true"
         data-key="values"
