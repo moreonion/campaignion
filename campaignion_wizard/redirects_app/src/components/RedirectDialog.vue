@@ -83,14 +83,12 @@ export default {
     },
     destination: {
       get () {
-        console.log('get destination')
         return {
           value: this.currentRedirect.destination,
           label: this.currentRedirect.prettyDestination
         }
       },
       set (val) {
-        console.log('set destination')
         this.currentRedirect.destination = val.value
         this.currentRedirect.prettyDestination = val.label
       }
@@ -153,7 +151,6 @@ export default {
 
   mounted () {
     this.$root.$on('newRedirect', () => {
-      console.log('caught event on bus: new')
       this.currentRedirect = emptyRedirect()
       this.$store.commit('editNewRedirect')
     })
