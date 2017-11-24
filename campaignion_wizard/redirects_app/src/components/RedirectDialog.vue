@@ -11,7 +11,20 @@
       <label :for="'pra-redirect-label-' + _uid">{{ text('Redirect label') }} <small>{{ text('seen only by you') }}</small></label>
       <input type="text" v-model="currentRedirect.label" class="field-input" :id="'pra-redirect-label-' + _uid">
       <label :for="'pra-redirect-destination-' + _uid">{{ text('Redirect destination') }} <small>{{ text('type a node title or ID or paste a URL') }}</small></label>
-      <input type="text" v-model="currentRedirect.destination" class="field-input" :id="'pra-redirect-destination-' + _uid">
+      <DestinationField
+        :id="'pra-redirect-destination-' + _uid"
+        :v-model="destination"
+        :placeholder="text('Type to search nodes')"
+        :show-dropdown-on-focus="true"
+        data-key="values"
+        label-key="label"
+        url="http://foo.bar.com"
+        :headers="{'Authorization': 'JWT foo.bar.3456ß8971230469827456.jklcnfgb'}"
+        search-param="q"
+        :count="20"
+        @input="item => {destination = item}"
+      />
+      <p>{{ currentRedirect.destination }}</p>
     </section>
 <!--
     <FilterEditor
@@ -35,8 +48,13 @@ import {clone} from '@/utils'
 import {OPERATORS, emptyRedirect} from '@/utils/defaults'
 import {mapState} from 'vuex'
 import {isEqual, omit} from 'lodash'
+import DestinationField from './DestinationField'
 
 export default {
+  components: {
+    DestinationField
+  },
+
   data () {
     return {
       currentRedirect: emptyRedirect(),
@@ -63,6 +81,20 @@ export default {
     visible () {
       return this.currentRedirectIndex !== null
     },
+    destination: {
+      get () {
+        console.log('get destination')
+        return {
+          value: this.currentRedirect.destination,
+          label: this.currentRedirect.prettyDestination
+        }
+      },
+      set (val) {
+        console.log('set destination')
+        this.currentRedirect.destination = val.value
+        this.currentRedirect.prettyDestination = val.label
+      }
+    },
     ...mapState([
       'redirects',
       'currentRedirectIndex'
@@ -76,6 +108,7 @@ export default {
         case 'seen only by you': return Drupal.t('(seen only by you)')
         case 'Redirect destination': return Drupal.t('Redirect destination')
         case 'type a node title or ID or paste a URL': return Drupal.t('type a node title or ID or paste a URL')
+        case 'Type to search nodes': return Drupal.t('Type to search nodes')
         case 'unsaved changes': return Drupal.t('You have unsaved changes!')
         case 'Cancel': return this.modalDirty ? Drupal.t('Discard my changes') : Drupal.t('Cancel')
         case 'Done': return Drupal.t('Done')
