@@ -13,7 +13,7 @@ export const OPERATORS = {
   }
 }
 
-export function emptyRedirect (type) {
+export function emptyRedirect () {
   return {
     id: null,
     label: '',
