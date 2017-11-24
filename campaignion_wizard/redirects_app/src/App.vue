@@ -1,5 +1,5 @@
 <template>
-<div class="redirect-app" data-interrupt-submit>
+<div class="redirect-app" data-interrupt-submit :data-has-unsaved-changes="unsavedChanges">
   <ElButton @click="newRedirect()">{{ text('Add redirect') }}</ElButton>
   <RedirectList/>
 
@@ -13,8 +13,8 @@
       :show-dropdown-on-focus="true"
       data-key="values"
       label-key="label"
-      url="http://foo.bar.com"
-      :headers="{'Authorization': 'JWT foo.bar.3456ß8971230469827456.jklcnfgb'}"
+      :url="$root.$options.settings.endpoints.nodes"
+      :headers="{}"
       search-param="q"
       :count="20"
       @input="item => {destination = item}"
@@ -28,7 +28,9 @@
 
 <script>
 import {mapState} from 'vuex'
-import {dispatch, validateDestination} from '@/utils'
+import {isEqual} from 'lodash'
+import {clone, dispatch, validateDestination} from '@/utils'
+import api from '@/utils/api'
 import RedirectList from './components/RedirectList'
 import RedirectDialog from './components/RedirectDialog'
 import DestinationField from './components/DestinationField'
@@ -69,27 +71,80 @@ export default {
     destinationIsValid () {
       return validateDestination(this.defaultRedirect.destination)
     },
+    unsavedChanges () {
+      if (this.redirects.length !== this.initialData.redirects.length) return true
+      if (!isEqual(this.defaultRedirect, this.initialData.defaultRedirect)) return true
+      for (let i = 0, j = this.redirects.length; i < j; i++) {
+        if (!isEqual(this.redirects[i], this.initialData.redirects[i])) return true
+      }
+      return false
+    },
     ...mapState([
-      'defaultRedirect'
+      'redirects',
+      'defaultRedirect',
+      'initialData'
     ])
   },
 
+  created () {
+    // Shortcut to settings.
+    this.$root.$options.settings = Drupal.settings.campaignion_wizard[this.$root.$options.drupalContainer.id]
+  },
+
   mounted () {
+    // Initialize data
+    this.$store.commit({
+      type: 'initData',
+      redirects: this.$root.$options.settings.redirects,
+      defaultRedirectUrl: this.$root.$options.settings.default_redirect_url
+    })
     // Handle events from interrupt-submit.js
     const listener = e => {
+      const leavePage = () => {
+        dispatch(this.$root.$el, 'resume-leave-page')
+      }
+
+      const stayOnPage = () => {
+        dispatch(this.$root.$el, 'cancel-leave-page')
+      }
+
       if (e.type === 'request-leave-page') {
-        // TODO User wants to go back - ask: lose data?
+        // User clicked 'back' button.
+        // Forget about unsaved changes if the app is hidden.
+        // TODO if (appIsHidden) {leavePage(); return}
+        if (this.unsavedChanges) {
+          this.$confirm(this.text('unsaved changes'), this.text('unsaved changes title'), {
+            confirmButtonText: this.text('Go back anyway'),
+            cancelButtonText: this.text('Stay on page'),
+            type: 'warning'
+          }).then(() => { leavePage() }, () => { stayOnPage() })
+        } else {
+          leavePage()
+        }
+        return
       } else if (e.type === 'request-submit-page') {
+        // User clicked one of the submit buttons.
+        // If nothing has changed, just submit.
+        if (!this.unsavedChanges) {
+          leavePage()
+          return
+        }
+        // Validate destination field (only if the app is visible).
+        // TODO && !appIsHidden
         if (!this.destinationIsValid) {
-          dispatch(this.$root.$el, 'cancel-leave-page')
+          stayOnPage()
           this.showErrors = true
           return
         }
-        // TODO persist data.
-        // call dispatch(this.$root.$el, 'resume-leave-page') in callback after server responded ok
-        // or cancel-leave-page + warning in case of http error
+        this.persistData().then(() => {
+          leavePage()
+        }, () => {
+          stayOnPage()
+          this.$alert(this.text('service unavailable'), this.text('service unavailable title'), {
+            confirmButtonText: this.text('OK')
+          })
+        })
       }
-      this.askingToLeave = true
     }
     this.$root.$el.addEventListener('request-submit-page', listener)
     this.$root.$el.addEventListener('request-leave-page', listener)
@@ -99,6 +154,21 @@ export default {
     newRedirect () {
       this.$root.$emit('newRedirect')
     },
+    persistData () {
+      return new Promise((resolve, reject) => {
+        var redirects = clone(this.redirects)
+        redirects.push(clone(this.defaultRedirect))
+        api.postData({
+          url: this.$root.$options.settings.endpoints.redirects,
+          data: {redirects},
+          headers: {}
+        }).then(() => {
+          resolve()
+        }, error => {
+          reject(error)
+        })
+      })
+    },
     text (text) {
       switch (text) {
         case 'Add redirect': return Drupal.t('Add personalized redirect')
@@ -106,6 +176,14 @@ export default {
         case 'type a node title or ID or paste a URL': return Drupal.t('type a node title or ID or paste a URL')
         case 'Type to search nodes': return Drupal.t('Type to search nodes')
         case 'destination error': return Drupal.t('Please enter a valid URL or choose a node.')
+        case 'service unavailable title': return Drupal.t('Service unavailable')
+        case 'service unavailable': return Drupal.t('The service is temporarily unavailable.\rYour redirects could not be saved.\rPlease try again or contact support if the issue persists.')
+        case 'unsaved changes title': return Drupal.t('Unsaved changes')
+        case 'unsaved changes': return Drupal.t('You have unsaved changes!\rYou will lose your changes if you go back.')
+        case 'OK': return Drupal.t('OK')
+        case 'Cancel': return Drupal.t('Cancel')
+        case 'Go back anyway': return Drupal.t('Go back anyway')
+        case 'Stay on page': return Drupal.t('Stay on page')
       }
     }
   }
@@ -113,12 +191,4 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>

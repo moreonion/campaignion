@@ -2,6 +2,20 @@ import Vue from 'vue'
 import {clone} from '@/utils'
 
 export default {
+  initData (state, {redirects, defaultRedirectUrl}) {
+    if (defaultRedirectUrl && (typeof redirects === 'undefined' || !redirects.length)) {
+      state.defaultRedirect.destination = defaultRedirectUrl
+      state.defaultRedirect.prettyDestination = defaultRedirectUrl
+    } else {
+      state.defaultRedirect = clone(redirects[redirects.length - 1])
+      state.redirects = clone(redirects).slice(0, -1)
+    }
+
+    // Preserve initial state
+    state.initialData.redirects = clone(state.redirects)
+    state.initialData.defaultRedirect = clone(state.defaultRedirect)
+  },
+
   editNewRedirect (state) {
     state.currentRedirectIndex = -1
   },
