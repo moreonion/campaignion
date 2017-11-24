@@ -27,14 +27,13 @@
       />
       <div v-if="showErrors && !destinationIsValid" class="pra-error-message">{{ text('destination error') }}</div>
     </section>
-<!--
+
     <FilterEditor
-      :fields="targetAttributes"
+      :fields="filterFields"
       :filters.sync="currentRedirect.filters"
-      :filter-default="{type: 'target-attribute'}"
       :operators="OPERATORS"
     />
--->
+
     <span slot="footer" :class="{'pra-dialog-footer': true, 'pra-dialog-alert': modalDirty}">
       <span v-if="modalDirty" class="pra-dialog-alert-message">{{ text('unsaved changes') }}</span>
       <el-button @click="cancelButtonHandler()" class="js-modal-cancel">{{ text('Cancel') }}</el-button>
@@ -50,10 +49,12 @@ import {OPERATORS, emptyRedirect} from '@/utils/defaults'
 import {mapState} from 'vuex'
 import {isEqual, omit} from 'lodash'
 import DestinationField from './DestinationField'
+import FilterEditor from './FilterEditor'
 
 export default {
   components: {
-    DestinationField
+    DestinationField,
+    FilterEditor
   },
 
   data () {
@@ -102,7 +103,8 @@ export default {
     },
     ...mapState([
       'redirects',
-      'currentRedirectIndex'
+      'currentRedirectIndex',
+      'filterFields'
     ])
   },
 
