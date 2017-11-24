@@ -1,9 +1,16 @@
 // This module is used to provide the Drupal global in development and test mode.
 // Functions taken from drupal.js.
 
+import exampleData from '../test/fixtures/example-data'
+import initialData from '../test/fixtures/initial-data'
+
 const Drupal = {
   settings: {
-    // My settings here...
+    campaignion_wizard: {
+      'personalized-redirects-widget--5': (process.env.NODE_ENV === 'development')
+        ? exampleData
+        : initialData
+    }
   },
 
   locale: {},

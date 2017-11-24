@@ -77,12 +77,6 @@ class ThankyouStep extends WizardStep {
       '#default_value' => $type == 'redirect' ? 'redirect' : NULL,
       '#parents'       => array($prefix, 'type'),
     );
-//    $form['redirect_url'] = array(
-//      '#type'          => 'textfield',
-//      '#title'         => t('Redirect URL'),
-//      '#states'        => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'redirect'))),
-//      '#default_value' => $old['redirect_url'],
-//    );
 
     // Personalized redirects widget
     $redirect_container_id = drupal_html_id('personalized-redirects-widget');
@@ -94,8 +88,31 @@ class ThankyouStep extends WizardStep {
       '#attributes' => ['class' => ['personalized-redirects-widget']],
     );
     $settings = array(
-      'default_redirect_url' => $old['redirect_url'],
-      // ...
+      // default_redirect_url can be used to migrate the old redirects to the new format.
+      // See redirects_app/README.md
+      // TODO This should be reviewed:
+      // 'default_redirect_url' => $old['redirect_url'],
+      // TODO The following is dummy data for testing only:
+      'default_redirect_url' => 'http://old-default-url.com',
+      'redirects' => [],
+      'fields' => [
+        [
+          'id' => 'f_name',
+          'label' => 'First name'
+        ],
+        [
+          'id' => 'l_name',
+          'label' => 'Last name'
+        ],
+        [
+          'id' => 'email',
+          'label' => 'Email address'
+        ]
+      ],
+      'endpoints' => [
+        'nodes' => '/getnodes',
+        'redirects' => '/node/8/save-my-redirects'
+      ]
     );
     $settings = array(
       'campaignion_wizard' => array(

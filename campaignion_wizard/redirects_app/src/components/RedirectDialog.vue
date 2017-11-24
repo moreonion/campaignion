@@ -19,8 +19,8 @@
         :show-dropdown-on-focus="true"
         data-key="values"
         label-key="label"
-        url="http://foo.bar.com"
-        :headers="{'Authorization': 'JWT foo.bar.3456ß8971230469827456.jklcnfgb'}"
+        :url="$root.$options.settings.endpoints.nodes"
+        :headers="{}"
         search-param="q"
         :count="20"
         @input="item => {destination = item}"
@@ -29,7 +29,7 @@
     </section>
 
     <FilterEditor
-      :fields="filterFields"
+      :fields="$root.$options.settings.fields"
       :filters.sync="currentRedirect.filters"
       :operators="OPERATORS"
     />
@@ -103,8 +103,7 @@ export default {
     },
     ...mapState([
       'redirects',
-      'currentRedirectIndex',
-      'filterFields'
+      'currentRedirectIndex'
     ])
   },
 

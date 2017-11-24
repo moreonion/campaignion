@@ -2,7 +2,6 @@
 // standalone) has been set in webpack.dev.conf and webpack.test.conf with an alias.
 import Vue from 'vue'
 import App from './App'
-import axios from 'axios'
 import {createStore} from './store'
 
 import {
@@ -31,7 +30,6 @@ Vue.use(DropdownMenu)
 Vue.use(Option)
 Vue.use(Select)
 
-Vue.prototype.$http = axios
 Vue.prototype.$msgbox = MessageBox
 Vue.prototype.$alert = MessageBox.alert
 Vue.prototype.$confirm = MessageBox.confirm
@@ -50,6 +48,7 @@ containers.forEach(drupalContainer => {
   new Vue({
     el,
     drupalContainer,
+    settings: {},
     template: '<App/>',
     store: createStore(),
     components: {App}

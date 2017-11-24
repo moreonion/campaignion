@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 // function paramReadyUrl (url) {
 //   if (!url.match(/\?[^=]+=[^&]*/)) {
 //     // there’s no parameter. replace trailing ? or / or /? with ?
@@ -11,7 +13,8 @@
 
 export default {
   postData: function ({url, data, headers}) {
-    return new Promise().resolve()
+    // TODO authentification?
+    return axios.put(url, data)
   },
   getNodes: function ({url, queryParam, queryString, headers}) {
     // Mock server response:
@@ -35,7 +38,7 @@ export default {
         }
         resolve({
           config: {
-            url: 'http://mytest.com/foo/bar?' + queryParam + '=' + queryString
+            url: url + '?' + queryParam + '=' + queryString
           },
           data: {
             values
