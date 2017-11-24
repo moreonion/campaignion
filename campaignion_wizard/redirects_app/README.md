@@ -22,6 +22,41 @@ JSON Response:
 
 ### Persist data on form submit
 
+``` json
+{
+  "redirects": [
+    {
+      "id": null,
+      "label": "My internal label",
+      "destination": "node/20",
+      "prettyDestination": "Pretty title of my node (20)",
+      "filters": [
+        {
+          "id": null,
+          "type": "opt-in",
+          "value": true
+        },
+        {
+          "id": null,
+          "type": "submission-field",
+          "field": "f_name",
+          "operator": "contains",
+          "value": "foo"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Operators:
+
+* `==` is
+* `!=` is not
+* `contains` contains
+* `!contains` does not contain
+* `regexp` matches regular expression
+* `!regexp` doesn’t match regular expression
 
 ## Build Setup
 
