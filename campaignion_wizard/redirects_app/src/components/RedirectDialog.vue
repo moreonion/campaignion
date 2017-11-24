@@ -13,6 +13,7 @@
       <label :for="'pra-redirect-destination-' + _uid">{{ text('Redirect destination') }} <small>{{ text('type a node title or ID or paste a URL') }}</small></label>
       <DestinationField
         :id="'pra-redirect-destination-' + _uid"
+        :class="{'pra-has-error': showErrors && !destinationIsValid}"
         :value="destination"
         :placeholder="text('Type to search nodes')"
         :show-dropdown-on-focus="true"
@@ -24,7 +25,7 @@
         :count="20"
         @input="item => {destination = item}"
       />
-      <p>{{ currentRedirect.destination }}</p>
+      <div v-if="showErrors && !destinationIsValid" class="pra-error-message">{{ text('destination error') }}</div>
     </section>
 <!--
     <FilterEditor
@@ -59,6 +60,7 @@ export default {
     return {
       currentRedirect: emptyRedirect(),
       modalDirty: false,
+      showErrors: false,
       OPERATORS
     }
   },
@@ -93,6 +95,12 @@ export default {
         this.currentRedirect.prettyDestination = val.label
       }
     },
+    destinationIsValid () {
+      return (this.currentRedirect.destination.length &&
+        this.currentRedirect.destination.match(/^(www\.|http:\/\/|https:\/\/|\/)/) &&
+        this.currentRedirect.destination.indexOf(' ') === -1) ||
+        this.currentRedirect.destination.match(/^node\//)
+    },
     ...mapState([
       'redirects',
       'currentRedirectIndex'
@@ -107,6 +115,7 @@ export default {
         case 'Redirect destination': return Drupal.t('Redirect destination')
         case 'type a node title or ID or paste a URL': return Drupal.t('type a node title or ID or paste a URL')
         case 'Type to search nodes': return Drupal.t('Type to search nodes')
+        case 'destination error': return Drupal.t('Please enter a valid URL or choose a node.')
         case 'unsaved changes': return Drupal.t('You have unsaved changes!')
         case 'Cancel': return this.modalDirty ? Drupal.t('Discard my changes') : Drupal.t('Cancel')
         case 'Done': return Drupal.t('Done')
@@ -137,13 +146,16 @@ export default {
       }
     },
     updateRedirect () {
-      // TODO: validate destination field!
-      // TODO: save prettyDestination
+      if (!this.destinationIsValid) {
+        this.showErrors = true
+        return
+      }
       this.$store.commit({type: 'updateRedirect', redirect: this.currentRedirect})
       this.close()
     },
     close () {
       this.modalDirty = false
+      this.showErrors = false
       this.$store.commit('leaveRedirect')
       this.$root.$emit('closeRedirectDialog')
     }
