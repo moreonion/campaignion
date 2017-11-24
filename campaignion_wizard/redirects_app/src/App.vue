@@ -1,36 +1,32 @@
 <template>
-  <div class="redirect-app" data-interrupt-submit>
-    <img src="./assets/logo.png">
-    <Hello/>
-    <el-dropdown>
-      <span class="el-dropdown-link">
-        Dropdown List<i class="el-icon-caret-bottom el-icon--right"></i>
-      </span>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item>Action 1</el-dropdown-item>
-        <el-dropdown-item>Action 2</el-dropdown-item>
-        <el-dropdown-item>Action 3</el-dropdown-item>
-        <el-dropdown-item disabled>Action 4</el-dropdown-item>
-        <el-dropdown-item divided>Action 5</el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
-
-    Select with localized placeholder:
-    <el-select>
-      <el-option>foo</el-option>
-      <el-option>bar</el-option>
-    </el-select>
-
-  </div>
+<div class="redirect-app" data-interrupt-submit>
+  <ElButton @click="newRedirect()">{{ text('Add redirect') }}</ElButton>
+  <RedirectList/>
+  <RedirectDialog/>
+</div>
 </template>
 
 <script>
-import Hello from './components/Hello'
+import RedirectList from './components/RedirectList'
+import RedirectDialog from './components/RedirectDialog'
 
 export default {
   name: 'app',
+
   components: {
-    Hello
+    RedirectList,
+    RedirectDialog
+  },
+
+  methods: {
+    newRedirect () {
+      this.$root.$emit('newRedirect')
+    },
+    text (text) {
+      switch (text) {
+        case 'Add redirect': return Drupal.t('Add personalized redirect')
+      }
+    }
   }
 }
 </script>
