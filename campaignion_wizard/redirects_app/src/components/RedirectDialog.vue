@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import {clone} from '@/utils'
+import {clone, validateDestination} from '@/utils'
 import {OPERATORS, emptyRedirect} from '@/utils/defaults'
 import {mapState} from 'vuex'
 import {isEqual, omit} from 'lodash'
@@ -84,6 +84,8 @@ export default {
       return this.currentRedirectIndex !== null
     },
     destination: {
+      // destination and prettyDestination translated for the DestinationField
+      // component as value and label
       get () {
         return {
           value: this.currentRedirect.destination,
@@ -96,10 +98,7 @@ export default {
       }
     },
     destinationIsValid () {
-      return (this.currentRedirect.destination.length &&
-        this.currentRedirect.destination.match(/^(www\.|http:\/\/|https:\/\/|\/)/) &&
-        this.currentRedirect.destination.indexOf(' ') === -1) ||
-        this.currentRedirect.destination.match(/^node\//)
+      return validateDestination(this.currentRedirect.destination)
     },
     ...mapState([
       'redirects',

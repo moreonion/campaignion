@@ -27,6 +27,11 @@ export default {
     }
   },
 
+  updateDefaultRedirect (state, {destination, prettyDestination}) {
+    state.defaultRedirect.destination = destination
+    state.defaultRedirect.prettyDestination = prettyDestination
+  },
+
   updateRedirects (state, {redirects}) {
     state.redirects = redirects
   }

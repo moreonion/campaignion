@@ -8,7 +8,15 @@ export function dispatch (el, type) {
   el.dispatchEvent(e)
 }
 
+export function validateDestination (destination) {
+  return (destination.length &&
+    destination.match(/^(www\.|http:\/\/|https:\/\/|\/)/) &&
+    destination.indexOf(' ') === -1) ||
+    destination.match(/^node\//)
+}
+
 export default {
   clone,
-  dispatch
+  dispatch,
+  validateDestination
 }
