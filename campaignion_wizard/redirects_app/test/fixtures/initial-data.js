@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   default_redirect_url: 'http://old-default-url.com', // This could be the old redirect url.
   redirects: [],
   fields: [
@@ -16,7 +16,7 @@ export default {
     }
   ],
   endpoints: {
-    nodes: '/getnodes',
-    redirects: '/node/8/save-my-redirects'
+    nodes: '/api/getnodes',
+    redirects: '/api/data'
   }
 }
