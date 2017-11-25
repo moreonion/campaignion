@@ -7,25 +7,9 @@
     :before-close="dialogCancelHandler"
     >
 
-    <section class="pra-redirect-fields">
+    <section class="pra-redirect-label">
       <label :for="'pra-redirect-label-' + _uid">{{ text('Redirect label') }} <small>{{ text('seen only by you') }}</small></label>
       <input type="text" v-model="currentRedirect.label" class="field-input" :id="'pra-redirect-label-' + _uid">
-      <label :for="'pra-redirect-destination-' + _uid">{{ text('Redirect destination') }} <small>{{ text('type a node title or ID or paste a URL') }}</small></label>
-      <DestinationField
-        :id="'pra-redirect-destination-' + _uid"
-        :class="{'pra-has-error': showErrors && !destinationIsValid}"
-        :value="destination"
-        :placeholder="text('Type to search nodes')"
-        :show-dropdown-on-focus="true"
-        data-key="values"
-        label-key="label"
-        :url="$root.$options.settings.endpoints.nodes"
-        :headers="{}"
-        search-param="q"
-        :count="20"
-        @input="item => {destination = item}"
-      />
-      <div v-if="showErrors && !destinationIsValid" class="pra-error-message">{{ text('destination error') }}</div>
     </section>
 
     <FilterEditor
@@ -33,6 +17,25 @@
       :filters.sync="currentRedirect.filters"
       :operators="OPERATORS"
     />
+
+    <section class="pra-redirect-destination">
+      <label :for="'pra-redirect-destination-' + _uid">{{ text('Redirect destination') }} <small>{{ text('type a node title or ID or paste a URL') }}</small></label>
+      <DestinationField
+      :id="'pra-redirect-destination-' + _uid"
+      :class="{'pra-has-error': showErrors && !destinationIsValid}"
+      :value="destination"
+      :placeholder="text('Type to search nodes')"
+      :show-dropdown-on-focus="true"
+      data-key="values"
+      label-key="label"
+      :url="$root.$options.settings.endpoints.nodes"
+      :headers="{}"
+      search-param="q"
+      :count="20"
+      @input="item => {destination = item}"
+      />
+      <div v-if="showErrors && !destinationIsValid" class="pra-error-message">{{ text('destination error') }}</div>
+    </section>
 
     <span slot="footer" :class="{'pra-dialog-footer': true, 'pra-dialog-alert': modalDirty}">
       <span v-if="modalDirty" class="pra-dialog-alert-message">{{ text('unsaved changes') }}</span>
