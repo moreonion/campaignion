@@ -1,6 +1,6 @@
 {
   "name": "messages_app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Front end for the messages step.",
   "author": "Maya Kokits <maya@more-onion.com>",
   "private": true,
