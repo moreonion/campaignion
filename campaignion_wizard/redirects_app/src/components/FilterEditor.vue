@@ -40,7 +40,7 @@
             type="text"
             autocomplete="off"
             :placeholder="filter.operator.indexOf('regexp') !== -1 ? 'regular expression' : ''"
-            class="pra-filter-value"
+            class="pra-filter-value field-input field-inline"
           />
         </template>
 
