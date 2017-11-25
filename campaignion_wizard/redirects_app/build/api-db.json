@@ -22,23 +22,38 @@
         ]
       },
       {
-        "id": 4,
-        "label": "Spam haters go here",
-        "destination": "http://opt-in.com",
-        "prettyDestination": "http://opt-in.com",
+        "id": null,
+        "label": "Awesome redirect",
+        "destination": "node/3",
+        "prettyDestination": "Some Node title containing foo (3)",
         "filters": [
           {
-            "id": 5,
+            "id": null,
             "type": "opt-in",
             "value": false
           }
         ]
       },
       {
+        "id": null,
+        "label": "Real spam lovers go here",
+        "destination": "http://opt-in.com",
+        "prettyDestination": "http://opt-in.com",
+        "filters": [
+          {
+            "id": null,
+            "type": "submission-field",
+            "field": "l_name",
+            "operator": "!contains",
+            "value": "bar"
+          }
+        ]
+      },
+      {
         "id": 6,
         "label": "",
-        "destination": "http://example.com",
-        "prettyDestination": "http://example.com",
+        "destination": "/something_else",
+        "prettyDestination": "/something_else",
         "filters": []
       }
     ]

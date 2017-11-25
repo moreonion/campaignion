@@ -85,9 +85,8 @@ module.exports = {
 
   'redirect drag’n’drop': function (browser) {
     // In chromium this test regularly fails, probably due to a selenium issue.
-    // Workaround: After the chromium window opened, move the window a little bit,
-    // place the mouse pointer somewhere inside the window.
-    console.log('If this test keeps failing, try to move the browser window a little and place the mouse pointer inside.')
+    // Workaround: Place the mouse pointer somewhere inside the browser window.
+    console.log('If this test keeps failing, place the mouse pointer inside the browser window.')
     var app = browser.page.app()
     var redirect = app.section.redirectList.section.redirect
     var redirectSelectors = listSelectors(redirect.selector, 2)
@@ -285,6 +284,84 @@ module.exports = {
   },
 
   'save redirects to server': function (browser) {
-    // browser.end()
+    var app = browser.page.app()
+
+    browser
+      .listenXHR()
+      .pause(500)
+    app.click('@submit')
+    browser
+      .pause(500)
+      .getAlertText(function (result) {
+        browser.assert.equal(result.value, 'You can leave the page now.')
+        browser.acceptAlert()
+      })
+      .getXHR('/data', 1000, function (xhrs) {
+        browser.assert.equal(xhrs.length, 1)
+        browser.assert.equal(xhrs[0].status, 'success')
+        browser.assert.equal(xhrs[0].method, 'PUT')
+        browser.assert.equal(xhrs[0].httpResponseCode, '200')
+
+        var redirects = JSON.parse(xhrs[0].requestData).redirects
+
+        browser.assert.equal(redirects.length, 4)
+        browser.assert.deepEqual(redirects[0], {
+          id: 1,
+          label: 'My internal label',
+          destination: 'node/20',
+          prettyDestination: 'Pretty title of my node (20)',
+          filters: [
+            {
+              id: 2,
+              type: 'opt-in',
+              value: true
+            },
+            {
+              id: 3,
+              type: 'submission-field',
+              field: 'f_name',
+              operator: 'contains',
+              value: 'foo'
+            }
+          ]
+        })
+        browser.assert.deepEqual(redirects[1], {
+          id: null,
+          label: 'Awesome redirect',
+          destination: 'node/3',
+          prettyDestination: 'Some Node title containing foo (3)',
+          filters: [
+            {
+              id: null,
+              type: 'opt-in',
+              value: false
+            }
+          ]
+        })
+        browser.assert.deepEqual(redirects[2], {
+          id: null,
+          label: 'Real spam lovers go here',
+          destination: 'http://opt-in.com',
+          prettyDestination: 'http://opt-in.com',
+          filters: [
+            {
+              id: null,
+              type: 'submission-field',
+              field: 'l_name',
+              operator: '!contains',
+              value: 'bar'
+            }
+          ]
+        })
+        browser.assert.deepEqual(redirects[3], {
+          id: 6,
+          label: '',
+          destination: '/something_else',
+          prettyDestination: '/something_else',
+          filters: []
+        })
+      })
+
+    browser.end()
   }
 }
