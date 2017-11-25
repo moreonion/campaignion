@@ -134,8 +134,10 @@ yarn dev
 # build for production with minification
 yarn build
 
-# run unit tests
-yarn unit
+# build nightwatch-xhr for the e2e tests
+cd node_modules/nightwatch-xhr
+yarn install
+cd ../..
 
 # run e2e tests
 yarn e2e
