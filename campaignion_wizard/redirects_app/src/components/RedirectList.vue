@@ -19,8 +19,8 @@
         <ElDropdown split-button trigger="click" @click="editRedirect(index)" class="pra-redirect-actions">
           {{ text('Edit') }}
           <ElDropdownMenu slot="dropdown">
-            <ElDropdownItem @click.native="duplicateRedirect(index)">{{ text('Duplicate') }}</ElDropdownItem>
-            <ElDropdownItem @click.native="removeRedirect(index)">{{ text('Delete') }}</ElDropdownItem>
+            <ElDropdownItem @click.native="duplicateRedirect(index)" class="pra-duplicate-redirect">{{ text('Duplicate') }}</ElDropdownItem>
+            <ElDropdownItem @click.native="removeRedirect(index)" class="pra-delete-redirect">{{ text('Delete') }}</ElDropdownItem>
           </ElDropdownMenu>
         </ElDropdown>
       </div>
