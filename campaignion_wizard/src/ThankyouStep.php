@@ -110,8 +110,8 @@ class ThankyouStep extends WizardStep {
         ]
       ],
       'endpoints' => [
-        'nodes' => '/getnodes',
-        'redirects' => '/node/8/save-my-redirects'
+        'nodes' => 'http://localhost:8081/getnodes',
+        'redirects' => 'http://localhost:8081/data'
       ]
     );
     $settings = array(

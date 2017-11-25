@@ -9,7 +9,6 @@ const middlewares = jsonServer.defaults()
 // Set default middlewares (logger, static, cors and no-cache)
 server.use(middlewares)
 
-console.log(initialData.endpoints.nodes)
 // Add custom routes before JSON Server router
 server.get('/getnodes', (req, res) => {
   res.status(200).jsonp(fakeNodes(req.url))
