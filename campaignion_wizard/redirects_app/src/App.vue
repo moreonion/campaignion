@@ -111,7 +111,10 @@ export default {
       if (e.type === 'request-leave-page') {
         // User clicked 'back' button.
         // Forget about unsaved changes if the app is hidden.
-        // TODO if (appIsHidden) {leavePage(); return}
+        if (this.appIsHidden()) {
+          leavePage()
+          return
+        }
         if (this.unsavedChanges) {
           this.$confirm(this.text('unsaved changes'), this.text('unsaved changes title'), {
             confirmButtonText: this.text('Go back anyway'),
@@ -130,8 +133,7 @@ export default {
           return
         }
         // Validate destination field (only if the app is visible).
-        // TODO && !appIsHidden
-        if (!this.destinationIsValid) {
+        if (!this.destinationIsValid && !this.appIsHidden()) {
           stayOnPage()
           this.showErrors = true
           return
@@ -151,6 +153,9 @@ export default {
   },
 
   methods: {
+    appIsHidden () {
+      return this.$root.$options.drupalContainer.style.display === 'none'
+    },
     newRedirect () {
       this.$root.$emit('newRedirect')
     },

@@ -8,22 +8,20 @@
     @end="dragEnd"
     >
     <li v-for="(redirect, index) in redirects" :key="index" class="pra-redirect">
-      <div class="pra-redirect-card">
-        <span class="pra-redirect-handle"></span>
-        <span class="pra-redirect-info">
-          <div v-if="redirect.label" class="pra-redirect-label">{{ redirect.label }}</div>
-          <RedirectDescription :redirect="redirect" :index="index" class="pra-redirect-description"/>
-          <div class="pra-redirect-destination">➜ {{ redirect.prettyDestination }}</div>
-        </span>
+      <span class="pra-redirect-handle"></span>
+      <span class="pra-redirect-info">
+        <div v-if="redirect.label" class="pra-redirect-label">{{ redirect.label }}</div>
+        <RedirectDescription :redirect="redirect" :index="index" class="pra-redirect-description"/>
+        <div class="pra-redirect-destination">➜ {{ redirect.prettyDestination }}</div>
+      </span>
 
-        <ElDropdown split-button trigger="click" @click="editRedirect(index)" class="pra-redirect-actions">
-          {{ text('Edit') }}
-          <ElDropdownMenu slot="dropdown">
-            <ElDropdownItem @click.native="duplicateRedirect(index)" class="pra-duplicate-redirect">{{ text('Duplicate') }}</ElDropdownItem>
-            <ElDropdownItem @click.native="removeRedirect(index)" class="pra-delete-redirect">{{ text('Delete') }}</ElDropdownItem>
-          </ElDropdownMenu>
-        </ElDropdown>
-      </div>
+      <ElDropdown split-button trigger="click" @click="editRedirect(index)" class="pra-redirect-actions">
+        {{ text('Edit') }}
+        <ElDropdownMenu slot="dropdown">
+          <ElDropdownItem @click.native="duplicateRedirect(index)" class="pra-duplicate-redirect">{{ text('Duplicate') }}</ElDropdownItem>
+          <ElDropdownItem @click.native="removeRedirect(index)" class="pra-delete-redirect">{{ text('Delete') }}</ElDropdownItem>
+        </ElDropdownMenu>
+      </ElDropdown>
     </li>
   </Draggable>
 </template>
