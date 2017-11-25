@@ -14,7 +14,7 @@
     </header>
 
     <ul class="pra-filters">
-      <li v-for="(filter, index) in f" :key="index" class="pra-filter">
+      <li v-for="(filter, index) in f" :key="index" :class="['pra-filter', 'pra-filter-' + filter.type]">
 
         <span v-if="index === 0" class="pra-logical-connective">{{ text('If') }}</span>
         <span v-else class="pra-logical-connective">{{ text('and') }}</span>
@@ -29,10 +29,10 @@
         </template>
 
         <template v-else>
-          <ElSelect v-model="filter.field">
+          <ElSelect v-model="filter.field" class="pra-filter-field">
             <ElOption v-for="field in fields" :key="field.id" :label="field.label" :value="field.id"/>
           </ElSelect>
-          <ElSelect v-model="filter.operator">
+          <ElSelect v-model="filter.operator" class="pra-filter-operator">
             <ElOption v-for="item in operatorOptions" :key="item.value" :label="item.label" :value="item.value"/>
           </ElSelect>
           <input
@@ -40,6 +40,7 @@
             type="text"
             autocomplete="off"
             :placeholder="filter.operator.indexOf('regexp') !== -1 ? 'regular expression' : ''"
+            class="pra-filter-value"
           />
         </template>
 

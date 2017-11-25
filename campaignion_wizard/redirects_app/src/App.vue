@@ -1,6 +1,6 @@
 <template>
 <div class="redirect-app" data-interrupt-submit :data-has-unsaved-changes="unsavedChanges">
-  <ElButton @click="newRedirect()">{{ text('Add redirect') }}</ElButton>
+  <ElButton @click="newRedirect()" class="pra-add-redirect">{{ text('Add redirect') }}</ElButton>
   <RedirectList/>
 
   <section class="pra-default-redirect">
