@@ -12,8 +12,8 @@
         <span class="pra-redirect-handle"></span>
         <span class="pra-redirect-info">
           <div v-if="redirect.label" class="pra-redirect-label">{{ redirect.label }}</div>
-          <div class="pra-redirect-destination">{{ text('Redirect to') }} {{ redirect.prettyDestination }}</div>
           <RedirectDescription :redirect="redirect" :index="index" class="pra-redirect-description"/>
+          <div class="pra-redirect-destination">➜ {{ redirect.prettyDestination }}</div>
         </span>
 
         <ElDropdown split-button trigger="click" @click="editRedirect(index)" class="pra-redirect-actions">
