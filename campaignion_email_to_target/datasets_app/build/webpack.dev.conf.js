@@ -28,7 +28,9 @@ module.exports = merge(baseWebpackConfig, {
       'Drupal': [path.resolve(__dirname, './drupal-fixture'), 'default']
     }),
     new webpack.DefinePlugin({
-      'process.env': config.dev.env
+      'process.env': Object.assign({}, config.dev.env, {
+        E2T_API_TOKEN: '"' + process.env.E2T_API_TOKEN + '"'
+      })
     }),
     // element-ui: replace default Chinese strings with English strings.
     new webpack.NormalModuleReplacementPlugin(
@@ -42,6 +44,11 @@ module.exports = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
+      inject: true
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'dataset-manager.html',
+      template: 'dataset-manager.html',
       inject: true
     }),
     new FriendlyErrorsPlugin()
