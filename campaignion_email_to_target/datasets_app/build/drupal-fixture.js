@@ -4,6 +4,10 @@
 const Drupal = {
   settings: {
     campaignion_email_to_target: {
+      standardColumns: ['email', 'first_name', 'last_name', 'salutation'], // 'title' is added before saving
+      validations: {
+        'email': '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$' // backslashes have to be escaped!
+      },
       endpoints: {
         'e2t-api': {
           url: 'https://e2t-api.more-onion.com/v2',

@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import axios from 'axios'
 import store from './store'
+import {ClientTable} from 'vue-tables-2'
 
 import {
   Button,
@@ -26,6 +27,8 @@ if (Drupal.settings.campaignion_vue && Drupal.settings.campaignion_vue.element_u
 const bus = new Vue()
 Vue.prototype.$bus = bus
 
+Vue.use(ClientTable, {}, true)
+
 // Register element-ui components.
 Vue.use(Button)
 Vue.use(Dialog)
@@ -43,10 +46,14 @@ Vue.prototype.$prompt = MessageBox.prompt
 
 Vue.config.productionTip = false
 
+console.log(Drupal.settings.campaignion_email_to_target)
+
 /* eslint-disable no-new */
 new Vue({
   el: '.datasets-app',
   template: '<App/>',
+  settings: Drupal.settings.campaignion_email_to_target,
+  datasetField: document.querySelector('.datasets-app-selected-dataset'),
   store,
   components: { App }
 })
