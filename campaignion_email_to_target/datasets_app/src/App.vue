@@ -1,63 +1,98 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <hello></hello>
+    <template v-if="livingInWizard">
+      <div class="dsa-intro-text" v-html="introText"></div>
+      <button type="button" @click="openSelectDialog" :disabled="apiError">{{ buttonText }}</button>
+    </template>
+    <div v-if="apiError" class="dsa-has-error">{{ text('api error') }}</div>
+
+    <SelectDatasetDialog />
+
     <p>And this is the token: "{{ token }}"</p>
-
-    <v-client-table v-if="contacts.length" :data="contacts" :columns="columns" :options="options" name="contactsTable" class="dsa-contacts-table"/>
-    <EditValuePopup />
-
-    <button @click="loadDatasets" type="button" name="button">Load datasets</button>
-    <button @click="generateContacts" type="button" name="button">Generate contacts</button>
-
   </div>
 </template>
 
 <script>
 import {mapState} from 'vuex'
-import Hello from './components/Hello'
-import EditValuePopup from './components/EditValuePopup'
-import api from '@/utils/api'
+import SelectDatasetDialog from '@/components/SelectDatasetDialog'
 import {clone} from '@/utils'
 
 export default {
   name: 'app',
+
   components: {
-    Hello,
-    EditValuePopup
+    SelectDatasetDialog
   },
+
   data: function () {
     return {
-      livingInWizard: !!this.$root.$options.datasetField,
-      columns: ['email', 'first_name', 'last_name', 'salutation'],
-      options: {}
+      livingInWizard: !!this.$root.$options.datasetField
     }
   },
+
   computed: {
+    introText () {
+      return this.currentDataset
+        ? Drupal.t('You have chosen the dataset <strong>"@dataset".</strong> If you would like to edit the dataset or choose a different one click the "edit" button.', {'@dataset': this.currentDataset.title})
+        : Drupal.t('Click the button to choose a dataset.')
+    },
+    buttonText () {
+      return this.currentDataset
+        ? Drupal.t('Edit your target dataset')
+        : Drupal.t('Choose your target dataset')
+    },
     token () {
+      // TODO remove, also from template
       return this.$root.$options.settings.endpoints['e2t-api'].token
     },
     ...mapState([
-      'contacts'
+      'currentDataset',
+      'apiError',
+      'showSelectDialog',
+      'showEditDialog'
     ])
   },
-  methods: {
-    loadDatasets () {
-      api.getDatasets().then((data) => {
-        console.log(data)
-      })
+
+  watch: {
+    currentDataset (dataset) {
+      if (this.livingInWizard && dataset) {
+        this.$root.$options.datasetField.value = dataset.key
+      }
     },
-    generateContacts () {
-      this.$store.commit({
-        type: 'generateContacts'
-      })
+    // don’t accidentially submit drupal form while dialogs are open
+    showSelectDialog (val) {
+      this.disableDrupalSubmits(val)
+    },
+    showEditDialog (val) {
+      this.disableDrupalSubmits(val)
     }
   },
+
+  methods: {
+    openSelectDialog () {
+      this.$store.commit('openSelectDialog')
+    },
+
+    disableDrupalSubmits (bool) {
+      const inputs = document.querySelectorAll('input[type=submit]')
+      for (var i = 0, j = inputs.length; i < j; i++) {
+        inputs[i].disabled = bool
+      }
+    },
+
+    text (text) {
+      switch (text) {
+        case 'api error': return Drupal.t('The email to target API couldn’t be reached. Please reload the page.')
+      }
+    }
+  },
+
   created () {
     this.$store.commit({
       type: 'init',
       settings: clone(this.$root.$options.settings)
     })
+    this.$store.dispatch('loadDatasets')
   }
 }
 </script>

@@ -8,6 +8,27 @@ export default {
     state.validations = settings.validations || {}
   },
 
+  setDatasets (state, datasets) {
+    state.datasets = datasets
+  },
+
+  openSelectDialog (state) {
+    state.showSelectDialog = true
+  },
+
+  closeSelectDialog (state) {
+    state.showSelectDialog = false
+  },
+
+  selectDataset (state, {dataset}) {
+    state.showSelectDialog = false
+    state.currentDataset = dataset
+  },
+
+  setApiError (state, val) {
+    state.apiError = !!val
+  },
+
   // TODO remove content generators
   generateContacts (state) {
     const arr = []

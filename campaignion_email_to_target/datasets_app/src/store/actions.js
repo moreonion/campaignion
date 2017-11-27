@@ -1,7 +1,11 @@
+import api from '@/utils/api'
+
 export default {
-  incrementAsync (context, {amount}) {
-    setTimeout(() => {
-      context.commit('increment', {amount})
-    }, 1000)
+  loadDatasets (context) {
+    api.getDatasets().then(data => {
+      context.commit('setDatasets', data.data)
+    }, () => {
+      context.commit('setApiError', true)
+    })
   }
 }
