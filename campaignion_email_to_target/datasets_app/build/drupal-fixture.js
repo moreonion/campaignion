@@ -4,9 +4,39 @@
 const Drupal = {
   settings: {
     campaignion_email_to_target: {
-      standardColumns: ['email', 'first_name', 'last_name', 'salutation'], // 'title' is added before saving
+      contactPrefix: 'contact.',
+      standardColumns: [
+        {
+          key: 'email',
+          description: '',
+          title: 'Email address'
+        },
+        {
+          key: 'title',
+          description: '',
+          title: 'Title'
+        },
+        {
+          key: 'first_name',
+          description: '',
+          title: 'First name'
+        },
+        {
+          key: 'last_name',
+          description: '',
+          title: 'Last name'
+        },
+        {
+          key: 'salutation',
+          description: 'Full name and titles',
+          title: 'Salutation'
+        }
+      ],
       validations: {
-        'email': '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$' // backslashes have to be escaped!
+        'email': '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$', // backslashes have to be escaped!
+        'first_name': '\\S+',
+        'last_name': '\\S+',
+        'salutation': '\\S+'
       },
       endpoints: {
         'e2t-api': {

@@ -46,8 +46,6 @@ Vue.prototype.$prompt = MessageBox.prompt
 
 Vue.config.productionTip = false
 
-console.log(Drupal.settings.campaignion_email_to_target)
-
 /* eslint-disable no-new */
 new Vue({
   el: '.datasets-app',

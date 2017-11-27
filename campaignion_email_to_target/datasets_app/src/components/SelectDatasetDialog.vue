@@ -9,7 +9,7 @@
 
     <template slot="title">
       <span class="el-dialog__title">{{ text('Choose your dataset') }}</span>
-      <button type="button">{{ text('Add new dataset') }}</button>
+      <button type="button" @click="editNewDataset" class="dsa-add-new-dataset">{{ text('Add new dataset') }}</button>
     </template>
 
     <p class="dsa-hint">{{ text('hint') }}</p>
@@ -40,6 +40,11 @@ export default {
   },
 
   methods: {
+    editNewDataset () {
+      this.$store.commit('closeSelectDialog')
+      this.$store.commit('editNewDataset')
+    },
+
     dialogCancelHandler (done) {
       this.$store.commit('closeSelectDialog')
       done()

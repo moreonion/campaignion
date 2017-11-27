@@ -3,7 +3,7 @@
     'dsa-edit-value-popup': true,
     'dsa-has-error': showError && !valid
   }">
-    <input type="text" v-model="value" @keyup.enter="save" @keyup.esc="cancel" ref="input" />
+    <input type="text" v-model="value" @keydown.enter.stop="save" @keydown.esc.stop="cancel" ref="input" />
     <button type="button" @click="save">{{ text('save') }}</button>
     <button type="button" @click="cancel">{{ text('cancel') }}</button>
     <div v-if="showError && !valid" class="dsa-edit-value-error">
@@ -27,6 +27,8 @@ export default {
       showError: false,
       popper: {},
       clickHandler: e => {
+        // close the editing tooltip if the user clicks somewhere else
+        // do nothing if no value is being edited
         if (!this.editValue) return
         // do nothing if the user clicked inside the tooltip
         if (this.$el.tagName && this.$el.contains(e.target)) return
@@ -89,7 +91,8 @@ export default {
         })
         this.$nextTick(() => {
           // if the next field is blank, edit it
-          if (nextCell && !nextCell.textContent) {
+          if (nextCell && !nextCell.textContent && !(nextCell.children[0] && nextCell.children[0].classList.contains('dsa-delete-contact'))) {
+            nextCell.classList.add('dsa-edited') // for click handler
             dispatch(nextCell, 'click')
           }
         })

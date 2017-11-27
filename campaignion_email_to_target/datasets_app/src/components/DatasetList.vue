@@ -32,10 +32,18 @@ export default {
 
   methods: {
     select (dataset) {
-      this.$store.commit({
-        type: 'selectDataset',
-        dataset
-      })
+      this.$store.commit('closeSelectDialog')
+      if (dataset.is_custom) {
+        this.$store.dispatch({
+          type: 'loadContacts',
+          dataset
+        })
+      } else {
+        this.$store.commit({
+          type: 'setSelectedDataset',
+          key: dataset.key
+        })
+      }
     },
 
     text (text) {

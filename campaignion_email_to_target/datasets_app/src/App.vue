@@ -2,11 +2,12 @@
   <div id="app">
     <template v-if="livingInWizard">
       <div class="dsa-intro-text" v-html="introText"></div>
-      <button type="button" @click="openSelectDialog" :disabled="apiError">{{ buttonText }}</button>
+      <button type="button" @click="openDialog" :disabled="apiError || showSpinner">{{ buttonText }}</button>
     </template>
     <div v-if="apiError" class="dsa-has-error">{{ text('api error') }}</div>
 
     <SelectDatasetDialog />
+    <EditDatasetDialog />
 
     <p>And this is the token: "{{ token }}"</p>
   </div>
@@ -15,13 +16,15 @@
 <script>
 import {mapState} from 'vuex'
 import SelectDatasetDialog from '@/components/SelectDatasetDialog'
+import EditDatasetDialog from '@/components/EditDatasetDialog'
 import {clone} from '@/utils'
 
 export default {
   name: 'app',
 
   components: {
-    SelectDatasetDialog
+    SelectDatasetDialog,
+    EditDatasetDialog
   },
 
   data: function () {
@@ -32,12 +35,12 @@ export default {
 
   computed: {
     introText () {
-      return this.currentDataset
-        ? Drupal.t('You have chosen the dataset <strong>"@dataset".</strong> If you would like to edit the dataset or choose a different one click the "edit" button.', {'@dataset': this.currentDataset.title})
+      return this.selectedDataset
+        ? Drupal.t('You have chosen the dataset <strong>"@dataset".</strong> If you would like to edit the dataset or choose a different one click the "edit" button.', {'@dataset': this.selectedDataset.title})
         : Drupal.t('Click the button to choose a dataset.')
     },
     buttonText () {
-      return this.currentDataset
+      return this.selectedDataset
         ? Drupal.t('Edit your target dataset')
         : Drupal.t('Choose your target dataset')
     },
@@ -46,15 +49,16 @@ export default {
       return this.$root.$options.settings.endpoints['e2t-api'].token
     },
     ...mapState([
-      'currentDataset',
+      'selectedDataset',
       'apiError',
       'showSelectDialog',
-      'showEditDialog'
+      'showEditDialog',
+      'showSpinner'
     ])
   },
 
   watch: {
-    currentDataset (dataset) {
+    selectedDataset (dataset) {
       if (this.livingInWizard && dataset) {
         this.$root.$options.datasetField.value = dataset.key
       }
@@ -69,8 +73,12 @@ export default {
   },
 
   methods: {
-    openSelectDialog () {
-      this.$store.commit('openSelectDialog')
+    openDialog () {
+      if (this.selectedDataset && this.selectedDataset.is_custom) {
+        this.$store.dispatch({type: 'loadContacts', dataset: this.selectedDataset})
+      } else {
+        this.$store.commit('openSelectDialog')
+      }
     },
 
     disableDrupalSubmits (bool) {
@@ -92,7 +100,10 @@ export default {
       type: 'init',
       settings: clone(this.$root.$options.settings)
     })
-    this.$store.dispatch('loadDatasets')
+    this.$store.dispatch({
+      type: 'loadDatasets',
+      selected: this.livingInWizard ? this.$root.$options.datasetField.value : undefined
+    })
   }
 }
 </script>
