@@ -29,7 +29,8 @@ module.exports = merge(baseWebpackConfig, {
     }),
     new webpack.DefinePlugin({
       'process.env': Object.assign({}, config.dev.env, {
-        E2T_API_TOKEN: '"' + process.env.E2T_API_TOKEN + '"'
+        E2T_API_URL: process.env.E2T_API_TOKEN ? '"https://e2t-api.more-onion.com/v2"' : '"/api"',
+        E2T_API_TOKEN: process.env.E2T_API_TOKEN ? '"' + process.env.E2T_API_TOKEN + '"' : '"xxx"'
       })
     }),
     // element-ui: replace default Chinese strings with English strings.

@@ -40,8 +40,8 @@ const Drupal = {
       },
       endpoints: {
         'e2t-api': {
-          url: 'https://e2t-api.more-onion.com/v2',
-          token: process.env.E2T_API_TOKEN // token injected by webpack.DefinePlugin - use dev api if token is 'undefined'
+          url: process.env.E2T_API_URL, // url injected by webpack.DefinePlugin
+          token: process.env.E2T_API_TOKEN // token injected by webpack.DefinePlugin
         }
       }
     }
