@@ -26,8 +26,18 @@ export default {
       })
     },
     ...mapState([
-      'datasets'
+      'datasets',
+      'showSelectDialog'
     ])
+  },
+
+  watch: {
+    showSelectDialog (val) {
+      if (val) {
+        // init list
+        this.filter = ''
+      }
+    }
   },
 
   methods: {

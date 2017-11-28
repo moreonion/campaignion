@@ -42,13 +42,14 @@ server.put('/datasets/:key/contacts', function (req, res) {
   const datasetKey = req.url.match(/^\/datasets\/([^\/]+)\/contacts$/)[1]
 
   // See https://github.com/typicode/lowdb
-  // check if the resource exists
-  var contactsObj = router.db
-    .get('contacts')
-    .find({datasetId: datasetKey})
+  // check if the dataset exists and is custom
+  var dataset = router.db
+    .get('datasets')
+    .find({key: datasetKey})
     .value()
 
-  if (contactsObj) {
+  if (dataset && dataset.is_custom) {
+    console.log('found dataset ' + datasetKey)
     router.db
       .get('contacts')
       .find({datasetId: datasetKey})
@@ -59,7 +60,7 @@ server.put('/datasets/:key/contacts', function (req, res) {
       .get('contacts')
       .find({datasetId: datasetKey})
       .value()
-    res.jsonp(contactsObj.contacts)
+    res.status(200).jsonp(contactsObj.contacts)
   } else {
     res.sendStatus(404)
   }
@@ -72,10 +73,13 @@ server.use((req, res, next) => {
     return
   }
 
-  if (req.method === 'POST' && req.url.match("/contacts")) {
-    req.body = {
-      contacts: setContactIds(req.body)
-    }
+  if (req.method === 'POST' && req.url === '/datasets') {
+    // when creating a new dataset, create an empty list of contacts
+    var datasetKey = req.body.key
+    router.db
+      .get('contacts')
+      .upsert({datasetId: datasetKey, contacts: []})
+      .write()
   }
 
   // Continue to JSON Server router

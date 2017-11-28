@@ -36,10 +36,10 @@
     },
     {
       "attributes": [
+        {"description": "", "key": "contact.email", "title": "Email address"},
         {"description": "", "key": "contact.title", "title": "Title"},
         {"description": "", "key": "contact.first_name", "title": "First name"},
         {"description": "", "key": "contact.last_name", "title": "Last name"},
-        {"description": "", "key": "contact.email", "title": "Email address"},
         {"description": "Full name and titles", "key": "contact.salutation", "title": "Salutation"},
         {"description": "Political affiliation", "key": "contact.political_affiliation", "title": "Color"}
       ],

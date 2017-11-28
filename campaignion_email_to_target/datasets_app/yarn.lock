@@ -4609,6 +4609,10 @@ netmask@~1.0.4:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-1.0.6.tgz#20297e89d86f6f6400f250d9f4f6b4c1945fcd35"
 
+nightwatch-xhr@^0.4.3:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/nightwatch-xhr/-/nightwatch-xhr-0.4.3.tgz#5da65d8c86664e9426e316c2c6854e2afd9a96d1"
+
 nightwatch@^0.9.12:
   version "0.9.16"
   resolved "https://registry.yarnpkg.com/nightwatch/-/nightwatch-0.9.16.tgz#c4ac3ec711b0ff047c3dca9c6557365ee236519f"

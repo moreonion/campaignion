@@ -5,7 +5,12 @@ var config = require('../../config')
 module.exports = {
   src_folders: ['test/e2e/specs'],
   output_folder: 'test/e2e/reports',
-  custom_assertions_path: ['test/e2e/custom-assertions'],
+  custom_commands_path: ['node_modules/nightwatch-xhr/es5/commands'],
+  custom_assertions_path: [
+    'test/e2e/custom-assertions',
+    'node_modules/nightwatch-xhr/es5/assertions'
+  ],
+  page_objects_path: ['test/e2e/pages'],
 
   selenium: {
     start_process: true,

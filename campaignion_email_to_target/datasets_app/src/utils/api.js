@@ -30,7 +30,7 @@ export default {
 
   saveContacts (datasetKey, contacts, createNew) {
     return axios({
-      method: createNew ? 'post' : 'put',
+      method: 'put',
       url: url + datasetKey + '/contact',
       data: JSON.stringify(contacts),
       headers,

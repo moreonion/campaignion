@@ -3,9 +3,9 @@
     'dsa-edit-value-popup': true,
     'dsa-has-error': showError && !valid
   }">
-    <input type="text" v-model="value" @keydown.enter.stop="save" @keydown.esc.stop="cancel" ref="input" />
-    <button type="button" @click="save">{{ text('save') }}</button>
-    <button type="button" @click="cancel">{{ text('cancel') }}</button>
+    <input type="text" v-model="value" @keydown.enter.stop="save" @keydown.esc.stop="cancel" ref="input" class="dsa-edit-value-input"/>
+    <button type="button" @click="save" class="dsa-edit-value-save">{{ text('save') }}</button>
+    <button type="button" @click="cancel" class="dsa-edit-value-cancel">{{ text('cancel') }}</button>
     <div v-if="showError && !valid" class="dsa-edit-value-error">
       {{ text('Please enter a valid value.') }}
     </div>

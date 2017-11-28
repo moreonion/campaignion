@@ -2,7 +2,7 @@
   <div id="app">
     <template v-if="livingInWizard">
       <div class="dsa-intro-text" v-html="introText"></div>
-      <button type="button" @click="openDialog" :disabled="apiError || showSpinner">{{ buttonText }}</button>
+      <button type="button" @click="openDialog" :disabled="apiError || showSpinner" class="dsa-select-or-edit-dataset">{{ buttonText }}</button>
     </template>
     <div v-if="apiError" class="dsa-has-error">{{ text('api error') }}</div>
 

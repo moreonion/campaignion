@@ -5,6 +5,7 @@
     :close-on-click-modal="false"
     size="medium"
     :before-close="dialogCancelHandler"
+    class="dsa-select-dataset-dialog"
     >
 
     <template slot="title">
@@ -26,11 +27,6 @@ import DatasetList from '@/components/DatasetList'
 export default {
   components: {
     DatasetList
-  },
-
-  data () {
-    return {
-    }
   },
 
   computed: {
