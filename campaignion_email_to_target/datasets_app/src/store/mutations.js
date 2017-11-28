@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import {emptyDataset} from '@/utils/defaults'
-import {clone, elementIndex} from '@/utils'
+import {INVALID_CONTACT_STRING, clone, elementIndex, validateContacts} from '@/utils'
 import {findIndex} from 'lodash'
 
 var idCounter = 0
@@ -10,6 +10,7 @@ function newId () {
 
 function filterTableColumns (columns, isCustom) {
   const cols = columns.map(col => col.key)
+  cols.splice(0, 0, '__error')
   if (isCustom) {
     cols.push('__delete')
   }
@@ -92,7 +93,8 @@ export default {
   addContact (state) {
     if (!state.currentDataset.is_custom) return
     const newContact = {
-      id: newId() // we need ids to identify rows when they are clicked. these pseudo ids are removed before POSTing.
+      id: newId(), // we need ids to identify rows when they are clicked. these pseudo ids are removed before POSTing.
+      __error: INVALID_CONTACT_STRING // contacts are invalid at first because they are empty
     }
     for (var i = 0, j = state.columns.length; i < j; i++) {
       newContact[state.columns[i].key] = ''
@@ -115,6 +117,8 @@ export default {
     if (el.children[0] && el.children[0].classList.contains('dsa-delete-contact')) return
     const cellIndex = elementIndex(el)
     const col = state.contactsTable.columns[cellIndex]
+    // return if user clicked the error cell
+    if (cellIndex === 0 && state.contactsTable.columns[0] === '__error') return
     // TODO v2: in non-custom datasets, check if column may be edited
     state.editValue = {
       id: row.id,
@@ -134,6 +138,8 @@ export default {
     state.contacts[i][state.editValue.col] = value
     state.editValue = null
     state.datasetChanged = true
+    // check if the row (still) has an error
+    validateContacts(state.contacts, state.validations, i)
   },
 
   updateTitle (state, title) {
