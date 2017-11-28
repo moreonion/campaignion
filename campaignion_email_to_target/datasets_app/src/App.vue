@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <template v-if="livingInWizard">
+    <div v-if="livingInWizard" v-loading="showSpinner && !showSelectDialog && !showEditDialog" class="dsa-wizard-step">
       <div class="dsa-intro-text" v-html="introText"></div>
       <button type="button" @click="openDialog" :disabled="apiError || showSpinner" class="dsa-select-or-edit-dataset">{{ buttonText }}</button>
-    </template>
+    </div>
     <div v-if="apiError" class="dsa-has-error">{{ text('api error') }}</div>
 
     <SelectDatasetDialog />

@@ -15,7 +15,7 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
-    "campaignion_vue": "1.2.8",
+    "campaignion_vue": "1.2.9",
     "popper.js": "^1.12.9",
     "vue-tables-2": "1.0.10"
   },

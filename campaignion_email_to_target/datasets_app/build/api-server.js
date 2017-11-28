@@ -82,8 +82,10 @@ server.use((req, res, next) => {
       .write()
   }
 
-  // Continue to JSON Server router
-  next()
+  // Continue to JSON Server router, delay for real experience
+  setTimeout(function () {
+    next()
+  }, 500)
 })
 
 // Finetune output

@@ -13,6 +13,9 @@ module.exports = {
 
     app.expect.element('@chosenDataset').to.be.present
     app.expect.element('@chosenDataset').value.to.be.equal('mp')
+
+    client.pause(700)
+
     app.expect.element('@introText').text.to.contain('MPs')
     app.expect.element('@selectOrEditDataset').to.be.visible
     app.expect.section('@selectDialog').not.to.be.visible

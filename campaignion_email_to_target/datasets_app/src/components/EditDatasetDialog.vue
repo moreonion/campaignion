@@ -7,54 +7,56 @@
     :before-close="dialogCancelHandler"
     class="dsa-edit-dataset-dialog"
     >
-    <section class="dsa-dataset-meta">
-      <div>
-        <label for="dsa-dataset-title">{{ text('dataset title') }} <small>{{ text('only for internal use') }}</small></label>
-        <input type="text" :value="currentDataset.title" @input="updateTitle" class="field-input" id="dsa-dataset-title" />
-      </div>
-      <div>
-        <label for="dsa-dataset-description">{{ text('dataset description') }} <small>{{ text('only for internal use') }}</small></label>
-        <input type="text" :value="currentDataset.description" @input="updateDescription" class="field-input" id="dsa-dataset-description">
-      </div>
-    </section>
-    <span class="dsa-target-data">{{ text('target data') }}</span>
+    <div v-loading="showSpinner" class="dsa-edit-dataset-dialog-body-wrapper">
+      <section class="dsa-dataset-meta">
+        <div>
+          <label for="dsa-dataset-title">{{ text('dataset title') }} <small>{{ text('only for internal use') }}</small></label>
+          <input type="text" :value="currentDataset.title" @input="updateTitle" class="field-input" id="dsa-dataset-title" />
+        </div>
+        <div>
+          <label for="dsa-dataset-description">{{ text('dataset description') }} <small>{{ text('only for internal use') }}</small></label>
+          <input type="text" :value="currentDataset.description" @input="updateDescription" class="field-input" id="dsa-dataset-description">
+        </div>
+      </section>
+      <span class="dsa-target-data">{{ text('target data') }}</span>
 
-    <v-client-table
-      v-if="contacts.length"
-      :data="contacts"
-      :columns="tableColumns"
-      :options="options"
-      name="contactsTable"
-      ref="contactsTable"
-      class="dsa-contacts-table"
-    >
-      <template slot="__error" scope="props">
-        <span v-if="showContactErrors && props.row.__error" class="dsa-invalid-contact">✘</span>
-      </template>
+      <v-client-table
+        v-if="contacts.length"
+        :data="contacts"
+        :columns="tableColumns"
+        :options="options"
+        name="contactsTable"
+        ref="contactsTable"
+        class="dsa-contacts-table"
+      >
+        <template slot="__error" scope="props">
+          <span v-if="showContactErrors && props.row.__error" class="dsa-invalid-contact">✘</span>
+        </template>
 
-      <template slot="__delete" scope="props">
-        <a href="#" class="dsa-delete-contact" @click.prevent.stop="deleteContact(props.row.id)">{{ text('delete') }}</a>
-      </template>
+        <template slot="__delete" scope="props">
+          <a href="#" class="dsa-delete-contact" @click.prevent.stop="deleteContact(props.row.id)">{{ text('delete') }}</a>
+        </template>
 
-      <template :slot="'h__' + attribute.key" scope="props" v-for="attribute in currentDataset.attributes">
-        <span class="VueTables__heading" :title="attribute.description">{{ attribute.title }}</span>
-      </template>
+        <template :slot="'h__' + attribute.key" scope="props" v-for="attribute in currentDataset.attributes">
+          <span class="VueTables__heading" :title="attribute.description">{{ attribute.title }}</span>
+        </template>
 
-      <template slot="h____error" scope="props"></template>
+        <template slot="h____error" scope="props"></template>
 
-      <template slot="h____delete" scope="props">
-        <span class="VueTables__heading"></span>
-      </template>
-    </v-client-table>
-    <button type="button" @click="addContact" class="dsa-add-contact">{{ text('add row') }}</button>
+        <template slot="h____delete" scope="props">
+          <span class="VueTables__heading"></span>
+        </template>
+      </v-client-table>
+      <button type="button" @click="addContact" class="dsa-add-contact">{{ text('add row') }}</button>
+    </div>
 
     <EditValuePopup />
 
     <span slot="footer" :class="{'dialog-footer': true, 'dialog-alert': modalDirty}">
-      <el-button @click="chooseDataset()" class="dsa-choose-dataset" :disabled="datasetChanged">{{ text('choose dataset') }}</el-button>
+      <el-button @click="chooseDataset()" class="dsa-choose-dataset" :disabled="datasetChanged || showSpinner">{{ text('choose dataset') }}</el-button>
       <span v-if="modalDirty" class="dialog-alert-message">{{ text('unsaved changes') }}</span>
-      <el-button @click="cancelButtonHandler()" class="js-modal-cancel">{{ text('Cancel') }}</el-button>
-      <el-button type="primary" :disabled="datasetIsEmpty" @click="saveDataset" class="js-modal-save">{{ text('Save') }}</el-button>
+      <el-button :disabled="showSpinner" @click="cancelButtonHandler()" class="js-modal-cancel">{{ text('Cancel') }}</el-button>
+      <el-button type="primary" :disabled="datasetIsEmpty || showSpinner" @click="saveDataset" class="js-modal-save">{{ text('Save') }}</el-button>
     </span>
   </el-dialog>
 </template>
@@ -104,6 +106,7 @@ export default {
       'tableColumns',
       'contactsTable',
       'showEditDialog',
+      'showSpinner',
       'datasetChanged'
     ])
   },
