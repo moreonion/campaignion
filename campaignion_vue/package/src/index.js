@@ -11,6 +11,7 @@ import {
   DropdownItem,
   DropdownMenu,
   MessageBox,
+  Loading,
   Option,
   Select
 } from 'element-ui';
@@ -28,6 +29,7 @@ export default {
     DropdownItem,
     DropdownMenu,
     MessageBox,
+    Loading,
     Option,
     Select
   },
