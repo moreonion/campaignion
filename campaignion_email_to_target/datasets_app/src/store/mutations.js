@@ -142,6 +142,37 @@ export default {
     validateContacts(state.contacts, state.validations, i)
   },
 
+  setContacts (state, contacts) {
+    // TODO v2: derive columns from CSV and set accordingly
+    // for now: clear additional fields
+    const c = clone(contacts)
+    const allowedFields = state.standardColumns.map(col => col.key)
+    for (let i = 0, j = c.length; i < j; i++) {
+      // delete extra fields
+      for (let key in c[i]) {
+        if (c[i].hasOwnProperty(key) && allowedFields.indexOf(key) === -1) {
+          delete c[i][key]
+        }
+      }
+      // add missing fields
+      for (let ii = 0, jj = allowedFields.length; ii < jj; ii++) {
+        if (typeof c[i][allowedFields[ii]] === 'undefined') {
+          c[i][allowedFields[ii]] = ''
+        }
+      }
+      // add dummy id, will be removed before saving
+      c[i].id = newId()
+    }
+    state.columns = clone(state.standardColumns)
+    state.tableColumns.splice(0, state.tableColumns.length, ...filterTableColumns(state.columns, state.currentDataset.is_custom)) // don’t replace with a new array to keep table binding
+    state.contacts.splice(0, state.contacts.length, ...c) // don’t replace with a new array to keep table binding
+    state.datasetChanged = true
+  },
+
+  validateContacts (state) {
+    validateContacts(state.contacts, state.validations)
+  },
+
   updateTitle (state, title) {
     state.currentDataset.title = title
     state.datasetChanged = true

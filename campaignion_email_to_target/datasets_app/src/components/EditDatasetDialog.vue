@@ -20,6 +20,11 @@
       </section>
       <span class="dsa-target-data">{{ text('target data') }}</span>
 
+      <div class="dsa-upload-data-wrapper">
+        <label for="dsa-updoad-data" @click="chooseFile" class="el-button">{{ text('upload dataset') }}</label>
+        <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
+      </div>
+
       <v-client-table
         v-if="contacts.length"
         :data="contacts"
@@ -66,6 +71,7 @@ import EditValuePopup from '@/components/EditValuePopup'
 import {mapState} from 'vuex'
 import {INVALID_CONTACT_STRING} from '@/utils'
 import {find} from 'lodash'
+import Papa from 'papaparse'
 
 export default {
   components: {
@@ -80,8 +86,7 @@ export default {
         perPageValues: [20]
       },
       modalDirty: false,
-      showContactErrors: false,
-      warnedBeforeUpload: false
+      showContactErrors: false
     }
   },
 
@@ -104,6 +109,7 @@ export default {
       'currentDataset',
       'contacts',
       'tableColumns',
+      'standardColumns',
       'contactsTable',
       'showEditDialog',
       'showSpinner',
@@ -120,6 +126,9 @@ export default {
         if (this.$refs.contactsTable) {
           this.$refs.contactsTable.setPage(1)
           this.$refs.contactsTable.setFilter('')
+        }
+        if (this.$refs.fileInput) {
+          this.$refs.fileInput.value = ''
         }
       }
     },
@@ -162,21 +171,70 @@ export default {
     },
 
     chooseFile (e) {
-      if (this.contacts.length && !this.warnedBeforeUpload) {
+      if (this.contacts.length) {
         e.preventDefault()
-        this.$confirm(this.text('upload warning'), Drupal.t('Data will be lost'), {
+        this.$confirm(this.text('upload warning'), this.text('Data will be lost'), {
           confirmButtonText: this.text('proceed'),
           cancelButtonText: Drupal.t('Cancel'),
           type: 'warning'
         }).then(() => {
-          console.log(this.$refs.fileInput)
+          this.$refs.fileInput.click()
         }, () => {
         })
       }
     },
 
     processFile () {
-
+      this.$store.commit('showSpinner', true)
+      Papa.parse(this.$refs.fileInput.files[0], {
+        header: true,
+        skipEmptyLines: true,
+        complete: ({data, errors, meta}) => {
+          // clean up result
+          if (errors &&
+            errors.length === 1 &&
+            errors[0].code === 'TooFewFields' &&
+            errors.row === data.length - 1 &&
+            Object.keys(data[data.length - 1]).length === 1) {
+            data.pop()
+          }
+          // validate result
+          if (!meta.fields) {
+            this.$alert(Drupal.t('Your file seems to be crap.'), Drupal.t('Invalid data'))
+            this.$store.commit('showSpinner', false)
+            return
+          }
+          const missingCols = []
+          for (var i = 0, j = this.standardColumns.length; i < j; i++) {
+            if (meta.fields.indexOf(this.standardColumns[i].key) === -1) {
+              missingCols.push(this.standardColumns[i].key)
+            }
+          }
+          if (missingCols.length) {
+            this.$alert(Drupal.t('The following columns are missing in the headers line: ') + missingCols.join(', '), Drupal.t('Invalid data'))
+            this.$store.commit('showSpinner', false)
+            return
+          }
+          if (data.length < 1) {
+            this.$alert(Drupal.t('We want targets in the file!'), Drupal.t('Invalid data'))
+            this.$store.commit('showSpinner', false)
+            return
+          }
+          this.$store.commit('setContacts', data)
+          this.$store.commit('validateContacts')
+          this.$store.commit('showSpinner', false)
+          if (!this.contactsAreValid) {
+            this.$alert(Drupal.t('I filtered the table so you see only the invalid contacts. You can remove the filter after fixing your targets.'), Drupal.t('Some contacts are not valid.'))
+            this.$refs.contactsTable.setFilter(INVALID_CONTACT_STRING)
+            this.showContactErrors = true
+          }
+        },
+        error: (error, file) => {
+          this.$alert(Drupal.t('Your file seems to be crap.'), Drupal.t('Parsing error'))
+          this.$store.commit('showSpinner', false)
+          console.log('Parsing error:', error, file)
+        }
+      })
     },
 
     saveDataset () {
@@ -223,6 +281,7 @@ export default {
         case 'only for internal use': return Drupal.t('for internal use only')
         case 'upload dataset': return Drupal.t('Upload dataset (CSV)')
         case 'upload warning': return Drupal.t('The existing dataset will be replaced with the CSV data. The existing data will be removed.')
+        case 'Data will be lost': return Drupal.t('Data will be lost')
         case 'proceed': return Drupal.t('Yes, proceed')
         case 'target data': return Drupal.t('The target data')
         case 'add row': return Drupal.t('Add a new target')
@@ -238,4 +297,7 @@ export default {
 </script>
 
 <style lang="css">
+input#dsa-updoad-data {
+  display: none;
+}
 </style>
