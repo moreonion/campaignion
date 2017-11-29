@@ -29,7 +29,6 @@ export default {
       value: '',
       validator: new RegExp(''),
       showError: false,
-      popper: {},
       clickHandler: e => {
         // close the editing tooltip if the user clicks somewhere else
         // do nothing if no value is being edited
@@ -79,7 +78,11 @@ export default {
               }
             }
           })
-          this.$refs.input.focus()
+          setTimeout(() => {
+            if (this.$refs.input) {
+              this.$refs.input.focus()
+            }
+          }, 30)
         })
       } else {
         popper.destroy()
