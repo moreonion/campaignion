@@ -1,6 +1,6 @@
 <template lang="html">
   <section class="dsa-dataset-list">
-    <input type="text" v-model="filter" :placeholder="text('filter placeholder')">
+    <input type="text" v-model="filter" :placeholder="text('filter placeholder')" class="field-input">
     <ul class="dsa-datasets">
       <li v-for="dataset in filteredDatasets" :key="dataset.key" @click="select(dataset)">
         {{ dataset.title }}

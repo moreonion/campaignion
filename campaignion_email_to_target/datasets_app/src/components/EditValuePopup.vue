@@ -3,12 +3,15 @@
     'dsa-edit-value-popup': true,
     'dsa-has-error': showError && !valid
   }">
-    <input type="text" v-model="value" @keydown.enter.stop="save" @keydown.esc.stop="cancel" ref="input" class="dsa-edit-value-input"/>
-    <button type="button" @click="save" class="dsa-edit-value-save">{{ text('save') }}</button>
-    <button type="button" @click="cancel" class="dsa-edit-value-cancel">{{ text('cancel') }}</button>
     <div v-if="showError && !valid" class="dsa-edit-value-error">
       {{ text('Please enter a valid value.') }}
     </div>
+    <div v-else class="dsa-edit-value-label">
+      {{ label }}
+    </div>
+    <input type="text" v-model="value" @keydown.enter.stop="save" @keydown.esc.stop="cancel" ref="input" class="dsa-edit-value-input field-input"/>
+    <el-button type="button" @click="save" class="dsa-edit-value-save">{{ text('save') }}</el-button>
+    <el-button type="button" @click="cancel" class="dsa-edit-value-cancel">{{ text('cancel') }}</el-button>
   </div>
 </template>
 
@@ -16,6 +19,7 @@
 import {mapState} from 'vuex'
 import Popper from 'popper.js/dist/umd/popper'
 import {dispatch} from '@/utils'
+import {find} from 'lodash'
 
 var popper = {}
 
@@ -48,8 +52,12 @@ export default {
     valid () {
       return this.validator.test(this.value)
     },
+    label () {
+      return find(this.columns, {key: this.editValue.col}).title || this.editValue.col
+    },
     ...mapState([
       'editValue',
+      'columns',
       'validations'
     ])
   },
@@ -63,7 +71,14 @@ export default {
         this.value = val.row[val.col]
         this.highlightCell(true)
         this.$nextTick(() => {
-          popper = new Popper(val.el, this.$el, {placement: 'top'})
+          popper = new Popper(val.el, this.$el, {
+            placement: 'top',
+            modifiers: {
+              preventOverflow: {
+                boundariesElement: 'viewport'
+              }
+            }
+          })
           this.$refs.input.focus()
         })
       } else {
@@ -124,7 +139,7 @@ export default {
 
     text (text) {
       switch (text) {
-        case 'Please enter a valid value.': return Drupal.t('Please enter a valid value.')
+        case 'Please enter a valid value.': return Drupal.t('Please enter a valid @fieldName', {'@fieldName': this.label.toLowerCase()})
         case 'save': return Drupal.t('Save')
         case 'cancel': return Drupal.t('Cancel')
       }
@@ -134,4 +149,24 @@ export default {
 </script>
 
 <style lang="css">
+.dsa-edit-value-popup {
+  background-color: #ccc;
+  padding: 0.5rem;
+}
+
+.dsa-edit-value-input {
+  display: block;
+  width: 12rem;
+}
+
+.dsa-edit-value-save.el-button {
+  width: calc(50% - 0.25rem);
+  margin: 0;
+}
+
+.dsa-edit-value-cancel.el-button {
+  width: calc(50% - 0.25rem);
+  margin: 0;
+  float: right;
+}
 </style>

@@ -15,9 +15,44 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
     $this->fieldForm = new EntityFieldForm('node', $this->wizard->node, [$field]);
     $form += $this->fieldForm->formArray($form_state);
 
-    $settings = [];
     $client = Client::fromConfig();
     $token = $client->getAccessToken();
+
+    $settings = [];
+    $settings['contactPrefix'] = 'contact.';  // identifies contact fields within a dataset’s attributes
+    $settings['standardColumns'] = [          // these are posted by the front end if a new dataset is added
+      [
+        'key' => 'email',
+        'description' => '',
+        'title' => 'Email address',
+      ],
+      [
+        'key' => 'title',
+        'description' => '',
+        'title' => 'Title',
+      ],
+      [
+        'key' => 'first_name',
+        'description' => '',
+        'title' => 'First name',
+      ],
+      [
+        'key' => 'last_name',
+        'description' => '',
+        'title' => 'Last name',
+      ],
+      [
+        'key' => 'salutation',
+        'description' => 'Full name and titles',
+        'title' => 'Salutation',
+      ]
+    ];
+    $settings['validations'] = [              // used by the front end, a set of 'key' => 'regex' pairs
+      'email' => '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$', // backslashes have to be escaped so JS won’t interpret them as escape sequence.
+      'first_name' => '\\S+',
+      'last_name' => '\\S+',
+      'salutation' => '\\S+',
+    ];
     $settings['endpoints']['e2t-api'] = [
       'url' => $client->getEndpoint(),
       'token' => $token

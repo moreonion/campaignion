@@ -18,15 +18,8 @@
           <input type="text" :value="currentDataset.description" @input="updateDescription" class="field-input" id="dsa-dataset-description">
         </div>
       </section>
-      <span class="dsa-target-data">{{ text('target data') }}</span>
-
-      <div class="dsa-upload-data-wrapper">
-        <label for="dsa-updoad-data" @click="chooseFile" class="el-button">{{ text('upload dataset') }}</label>
-        <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
-      </div>
 
       <v-client-table
-        v-if="contacts.length"
         :data="contacts"
         :columns="tableColumns"
         :options="options"
@@ -34,6 +27,13 @@
         ref="contactsTable"
         class="dsa-contacts-table"
       >
+        <span slot="beforeFilter" class="dsa-target-data ae-legend">{{ text('target data') }}</span>
+
+        <span class="dsa-upload-data-wrapper" slot="afterFilter">
+          <label for="dsa-updoad-data" @click="chooseFile" class="el-button">{{ text('upload dataset') }}</label>
+          <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
+        </span>
+
         <template slot="__error" scope="props">
           <span v-if="showContactErrors && props.row.__error" class="dsa-invalid-contact">✘</span>
         </template>
@@ -52,7 +52,7 @@
           <span class="VueTables__heading"></span>
         </template>
       </v-client-table>
-      <button type="button" @click="addContact" class="dsa-add-contact">{{ text('add row') }}</button>
+      <el-button type="button" @click="addContact" class="dsa-add-contact">{{ text('add row') }}</el-button>
     </div>
 
     <EditValuePopup />
@@ -71,6 +71,7 @@ import EditValuePopup from '@/components/EditValuePopup'
 import {mapState} from 'vuex'
 import {INVALID_CONTACT_STRING} from '@/utils'
 import {find} from 'lodash'
+import animatedScrollTo from 'animated-scrollto'
 import Papa from 'papaparse'
 
 export default {
@@ -83,7 +84,19 @@ export default {
       options: {
         sortable: [],
         perPage: 20,
-        perPageValues: [20]
+        perPageValues: [20],
+        texts: {
+          count: Drupal.t('Showing {from} to {to} of {count} records|{count} records|One record'),
+          filter: '',
+          filterPlaceholder: Drupal.t('Filter targets'),
+          limit: Drupal.t('Records per page:'),
+          page: Drupal.t('Page:'),
+          noResults: Drupal.t('No targets found.'),
+          filterBy: Drupal.t('Filter by {column}'),
+          loading: Drupal.t('Loading...'),
+          defaultOption: Drupal.t('Select {column}'),
+          columns: Drupal.t('Columns')
+        }
       },
       modalDirty: false,
       showContactErrors: false
@@ -223,7 +236,10 @@ export default {
           this.$store.commit('setContacts', data)
           this.$store.commit('validateContacts')
           this.$store.commit('showSpinner', false)
-          if (!this.contactsAreValid) {
+          this.$refs.contactsTable.setPage(1)
+          if (this.contactsAreValid) {
+            this.$refs.contactsTable.setFilter('')
+          } else {
             this.$alert(Drupal.t('I filtered the table so you see only the invalid contacts. You can remove the filter after fixing your targets.'), Drupal.t('Some contacts are not valid.'))
             this.$refs.contactsTable.setFilter(INVALID_CONTACT_STRING)
             this.showContactErrors = true
@@ -259,7 +275,11 @@ export default {
     dialogCancelHandler (done) {
       if (this.datasetChanged) {
         this.modalDirty = true // show warning
-        // TODO scroll to bottom?
+        animatedScrollTo(
+          this.$root.$el.querySelector('.el-dialog__wrapper.dsa-edit-dataset-dialog'),
+          this.$el.querySelector('.js-modal-cancel').offsetTop,
+          400
+        )
       } else {
         this.$store.commit('closeEditDialog')
         done()
@@ -299,5 +319,8 @@ export default {
 <style lang="css">
 input#dsa-updoad-data {
   display: none;
+}
+.table-responsive {
+  overflow-x: auto;
 }
 </style>

@@ -1,15 +1,14 @@
 <template>
-  <div id="app">
+  <div class="datasets-app">
     <div v-if="livingInWizard" v-loading="showSpinner && !showSelectDialog && !showEditDialog" class="dsa-wizard-step">
+      <div class="ae-legend">{{ text('Your targets') }}</div>
       <div class="dsa-intro-text" v-html="introText"></div>
-      <button type="button" @click="openDialog" :disabled="apiError || showSpinner" class="dsa-select-or-edit-dataset">{{ buttonText }}</button>
+      <el-button type="button" @click="openDialog" :disabled="apiError || showSpinner" class="dsa-select-or-edit-dataset">{{ buttonText }}</el-button>
     </div>
     <div v-if="apiError" class="dsa-has-error">{{ text('api error') }}</div>
 
     <SelectDatasetDialog />
     <EditDatasetDialog />
-
-    <p>And this is the token: "{{ token }}"</p>
   </div>
 </template>
 
@@ -43,10 +42,6 @@ export default {
       return this.selectedDataset
         ? Drupal.t('Edit your target dataset')
         : Drupal.t('Choose your target dataset')
-    },
-    token () {
-      // TODO remove, also from template
-      return this.$root.$options.settings.endpoints['e2t-api'].token
     },
     ...mapState([
       'selectedDataset',
@@ -91,6 +86,7 @@ export default {
     text (text) {
       switch (text) {
         case 'api error': return Drupal.t('The email to target API couldn’t be reached. Please reload the page.')
+        case 'Your targets': return Drupal.t('Your targets')
       }
     }
   },
@@ -109,15 +105,6 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-
 li.VuePagination__pagination-item {
     display: inline-block;
     list-style-type: none;
@@ -133,21 +120,21 @@ td.dsa-edited {
 }
 
 .dsa-flash {
-  -webkit-animation-name: flash-animation;
+  -webkit-animation-name: dsa-flash-animation;
   -webkit-animation-duration: 1s;
-  animation-name: flash-animation;
+  animation-name: dsa-flash-animation;
   animation-duration: 1s;
 }
 
-@-webkit-keyframes flash-animation {
+@-webkit-keyframes dsa-flash-animation {
   0% { background: transparent; }
-  10% { background: red; }
+  10% { background: #d66540; }
   100% { background: transparent; }
 }
 
-@keyframes flash-animation {
+@keyframes dsa-flash-animation {
   0% { background: transparent; }
-  10% { background: red; }
+  10% { background: #d66540; }
   100% { background: transparent; }
 }
 </style>
