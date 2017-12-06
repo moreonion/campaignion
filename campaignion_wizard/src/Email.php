@@ -73,7 +73,6 @@ class Email {
     $email_form['template']['template']['#type']         = 'text_format';
     $email_form['template']['template']['#format']       = $email['html'] ? $formats['html'] : $formats['plain'];
     $email_form['template']['template']['#wysiwyg']      = TRUE;
-    $email_form['template']['template']['#pre_render'][] = 'wysiwyg_pre_render_text_format';
     // needed for ['template']['tokens'] which does not load js via #collapsible
     // tokens it is only html markup
     drupal_add_library("system", "drupal.collapse");
