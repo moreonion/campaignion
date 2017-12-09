@@ -58,7 +58,7 @@ Drupal.settings.campaignion_wizard.campaignion_wizard--2 = {
 ```
 
 ### Get nodes list
-`GET <nodes_endpoint>?q=<search term or nid>`
+`GET <nodes_endpoint>?s=<search term or nid>`
 
 JSON Response:
 ``` json
