@@ -15,7 +15,7 @@
       label-key="label"
       :url="$root.$options.settings.endpoints.nodes"
       :headers="{}"
-      search-param="q"
+      search-param="s"
       :count="20"
       @input="item => {destination = item}"
     />
