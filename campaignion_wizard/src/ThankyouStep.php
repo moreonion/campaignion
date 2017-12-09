@@ -116,7 +116,7 @@ class ThankyouStep extends WizardStep {
       'redirects' => [],
       'fields' => $this->components(),
       'endpoints' => [
-        'nodes' => 'http://localhost:8081/getnodes',
+        'nodes' => url('wizard/nodes'),
         'redirects' => 'http://localhost:8081/data'
       ]
     );
