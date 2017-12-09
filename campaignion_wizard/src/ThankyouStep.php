@@ -47,6 +47,20 @@ class ThankyouStep extends WizardStep {
     module_load_include('inc', 'webform', 'includes/webform.components');
   }
 
+  /**
+   * Get components of the action in a format needed by the API.
+   */
+  protected function components() {
+    $fields = [];
+    foreach ($this->wizard->node->webform['components'] as $cid => $component) {
+      $fields[] = [
+        'id' => $cid,
+        'label' => $component['name'],
+      ];
+    }
+    return $fields;
+  }
+
   protected function pageForm(&$form_state, $index, $title, $prefix) {
     $field = &$this->referenceField['und'][$index];
 
@@ -95,20 +109,7 @@ class ThankyouStep extends WizardStep {
       // TODO The following is dummy data for testing only:
       'default_redirect_url' => 'http://old-default-url.com',
       'redirects' => [],
-      'fields' => [
-        [
-          'id' => 'f_name',
-          'label' => 'First name'
-        ],
-        [
-          'id' => 'l_name',
-          'label' => 'Last name'
-        ],
-        [
-          'id' => 'email',
-          'label' => 'Email address'
-        ]
-      ],
+      'fields' => $this->components(),
       'endpoints' => [
         'nodes' => 'http://localhost:8081/getnodes',
         'redirects' => 'http://localhost:8081/data'
