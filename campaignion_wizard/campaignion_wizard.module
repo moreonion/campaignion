@@ -29,6 +29,10 @@ function campaignion_wizard_menu() {
     'title'          => 'Edit',
     'page arguments' => array(1, 'content'),
   ) + $info['node/%node/wizard/%'];
+  $info['wizard/nodes'] = [
+    'title' => 'Search node titles',
+    'page callback' => 'campaignion_wizard_search_nodes',
+  ];
   return $info;
 }
 
@@ -67,6 +71,27 @@ function campaignion_wizard_redirect_add($type) {
   $type = str_replace('_', '-', $type);
   campaignion_wizard_redirect("wizard/$type");
   return node_add($type);
+}
+
+/**
+ * Page callback for wizard/nodes.
+ */
+function campaignion_wizard_search_nodes() {
+  $search = isset($_GET['s']) ? $_GET['s'] : '';
+  $result = db_select('node', 'n')
+    ->addTag('node_access')
+    ->fields('n', ['nid', 'title'])
+    ->condition('n.title', '%' . db_like($search) . '%', 'LIKE')
+    ->range(0, 100)
+    ->execute();
+  $data = [];
+  foreach ($result as $row) {
+    $data[] = [
+      'value' => 'node/' . $row->nid,
+      'label' => $row->title,
+    ];
+  }
+  little_helpers_deliver_json(['values' => $data]);
 }
 
 /**
