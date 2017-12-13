@@ -41,7 +41,7 @@ class Tagger {
   }
 
   /**
-   * Associative array mapping taxonomy term names to their tids.
+   * Associative array mapping normalized taxonomy term names to their tids.
    *
    * @var int[]
    */
@@ -72,7 +72,7 @@ class Tagger {
       ':parent' => $parent_tid,
     ]);
     foreach ($result as $row) {
-      $this->map[$row->name] = $row->tid;
+      $this->map[strtolower($row->name)] = $row->tid;
     }
     $this->vid = $vid;
     $this->parentTid = $parent_tid;
@@ -102,7 +102,12 @@ class Tagger {
     }
 
     foreach ($tags as $tag) {
-      if (!isset($this->map[$tag])) {
+      // Normalize tags before searching for them:
+      // - Make tags case-insensitive. MySQL is set to be case-insensitive by
+      //   default.
+      // - Trim tags as they are trimmed by taxonomy_term_save().
+      $ltag = strtolower(trim($tag));
+      if (!isset($this->map[$ltag])) {
         if ($add) {
           $term = entity_create('taxonomy_term', [
             'name' => $tag,
@@ -110,13 +115,13 @@ class Tagger {
             'parent' => $this->parentTid,
           ]);
           entity_save('taxonomy_term', $term);
-          $this->map[$tag] = $term->tid;
+          $this->map[$ltag] = $term->tid;
         }
         else {
           continue;
         }
       }
-      $tid = $this->map[$tag];
+      $tid = $this->map[$ltag];
       if (!isset($items[$tid])) {
         $changed = TRUE;
         $items[$tid] = ['tid' => $tid];
