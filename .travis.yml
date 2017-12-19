@@ -16,7 +16,7 @@ cache:
 
 install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - composer global require drush/drush:6.* 'phpunit/phpunit=5.6.*'
+  - composer global require drush/drush:6.*
 
 before_script:
   - repo=`pwd`
@@ -33,4 +33,4 @@ before_script:
 
 script:
   - cd $repo
-  - UPAL_ROOT=$root UPAL_DB_URL=mysql://root:@127.0.0.1/drupal UPAL_WEB_URL=http://127.0.0.1 ~/.composer/vendor/bin/phpunit -c phpunit.xml --bootstrap $upal/bootstrap.php .
+  - UPAL_ROOT=$root UPAL_DB_URL=mysql://root:@127.0.0.1/drupal UPAL_WEB_URL=http://127.0.0.1 phpunit -c phpunit.xml --bootstrap $upal/bootstrap.php .
