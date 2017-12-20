@@ -28,7 +28,7 @@ before_script:
   - ln -s $repo test-root/sites/all/modules/campaignion
   - cd test-root
   - root=`pwd`
-  - drush dl addressfield ctools date entity features field_type_language i18n little_helpers psr0 redhen webform webform_confirm_email webform_template ultimate_cron-7.x-2.x
+  - drush dl addressfield ctools date entity features field_type_language form_builder i18n little_helpers oowizard paypal_payment psr0 redhen webform webform_confirm_email webform_template ultimate_cron
   - drush --yes pm-enable campaignion_test
 
 script:
