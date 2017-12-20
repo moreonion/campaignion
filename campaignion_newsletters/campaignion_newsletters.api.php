@@ -33,14 +33,3 @@ function hook_campaignion_newsletters_subscription_presave(Subscription $subscri
  */
 function hook_campaignion_newsletters_subscription_saved(Subscription $subscription, $from_provider, $was_new) {
 }
-
-/**
- * React to a newsletter subscription being deleted.
- *
- * @param \Drupal\campaignion_newsletters\Subscription $subscription
- *   The subscription that was delted from the database.
- * @param bool $from_provider
- *   TRUE if the change was initiated by the newsletter provider.
- */
-function hook_campaignion_newsletters_subscription_saved(Subscription $subscription, $from_provider) {
-}
