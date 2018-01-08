@@ -49,6 +49,90 @@ function campaignion_action_schema() {
       'sid_nid' => ['sid', 'nid'],
     ],
   ];
+  $schema['campaignion_action_redirect'] = [
+    'description' => 'Store redirects for an action.',
+    'fields' => [
+      'id' => [
+        'description' => 'Redirect ID',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'nid' => [
+        'description' => 'node.nid of the action',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'delta' => [
+        'description' => 'Identifies a redirect set (ie. for before or after the confirmation).',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'weight' => [
+        'description' => 'Weight value used for sorting redirects',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'label' => [
+        'description' => 'Redirect label',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'destination' => [
+        'description' => 'Destination path or URL.',
+        'type' => 'varchar',
+        'length' => 4096,
+        'not null' => TRUE,
+      ],
+    ],
+    'indexes' => [
+      'action' => ['nid'],
+    ],
+    'primary key' => ['id'],
+  ];
+  $schema['campaignion_action_redirect_filter'] = [
+    'description' => 'Filters for action redirects.',
+    'fields' => [
+      'id' => [
+        'description' => 'Filter ID',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'redirect_id' => [
+        'description' => 'Redirect ID',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'weight' => [
+        'description' => 'Weight value used for sorting filters',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'type' => [
+        'description' => 'Filter plugin-type',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ],
+      'config' => [
+        'description' => 'Configuration for the filter',
+        'type' => 'blob',
+        'serialize' => TRUE,
+      ],
+    ],
+    'indexes' => [
+      'message' => ['redirect_id'],
+    ],
+    'primary key' => ['id'],
+  ];
   return $schema;
 }
 
@@ -58,6 +142,99 @@ function campaignion_action_schema() {
 function campaignion_action_install() {
   campaignion_action_update_1();
   DrupalQueue::get('campaignion_action')->createQueue();
+}
+
+/**
+ * Create tables for custom redirects.
+ */
+function campaignion_action_update_3() {
+  $schema['campaignion_action_redirect'] = [
+    'description' => 'Store redirects for an action.',
+    'fields' => [
+      'id' => [
+        'description' => 'Redirect ID',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'nid' => [
+        'description' => 'node.nid of the action',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'delta' => [
+        'description' => 'Identifies a redirect set (ie. for before or after the confirmation).',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'weight' => [
+        'description' => 'Weight value used for sorting redirects',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'label' => [
+        'description' => 'Redirect label',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'destination' => [
+        'description' => 'Destination path or URL.',
+        'type' => 'varchar',
+        'length' => 4096,
+        'not null' => TRUE,
+      ],
+    ],
+    'indexes' => [
+      'action' => ['nid'],
+    ],
+    'primary key' => ['id'],
+  ];
+  $schema['campaignion_action_redirect_filter'] = [
+    'description' => 'Filters for action redirects.',
+    'fields' => [
+      'id' => [
+        'description' => 'Filter ID',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'redirect_id' => [
+        'description' => 'Redirect ID',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'weight' => [
+        'description' => 'Weight value used for sorting filters',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'type' => [
+        'description' => 'Filter plugin-type',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ],
+      'config' => [
+        'description' => 'Configuration for the filter',
+        'type' => 'blob',
+        'serialize' => TRUE,
+      ],
+    ],
+    'indexes' => [
+      'message' => ['redirect_id'],
+    ],
+    'primary key' => ['id'],
+  ];
+  foreach ($schema as $table => $s) {
+    db_create_table($table, $s);
+  }
 }
 
 /**

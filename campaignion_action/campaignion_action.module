@@ -8,9 +8,47 @@
 use Drupal\campaignion\ContactTypeManager;
 use Drupal\campaignion\NoEmailException;
 use Drupal\campaignion_action\Loader;
+use Drupal\campaignion_action\Redirects\Endpoint;
+use Drupal\campaignion_action\Redirects\Redirect;
 use Drupal\campaignion_action\SignedLink;
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 use Drupal\little_helpers\Webform\Submission;
+
+/**
+ * Implements hook_menu().
+ */
+function campaignion_action_menu() {
+  $info['node/%node/redirects/%'] = array(
+    'title' => 'API for editing a node’s redirects.',
+    'page callback' => 'campaignion_action_edit_redirects',
+    'page arguments' => [1, 3],
+    'access callback' => 'node_access',
+    'access arguments' => ['update', 1],
+    'type' => MENU_CALLBACK,
+    'delivery callback' => 'little_helpers_deliver_json',
+  );
+  return $info;
+}
+
+/**
+ * Page callback: Redirect editing API.
+ */
+function campaignion_action_edit_redirects($node, $delta) {
+  if (!in_array($delta, ['0', '1'])) {
+    return MENU_NOT_FOUND;
+  }
+  $delta = (int) $delta;
+  $endpoint = new Endpoint($node, $delta);
+  switch ($_SERVER['REQUEST_METHOD']) {
+    case 'GET':
+      return $endpoint->get();
+
+    case 'PUT':
+      $data = drupal_json_decode(file_get_contents('php://input'));
+      return $endpoint->put($data);
+  }
+  return 405;
+}
 
 /**
  * Implements hook_module_implements_alter().

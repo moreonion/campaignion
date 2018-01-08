@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_wizard;
 
 use \Drupal\campaignion\Forms\EmbeddedNodeForm;
+use Drupal\campaignion_action\Redirects\Endpoint;
 
 class ThankyouStep extends WizardStep {
   protected $step = 'thank';
@@ -29,16 +30,6 @@ class ThankyouStep extends WizardStep {
     $emails = $this->wizard->node->webform['emails'];
     $eid = EmailStep::WIZARD_CONFIRMATION_REQUEST_EID;
     return isset($emails[$eid]) && !empty($emails[$eid]['status']);
-  }
-
-  protected function setConfirmationRedirect($url) {
-    $sql = 'UPDATE {webform_confirm_email} SET redirect_url=:url WHERE nid=:nid AND email_type=:conf_request';
-    $args = array(
-      ':url'          => $url,
-      ':nid'          => $this->wizard->node->nid,
-      ':conf_request' => WEBFORM_CONFIRM_EMAIL_CONFIRMATION_REQUEST,
-    );
-    db_query($sql, $args);
   }
 
   protected function loadIncludes() {
@@ -69,20 +60,12 @@ class ThankyouStep extends WizardStep {
   protected function pageForm(&$form_state, $index, $title, $prefix) {
     $field = &$this->referenceField['und'][$index];
 
+    $type = $field['type'];
     if (isset($field['node_reference_nid'])) {
-      $type = 'node';
       $node = node_load($field['node_reference_nid']);
-      $old['redirect_url'] = '';
     }
     else {
-      $type = 'redirect';
       $node = $this->wizard->prepareNode($this->contentType);
-      if (isset($field['redirect_url']) == FALSE) {
-        $old['redirect_url'] = '';
-      }
-      else {
-        $old['redirect_url'] = $field['redirect_url'];
-      }
     }
 
     $form = array(
@@ -107,19 +90,12 @@ class ThankyouStep extends WizardStep {
       '#attributes' => ['class' => ['personalized-redirects-widget']],
     );
     $settings = array(
-      // default_redirect_url can be used to migrate the old redirects to the new format.
-      // See redirects_app/README.md
-      // TODO This should be reviewed:
-      // 'default_redirect_url' => $old['redirect_url'],
-      // TODO The following is dummy data for testing only:
-      'default_redirect_url' => 'http://old-default-url.com',
-      'redirects' => [],
       'fields' => $this->components(),
       'endpoints' => [
         'nodes' => url('wizard/nodes'),
-        'redirects' => 'http://localhost:8081/data'
+        'redirects' => url("node/{$this->wizard->node->nid}/redirects/$index"),
       ]
-    );
+    ) + (new Endpoint($this->wizard->node, $index))->get();
     $settings = array(
       'campaignion_wizard' => array(
         $redirect_container_id => $settings,
@@ -237,53 +213,20 @@ class ThankyouStep extends WizardStep {
       $thank_you_pages['submission_node'] = 0;
     }
 
-    foreach(array(0,1) as $index) {
-      $field = &$this->referenceField[LANGUAGE_NONE][$index];
-      $field['node_reference_nid'] = NULL;
-      $field['redirect_url'] = NULL;
-    }
-
     foreach($thank_you_pages as $page => $index) {
       $field = &$this->referenceField[LANGUAGE_NONE][$index];
+      $field['type'] = $values[$page]['type'];
       if ($values[$page]['type'] == 'node') {
         $form_state['values'] =& $values[$page]['node_form'];
 
         $formObj = $form_state['embedded'][$page]['node_form']['formObject'];
         $formObj->submit($form, $form_state);
-
         $field['node_reference_nid'] = $formObj->node()->nid;
-        $field['redirect_url']       = NULL;
-        $path = 'node/' . $form_state['values']['nid'];
-        if (count($thank_you_pages) == 1) {
-          $action->webform['redirect_url'] = $path;
-        }
-        else {
-          if ($page == 'thank_you_node') {
-            $this->setConfirmationRedirect($path);
-          }
-          else {
-            $action->webform['redirect_url'] = $path;
-          }
-        }
-      }
-      else {
-        $field['node_reference_nid'] = NULL;
-        $field['redirect_url']       = $values[$page]['redirect_url'];
-
-        if (count($thank_you_pages) == 1) {
-          $action->webform['redirect_url'] = $values[$page]['redirect_url'];
-        }
-        else {
-          if ($page == 'thank_you_node') {
-            $this->setConfirmationRedirect($values[$page]['redirect_url']);
-          }
-          else {
-            $action->webform['redirect_url'] = $values[$page]['redirect_url'];
-          }
-        }
       }
     }
-
+    // We completely ignore $node->webform['redirect'] and the redirect urls
+    // for confirmation emails here because their behavior is overriden in
+    // campaignion_action.
     node_save($action);
 
     $form_state['values'] =& $values;

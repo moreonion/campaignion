@@ -37,6 +37,9 @@ function campaignion_wizard_menu() {
   $info['wizard/nodes'] = [
     'title' => 'Search node titles',
     'page callback' => 'campaignion_wizard_search_nodes',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'delivery callback' => 'little_helpers_deliver_json',
   ];
   return $info;
 }
@@ -96,8 +99,9 @@ function campaignion_wizard_search_nodes() {
       'label' => $row->title,
     ];
   }
-  little_helpers_deliver_json(['values' => $data]);
+  return ['values' => $data];
 }
+
 
 /**
  * Redirect keeping all query parameters.
