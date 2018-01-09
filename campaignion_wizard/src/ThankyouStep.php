@@ -195,11 +195,7 @@ class ThankyouStep extends WizardStep {
           form_set_error("$page][node_form][title", t('!name field is required.', array('!name' => 'Title')));
         }
       }
-      elseif ($values[$page]['type'] == 'redirect') {
-        if (empty($values[$page]['redirect_url'])) {
-          form_set_error('redirect_url', t('You need to provide either a redirect url or create a thank you page.'));
-        }
-      }
+      // Redirect validating is done in the JS prior to the submit.
     }
   }
 
