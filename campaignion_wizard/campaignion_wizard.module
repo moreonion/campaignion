@@ -1,6 +1,11 @@
 <?php
 
-use \Drupal\campaignion_action\Loader;
+/**
+ * @file
+ * Hook implementations and page callbacks for the campaignion wizard.
+ */
+
+use Drupal\campaignion_action\Loader;
 
 /**
  * Implements hook_menu().
@@ -121,7 +126,8 @@ function campaignion_wizard_admin_paths() {
 
 /**
  * Implements hook_theme().
- * Used for better control of webform emails setting form
+ *
+ * Used for better control of webform emails setting form.
  */
 function campaignion_wizard_theme() {
   $items['campaignion_wizard_form'] = [

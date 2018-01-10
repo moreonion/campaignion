@@ -1,10 +1,15 @@
 <?php
 
+/**
+ * @file
+ * Hook implementations for the campaignion_action module.
+ */
+
 use Drupal\campaignion\ContactTypeManager;
 use Drupal\campaignion\NoEmailException;
-use \Drupal\campaignion_action\Loader;
-use \Drupal\campaignion_action\SignedLink;
-use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+use Drupal\campaignion_action\Loader;
+use Drupal\campaignion_action\SignedLink;
+use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
@@ -85,7 +90,6 @@ function campaignion_action_node_access($node, $op) {
   return NODE_ACCESS_IGNORE;
 }
 
-
 /**
  * Implements hook_node_prepare().
  */
@@ -123,8 +127,7 @@ function campaignion_action_node_insert($node) {
 }
 
 /**
- * Implements hook_form_BASE_FORM_ID_alter().
- * Implements hook_form_webform_client_form_alter().
+ * Implements hook_form_BASE_FORM_ID_alter() for webform_client_form().
  *
  * Insert a custom submit handler.
  */
@@ -142,12 +145,13 @@ function campaignion_action_form_webform_client_form_alter(&$form, &$form_state)
  * Always set the share and sid query-parameters.
  */
 function _campaignion_action_webform_share_redirect($form, &$form_state) {
-  if (!$form_state['webform_completed'] || !$form_state['redirect'])
+  if (!$form_state['webform_completed'] || !$form_state['redirect']) {
     return;
+  }
 
   $r = $form_state['redirect'];
   if (!is_array($r)) {
-    $parsed_url = drupal_parse_url($r );
+    $parsed_url = drupal_parse_url($r);
   }
   else {
     // In general $form_state['redirect'] is some input for drupal_goto().
@@ -240,14 +244,16 @@ function campaignion_action_cronapi($op, $job = NULL) {
  * Implements hook_cron().
  */
 function campaignion_action_cron() {
-  $end = time() + 10; // run for 10 seconds
+  // Run for 10 seconds.
+  $end = time() + 10;
   $queue = DrupalQueue::get('campaignion_action');
   while (time() < $end && ($item = $queue->claimItem())) {
     $d = &$item->data;
     $node = node_load($d['nid']);
     if ($submissionObj = WebformSubmission::load($d['nid'], $d['sid'])) {
       module_invoke_all('campaignion_action_taken', $node, $submissionObj);
-    } else {
+    }
+    else {
       watchdog('campaignion_action', 'Submission(!nid,!sid) has vanished before import.', array('!nid' => $d['nid'], '!sid' => $d['sid']), WATCHDOG_INFO);
     }
     $queue->deleteItem($item);

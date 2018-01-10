@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Schema definitions and migration functions.
+ */
+
+/**
  * Implements hook_schema().
  */
 function campaignion_action_schema() {
@@ -42,7 +47,7 @@ function campaignion_action_schema() {
     'primary key' => ['sid'],
     'unique keys' => [
       'sid_nid' => ['sid', 'nid'],
-    ]
+    ],
   ];
   return $schema;
 }
@@ -97,7 +102,7 @@ function campaignion_action_update_2() {
     'primary key' => ['sid'],
     'unique keys' => [
       'sid_nid' => ['sid', 'nid'],
-    ]
+    ],
   ]);
 }
 

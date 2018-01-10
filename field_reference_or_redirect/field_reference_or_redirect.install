@@ -1,14 +1,14 @@
 <?php
+
 /**
  * @file
- * Install, update, and uninstall functions for the field_reference_or_redirect module.
+ * Update, and schema functions for the field_reference_or_redirect module.
  */
 
 /**
  * Implements hook_field_schema().
  *
- * Defines the database schema of the field "field_reference_or_redirect
- *
+ * Defines the database schema of the reference_or_redirect field.
  */
 function field_reference_or_redirect_field_schema($field) {
 
