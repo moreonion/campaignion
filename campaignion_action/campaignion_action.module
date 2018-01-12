@@ -221,8 +221,8 @@ function _campaignion_action_webform_share_redirect($form, &$form_state) {
 function campaignion_action_webform_confirm_email_confirmation_redirect_alter(&$redirect, $node, $submission) {
   if ($action = Loader::instance()->actionFromNode($node)) {
     $submission_o = new Submission($node, $submission);
-    if ($r = $action->redirect($redirect, $submission_o, 1)) {
-      $redirect = $r;
+    if ($r = $action->redirect($submission_o, 1)) {
+      $redirect = ['path' => $r[0]] + $r[1];
     }
   }
   $redirect['query']['share'] = "node/{$node->nid}";

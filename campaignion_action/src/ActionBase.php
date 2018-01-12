@@ -115,7 +115,8 @@ class ActionBase {
     $item = field_get_items('node', $this->node, $field)[$delta];
     switch ($item['type']) {
       case 'node':
-        return ["node/{$item['node_reference_nid']}"];
+        $o = ['query' => [], 'fragment' => ''];
+        return ["node/{$item['node_reference_nid']}", $o];
 
       case 'redirect':
         $redirects = Redirect::byNid($this->node->nid, $delta);
