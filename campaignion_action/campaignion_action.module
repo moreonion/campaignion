@@ -174,7 +174,28 @@ function campaignion_action_form_webform_client_form_alter(&$form, &$form_state)
   if ($link->checkHash() && !empty($link->query['test-mode'])) {
     $form_state['test_mode'] = TRUE;
   }
+  $form['#submit'][] = '_campaignion_action_custom_redirect';
   $form['#submit'][] = '_campaignion_action_webform_share_redirect';
+}
+
+/**
+ * Form submission handler for webform_client_form().
+ *
+ * @see campaignion_action_form_webform_client_form_alter()
+ */
+function _campaignion_action_custom_redirect($form, &$form_state) {
+  if (!$form_state['webform_completed'] || !$form_state['redirect']) {
+    return;
+  }
+
+  if ($action = Loader::instance()->actionFromNode($form['#node'])) {
+    $sid = $form_state['values']['details']['sid'];
+    $submission = Submission::load($form['#node']->nid, $sid);
+    $delta = $submission->webform->needsConfirmation() ? 0 : 1;
+    if ($redirect = $action->redirect($submission, $delta)) {
+      $form_state['redirect'] = $redirect;
+    }
+  }
 }
 
 /**
@@ -187,26 +208,23 @@ function _campaignion_action_webform_share_redirect($form, &$form_state) {
     return;
   }
 
-  $r = $form_state['redirect'];
-  if (!is_array($r)) {
-    $parsed_url = drupal_parse_url($r);
-  }
-  else {
-    // In general $form_state['redirect'] is some input for drupal_goto().
-    $parsed_url = isset($r[1]) && is_array($r[1]) ? $r[1] : [];
-    $parsed_url['path'] = isset($r[0]) ? $r[0] : '';
-  }
+  $redirect = Redirect::normalizeRedirect($form_state['redirect']);
   $action_path = 'node/' . $form['#node']->nid;
-  $parsed_url['query']['share'] = $action_path;
-  $parsed_url['query']['sid'] = $form_state['values']['details']['sid'];
-
-  $form_state['redirect'] = [$parsed_url['path'], $parsed_url];
+  $redirect[1]['query']['share'] = $action_path;
+  $redirect[1]['query']['sid'] = $form_state['values']['details']['sid'];
+  $form_state['redirect'] = $redirect;
 }
 
 /**
  * Implements hook_webform_confirm_email_confirmation_redirect_alter().
  */
 function campaignion_action_webform_confirm_email_confirmation_redirect_alter(&$redirect, $node, $submission) {
+  if ($action = Loader::instance()->actionFromNode($node)) {
+    $submission_o = new Submission($node, $submission);
+    if ($r = $action->redirect($redirect, $submission_o, 1)) {
+      $redirect = $r;
+    }
+  }
   $redirect['query']['share'] = "node/{$node->nid}";
   $redirect['query']['sid'] = $submission->sid;
 }

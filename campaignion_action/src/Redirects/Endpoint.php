@@ -8,17 +8,30 @@ namespace Drupal\campaignion_action\Redirects;
 class Endpoint {
 
   /**
-   * @var object
    * The node that is being edited.
+   *
+   * @var object
    */
   protected $node;
 
   /**
-   * @var int
    * The number of the redirect set.
+   *
+   * @var int
    */
   protected $delta;
 
+  /**
+   * Construct a new API-endpoint.
+   *
+   * @param object $node
+   *   The node which’s redirects are being edited.
+   * @param int $delta
+   *   The type of redirect that‘s being edited. Currently valid values are:
+   *   - 0: Redirect after sending the confirmation request email.
+   *   - 1: Redirect for when no confirmation is needed or the submission is
+   *        being confirmed.
+   */
   public function __construct($node, $delta) {
     $this->node = $node;
     $this->delta = $delta;
@@ -27,11 +40,13 @@ class Endpoint {
   /**
    * Convert redirect data from API to model format.
    *
+   * @param array $data
+   *   Data to convert.
+   *
    * @return array
-   *   - Move redirect content (subject, header, redirect, footer) into the main array.
-   *   - Move filter configuration into the config sub-array.
+   *   Converted data.
    */
-  protected function api2model($data) {
+  protected function api2model(array $data) {
     $data += ['filters' => []];
     return $data;
   }
@@ -39,15 +54,27 @@ class Endpoint {
   /**
    * Convert redirect data from model to API format.
    *
+   * @param array $data
+   *   Data to convert.
+   *
    * @return array
-   *   - Extract the filter configuration into the main filter array.
+   *   Converted data.
    */
-  protected function model2api($data) {
+  protected function model2api(array $data) {
     $data += ['filters' => []];
     return $data;
   }
 
-  public function put($data) {
+  /**
+   * Handle a PUT request.
+   *
+   * @param array $data
+   *   Parsed JSON data sent to the API.
+   *
+   * @return array
+   *   API representation of the redirects.
+   */
+  public function put(array $data) {
     $data += ['redirects' => []];
     $data = $data['redirects'];
     $old_redirects = Redirect::byNid($this->node->nid, $this->delta);
@@ -76,6 +103,12 @@ class Endpoint {
     return ['redirects' => $new_redirects];
   }
 
+  /**
+   * Handle a GET request.
+   *
+   * @return array
+   *   API representation of the stored redirects.
+   */
   public function get() {
     $values = [];
     $redirects = Redirect::byNid($this->node->nid, $this->delta);
@@ -92,4 +125,3 @@ class Endpoint {
   }
 
 }
-

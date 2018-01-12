@@ -3,12 +3,14 @@
 namespace Drupal\campaignion_action\Redirects;
 
 use Drupal\little_helpers\DB\Model;
+use Drupal\little_helpers\Webform\Submission;
+use Drupal\campaignion_newsletters\Subscription;
 
 /**
  * Model class for redirect filters.
  */
 class Filter extends Model {
-  protected static $table  = 'campaignion_action_redirect_filter';
+  protected static $table = 'campaignion_action_redirect_filter';
   protected static $key = ['id'];
   protected static $values = ['redirect_id', 'weight', 'type', 'config'];
   protected static $serialize = ['config' => TRUE];
@@ -19,7 +21,13 @@ class Filter extends Model {
   public $type;
   public $config = [];
 
-  public static function fromArray($data) {
+  /**
+   * Construct a new instance from an array (as given in the API).
+   *
+   * @param array $data
+   *   Data representing the filter.
+   */
+  public static function fromArray(array $data) {
     $config = $data + ['id' => NULL, 'weight' => 0];
     unset($config['redirect_id']);
     $data = [];
@@ -29,10 +37,6 @@ class Filter extends Model {
     }
     $data['config'] = $config;
     return new static($data);
-  }
-
-  public function __construct($data = array(), $new = TRUE) {
-    parent::__construct($data, $new);
   }
 
   /**
@@ -49,10 +53,11 @@ class Filter extends Model {
    *
    * @param array $ids
    *   Redirect IDs to get the filters for.
+   *
    * @return array
    *   Filters ordered by redirect_id and weight, and keyed by their Id.
    */
-  public static function byRedirectIds($ids) {
+  public static function byRedirectIds(array $ids) {
     // DB queries doesn't work well with empty arrays in IN() clauses.
     if (!$ids) {
       return [];
@@ -70,6 +75,12 @@ class Filter extends Model {
     return $filters;
   }
 
+  /**
+   * Dump data into an array (as used by the API).
+   *
+   * @return array
+   *   Filter data as an array.
+   */
   public function toArray() {
     $data = [];
     foreach (array_merge(static::$key, static::$values) as $k) {
@@ -85,27 +96,88 @@ class Filter extends Model {
     return $data;
   }
 
-  public function match($submission) {
-    if ($this->type == 'target-attribute') {
-      $data['contact'] = $target;
-      $data['constituency'] = $constituency;
-      $name = $this->config['attributeName'];
-      $key_exists = NULL;
-      $value = drupal_array_get_nested_value($data, explode('.', $name), $key_exists);
-      return $key_exists ? $this->matchValue($value) : FALSE;
+  /**
+   * Check whether the filter condition is fulfilled.
+   *
+   * @param Drupal\little_helpers\Webform\Submission $submission
+   *   The submission to check.
+   *
+   * @return bool
+   *   TRUE if the filter is fulfilled, otherwise FALSE.
+   */
+  public function match(Submission $submission) {
+    switch ($this->type) {
+      case 'submission-field':
+        $value = $submission->valueByCid($this->config['field']);
+        return $this->matchValue($value);
+
+      case 'opt-in':
+        $optin = $this->hasOptin($submission);
+        return $this->config['value'] ? $optin : !$optin;
     }
-    return TRUE;
+    return FALSE;
   }
 
+  /**
+   * Check whether the contact has an opt-in after submitting this form.
+   *
+   * @param Drupal\little_helpers\Webform\Submission $submission
+   *   The submission to check for an opt-in.
+   *
+   * @return bool
+   *   TRUE if the contact will have an opt-in after submitting this form,
+   *   otherwise FALSE.
+   */
+  protected function hasOptin(Submission $submission) {
+    // If there is at least one subscription then we assume we have an opt-in.
+    if (module_exists('campaignion_newsletters')) {
+      if ($email = $submission->valueByKey('email')) {
+        $subscriptions = Subscription::byEmail($email);
+        if ($subscriptions) {
+          return TRUE;
+        }
+      }
+    }
+
+    // No opt-in so far. Look for an opt-in this this submission.
+    $components = $submission->webform->componentsByType('newsletter');
+    foreach ($components as $cid => $component) {
+      if ($submission->valueByCid($cid) == 'subscribed') {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Evaluate filter with regard to a submission value.
+   *
+   * @param mixed $target_value
+   *   The value to check.
+   *
+   * @return bool
+   *   TRUE when the value matches the filter conditions, otherwise FALSE.
+   */
   protected function matchValue($target_value) {
     $value = $this->config['value'];
     switch ($this->config['operator']) {
       case '==':
         return $target_value == $value;
+
       case '!=':
         return $target_value != $value;
+
+      case 'contains':
+        return strpos($target_value, $value) !== FALSE;
+
+      case '!contains':
+        return strpos($target_value, $value) === FALSE;
+
       case 'regexp':
         return (bool) preg_match("/$value/", $target_value);
+
+      case '!regexp':
+        return !preg_match("/$value/", $target_value);
     }
     return FALSE;
   }

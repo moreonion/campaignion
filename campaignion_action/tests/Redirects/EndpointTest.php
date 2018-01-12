@@ -15,6 +15,9 @@ class EndpointTest extends \DrupalWebTestCase {
     db_delete('campaignion_action_redirect_filter')->execute();
   }
 
+  /**
+   * Test PUT request on a node that doesn’t have redirects yet.
+   */
   public function testPutOneRedirectOnEmptyNode() {
     $data[] = [
       'label' => 'Test redirect',
@@ -37,12 +40,15 @@ class EndpointTest extends \DrupalWebTestCase {
     $this->assertEquals($data[0], $m);
   }
 
+  /**
+   * Test PUT request on a node with existing redirects.
+   */
   public function testPutWithExistingData() {
     $data = ['nid' => 1, 'delta' => 0];
-    $r1 = new Redirect(['label' => 'First', 'filters' => [[
-      'test' => 1,
-      'type' => 'test',
-    ]]] + $data);
+    $r1 = new Redirect([
+      'label' => 'First',
+      'filters' => [['test' => 1, 'type' => 'test']],
+    ] + $data);
     $r2 = new Redirect(['label' => 'Second', 'weight' => 1] + $data);
     $r3 = new Redirect(['label' => 'Third', 'weight' => 2] + $data);
     $r1->save(); $r2->save(); $r3->save();
@@ -52,13 +58,19 @@ class EndpointTest extends \DrupalWebTestCase {
     $fakenode = (object) ['nid' => 1];
     $endpoint = new Endpoint($fakenode, 0);
 
-    $answer = $endpoint->put(['redirects' => [
-      ['label' => 'New first'],
-      ['id' => $r1->id, 'label' => 'Was first is now second', 'filters' => [
-        ['id' => $r1->filters[0]->id, 'test' => 1, 'type' => 'test'],
-      ]],
-      ['id' => $r2->id, 'label' => 'Was second is now third'],
-    ]])['redirects'];
+    $answer = $endpoint->put([
+      'redirects' => [
+        ['label' => 'New first'],
+        [
+          'id' => $r1->id,
+          'label' => 'Was first is now second',
+          'filters' => [
+            ['id' => $r1->filters[0]->id, 'test' => 1, 'type' => 'test'],
+          ],
+        ],
+        ['id' => $r2->id, 'label' => 'Was second is now third'],
+      ],
+    ])['redirects'];
 
     $a_labels = [];
     foreach ($answer as $m) {
@@ -84,6 +96,9 @@ class EndpointTest extends \DrupalWebTestCase {
     $this->assertEqual($r2->id, $new_rs[2]->id);
   }
 
+  /**
+   * Test updating filters.
+   */
   public function testPutExchangeFilter() {
     $data = ['nid' => 1, 'delta' => 0];
     $filter = Filter::fromArray(['test' => 1, 'type' => 'test']);
@@ -93,9 +108,12 @@ class EndpointTest extends \DrupalWebTestCase {
     $fakenode = (object) ['nid' => 1];
     $endpoint = new Endpoint($fakenode, 0);
     $new_filter = ['test' => 2, 'type' => 'test'];
-    $answer = $endpoint->put(['redirects' => [
-      ['id' => $r1->id, 'label' => 'Still first', 'filters' => [$new_filter]],
-    ]])['redirects'];
+    $put['redirects'][] = [
+      'id' => $r1->id,
+      'label' => 'Still first',
+      'filters' => [$new_filter],
+    ];
+    $answer = $endpoint->put($put)['redirects'];
 
     $this->assertEqual(1, count($answer));
     $this->assertEqual(1, count($answer[0]['filters']));
