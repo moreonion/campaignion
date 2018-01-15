@@ -229,50 +229,16 @@ class ThankyouStep extends WizardStep {
   }
 
   public function status() {
-    $thank_you_pages = $this->referenceField[LANGUAGE_NONE];
-
-    $msg = t("After your supporters submitted their filled out form ");
-
-    if (   isset($thank_you_pages[0]['redirect_url'])       == TRUE
-        || isset($thank_you_pages[0]['node_reference_nid']) == TRUE) {
-
-      if (isset($thank_you_pages[0]['redirect_url']) == TRUE) {
-        $msg .= t(
-          "you're redirecting them to !link .",
-          array(
-            '!link' => l(
-              $thank_you_pages[0]['redirect_url'],
-              $thank_you_pages[0]['redirect_url']
-            )
-          )
-        );
-      }
-      else {
-        $node = node_load($thank_you_pages[0]['node_reference_nid']);
-        $msg .= t('they\'ll see your submission page !node.', array('!node' => l($node->title, 'node/' . $node->nid)));
-      }
-      $msg .= t("<br>After your supporters clicked the confirmation link ");
-    }
-
-    if (isset($thank_you_pages[1]['redirect_url']) == TRUE) {
-      $msg .= t(
-        "you're redirecting them to !link .",
-        array(
-          '!link' => l(
-            $thank_you_pages[1]['redirect_url'],
-            $thank_you_pages[1]['redirect_url']
-          )
-        )
-      );
-    }
-    else {
-      $node = node_load($thank_you_pages[1]['node_reference_nid']);
-      $msg .= t('they\'ll see your thank you page !node.', array('!node' => l($node->title, 'node/' . $node->nid)));
-    }
-
+    $items = $this->referenceField[LANGUAGE_NONE];
+    $msg = [
+      '#theme' => 'campaignion_wizard_thank_summary',
+      '#items' => $items,
+      '#node' => $this->wizard->node,
+      '#double_optin' => $this->hasDoubleOptIn(),
+    ];
     return array(
       'caption' => t('Thank you page'),
-      'message' => $msg,
+      'message' => drupal_render($msg),
     );
   }
 }

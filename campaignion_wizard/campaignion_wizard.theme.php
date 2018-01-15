@@ -1,4 +1,7 @@
 <?php
+
+use Drupal\campaignion_action\Redirects\Redirect;
+
 /**
  * Theme callback implementation
  * Copied from webform.emails.inc and adapted
@@ -40,4 +43,51 @@ function theme_campaignion_wizard_email_form($variables) {
   $children = element_children($form, TRUE);
   return drupal_render_children($form, $children);
 
+}
+
+/**
+ * Prepare variables for the thank you page summary on the confirmation step.
+ *
+ * Default template: campaignion-wizard-thank-summary.tpl.php.
+ *
+ * @param array $vars
+ *   An associative array containing:
+ *   - element: An associative array containing the properties of the element.
+ *     Properties used are: #items, #node and #double_optin.
+ *
+ */
+function template_preprocess_campaignion_wizard_thank_summary(&$vars) {
+  $node = $vars['element']['#node'];
+  $items = $vars['element']['#items'];
+  foreach ($items as $delta => &$item) {
+    switch ($item['type']) {
+      case 'node':
+        $item['node'] = node_load($item['node_reference_nid']);
+        break;
+
+      case 'redirect':
+        $item['redirects'] = [
+          '#theme' => 'links',
+          '#links' => [],
+        ];
+        foreach (Redirect::byNid($node->nid, $delta) as $redirect) {
+          $r = $redirect->toArray();
+          $item['redirects']['#links'][] = [
+            'title' => $r['prettyDestination'],
+            'href' => $r['destination'],
+          ];
+        }
+        break;
+    }
+  }
+
+  $pages = [];
+  if ($vars['element']['#double_optin']) {
+    $vars['after_submit'] = $items[0];
+    $vars['after_confirm'] = $items[1];
+  }
+  else {
+    $vars['after_submit'] = $items[1];
+    $vars['after_confirm'] = NULL;
+  }
 }

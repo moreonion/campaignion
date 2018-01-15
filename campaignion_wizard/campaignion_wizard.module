@@ -167,6 +167,11 @@ function campaignion_wizard_theme() {
     'render element' => 'form',
     'file'           => 'campaignion_wizard.theme.php',
   ];
+  $items['campaignion_wizard_thank_summary'] = [
+    'render element' => 'element',
+    'template' => 'templates/campaignion-wizard-thank-summary',
+    'file' => 'campaignion_wizard.theme.php',
+  ];
 
   return $items;
 }
