@@ -174,7 +174,14 @@ function campaignion_action_form_webform_client_form_alter(&$form, &$form_state)
   if ($link->checkHash() && !empty($link->query['test-mode'])) {
     $form_state['test_mode'] = TRUE;
   }
-  $form['#submit'][] = '_campaignion_action_custom_redirect';
+  $submit = [];
+  foreach ($form['#submit'] as $handler) {
+    $submit[] = $handler;
+    if ($handler == 'webform_client_form_submit') {
+      $submit[] = '_campaignion_action_custom_redirect';
+    }
+  }
+  $form['#submit'] = $submit;
   $form['#submit'][] = '_campaignion_action_webform_share_redirect';
 }
 
