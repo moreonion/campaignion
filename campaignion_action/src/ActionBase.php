@@ -121,11 +121,11 @@ class ActionBase {
       case 'redirect':
         $redirects = Redirect::byNid($this->node->nid, $delta);
         foreach ($redirects as $r) {
-        if ($r->checkFilters($submission)) {
-          return $r->normalized();
+          if ($r->checkFilters($submission)) {
+            return $r->normalized();
+          }
         }
         break;
-      }
     }
   }
 

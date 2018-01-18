@@ -88,13 +88,23 @@ class ModuleTest extends \DrupalUnitTestCase {
     campaignion_action_webform_confirm_email_confirmation_redirect_alter($redirect, $this->node, $submission);
     $this->assertEquals('unchanged', $redirect['path']);
 
-    // Redirect configured but field value not set.
-    $r = [
+    // Redirects configured but field value not set.
+    (new Redirect([
+      'nid' => $this->node->nid,
+      'delta' => 1,
+      'destination' => 'optin',
+      'filters' => [[
+        'type' => 'opt-in',
+        'value' => TRUE,
+      ]],
+      'weight' => 1,
+    ]))->save();
+    (new Redirect([
       'nid' => $this->node->nid,
       'delta' => 1,
       'destination' => 'not-default',
-    ];
-    (new Redirect($r))->save();
+      'weight' => 2,
+    ]))->save();
 
     campaignion_action_webform_confirm_email_confirmation_redirect_alter($redirect, $this->node, $submission);
     $this->assertEquals('unchanged', $redirect['path']);
