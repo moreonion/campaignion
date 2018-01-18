@@ -96,7 +96,7 @@ function campaignion_wizard_search_nodes() {
   foreach ($result as $row) {
     $data[] = [
       'value' => 'node/' . $row->nid,
-      'label' => $row->title,
+      'label' => "{$row->title} [{$row->nid}]",
     ];
   }
   return ['values' => $data];

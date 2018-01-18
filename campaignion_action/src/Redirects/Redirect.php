@@ -149,7 +149,7 @@ class Redirect extends Model {
     $data['prettyDestination'] = $data['destination'];
     if (substr($data['destination'], 0, 5) == 'node/') {
       if ($node = menu_get_object('node', 1, $data['destination'])) {
-        $data['prettyDestination'] = $node->title;
+        $data['prettyDestination'] = "{$node->title} [{$node->nid}]";
       }
     }
 
