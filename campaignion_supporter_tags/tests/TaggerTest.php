@@ -53,6 +53,14 @@ class TaggerTest extends \DrupalWebTestCase {
   }
 
   /**
+   * Test that tagging with an unknown parent throws an exception.
+   */
+  public function testUnknownParentTag() {
+    $this->expectException(\InvalidArgumentException::class);
+    Tagger::byNameAndParentUuid('supporter_tags', 'no-uuid');
+  }
+
+  /**
    * Delete parent term and all its children.
    */
   public function tearDown() {
