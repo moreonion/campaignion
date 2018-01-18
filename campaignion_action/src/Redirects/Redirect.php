@@ -9,6 +9,9 @@ use Drupal\little_helpers\Webform\Submission;
  * Model class for redirects.
  */
 class Redirect extends Model {
+  const CONFIRMATION_PAGE = 0;
+  const THANK_YOU_PAGE = 1;
+
   protected static $table = 'campaignion_action_redirect';
   protected static $key = ['id'];
   protected static $values = ['nid', 'delta', 'weight', 'label', 'destination'];

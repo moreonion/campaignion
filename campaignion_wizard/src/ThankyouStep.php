@@ -4,6 +4,7 @@ namespace Drupal\campaignion_wizard;
 
 use \Drupal\campaignion\Forms\EmbeddedNodeForm;
 use Drupal\campaignion_action\Redirects\Endpoint;
+use Drupal\campaignion_action\Redirects\Redirect;
 
 class ThankyouStep extends WizardStep {
   protected $step = 'thank';
@@ -150,13 +151,13 @@ class ThankyouStep extends WizardStep {
     // check if double opt in was enabled and if yes provide a 2nd thank you page
     $thank_you_class = 'half-left';
     if ($this->doubleOptIn) {
-      $form['submission_node'] = $this->pageForm($form_state, 0, t('Submission page'), 'submission_node');
+      $form['submission_node'] = $this->pageForm($form_state, Redirect::CONFIRMATION_PAGE, t('Submission page'), 'submission_node');
       $form['submission_node']['#attributes']['class'][] = 'half-left';
       $thank_you_class = 'half-right';
       $form['#attributes']['class'][] = 'two-halfs';
     }
 
-    $form['thank_you_node'] = $this->pageForm($form_state, 1, t('Thank you page'), 'thank_you_node');
+    $form['thank_you_node'] = $this->pageForm($form_state, Redirect::THANK_YOU_PAGE, t('Thank you page'), 'thank_you_node');
     $form['thank_you_node']['#attributes']['class'][] = $thank_you_class;
 
     $dir = drupal_get_path('module', 'campaignion_wizard');
@@ -204,9 +205,16 @@ class ThankyouStep extends WizardStep {
     unset($form_state['values']);
     $action = $this->wizard->node;
 
-    $thank_you_pages = array('thank_you_node' => 1);
+    // Be sure to always save two field items otherwise the thank you page
+    // is renumbered to 0.
+    $this->referenceField[LANGUAGE_NONE] += [
+      0 => ['type' => 'node', 'node_reference_nid' => NULL],
+      1 => ['type' => 'node', 'node_reference_nid' => NULL],
+    ];
+
+    $thank_you_pages = array('thank_you_node' => Redirect::THANK_YOU_PAGE);
     if ($this->doubleOptIn) {
-      $thank_you_pages['submission_node'] = 0;
+      $thank_you_pages['submission_node'] = Redirect::CONFIRMATION_PAGE;
     }
 
     foreach($thank_you_pages as $page => $index) {
