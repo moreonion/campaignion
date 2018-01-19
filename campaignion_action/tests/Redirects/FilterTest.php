@@ -89,6 +89,25 @@ class FilterTest extends \DrupalWebTestCase {
   }
 
   /**
+   * Test opt-in filter matching form_key (without campaignion_newsletters).
+   */
+  public function testMatchOptInCheckbox() {
+    $stub_s['data'][1][0] = '1';
+    $stub_n['webform']['components'][1] = [
+      'cid' => 1,
+      'form_key' => 'email_newsletter',
+      'type' => 'select',
+      'extra' => ['multiple' => TRUE, 'items' => "1|Yes\n"],
+    ];
+    $submission = new Submission((object) $stub_n, (object) $stub_s);
+    $fs = Filter::fromArray(['type' => 'opt-in', 'value' => TRUE]);
+    $this->assertTrue($fs->match($submission));
+
+    $fs = Filter::fromArray(['type' => 'opt-in', 'value' => FALSE]);
+    $this->assertFalse($fs->match($submission));
+  }
+
+  /**
    * Test submission value filter.
    */
   public function testMatchSubmissionValueContains() {

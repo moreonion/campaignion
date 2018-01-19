@@ -146,6 +146,12 @@ class Filter extends Model {
         return TRUE;
       }
     }
+
+    // A checked email_newsletter checkbox counts as opt-in.
+    if ($submission->valueByKey('email_newsletter')) {
+      return TRUE;
+    }
+
     return FALSE;
   }
 
