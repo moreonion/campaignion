@@ -40,16 +40,19 @@ class ThankyouStep extends WizardStep {
   }
 
   /**
-   * Get components of the action in a format needed by the API.
+   * Get components of a node in a format needed by the redirect app.
+   *
+   * @param object $node
+   *   This node’s components are listed.
    *
    * @return array
    *   Array of component metadata arrays with the following keys:
    *   - id: The component ID.
    *   - label: The component’s label.
    */
-  protected function components() {
+  protected static function components($node) {
     $fields = [];
-    foreach ($this->wizard->node->webform['components'] as $cid => $component) {
+    foreach ($node->webform['components'] as $cid => $component) {
       $fields[] = [
         'id' => $cid,
         'label' => $component['name'],
@@ -72,6 +75,8 @@ class ThankyouStep extends WizardStep {
     $form = array(
       '#type'  => 'fieldset',
       '#title' => $title,
+      '#delta' => $index,
+      '#process' => [[static::class, 'addRedirectSettings']],
     );
     $form['type'] = array(
       '#type'          => 'radio',
@@ -90,19 +95,6 @@ class ThankyouStep extends WizardStep {
       '#id'         => $redirect_container_id,
       '#attributes' => ['class' => ['personalized-redirects-widget']],
     );
-    $settings = array(
-      'fields' => $this->components(),
-      'endpoints' => [
-        'nodes' => url('wizard/nodes'),
-        'redirects' => url("node/{$this->wizard->node->nid}/redirects/$index"),
-      ]
-    ) + (new Endpoint($this->wizard->node, $index))->get();
-    $settings = array(
-      'campaignion_wizard' => array(
-        $redirect_container_id => $settings,
-      ),
-    );
-    $form['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
 
     $form['or2'] = array(
       '#type'   => 'markup',
@@ -249,4 +241,28 @@ class ThankyouStep extends WizardStep {
       'message' => drupal_render($msg),
     );
   }
+
+  /**
+   * Form processing handler for attaching settings for the redirect vue app.
+   *
+   * The existing redirects need to be added in a process handler otherwise they
+   * won’t be updated on server-side validation errors.
+   *
+   * @see \Drupal\campaignion_wizard\ThankYouStep::pageForm()
+   */
+  public static function addRedirectSettings($element, &$form_state) {
+    $node = $form_state['oowizard']->node;
+    $delta = $element['#delta'];
+    $settings = [
+      'fields' => static::components($node),
+      'endpoints' => [
+        'nodes' => url('wizard/nodes'),
+        'redirects' => url("node/{$node->nid}/redirects/$delta"),
+      ],
+    ] + (new Endpoint($node, $delta))->get();
+    $settings['campaignion_wizard'][$element['redirects']['#id']] = $settings;
+    $element['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
+    return $element;
+  }
+
 }
