@@ -10,7 +10,53 @@
 function campaignion_test_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'redhen_contact-contact-field_address'
+  // Exported field_instance: 'node-petition-field_thank_you_pages'.
+  $field_instances['node-petition-field_thank_you_pages'] = array(
+    'bundle' => 'petition',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'cck_blocks' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'exclude_cv' => 0,
+    'field_name' => 'field_thank_you_pages',
+    'label' => 'Thank you pages',
+    'required' => 0,
+    'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'exclude_cv' => FALSE,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'field_reference_or_redirect',
+      'settings' => array(),
+      'type' => 'reference_or_redirect_widget',
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'redhen_contact-contact-field_address'.
   $field_instances['redhen_contact-contact-field_address'] = array(
     'bundle' => 'contact',
     'custom_add_another' => '',
@@ -54,6 +100,7 @@ function campaignion_test_field_default_field_instances() {
       'module' => 'addressfield',
       'settings' => array(
         'available_countries' => array(),
+        'default_country' => 'site_default',
         'format_handlers' => array(
           'address' => 'address',
           'optional-country' => 'optional-country',
@@ -68,7 +115,7 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-field_date_of_birth'
+  // Exported field_instance: 'redhen_contact-contact-field_date_of_birth'.
   $field_instances['redhen_contact-contact-field_date_of_birth'] = array(
     'bundle' => 'contact',
     'default_value' => NULL,
@@ -84,6 +131,7 @@ function campaignion_test_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 5,
@@ -126,7 +174,8 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-field_direct_mail_newsletter'
+  // Exported field_instance:
+  // 'redhen_contact-contact-field_direct_mail_newsletter'.
   $field_instances['redhen_contact-contact-field_direct_mail_newsletter'] = array(
     'bundle' => 'contact',
     'default_value' => array(
@@ -173,7 +222,7 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-field_gender'
+  // Exported field_instance: 'redhen_contact-contact-field_gender'.
   $field_instances['redhen_contact-contact-field_gender'] = array(
     'bundle' => 'contact',
     'default_value' => NULL,
@@ -214,7 +263,7 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-field_ip_adress'
+  // Exported field_instance: 'redhen_contact-contact-field_ip_adress'.
   $field_instances['redhen_contact-contact-field_ip_adress'] = array(
     'bundle' => 'contact',
     'default_value' => NULL,
@@ -258,7 +307,7 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-field_phone_number'
+  // Exported field_instance: 'redhen_contact-contact-field_phone_number'.
   $field_instances['redhen_contact-contact-field_phone_number'] = array(
     'bundle' => 'contact',
     'default_value' => NULL,
@@ -302,7 +351,7 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-field_preferred_language'
+  // Exported field_instance: 'redhen_contact-contact-field_preferred_language'.
   $field_instances['redhen_contact-contact-field_preferred_language'] = array(
     'bundle' => 'contact',
     'default_value' => array(
@@ -347,7 +396,7 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-field_salutation'
+  // Exported field_instance: 'redhen_contact-contact-field_salutation'.
   $field_instances['redhen_contact-contact-field_salutation'] = array(
     'bundle' => 'contact',
     'default_value' => NULL,
@@ -388,7 +437,8 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-field_social_network_links'
+  // Exported field_instance:
+  // 'redhen_contact-contact-field_social_network_links'.
   $field_instances['redhen_contact-contact-field_social_network_links'] = array(
     'bundle' => 'contact',
     'default_value' => NULL,
@@ -432,7 +482,7 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-field_title'
+  // Exported field_instance: 'redhen_contact-contact-field_title'.
   $field_instances['redhen_contact-contact-field_title'] = array(
     'bundle' => 'contact',
     'default_value' => NULL,
@@ -476,7 +526,7 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'redhen_contact-contact-redhen_contact_email'
+  // Exported field_instance: 'redhen_contact-contact-redhen_contact_email'.
   $field_instances['redhen_contact-contact-redhen_contact_email'] = array(
     'bundle' => 'contact',
     'deleted' => 0,
@@ -610,7 +660,6 @@ function campaignion_test_field_default_field_instances() {
   t('Date of birth');
   t('Direct Mail Newsletter');
   t('Email');
-  t('Engagement level');
   t('Gender');
   t('IP-Adress');
   t('Phone number');

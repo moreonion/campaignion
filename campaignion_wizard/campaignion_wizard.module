@@ -1,6 +1,11 @@
 <?php
 
-use \Drupal\campaignion_action\Loader;
+/**
+ * @file
+ * Hook implementations and page callbacks for the campaignion wizard.
+ */
+
+use Drupal\campaignion_action\Loader;
 
 /**
  * Implements hook_menu().
@@ -29,6 +34,13 @@ function campaignion_wizard_menu() {
     'title'          => 'Edit',
     'page arguments' => array(1, 'content'),
   ) + $info['node/%node/wizard/%'];
+  $info['wizard/nodes'] = [
+    'title' => 'Search node titles',
+    'page callback' => 'campaignion_wizard_search_nodes',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'delivery callback' => 'little_helpers_deliver_json',
+  ];
   return $info;
 }
 
@@ -68,6 +80,28 @@ function campaignion_wizard_redirect_add($type) {
   campaignion_wizard_redirect("wizard/$type");
   return node_add($type);
 }
+
+/**
+ * Page callback for wizard/nodes.
+ */
+function campaignion_wizard_search_nodes() {
+  $search = isset($_GET['s']) ? $_GET['s'] : '';
+  $result = db_select('node', 'n')
+    ->addTag('node_access')
+    ->fields('n', ['nid', 'title'])
+    ->condition('n.title', '%' . db_like($search) . '%', 'LIKE')
+    ->range(0, 100)
+    ->execute();
+  $data = [];
+  foreach ($result as $row) {
+    $data[] = [
+      'value' => 'node/' . $row->nid,
+      'label' => "{$row->title} [{$row->nid}]",
+    ];
+  }
+  return ['values' => $data];
+}
+
 
 /**
  * Redirect keeping all query parameters.
@@ -121,7 +155,8 @@ function campaignion_wizard_admin_paths() {
 
 /**
  * Implements hook_theme().
- * Used for better control of webform emails setting form
+ *
+ * Used for better control of webform emails setting form.
  */
 function campaignion_wizard_theme() {
   $items['campaignion_wizard_form'] = [
@@ -131,6 +166,11 @@ function campaignion_wizard_theme() {
   $items['campaignion_wizard_email_form'] = [
     'render element' => 'form',
     'file'           => 'campaignion_wizard.theme.php',
+  ];
+  $items['campaignion_wizard_thank_summary'] = [
+    'render element' => 'element',
+    'template' => 'templates/campaignion-wizard-thank-summary',
+    'file' => 'campaignion_wizard.theme.php',
   ];
 
   return $items;

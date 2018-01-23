@@ -3,6 +3,8 @@
 namespace Drupal\campaignion_wizard;
 
 use \Drupal\campaignion\Forms\EmbeddedNodeForm;
+use Drupal\campaignion_action\Redirects\Endpoint;
+use Drupal\campaignion_action\Redirects\Redirect;
 
 class ThankyouStep extends WizardStep {
   protected $step = 'thank';
@@ -31,44 +33,50 @@ class ThankyouStep extends WizardStep {
     return isset($emails[$eid]) && !empty($emails[$eid]['status']);
   }
 
-  protected function setConfirmationRedirect($url) {
-    $sql = 'UPDATE {webform_confirm_email} SET redirect_url=:url WHERE nid=:nid AND email_type=:conf_request';
-    $args = array(
-      ':url'          => $url,
-      ':nid'          => $this->wizard->node->nid,
-      ':conf_request' => WEBFORM_CONFIRM_EMAIL_CONFIRMATION_REQUEST,
-    );
-    db_query($sql, $args);
-  }
-
   protected function loadIncludes() {
     module_load_include('pages.inc', 'node');
     module_load_include('inc', 'webform', 'includes/webform.emails');
     module_load_include('inc', 'webform', 'includes/webform.components');
   }
 
+  /**
+   * Get components of a node in a format needed by the redirect app.
+   *
+   * @param object $node
+   *   This node’s components are listed.
+   *
+   * @return array
+   *   Array of component metadata arrays with the following keys:
+   *   - id: The component ID.
+   *   - label: The component’s label.
+   */
+  protected static function components($node) {
+    $fields = [];
+    foreach ($node->webform['components'] as $cid => $component) {
+      $fields[] = [
+        'id' => $cid,
+        'label' => $component['name'],
+      ];
+    }
+    return $fields;
+  }
+
   protected function pageForm(&$form_state, $index, $title, $prefix) {
     $field = &$this->referenceField['und'][$index];
 
+    $type = $field['type'];
     if (isset($field['node_reference_nid'])) {
-      $type = 'node';
       $node = node_load($field['node_reference_nid']);
-      $old['redirect_url'] = '';
     }
     else {
-      $type = 'redirect';
       $node = $this->wizard->prepareNode($this->contentType);
-      if (isset($field['redirect_url']) == FALSE) {
-        $old['redirect_url'] = '';
-      }
-      else {
-        $old['redirect_url'] = $field['redirect_url'];
-      }
     }
 
     $form = array(
       '#type'  => 'fieldset',
       '#title' => $title,
+      '#delta' => $index,
+      '#process' => [[static::class, 'addRedirectSettings']],
     );
     $form['type'] = array(
       '#type'          => 'radio',
@@ -77,12 +85,17 @@ class ThankyouStep extends WizardStep {
       '#default_value' => $type == 'redirect' ? 'redirect' : NULL,
       '#parents'       => array($prefix, 'type'),
     );
-    $form['redirect_url'] = array(
-      '#type'          => 'textfield',
-      '#title'         => t('Redirect URL'),
-      '#states'        => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'redirect'))),
-      '#default_value' => $old['redirect_url'],
+
+    // Personalized redirects widget
+    $redirect_container_id = drupal_html_id('personalized-redirects-widget');
+    $form['redirects'] = array(
+      '#type'       => 'container',
+      '#title'      => t('Manage redirects'),
+      '#states'     => array('visible' => array(":input[name=\"${prefix}[type]\"]" => array('value' => 'redirect'))),
+      '#id'         => $redirect_container_id,
+      '#attributes' => ['class' => ['personalized-redirects-widget']],
     );
+
     $form['or2'] = array(
       '#type'   => 'markup',
       '#markup' => '<div class="thank-you-outer-or"><span class="thank-you-line-or"><span class="thank-you-text-or">' . t('or') . '</span></span></div>',
@@ -130,14 +143,25 @@ class ThankyouStep extends WizardStep {
     // check if double opt in was enabled and if yes provide a 2nd thank you page
     $thank_you_class = 'half-left';
     if ($this->doubleOptIn) {
-      $form['submission_node'] = $this->pageForm($form_state, 0, t('Submission page'), 'submission_node');
+      $form['submission_node'] = $this->pageForm($form_state, Redirect::CONFIRMATION_PAGE, t('Submission page'), 'submission_node');
       $form['submission_node']['#attributes']['class'][] = 'half-left';
       $thank_you_class = 'half-right';
       $form['#attributes']['class'][] = 'two-halfs';
     }
 
-    $form['thank_you_node'] = $this->pageForm($form_state, 1, t('Thank you page'), 'thank_you_node');
+    $form['thank_you_node'] = $this->pageForm($form_state, Redirect::THANK_YOU_PAGE, t('Thank you page'), 'thank_you_node');
     $form['thank_you_node']['#attributes']['class'][] = $thank_you_class;
+
+    $dir = drupal_get_path('module', 'campaignion_wizard');
+    $form['#attached']['js'][] = [
+      'data' => $dir . '/js/redirects_app/redirects_app.vue.min.js',
+      'scope' => 'footer',
+      'preprocess' => FALSE,
+    ];
+    $form['#attached']['css'][] = [
+      'data' => $dir . '/css/redirects_app/redirects_app.css',
+      'group' => 'CSS_DEFAULT',
+    ];
 
     $form['#tree'] = TRUE;
     $form['wizard_head']['#tree'] = FALSE;
@@ -164,11 +188,7 @@ class ThankyouStep extends WizardStep {
           form_set_error("$page][node_form][title", t('!name field is required.', array('!name' => 'Title')));
         }
       }
-      elseif ($values[$page]['type'] == 'redirect') {
-        if (empty($values[$page]['redirect_url'])) {
-          form_set_error('redirect_url', t('You need to provide either a redirect url or create a thank you page.'));
-        }
-      }
+      // Redirect validating is done in the JS prior to the submit.
     }
   }
 
@@ -177,108 +197,72 @@ class ThankyouStep extends WizardStep {
     unset($form_state['values']);
     $action = $this->wizard->node;
 
-    $thank_you_pages = array('thank_you_node' => 1);
-    if ($this->doubleOptIn) {
-      $thank_you_pages['submission_node'] = 0;
-    }
+    // Be sure to always save two field items otherwise the thank you page
+    // is renumbered to 0.
+    $this->referenceField[LANGUAGE_NONE] += [
+      0 => ['type' => 'node', 'node_reference_nid' => NULL],
+      1 => ['type' => 'node', 'node_reference_nid' => NULL],
+    ];
 
-    foreach(array(0,1) as $index) {
-      $field = &$this->referenceField[LANGUAGE_NONE][$index];
-      $field['node_reference_nid'] = NULL;
-      $field['redirect_url'] = NULL;
+    $thank_you_pages = array('thank_you_node' => Redirect::THANK_YOU_PAGE);
+    if ($this->doubleOptIn) {
+      $thank_you_pages['submission_node'] = Redirect::CONFIRMATION_PAGE;
     }
 
     foreach($thank_you_pages as $page => $index) {
       $field = &$this->referenceField[LANGUAGE_NONE][$index];
+      $field['type'] = $values[$page]['type'];
       if ($values[$page]['type'] == 'node') {
         $form_state['values'] =& $values[$page]['node_form'];
 
         $formObj = $form_state['embedded'][$page]['node_form']['formObject'];
         $formObj->submit($form, $form_state);
-
         $field['node_reference_nid'] = $formObj->node()->nid;
-        $field['redirect_url']       = NULL;
-        $path = 'node/' . $form_state['values']['nid'];
-        if (count($thank_you_pages) == 1) {
-          $action->webform['redirect_url'] = $path;
-        }
-        else {
-          if ($page == 'thank_you_node') {
-            $this->setConfirmationRedirect($path);
-          }
-          else {
-            $action->webform['redirect_url'] = $path;
-          }
-        }
-      }
-      else {
-        $field['node_reference_nid'] = NULL;
-        $field['redirect_url']       = $values[$page]['redirect_url'];
-
-        if (count($thank_you_pages) == 1) {
-          $action->webform['redirect_url'] = $values[$page]['redirect_url'];
-        }
-        else {
-          if ($page == 'thank_you_node') {
-            $this->setConfirmationRedirect($values[$page]['redirect_url']);
-          }
-          else {
-            $action->webform['redirect_url'] = $values[$page]['redirect_url'];
-          }
-        }
       }
     }
-
+    // We completely ignore $node->webform['redirect'] and the redirect urls
+    // for confirmation emails here because their behavior is overriden in
+    // campaignion_action.
     node_save($action);
 
     $form_state['values'] =& $values;
   }
 
   public function status() {
-    $thank_you_pages = $this->referenceField[LANGUAGE_NONE];
-
-    $msg = t("After your supporters submitted their filled out form ");
-
-    if (   isset($thank_you_pages[0]['redirect_url'])       == TRUE
-        || isset($thank_you_pages[0]['node_reference_nid']) == TRUE) {
-
-      if (isset($thank_you_pages[0]['redirect_url']) == TRUE) {
-        $msg .= t(
-          "you're redirecting them to !link .",
-          array(
-            '!link' => l(
-              $thank_you_pages[0]['redirect_url'],
-              $thank_you_pages[0]['redirect_url']
-            )
-          )
-        );
-      }
-      else {
-        $node = node_load($thank_you_pages[0]['node_reference_nid']);
-        $msg .= t('they\'ll see your submission page !node.', array('!node' => l($node->title, 'node/' . $node->nid)));
-      }
-      $msg .= t("<br>After your supporters clicked the confirmation link ");
-    }
-
-    if (isset($thank_you_pages[1]['redirect_url']) == TRUE) {
-      $msg .= t(
-        "you're redirecting them to !link .",
-        array(
-          '!link' => l(
-            $thank_you_pages[1]['redirect_url'],
-            $thank_you_pages[1]['redirect_url']
-          )
-        )
-      );
-    }
-    else {
-      $node = node_load($thank_you_pages[1]['node_reference_nid']);
-      $msg .= t('they\'ll see your thank you page !node.', array('!node' => l($node->title, 'node/' . $node->nid)));
-    }
-
+    $items = $this->referenceField[LANGUAGE_NONE];
+    $msg = [
+      '#theme' => 'campaignion_wizard_thank_summary',
+      '#items' => $items,
+      '#node' => $this->wizard->node,
+      '#double_optin' => $this->hasDoubleOptIn(),
+    ];
     return array(
       'caption' => t('Thank you page'),
-      'message' => $msg,
+      'message' => drupal_render($msg),
     );
   }
+
+  /**
+   * Form processing handler for attaching settings for the redirect vue app.
+   *
+   * The existing redirects need to be added in a process handler otherwise they
+   * won’t be updated on server-side validation errors.
+   *
+   * @see \Drupal\campaignion_wizard\ThankYouStep::pageForm()
+   */
+  public static function addRedirectSettings($element, &$form_state) {
+    $node = $form_state['oowizard']->node;
+    $delta = $element['#delta'];
+    $settings = [
+      'fields' => static::components($node),
+      'endpoints' => [
+        'nodes' => url('wizard/nodes'),
+        'redirects' => url("node/{$node->nid}/redirects/$delta"),
+      ],
+    ] + (new Endpoint($node, $delta))->get();
+    $settings['campaignion_wizard'][$element['redirects']['#id']] = $settings;
+    $element['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
+    return $element;
+  }
+
 }
