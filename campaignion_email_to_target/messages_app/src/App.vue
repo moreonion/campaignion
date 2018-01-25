@@ -20,7 +20,8 @@
 <script>
 import {mapState} from 'vuex'
 import {clone, dispatch, isEmptyMessage} from '@/utils'
-import {isEqual, omit} from 'lodash'
+import isEqual from 'lodash.isequal'
+import omit from 'lodash.omit'
 import SpecList from './components/SpecList'
 import MessageEditor from './components/MessageEditor'
 import TokensList from './components/TokensList'
