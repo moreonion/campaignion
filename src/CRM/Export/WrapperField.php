@@ -11,17 +11,25 @@ class WrapperField implements ExportMapperInterface {
     $this->key = $key;
   }
 
+  /**
+   * Get value(s) for this field.
+   *
+   * @return mixed
+   *   - NULL if the field doesn’t exist.
+   *   - A single field value if $delta is given and not NULL.
+   *   - All values as an array if $delta is NULL.
+   */
   public function value($delta = 0) {
     $w = $this->exporter->getWrappedContact();
-    if ($w->__isset($this->key)) {
-      $value = $w->{$this->key}->value();
-      if (isset($delta) && is_array($value) && isset($value[$delta])) {
-        return $value[$delta];
-      }
-      return $value;
+    if (!$w->__isset($this->key)) {
+      return NULL;
+    }
+    $field = $w->{$this->key};
+    if ($field instanceof \EntityListWrapper) {
+      return is_null($delta) ? $field->value() : $field->get($delta)->value();
     }
     else {
-      return NULL;
+      return is_null($delta) ? [$field->value()] : $field->value();
     }
   }
 
