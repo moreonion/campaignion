@@ -124,16 +124,16 @@ function _webform_edit_newsletter($component) {
     // Needed for form_builder.
     '#tree' => TRUE,
     '#type' => 'fieldset',
-    '#title' => t('Labels for the radios'),
+    '#title' => t('Labels for the radios.'),
     '#states' => ['visible' => ["#$display_id" => ['value' => 'radios']]],
     1 => [
       '#type' => 'textfield',
-      '#title' => t('Yes'),
+      '#title' => t('Subscribe'),
       '#default_value' => $component['extra']['radio_labels'][1],
     ],
     0 => [
       '#type' => 'textfield',
-      '#title' => t('No'),
+      '#title' => t('Unsubscribe'),
       '#default_value' => $component['extra']['radio_labels'][0],
     ],
   ];
@@ -204,8 +204,32 @@ function _webform_submit_newsletter($component, $value) {
       return empty($value['subscribed']) ? [''] : ['subscribed'];
 
     case 'radios':
-      return $value == 'yes' ? ['subscribed'] : [''];
+      switch ($value) {
+        case 'yes':
+          return ['subscribed'];
+        case 'no':
+          return ['unsubscribed'];
+        default:
+          return [''];
+      }
+  }
+}
 
+/**
+ * Helper function to create display labels for stored values.
+ */
+function _webform_newsletter_value_to_label($value) {
+  if (!$value) {
+    return t('not subscribed');
+  }
+  $value = reset($value);
+  switch ($value) {
+    case 'subscribed':
+      return t('subscribed');
+    case 'unsubscribed':
+      return t('unsubscribed');
+    default:
+      return t('not subscribed');
   }
 }
 
@@ -213,7 +237,7 @@ function _webform_submit_newsletter($component, $value) {
  * Implements _webform_display_component().
  */
 function _webform_display_newsletter($component, $value, $format = 'html') {
-  $v['#markup'] = !empty($value[0]) ? t('subscribed') : t('not subscribed');
+  $v['#markup'] = _webform_newsletter_value_to_label($value);
   return $v;
 }
 
@@ -327,7 +351,7 @@ function _webform_form_builder_map_newsletter() {
  * Implements _webform_table_component().
  */
 function _webform_table_newsletter($component, $value) {
-  return $value && reset($value) ? t('subscribed') : t('not subscribed');
+  return _webform_newsletter_value_to_label($value);
 }
 
 /**
@@ -345,7 +369,7 @@ function _webform_csv_headers_newsletter($component, $export_options) {
  * Implements _webform_csv_data_component().
  */
 function _webform_csv_data_newsletter($component, $export_options, $value) {
-  return $value && reset($value) ? t('subscribed') : t('not subscribed');
+  return _webform_newsletter_value_to_label($value);
 }
 
 /**

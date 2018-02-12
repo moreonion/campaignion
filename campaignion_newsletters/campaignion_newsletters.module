@@ -150,10 +150,11 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
     return;
   }
   foreach ($s->webform->componentsByType('newsletter') as $component) {
-    if ($s->valueByCid($component['cid'])) {
+    $value = $s->valueByCid($component['cid']);
+    if ($value == 'subscribed') {
       $needs_opt_in = !$component['extra']['opt_in_implied'];
-      foreach ($component['extra']['lists'] as $list_id => $value) {
-        if (!empty($value)) {
+      foreach ($component['extra']['lists'] as $list_id => $enabled) {
+        if (!empty($enabled)) {
           $subscription = Subscription::byData($list_id, $email);
           $subscription->delete = FALSE;
           $subscription->source = $s;
@@ -163,6 +164,11 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
           $subscription->optin_info = FormSubmission::fromWebformSubmission($s);
           $subscription->save();
         }
+      }
+    }
+    elseif ($value == 'unsubscribed') {
+      foreach (Subscription::byEmail($email) as $subscription) {
+        $subscription->delete();
       }
     }
   }

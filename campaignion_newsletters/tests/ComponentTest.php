@@ -41,13 +41,17 @@ class ComponentTest extends \DrupalUnitTestCase {
   public function testSubmitRadios() {
     $c['extra']['display'] = 'radios';
 
-    // Not checked checkbox.
+    // Radio no.
     $v = 'no';
-    $this->assertEqual([''], _webform_submit_newsletter($c, $v));
+    $this->assertEqual(['unsubscribed'], _webform_submit_newsletter($c, $v));
 
-    // Checked checkbox.
+    // Radio yes.
     $v = 'yes';
     $this->assertEqual(['subscribed'], _webform_submit_newsletter($c, $v));
+
+    // Not selected radio.
+    $v = NULL;
+    $this->assertEqual([''], _webform_submit_newsletter($c, $v));
   }
 
   public function testTable() {
