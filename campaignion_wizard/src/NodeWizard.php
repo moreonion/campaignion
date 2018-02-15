@@ -91,6 +91,12 @@ abstract class NodeWizard extends Wizard {
     $node->language = LANGUAGE_NONE;
     $node->title = '';
     $node->sticky = 0;
+
+    if (module_exists('change_publishing_status_permission')
+      && !user_access('change publishing status')) {
+      $node->status = FALSE;
+    }
+
     return $node;
   }
 

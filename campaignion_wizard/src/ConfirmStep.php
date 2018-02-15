@@ -74,6 +74,13 @@ class ConfirmStep extends WizardStep {
       '#wizard type' => 'return',
       '#attributes' => ['class' => ['button-finish-other']],
     ];
+
+    if (module_exists('change_publishing_status_permission')) {
+      $node = $this->wizard->node;
+      $buttons['return']['#access'] = user_access('change_publishing_status') || $node->status;
+      $buttons['draft']['#access'] = user_access('change_publishing_status') || !$node->status;
+    }
+
     return $buttons;
   }
 
