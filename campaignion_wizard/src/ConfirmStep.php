@@ -66,14 +66,6 @@ class ConfirmStep extends WizardStep {
       '#wizard type' => 'return',
       '#attributes' => ['class' => ['button-finish']],
     ];
-    $buttons['schedule'] = [
-      '#type' => 'submit',
-      '#value' => t('Schedule publishing'),
-      '#name' => 'schedule',
-      '#weight' => 1010,
-      '#access' => FALSE,
-      '#attributes' => ['class' => ['button-finish-other']],
-    ];
     $buttons['draft'] = [
       '#type' => 'submit',
       '#value' => t('Save as draft'),
@@ -122,10 +114,6 @@ class ConfirmStep extends WizardStep {
             node_save($node);
             drupal_set_message(t('!type saved as draft.', array('!type' => $type_name)), 'status');
             $form_state['redirect'] = 'node/' . $node->nid;
-            break;
-
-          case 'schedule':
-            drupal_set_message(t('Schedule is not implemented yet.'), 'warning');
             break;
         }
       }
