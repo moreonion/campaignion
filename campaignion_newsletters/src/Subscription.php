@@ -13,6 +13,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
   public $source = NULL;
   public $needs_opt_in = FALSE;
   public $send_welcome = FALSE;
+  public $optin_statement = '';
   public $optin_info = NULL;
 
   public static $lists = array();

@@ -161,6 +161,11 @@ function campaignion_activity_schema() {
       'from_provider' => [
         'description' => 'Flag for whether the change was initiated by the provider',
       ] + $unsigned_int_not_null,
+      'optin_statement' => [
+        'description' => 'Opt-in statement',
+        'type' => 'text',
+        'not null' => FALSE,
+      ],
     ],
     'primary key' => ['activity_id'],
     'indexes' => [
@@ -187,6 +192,17 @@ function campaignion_activity_schema() {
  */
 function campaignion_activity_uninstall() {
   variable_del('campaignion_activity_log_contact_save');
+}
+
+/**
+ * Add opt-in statement to newsletter subscription activities.
+ */
+function campaignion_activity_update_6() {
+  db_add_field('campaignion_activity_newsletter_subscription', 'optin_statement', array(
+    'description' => 'Opt-in statement',
+    'type' => 'text',
+    'not null' => FALSE,
+  ));
 }
 
 /**

@@ -29,6 +29,7 @@ function _webform_defaults_newsletter() {
       'display' => 'checkbox',
       'radio_labels' => [t('No'), t('Yes, I want to subscribe to the newsletter')],
       'checkbox_label' => t('Subscribe me to the newsletter.'),
+      'optin_statement' => '',
     ),
   );
 }
@@ -135,6 +136,12 @@ function _webform_edit_newsletter($component) {
     ],
   ];
 
+  $form['extra']['optin_statement'] = [
+    '#type' => 'textarea',
+    '#title' => t('Opt-in statement'),
+    '#default_value' => $component['extra']['optin_statement'],
+  ];
+
   return $form;
 }
 
@@ -225,6 +232,7 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
   $form['newsletter_display'] = $edit['extra']['display'] + $dp;
   $form['newsletter_checkbox_label'] = $edit['extra']['checkbox_label'] + $dp;
   $form['newsletter_radio_labels'] = $edit['extra']['radio_labels'] + $dp;
+  $form['newsletter_optin_statement'] = $edit['extra']['optin_statement'];
 
   return $form;
 }
@@ -261,6 +269,7 @@ function _webform_form_builder_properties_newsletter() {
     'newsletter_display' => [],
     'newsletter_radio_labels' => [],
     'newsletter_checkbox_label' => [],
+    'newsletter_optin_statement' => [],
   );
 }
 
@@ -301,6 +310,9 @@ function _webform_form_builder_map_newsletter() {
     ],
     'newsletter_checkbox_label' => [
       'storage_parents' => ['extra', 'checkbox_label'],
+    ],
+    'newsletter_optin_statement' => [
+      'storage_parents' => ['extra', 'optin_statement'],
     ],
   );
   return $map;
