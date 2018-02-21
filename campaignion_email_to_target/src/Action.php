@@ -102,7 +102,7 @@ class Action extends ActionBase {
   public function targetMessagePairs($submission_o, $test_mode = FALSE) {
     $dataset = $this->options['dataset_name'];
     $email_override = $test_mode ? $submission_o->valueByKey('email') : NULL;
-    $postcode = str_replace(' ', '', $submission_o->valueByKey('postcode'));
+    $postcode = preg_replace('/[ -]/', '', $submission_o->valueByKey('postcode'));
     $constituencies = $this->api->getTargets($dataset, $postcode);
 
     $pairs = [];
