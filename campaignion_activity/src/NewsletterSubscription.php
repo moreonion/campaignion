@@ -2,9 +2,9 @@
 
 namespace Drupal\campaignion_activity;
 
-use \Drupal\campaignion\ContactTypeManager;
-use \Drupal\campaignion\CRM\Import\Source\ArraySource;
-use \Drupal\campaignion_newsletters\Subscription;
+use Drupal\campaignion\ContactTypeManager;
+use Drupal\campaignion\CRM\Import\Source\ArraySource;
+use Drupal\campaignion_newsletters\Subscription;
 
 /**
  * Partial model object to store newsletter subscription data for activities.

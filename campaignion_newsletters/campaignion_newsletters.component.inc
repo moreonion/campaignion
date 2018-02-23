@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Campaignion newsletter component for webform.
@@ -78,7 +79,7 @@ function _webform_edit_newsletter($component) {
     '#description' => t('Which lists should the user be subscribed to?'),
     '#options' => $newsletters,
     '#weight' => 1,
-    // only relevant if type is 'select':
+    // Only relevant if type is 'select':
     '#empty_option' => t('Select newsletters'),
     '#multiple' => 1,
     '#select2' => array(),
@@ -120,7 +121,8 @@ function _webform_edit_newsletter($component) {
   ];
 
   $form['extra']['radio_labels'] = [
-    '#tree' => TRUE, // Needed for form_builder.
+    // Needed for form_builder.
+    '#tree' => TRUE,
     '#type' => 'fieldset',
     '#title' => t('Labels for the radios'),
     '#states' => ['visible' => ["#$display_id" => ['value' => 'radios']]],
@@ -145,6 +147,9 @@ function _webform_edit_newsletter($component) {
   return $form;
 }
 
+/**
+ * Validate function.
+ */
 function _webform_value_validate_newsletter(&$element, &$form_state) {
   $values = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
   $values = serialize($values);
@@ -176,6 +181,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
         '#options' => $options,
       ];
       break;
+
     case 'radios':
       $l = $component['extra']['radio_labels'];
       $options = ['yes' => $l[1], 'no' => $l[0]];
@@ -196,11 +202,10 @@ function _webform_submit_newsletter($component, $value) {
   switch ($component['extra']['display']) {
     case 'checkbox':
       return empty($value['subscribed']) ? [''] : ['subscribed'];
-      break;
 
     case 'radios':
       return $value == 'yes' ? ['subscribed'] : [''];
-      break;
+
   }
 }
 
@@ -215,7 +220,7 @@ function _webform_display_newsletter($component, $value, $format = 'html') {
 /**
  * Form callback for the newsletter property.
  *
- * @see _webform_form_builder_map_newsletter().
+ * @see _webform_form_builder_map_newsletter()
  */
 function campaignion_newsletters_form_builder_property_newsletter_form(&$form_state, $form_type, $element, $property) {
   $form['options'] = array(
@@ -240,22 +245,21 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
 /**
  * Submit handler for the newsletter property.
  *
- * @see _webform_form_builder_map_newsletter().
+ * @see _webform_form_builder_map_newsletter()
  */
 function campaignion_newsletters_form_builder_property_newsletter_form_submit(&$form, &$form_state) {
   $form_state['values']['newsletter_lists'] = $form_state['values']['options']['lists'];
 }
-
 
 /**
  * Implements _webform_form_builder_properties_component().
  *
  * Component specific properties.
  * This is currently broken as the component specific properties are merged into
- * the global property list. That makes it behave the same way as an implementation
- * of hook_form_builder_properties().
+ * the global property list. That makes it behave the same way as an
+ * implementation of hook_form_builder_properties().
  *
- * @see form_builder_webform_form_builder_properties().
+ * @see form_builder_webform_form_builder_properties()
  */
 function _webform_form_builder_properties_newsletter() {
   return array(
@@ -275,6 +279,7 @@ function _webform_form_builder_properties_newsletter() {
 
 /**
  * Implements _webform_CALLBACK_TYPE().
+ *
  * Implements _webform_form_builder_map_TYPE().
  *
  * Defines mapping from webform component to form_builder element type.
