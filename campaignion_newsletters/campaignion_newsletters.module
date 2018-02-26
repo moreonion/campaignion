@@ -1,16 +1,17 @@
 <?php
+
 /**
  * @file
  * Campaignion newsletter module.
  */
 
-use \Drupal\campaignion_newsletters\CronRunner;
-use \Drupal\campaignion_newsletters\ProviderFactory;
-use \Drupal\campaignion_newsletters\FormSubmission;
-use \Drupal\campaignion_newsletters\Subscription;
-use \Drupal\campaignion_newsletters\Subscriptions;
-use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
-use \Drupal\little_helpers\Webform\Submission;
+use Drupal\campaignion_newsletters\CronRunner;
+use Drupal\campaignion_newsletters\ProviderFactory;
+use Drupal\campaignion_newsletters\FormSubmission;
+use Drupal\campaignion_newsletters\Subscription;
+use Drupal\campaignion_newsletters\Subscriptions;
+use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Implements hook_cron().
@@ -48,8 +49,8 @@ function campaignion_newsletters_permission() {
  */
 function campaignion_newsletters_menu() {
   $items['admin/config/services/campaignion_newsletters'] = array(
-    'title' => t('Newsletter settings'),
-    'description' => t('Configure newsletter API behavior'),
+    'title' => 'Newsletter settings',
+    'description' => 'Configure newsletter API behavior',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('campaignion_newsletters_admin_settings'),
     'access arguments' => array('administer newsletters'),
@@ -59,9 +60,9 @@ function campaignion_newsletters_menu() {
   return $items;
 }
 
-
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
  * Implements hook_form_redhen_contact_contact_form_alter().
  */
 function campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form, &$form_state) {
@@ -91,7 +92,7 @@ function campaignion_newsletters_webform_component_info() {
  */
 function campaignion_newsletters_webform_submission_confirmed(Submission $submission) {
   $s = new WebformSubmission($submission->node, $submission);
-  // use value of the component with key 'email' as email address
+  // Use value of the component with key 'email' as email address.
   if (!($email = $s->value('email'))) {
     return;
   }
@@ -105,6 +106,7 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
           $subscription->source = $s;
           $subscription->needs_opt_in = $needs_opt_in;
           $subscription->send_welcome = (bool) $component['extra']['send_welcome'];
+          $subscription->optin_statement = $component['extra']['optin_statement'];
           $subscription->optin_info = FormSubmission::fromWebformSubmission($s);
           $subscription->save();
         }
@@ -118,17 +120,22 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
  *
  * Defines a new form_builder field:
  * - 'title'
- * - in which ['palette_group'] it appears. @see hook_form_builder_palette_groups().
- * - it's ['default'] representation (is used when dragging it into the preview area) including:
- *   - ['#webform_component'] the component array for webform (most important it's ['#webform_component']['type'].
- *     @see hook_webform_component_info().
- *   - ['#type'] the form-API type is used as the default form_builder element_type.
- *     @see hook_element_info().
+ * - in which ['palette_group'] it appears.
+ * - it's ['default'] representation (is used when dragging it into the preview
+ *   area) including:
+ *   - ['#webform_component'] the component array for webform (most important
+ *     it's ['#webform_component']['type'].
+ *   - ['#type'] the form-API type is used as the default form_builder
+ *     element_type.
  *   - ['#form_builder'] the form_builder type (again).
- *     @see hook_form_builder_element_types().
  * - whether or not the field is ['unique'].
  *
  * Fields are defined per form_type (so far only 'webform' is relevant for us).
+ *
+ * @see hook_form_builder_palette_groups()
+ * @see hook_webform_component_info()
+ * @see hook_element_info()
+ * @see hook_form_builder_element_types()
  */
 function campaignion_newsletters_form_builder_element_types($form_type, $form_id) {
   if ($form_type != 'webform') {
@@ -136,13 +143,13 @@ function campaignion_newsletters_form_builder_element_types($form_type, $form_id
   }
   require_once dirname(__FILE__) . '/campaignion_newsletters.component.inc';
   $map = _form_builder_webform_property_map('newsletter');
-  // default value is handled by the newsletter property.
+  // Default value is handled by the newsletter property.
   unset($map['properties']['default_value']);
   unset($map['properties']['description']);
   $fields['newsletter'] = array(
     'title' => t('Newsletter'),
     'properties' => array_keys($map['properties']),
-    'default' =>  array(
+    'default' => array(
       '#form_builder' => array('element_type' => 'newsletter'),
     ) + _form_builder_webform_default('newsletter'),
   );

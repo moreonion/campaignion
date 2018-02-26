@@ -2,7 +2,12 @@
 
 namespace Drupal\campaignion_newsletters;
 
-class Subscription extends \Drupal\little_helpers\DB\Model {
+use Drupal\little_helpers\DB\Model;
+
+/**
+ * Subscription model.
+ */
+class Subscription extends Model {
   public $list_id;
   public $email;
   public $fingerprint = '';
@@ -13,6 +18,7 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
   public $source = NULL;
   public $needs_opt_in = FALSE;
   public $send_welcome = FALSE;
+  public $optin_statement = '';
   public $optin_info = NULL;
 
   public static $lists = array();
@@ -22,6 +28,14 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
   protected static $values = array('fingerprint', 'updated', 'last_sync');
   protected static $serial = FALSE;
 
+  /**
+   * Get an instance from DB or create a new one.
+   *
+   * @param string $list_id
+   *   A list id.
+   * @param string $email
+   *   An email address.
+   */
   public static function byData($list_id, $email) {
     $result = db_select(static::$table, 's')
       ->fields('s')
@@ -30,11 +44,20 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
       ->execute();
     if ($row = $result->fetch()) {
       return new static($row, FALSE);
-    } else {
+    }
+    else {
       return static::fromData($list_id, $email);
     }
   }
 
+  /**
+   * Construct a new instance from data.
+   *
+   * @param string $list_id
+   *   A list id.
+   * @param string $email
+   *   An email address.
+   */
   public static function fromData($list_id, $email) {
     return new static(array(
       'list_id' => $list_id,
@@ -42,6 +65,15 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
     ), TRUE);
   }
 
+  /**
+   * Load all subscriptions for one email address.
+   *
+   * @param string $email
+   *   An email address.
+   *
+   * @return static[]
+   *   List of subscriptions.
+   */
   public static function byEmail($email) {
     $subscriptions = array();
     $result = db_select(static::$table, 's')
@@ -54,6 +86,12 @@ class Subscription extends \Drupal\little_helpers\DB\Model {
     return $subscriptions;
   }
 
+  /**
+   * Get the newsletter list instance.
+   *
+   * @return \Drupal\campaignion_newsletters\NewsletterList
+   *   The newsletter list for this subscription.
+   */
   public function newsletterList() {
     if (!isset(self::$lists[$this->list_id])) {
       self::$lists[$this->list_id] = NewsletterList::load($this->list_id);
