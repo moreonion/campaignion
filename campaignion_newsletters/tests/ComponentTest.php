@@ -8,6 +8,24 @@ class ComponentTest extends \DrupalUnitTestCase {
     require_once drupal_get_path('module', 'campaignion_newsletters') . '/campaignion_newsletters.component.inc';
   }
 
+  public function testComponentDefaults() {
+    $defaults = webform_component_invoke('newsletter', 'defaults');
+
+    $expected_subset = array(
+      'extra' => array(
+        'opt_in_implied' => 1,
+        'send_welcome' => 0,
+        'optin_statement' => '',
+      )
+    );
+
+    $this->assertArraySubset($expected_subset, $defaults);
+
+    $component = webform_component_invoke('newsletter', 'edit', $defaults);
+
+    $this->assertEqual('textarea', $component['extra']['optin_statement']['#type']);
+  }
+
   public function testSubmitCheckbox() {
     $c['extra']['display'] = 'checkbox';
 
