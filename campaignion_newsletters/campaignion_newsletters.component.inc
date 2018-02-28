@@ -347,3 +347,26 @@ function _webform_csv_headers_newsletter($component, $export_options) {
 function _webform_csv_data_newsletter($component, $export_options, $value) {
   return $value && reset($value) ? t('subscribed') : t('not subscribed');
 }
+
+/**
+ * Webform conditional comparison callback for 'equal'.
+ */
+function _webform_conditional_comparison_newsletter_equal(array $input_values, $rule_value, array $component) {
+  if (!$input_values) {
+    return $rule_value == 'no';
+  }
+  $look_for = $rule_value == 'yes' ? ['subscribed', 'yes'] : [0, 'no', ''];
+  foreach ($input_values as $value) {
+    if (in_array($value, $look_for, TRUE)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Webform conditional comparison callback for 'not_equal'.
+ */
+function _webform_conditional_comparison_newsletter_not_equal(array $input_values, $rule_value, array $component) {
+  return !_webform_conditional_comparison_newsletter_equal($input_values, $rule_value, $component);
+}
