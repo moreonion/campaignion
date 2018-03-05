@@ -131,13 +131,13 @@ function campaignion_newsletters_webform_conditional_form($node) {
  *
  * Load the JavaScript needed for same-page conditionals.
  */
-function campaignion_newsletters_form_webform_client_form_alter($form, &$form_state) {
+function campaignion_newsletters_form_webform_client_form_alter(&$form, &$form_state) {
   // Webfrom (4.16) provides no concise way to test whether a component with the
   // 'newsletter' conditional type is the source for a same-page conditional on
   // the current webform page. For simplicity we simply do the same as webform
   // does: Load the JavaScript for every webform.
   $path = drupal_get_path('module', 'campaignion_newsletters');
-  $element['#attached']['js'][] = "$path/campaignion_newsletters.conditionals.js";
+  $form['#attached']['js'][] = "$path/campaignion_newsletters.conditionals.js";
 }
 
 /**
