@@ -42,10 +42,12 @@ class ContentPage extends Page {
     $this->filterForm = new FilterForm('content', $filters, $default);
 
     $this->listing = new ContentListing(20);
-    $this->bulkOpForm = new BulkOpForm(array(
-      'publish' => new ContentPublish(),
-      'unpubslih' => new ContentUnpublish(),
-    ));
+    $ops = [];
+    if (!module_exists('change_publishing_status_permission') || user_access('change publishing status')) {
+      $ops['publish'] = new ContentPublish();
+      $ops['unpublish'] = new ContentUnpublish();
+    }
+    $this->bulkOpForm = new BulkOpForm($ops);
   }
 
   /**
