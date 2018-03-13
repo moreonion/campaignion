@@ -92,8 +92,7 @@ class MPDataLoader {
     foreach ($fields as $field) {
       if ($items = field_get_items($entity_type, $entity, $field['field_name'])) {
         foreach ($items as $item) {
-          if ($item['postal_code'] && $item['country'] == 'GB') {
-            $postcode = $item['postal_code'];
+          if ($postcode = $this->extractPostcode($item)) {
             break 2;
           }
         }
@@ -101,7 +100,7 @@ class MPDataLoader {
     }
     if ($postcode) {
       $api = Client::fromConfig();
-      $data = $api->getTargets('mp', str_replace(' ', '', $postcode));
+      $data = $api->getTargets('mp', $postcode);
       if ($data) {
         $constituency = !empty($data[0]) ? $data[0] : NULL;
         $target = !empty($constituency['contacts'][0]) ? $constituency['contacts'][0] : NULL;
@@ -109,6 +108,26 @@ class MPDataLoader {
         foreach ($target_fields as $field_name => $field) {
           $this->setters[$field_name]($wrapped->{$field_name}, $constituency, $target);
         }
+      }
+    }
+  }
+
+  /**
+   * Extracts a valid UK postcode from an addressfield item.
+   *
+   * @param array $item
+   *   The address to extract from.
+   *
+   * @return string|null
+   *   A valid (normalized) UK postcode, or NULL if the address doesn’t contain
+   *   one.
+   */
+  protected function extractPostcode(array $item) {
+    if ($item['postal_code'] && $item['country'] == 'GB') {
+      $r = postal_code_validation_validate($item['postal_code'], 'GB');
+      if (empty($r['error'])) {
+        // Strip spaces and dashes allowed by postal_code_validation_validate().
+        return preg_replace('/[ -]/', '', $item['postal_code']);
       }
     }
   }
