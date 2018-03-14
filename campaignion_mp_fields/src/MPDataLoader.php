@@ -10,12 +10,20 @@ use \Drupal\campaignion_email_to_target\Api\Client;
 class MPDataLoader {
 
   /**
+   * API-Client for the e2t-api.
+   *
+   * @var \Drupal\campaignion_email_to_target\Api\Client
+   */
+  protected $api;
+
+  /**
    * Generate new instance from hard-coded configuration.
    *
    * @return static
    *   A new instance of this class.
    */
   public static function fromConfig() {
+    $api = Client::fromConfig();
     $setters = [
       'mp_constituency' => function ($field, $constituency, $target) {
         if (!empty($constituency['name'])) {
@@ -40,7 +48,7 @@ class MPDataLoader {
         }
       },
     ];
-    return new static($setters);
+    return new static($api, $setters);
   }
 
   /**
@@ -54,7 +62,8 @@ class MPDataLoader {
    *   - target: The target data from the API (or NULL).
    *   The functions should set their field’s value if available.
    */
-  public function __construct(array $setters) {
+  public function __construct(Client $api, array $setters) {
+    $this->api = $api;
     $this->setters = $setters;
   }
 
@@ -99,8 +108,7 @@ class MPDataLoader {
       }
     }
     if ($postcode) {
-      $api = Client::fromConfig();
-      $data = $api->getTargets('mp', $postcode);
+      $data = $this->api->getTargets('mp', $postcode);
       if ($data) {
         $constituency = !empty($data[0]) ? $data[0] : NULL;
         $target = !empty($constituency['contacts'][0]) ? $constituency['contacts'][0] : NULL;
