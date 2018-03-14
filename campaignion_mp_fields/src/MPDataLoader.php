@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_mp_fields;
 
 use \Drupal\campaignion_email_to_target\Api\Client;
+use \Drupal\campaignion_email_to_target\Api\ConfigError;
 
 /**
  * Extract UK postcodes from address fields and add MP data to an entity.
@@ -19,11 +20,16 @@ class MPDataLoader {
   /**
    * Generate new instance from hard-coded configuration.
    *
-   * @return static
-   *   A new instance of this class.
+   * @return static|null
+   *   A new instance of this class or NULL if the API is not available.
    */
   public static function fromConfig() {
-    $api = Client::fromConfig();
+    try {
+      $api = Client::fromConfig();
+    }
+    catch (ConfigError $e) {
+      return NULL;
+    }
     $setters = [
       'mp_constituency' => function ($field, $constituency, $target) {
         if (!empty($constituency['name'])) {
