@@ -6,3 +6,4 @@ package = Campaignion
 dependencies[] = campaignion_vue
 dependencies[] = libraries
 dependencies[] = little_helpers
+dependencies[] = variable

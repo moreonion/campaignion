@@ -161,6 +161,16 @@ function campaignion_email_to_target_requirements($phase) {
 }
 
 /**
+ * Enable the variable module.
+ */
+function campaignion_email_to_target_update_8() {
+  if (!module_enable(['variable'])) {
+    $err = 'Could not enable variable.';
+    throw new \DrupalUpdateException($err);
+  }
+}
+
+/**
  * Add selection_mode column to all fields.
  */
 function campaignion_email_to_target_update_7() {
