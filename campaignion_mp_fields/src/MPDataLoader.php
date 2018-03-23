@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_mp_fields;
 
 use \Drupal\campaignion_email_to_target\Api\Client;
+use \Drupal\campaignion_email_to_target\Api\ConfigError;
 
 /**
  * Extract UK postcodes from address fields and add MP data to an entity.
@@ -10,12 +11,25 @@ use \Drupal\campaignion_email_to_target\Api\Client;
 class MPDataLoader {
 
   /**
+   * API-Client for the e2t-api.
+   *
+   * @var \Drupal\campaignion_email_to_target\Api\Client
+   */
+  protected $api;
+
+  /**
    * Generate new instance from hard-coded configuration.
    *
-   * @return static
-   *   A new instance of this class.
+   * @return static|null
+   *   A new instance of this class or NULL if the API is not available.
    */
   public static function fromConfig() {
+    try {
+      $api = Client::fromConfig();
+    }
+    catch (ConfigError $e) {
+      return NULL;
+    }
     $setters = [
       'mp_constituency' => function ($field, $constituency, $target) {
         if (!empty($constituency['name'])) {
@@ -40,7 +54,7 @@ class MPDataLoader {
         }
       },
     ];
-    return new static($setters);
+    return new static($api, $setters);
   }
 
   /**
@@ -54,7 +68,8 @@ class MPDataLoader {
    *   - target: The target data from the API (or NULL).
    *   The functions should set their field’s value if available.
    */
-  public function __construct(array $setters) {
+  public function __construct(Client $api, array $setters) {
+    $this->api = $api;
     $this->setters = $setters;
   }
 
@@ -92,16 +107,14 @@ class MPDataLoader {
     foreach ($fields as $field) {
       if ($items = field_get_items($entity_type, $entity, $field['field_name'])) {
         foreach ($items as $item) {
-          if ($item['postal_code'] && $item['country'] == 'GB') {
-            $postcode = $item['postal_code'];
+          if ($postcode = $this->extractPostcode($item)) {
             break 2;
           }
         }
       }
     }
     if ($postcode) {
-      $api = Client::fromConfig();
-      $data = $api->getTargets('mp', str_replace(' ', '', $postcode));
+      $data = $this->api->getTargets('mp', $postcode);
       if ($data) {
         $constituency = !empty($data[0]) ? $data[0] : NULL;
         $target = !empty($constituency['contacts'][0]) ? $constituency['contacts'][0] : NULL;
@@ -109,6 +122,26 @@ class MPDataLoader {
         foreach ($target_fields as $field_name => $field) {
           $this->setters[$field_name]($wrapped->{$field_name}, $constituency, $target);
         }
+      }
+    }
+  }
+
+  /**
+   * Extracts a valid UK postcode from an addressfield item.
+   *
+   * @param array $item
+   *   The address to extract from.
+   *
+   * @return string|null
+   *   A valid (normalized) UK postcode, or NULL if the address doesn’t contain
+   *   one.
+   */
+  protected function extractPostcode(array $item) {
+    if ($item['postal_code'] && $item['country'] == 'GB') {
+      $r = postal_code_validation_validate($item['postal_code'], 'GB');
+      if (empty($r['error'])) {
+        // Strip spaces and dashes allowed by postal_code_validation_validate().
+        return preg_replace('/[ -]/', '', $item['postal_code']);
       }
     }
   }
