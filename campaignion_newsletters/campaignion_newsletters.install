@@ -187,6 +187,18 @@ function campaignion_newsletters_uninstall() {
 }
 
 /**
+ * Update internal representation of conditional values ('no' → '').
+ */
+function campaignion_newsletters_update_16() {
+  $sql = <<<SQL
+UPDATE webform_conditional_rules r
+  INNER JOIN webform_component c ON r.nid=c.nid AND r.source=c.cid SET r.value=''
+WHERE source_type='component' AND r.value='no'
+SQL;
+  db_query($sql);
+}
+
+/**
  * Add an updated and last_sync timestamps to newsletter subscriptions.
  */
 function campaignion_newsletters_update_15() {

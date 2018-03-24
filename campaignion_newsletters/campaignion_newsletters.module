@@ -8,6 +8,7 @@
 use Drupal\campaignion_newsletters\CronRunner;
 use Drupal\campaignion_newsletters\ProviderFactory;
 use Drupal\campaignion_newsletters\FormSubmission;
+use Drupal\campaignion_newsletters\NewsletterList;
 use Drupal\campaignion_newsletters\Subscription;
 use Drupal\campaignion_newsletters\Subscriptions;
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
@@ -117,7 +118,8 @@ function campaignion_newsletters_webform_conditional_form($node) {
         '#type' => 'select',
         '#options' => [
           'yes' => t('Opt-in'),
-          'no' => t('No opt-in'),
+          '' => t('No change'),
+          'no' => t('Opt-out'),
         ],
       ];
       $forms[$cid] = drupal_render($element);
@@ -167,8 +169,32 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
       }
     }
     elseif ($value == 'unsubscribed') {
-      foreach (Subscription::byEmail($email) as $subscription) {
-        $subscription->delete();
+      $all_lists = $component['extra']['optout_all_lists'];
+      if ($all_lists) {
+        if (variable_get_value('campaignion_newsletters_opt_out_unknown')) {
+          foreach (NewsletterList::listAll() as $l) {
+            $subscription = Subscription::byData($l->list_id, $email);
+            if ($subscription->isNew()) {
+              $subscription->queueUnsubscribe();
+            }
+            else {
+              $subscription->delete();
+            }
+          }
+        }
+        else {
+          foreach (Subscription::byEmail($email) as $subscription) {
+            $subscription->delete();
+          }
+        }
+      }
+      else {
+        $lists = $component['extra']['lists'];
+        foreach (Subscription::byEmail($email) as $subscription) {
+          if (!empty($lists[$subscription->list_id])) {
+            $subscription->delete();
+          }
+        }
       }
     }
   }

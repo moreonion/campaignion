@@ -23,5 +23,12 @@ function campaignion_newsletters_variable_info($options) {
     'default' => 5,
     'localize' => FALSE,
   ];
+  $v['campaignion_newsletters_unsubscribe_unknown'] = [
+    'title' => t('Try removing unknown subscriptions.', [], $options),
+    'description' => t('When unsubscribing from all lists try to unsubscribe from all lists instead of just those that we have subscriptions for.', [], $options),
+    'type' => 'boolean',
+    'default' => FALSE,
+    'localize' => FALSE,
+  ];
   return $v;
 }

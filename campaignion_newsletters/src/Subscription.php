@@ -175,14 +175,21 @@ class Subscription extends Model {
       return;
     }
     if (!$from_provider) {
-      QueueItem::byData(array(
-        'list_id' => $this->list_id,
-        'email' => $this->email,
-        'action' => QueueItem::UNSUBSCRIBE,
-      ))->save();
+      $this->queueUnsubscribe();
     }
     parent::delete();
     module_invoke_all('campaignion_newsletters_subscription_deleted', $this, $from_provider);
+  }
+
+  /**
+   * Queue an unsubscribe request for this subscription.
+   */
+  public function queueUnsubscribe() {
+    QueueItem::byData(array(
+      'list_id' => $this->list_id,
+      'email' => $this->email,
+      'action' => QueueItem::UNSUBSCRIBE,
+    ))->save();
   }
 
 }

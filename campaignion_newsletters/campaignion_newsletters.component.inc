@@ -31,6 +31,8 @@ function _webform_defaults_newsletter() {
       'radio_labels' => [t('No'), t('Yes, I want to subscribe to the newsletter')],
       'checkbox_label' => t('Subscribe me to the newsletter.'),
       'optin_statement' => '',
+      'no_is_optout' => FALSE,
+      'optout_all_lists' => TRUE,
     ),
   );
 }
@@ -144,6 +146,21 @@ function _webform_edit_newsletter($component) {
     '#default_value' => $component['extra']['optin_statement'],
   ];
 
+  $optout_id = drupal_html_id('newsletter-no-is-optout');
+  $form['extra']['no_is_optout'] = [
+    '#type' => 'checkbox',
+    '#title' => t('No (radio) is taken as opt-out'),
+    '#default_value' => !empty($component['extra']['no_is_optout']),
+    '#id' => $optout_id,
+  ];
+
+  $form['extra']['optout_all_lists'] = [
+    '#type' => 'checkbox',
+    '#title' => t('On opt-out: Remove all subscriptions for this email address.'),
+    '#default_value' => !empty($component['extra']['optout_all_lists']),
+    '#states' => ['visible' => ["#$optout_id" => ['checked' => TRUE]]],
+  ];
+
   return $form;
 }
 
@@ -184,7 +201,8 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
 
     case 'radios':
       $l = $component['extra']['radio_labels'];
-      $options = ['yes' => $l[1], 'no' => $l[0]];
+      $no_value = !empty($component['extra']['no_is_optout']) ? 'no' : '';
+      $options = ['yes' => $l[1], $no_value => $l[0]];
       $element += [
         '#type' => 'radios',
         '#default_value' => !empty($component['value']['subscribed']) ? 'yes' : NULL,
@@ -262,6 +280,8 @@ function campaignion_newsletters_form_builder_property_newsletter_form(&$form_st
   $form['newsletter_checkbox_label'] = $edit['extra']['checkbox_label'] + $dp;
   $form['newsletter_radio_labels'] = $edit['extra']['radio_labels'] + $dp;
   $form['newsletter_optin_statement'] = $edit['extra']['optin_statement'];
+  $form['newsletter_no_is_optout'] = $edit['extra']['no_is_optout'];
+  $form['newsletter_optout_all_lists'] = $edit['extra']['optout_all_lists'];
 
   return $form;
 }
@@ -298,6 +318,8 @@ function _webform_form_builder_properties_newsletter() {
     'newsletter_radio_labels' => [],
     'newsletter_checkbox_label' => [],
     'newsletter_optin_statement' => [],
+    'newsletter_optin_no_is_optout' => [],
+    'newsletter_optin_optout_all_lists' => [],
   );
 }
 
@@ -343,6 +365,12 @@ function _webform_form_builder_map_newsletter() {
     'newsletter_optin_statement' => [
       'storage_parents' => ['extra', 'optin_statement'],
     ],
+    'newsletter_no_is_optout' => [
+      'storage_parents' => ['extra', 'no_is_optout'],
+    ],
+    'newsletter_optout_all_lists' => [
+      'storage_parents' => ['extra', 'optout_all_lists'],
+    ],
   );
   return $map;
 }
@@ -377,9 +405,14 @@ function _webform_csv_data_newsletter($component, $export_options, $value) {
  */
 function _webform_conditional_comparison_newsletter_equal(array $input_values, $rule_value, array $component) {
   if (!$input_values) {
-    return $rule_value == 'no';
+    return $rule_value == '';
   }
-  $look_for = $rule_value == 'yes' ? ['subscribed', 'yes'] : [0, 'no', ''];
+  $look_for_map = [
+    '' => [0, ''],
+    'yes' => ['subscribed', 'yes'],
+    'no' => ['unsubscribed', 'no'],
+  ];
+  $look_for = $look_for_map[$rule_value];
   foreach ($input_values as $value) {
     if (in_array($value, $look_for, TRUE)) {
       return TRUE;
