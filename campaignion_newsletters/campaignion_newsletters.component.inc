@@ -16,7 +16,7 @@ function _webform_defaults_newsletter() {
     'required' => 0,
     'pid' => 0,
     'weight' => 0,
-    'value' => serialize(array('subscribed' => 'subscribed')),
+    'value' => serialize(['']),
     'extra' => array(
       'items' => '',
       'multiple' => NULL,
