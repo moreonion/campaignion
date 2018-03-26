@@ -187,15 +187,33 @@ function campaignion_newsletters_uninstall() {
 }
 
 /**
- * Update internal representation of conditional values ('no' → '').
+ * Migrate old newsletter conditional filters to new filters.
  */
 function campaignion_newsletters_update_16() {
   $sql = <<<SQL
 UPDATE webform_conditional_rules r
-  INNER JOIN webform_component c ON r.nid=c.nid AND r.source=c.cid SET r.value=''
-WHERE source_type='component' AND r.value='no'
+  INNER JOIN webform_component c ON r.nid=c.nid AND r.source=c.cid
+SET r.value=''
+WHERE source_type='component' AND c.type='newsletter' AND r.value IN ('no', 'No')
 SQL;
   db_query($sql);
+
+  $sql = <<<SQL
+UPDATE webform_conditional_rules r
+  INNER JOIN webform_component c ON r.nid=c.nid AND r.source=c.cid
+SET r.value='yes'
+WHERE source_type='component' AND c.type='newsletter' AND r.value IN ('yes', 'Yes', 'subscribed')
+SQL;
+  db_query($sql);
+
+  $sql = <<<SQL
+UPDATE webform_conditional_rules r
+  INNER JOIN webform_component c ON r.nid=c.nid AND r.source=c.cid
+SET r.operator='equal'
+WHERE source_type='component' AND c.type='newsletter' AND r.operator='empty'
+SQL;
+  db_query($sql);
+
 }
 
 /**
