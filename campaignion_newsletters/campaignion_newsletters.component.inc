@@ -260,118 +260,15 @@ function _webform_display_newsletter($component, $value, $format = 'html') {
 }
 
 /**
- * Form callback for the newsletter property.
- *
- * @see _webform_form_builder_map_newsletter()
- */
-function campaignion_newsletters_form_builder_property_newsletter_form(&$form_state, $form_type, $element, $property) {
-  $form['options'] = array(
-    '#form_builder' => array('property_group' => 'options'),
-    '#tree' => TRUE,
-  );
-  $edit = _webform_edit_newsletter($element['#webform_component']);
-  $form['options']['lists'] = $edit['extra']['lists'];
-  $form['newsletter_title'] = $edit['extra']['description'];
-  $form['newsletter_value'] = $edit['value'];
-  $form['newsletter_opt_in_implied'] = $edit['extra']['opt_in_implied'];
-  $form['newsletter_send_welcome'] = $edit['extra']['send_welcome'];
-  $dp['#form_builder']['property_group'] = 'display';
-  $form['newsletter_display'] = $edit['extra']['display'] + $dp;
-  $form['newsletter_checkbox_label'] = $edit['extra']['checkbox_label'] + $dp;
-  $form['newsletter_radio_labels'] = $edit['extra']['radio_labels'] + $dp;
-  $form['newsletter_optin_statement'] = $edit['extra']['optin_statement'];
-  $form['newsletter_no_is_optout'] = $edit['extra']['no_is_optout'];
-  $form['newsletter_optout_all_lists'] = $edit['extra']['optout_all_lists'];
-
-  return $form;
-}
-
-/**
- * Submit handler for the newsletter property.
- *
- * @see _webform_form_builder_map_newsletter()
- */
-function campaignion_newsletters_form_builder_property_newsletter_form_submit(&$form, &$form_state) {
-  $form_state['values']['newsletter_lists'] = $form_state['values']['options']['lists'];
-}
-
-/**
- * Implements _webform_form_builder_properties_component().
- *
- * Component specific properties.
- * This is currently broken as the component specific properties are merged into
- * the global property list. That makes it behave the same way as an
- * implementation of hook_form_builder_properties().
- *
- * @see form_builder_webform_form_builder_properties()
- */
-function _webform_form_builder_properties_newsletter() {
-  return array(
-    'newsletter_lists' => array(
-      'form' => 'campaignion_newsletters_form_builder_property_newsletter_form',
-      'submit' => array('campaignion_newsletters_form_builder_property_newsletter_form_submit'),
-    ),
-    'newsletter_title' => array(),
-    'newsletter_opt_in_implied' => array(),
-    'newsletter_send_welcome' => [],
-    'newsletter_display' => [],
-    'newsletter_radio_labels' => [],
-    'newsletter_checkbox_label' => [],
-    'newsletter_optin_statement' => [],
-    'newsletter_optin_no_is_optout' => [],
-    'newsletter_optin_optout_all_lists' => [],
-  );
-}
-
-/**
  * Implements _webform_CALLBACK_TYPE().
  *
  * Implements _webform_form_builder_map_TYPE().
- *
- * Defines mapping from webform component to form_builder element type.
- * Tell form_builder_webform how to store properties:
- * $form_state['values']['newsletter'] -> $component['value'].
  *
  * This hook allows us to extend the list of properties defined in
  * hook_form_builder_element_types() specific for form_builder_webform.
  */
 function _webform_form_builder_map_newsletter() {
   $map['form_builder_type'] = 'newsletter';
-  $map['properties'] = array(
-    'newsletter_lists' => array(
-      'storage_parents' => array('extra', 'lists'),
-    ),
-    'newsletter_title' => array(
-      'storage_parents' => array('extra', 'description'),
-    ),
-    'newsletter_opt_in_implied' => array(
-      'storage_parents' => array('extra', 'opt_in_implied'),
-    ),
-    'newsletter_send_welcome' => array(
-      'storage_parents' => array('extra', 'send_welcome'),
-    ),
-    'newsletter_value' => array(
-      'storage_parents' => array('value'),
-    ),
-    'newsletter_display' => [
-      'storage_parents' => ['extra', 'display'],
-    ],
-    'newsletter_radio_labels' => [
-      'storage_parents' => ['extra', 'radio_labels'],
-    ],
-    'newsletter_checkbox_label' => [
-      'storage_parents' => ['extra', 'checkbox_label'],
-    ],
-    'newsletter_optin_statement' => [
-      'storage_parents' => ['extra', 'optin_statement'],
-    ],
-    'newsletter_no_is_optout' => [
-      'storage_parents' => ['extra', 'no_is_optout'],
-    ],
-    'newsletter_optout_all_lists' => [
-      'storage_parents' => ['extra', 'optout_all_lists'],
-    ],
-  );
   return $map;
 }
 
