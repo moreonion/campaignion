@@ -58,22 +58,24 @@ class ComponentTest extends \DrupalUnitTestCase {
     $export = function ($v) {
       return _webform_table_newsletter(NULL, $v);
     };
-    $this->assertEqual(t('not subscribed'), $export(NULL));
-    $this->assertEqual(t('not subscribed'), $export(['0']));
+    $this->assertEqual(t('no change'), $export(NULL));
+    $this->assertEqual(t('no change'), $export(['0']));
     $this->assertEqual(t('subscribed'), $export(['subscribed']));
     // Old format - backwards compatibility.
     $this->assertEqual(t('subscribed'), $export(['subscribed' => 'subscribed']));
+    $this->assertEqual(t('unsubscribed'), $export(['unsubscribed']));
   }
 
   public function testCsvData() {
     $export = function ($v) {
       return _webform_csv_data_newsletter(NULL, [], $v);
     };
-    $this->assertEqual(t('not subscribed'), $export(NULL));
-    $this->assertEqual(t('not subscribed'), $export(['0']));
+    $this->assertEqual(t('no change'), $export(NULL));
+    $this->assertEqual(t('no change'), $export(['0']));
     $this->assertEqual(t('subscribed'), $export(['subscribed']));
     // Old format - backwards compatibility.
     $this->assertEqual(t('subscribed'), $export(['subscribed' => 'subscribed']));
+    $this->assertEqual(t('unsubscribed'), $export(['unsubscribed']));
   }
 
 }

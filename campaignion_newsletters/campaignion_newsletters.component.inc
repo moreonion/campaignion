@@ -238,7 +238,7 @@ function _webform_submit_newsletter($component, $value) {
  */
 function _webform_newsletter_value_to_label($value) {
   if (!$value) {
-    return t('not subscribed');
+    return t('no change');
   }
   $value = reset($value);
   switch ($value) {
@@ -247,7 +247,7 @@ function _webform_newsletter_value_to_label($value) {
     case 'unsubscribed':
       return t('unsubscribed');
     default:
-      return t('not subscribed');
+      return t('no change');
   }
 }
 
