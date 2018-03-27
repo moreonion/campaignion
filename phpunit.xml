@@ -19,7 +19,6 @@
     <directory suffix=".php">.</directory>
     <directory suffix=".inc">.</directory>
     <directory suffix=".module">.</directory>
-    <directory suffix=".install">.</directory>
     <exclude>
       <directory suffix="Test.php">.</directory>
       <directory suffix=".api.php">.</directory>
