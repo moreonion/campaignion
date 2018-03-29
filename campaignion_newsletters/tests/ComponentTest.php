@@ -2,80 +2,79 @@
 
 namespace Drupal\campaignion_newsletters;
 
+use Drupal\campaignion\Contact;
+use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+use Drupal\campaignion_newsletters\Subscription;
+
+/**
+ * Test the Component functionality.
+ */
 class ComponentTest extends \DrupalUnitTestCase {
 
+  /**
+   * Create a contact and some lists for testing.
+   */
   public function setUp() {
-    require_once drupal_get_path('module', 'campaignion_newsletters') . '/campaignion_newsletters.component.inc';
+    parent::setUp();
   }
 
-  public function testComponentDefaults() {
-    $defaults = webform_component_invoke('newsletter', 'defaults');
-
-    $expected_subset = array(
-      'extra' => array(
-        'opt_in_implied' => 1,
-        'send_welcome' => 0,
-        'optin_statement' => '',
-      )
-    );
-
-    $this->assertArraySubset($expected_subset, $defaults);
-
-    $component = webform_component_invoke('newsletter', 'edit', $defaults);
-
-    $this->assertEqual('textarea', $component['extra']['optin_statement']['#type']);
+  /**
+   * Clean up the test contact.
+   */
+  public function tearDown() {
+    if ($c = Contact::byEmail('test@example.com')) {
+      entity_delete('redhen_contact', $c->contact_id);
+    }
+    db_delete('campaignion_newsletters_subscriptions')->execute();
+    db_delete('campaignion_newsletters_queue')->execute();
+    parent::tearDown();
   }
 
-  public function testSubmitCheckbox() {
-    $c['extra']['display'] = 'checkbox';
-
-    // Not checked checkbox.
-    $v['subscribed'] = 0;
-    $this->assertEqual([''], _webform_submit_newsletter($c, $v));
-
-    // Checked checkbox.
-    $v['subscribed'] = 'subscribed';
-    $this->assertEqual(['subscribed'], _webform_submit_newsletter($c, $v));
+  /**
+   * Test subscribing to a new list.
+   */
+  public function testSubscribe() {
+    $component = ['cid' => 1, 'pid' => 0, 'form_key' => 'newsletter'];
+    $component['extra']['lists'][1] = 1;
+    $c = new Component($component, FALSE);
+    $s = $this->createMock(WebformSubmission::class);
+    $s->node = (object) [
+      'webform' => [
+        'components' => [1 => $component]
+      ],
+    ];
+    $c->subscribe('test@example.com', $s);
+    $subscriptions = Subscription::byEmail('test@example.com');
+    $this->assertCount(1, $subscriptions);
   }
 
-  public function testSubmitRadios() {
-    $c['extra']['display'] = 'radios';
+  /**
+   * Test unscribing a contact.
+   */
+  public function testUnsubscribe() {
+    $e = 'test@example.com';
+    Subscription::byData(1, $e)->save();
+    Subscription::byData(2, $e)->save();
+    $this->assertCount(2, Subscription::byEmail($e));
 
-    // Radio no.
-    $v = 'no';
-    $this->assertEqual(['unsubscribed'], _webform_submit_newsletter($c, $v));
+    $component = ['cid' => 1, 'pid' => 0, 'form_key' => 'newsletter'];
+    $component['extra']['lists'][1] = 1;
+    $component['extra']['optout_all_lists'] = FALSE;
+    $c = new Component($component, FALSE);
+    $c->unsubscribe($e);
+    $this->assertCount(1, Subscription::byEmail($e));
+    $this->assertNotEmpty(QueueItem::load(1, $e));
 
-    // Radio yes.
-    $v = 'yes';
-    $this->assertEqual(['subscribed'], _webform_submit_newsletter($c, $v));
+    $component['extra']['optout_all_lists'] = TRUE;
+    $c = new Component($component, FALSE);
+    $c->unsubscribe($e);
+    $this->assertCount(0, Subscription::byEmail($e));
+    $this->assertNotEmpty(QueueItem::load(2, $e));
 
-    // Not selected radio.
-    $v = NULL;
-    $this->assertEqual([''], _webform_submit_newsletter($c, $v));
-  }
-
-  public function testTable() {
-    $export = function ($v) {
-      return _webform_table_newsletter(NULL, $v);
-    };
-    $this->assertEqual(t('no change'), $export(NULL));
-    $this->assertEqual(t('no change'), $export(['0']));
-    $this->assertEqual(t('subscribed'), $export(['subscribed']));
-    // Old format - backwards compatibility.
-    $this->assertEqual(t('subscribed'), $export(['subscribed' => 'subscribed']));
-    $this->assertEqual(t('unsubscribed'), $export(['unsubscribed']));
-  }
-
-  public function testCsvData() {
-    $export = function ($v) {
-      return _webform_csv_data_newsletter(NULL, [], $v);
-    };
-    $this->assertEqual(t('no change'), $export(NULL));
-    $this->assertEqual(t('no change'), $export(['0']));
-    $this->assertEqual(t('subscribed'), $export(['subscribed']));
-    // Old format - backwards compatibility.
-    $this->assertEqual(t('subscribed'), $export(['subscribed' => 'subscribed']));
-    $this->assertEqual(t('unsubscribed'), $export(['unsubscribed']));
+    $c = new Component($component, TRUE);
+    $c->setAllListIds([1, 2, 3]);
+    $c->unsubscribe($e);
+    $this->assertNotEmpty(QueueItem::load(3, $e));
   }
 
 }

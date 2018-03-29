@@ -35,18 +35,20 @@ class Subscription extends Model {
    *   A list id.
    * @param string $email
    *   An email address.
+   * @param array $data
+   *   Additional data to pass to the constructor.
    */
-  public static function byData($list_id, $email) {
+  public static function byData($list_id, $email, array $data = []) {
     $result = db_select(static::$table, 's')
       ->fields('s')
       ->condition('list_id', $list_id)
       ->condition('email', $email)
       ->execute();
-    if ($row = $result->fetch()) {
-      return new static($row, FALSE);
+    if ($row = $result->fetchAssoc()) {
+      return new static($row + $data, FALSE);
     }
     else {
-      return static::fromData($list_id, $email);
+      return static::fromData($list_id, $email, $data);
     }
   }
 
@@ -57,12 +59,14 @@ class Subscription extends Model {
    *   A list id.
    * @param string $email
    *   An email address.
+   * @param array $data
+   *   Additional data to pass to the constructor.
    */
-  public static function fromData($list_id, $email) {
+  public static function fromData($list_id, $email, array $data = []) {
     return new static(array(
       'list_id' => $list_id,
       'email' => $email,
-    ), TRUE);
+    ) + $data, TRUE);
   }
 
   /**

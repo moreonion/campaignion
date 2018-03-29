@@ -5,12 +5,10 @@
  * Campaignion newsletter module.
  */
 
+use Drupal\campaignion_newsletters\Component;
 use Drupal\campaignion_newsletters\CronRunner;
 use Drupal\campaignion_newsletters\ProviderFactory;
 use Drupal\campaignion_newsletters\FormBuilderElementNewsletter;
-use Drupal\campaignion_newsletters\FormSubmission;
-use Drupal\campaignion_newsletters\NewsletterList;
-use Drupal\campaignion_newsletters\Subscription;
 use Drupal\campaignion_newsletters\Subscriptions;
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 use Drupal\little_helpers\Webform\Submission;
@@ -153,49 +151,13 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
     return;
   }
   foreach ($s->webform->componentsByType('newsletter') as $component) {
-    $value = $s->valueByCid($component['cid']);
-    if ($value == 'subscribed') {
-      $needs_opt_in = !$component['extra']['opt_in_implied'];
-      foreach ($component['extra']['lists'] as $list_id => $enabled) {
-        if (!empty($enabled)) {
-          $subscription = Subscription::byData($list_id, $email);
-          $subscription->delete = FALSE;
-          $subscription->source = $s;
-          $subscription->needs_opt_in = $needs_opt_in;
-          $subscription->send_welcome = (bool) $component['extra']['send_welcome'];
-          $subscription->optin_statement = $component['extra']['optin_statement'];
-          $subscription->optin_info = FormSubmission::fromWebformSubmission($s);
-          $subscription->save();
-        }
+    if ($value = $s->valueByCid($component['cid'])) {
+      $c = new Component($component);
+      if ($value == 'subscribed') {
+        $c->subscribe($email);
       }
-    }
-    elseif ($value == 'unsubscribed') {
-      $all_lists = $component['extra']['optout_all_lists'];
-      if ($all_lists) {
-        if (variable_get_value('campaignion_newsletters_opt_out_unknown')) {
-          foreach (NewsletterList::listAll() as $l) {
-            $subscription = Subscription::byData($l->list_id, $email);
-            if ($subscription->isNew()) {
-              $subscription->queueUnsubscribe();
-            }
-            else {
-              $subscription->delete();
-            }
-          }
-        }
-        else {
-          foreach (Subscription::byEmail($email) as $subscription) {
-            $subscription->delete();
-          }
-        }
-      }
-      else {
-        $lists = $component['extra']['lists'];
-        foreach (Subscription::byEmail($email) as $subscription) {
-          if (!empty($lists[$subscription->list_id])) {
-            $subscription->delete();
-          }
-        }
+      elseif ($value == 'unsubscribed') {
+        $c->unsubscribe($email);
       }
     }
   }
