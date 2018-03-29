@@ -37,26 +37,4 @@ class FormBuilderElementNewsletter extends \FormBuilderWebformElement {
     return $form;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function configurationSubmit(&$form, &$form_state) {
-    $form_state['values']['newsletter_lists'] = $form_state['values']['options']['lists'];
-    parent::configurationSubmit($form, $form_state);
-
-    $component = &$this->element['#webform_component'];
-    $values = $form_state['values'];
-    $component['extra']['lists'] = $values['options']['lists'];
-    $component['value'] = $values['value'];
-    $component['extra']['description'] = $values['title'];
-    $component['extra']['opt_in_implied'] = $values['opt_in_implied'];
-    $component['extra']['send_welcome'] = $values['send_welcome'];
-    $component['extra']['display'] = $values['display'];
-    $component['extra']['radio_labels'] = $values['radio_labels'];
-    $component['extra']['checkbox_label'] = $values['checkbox_label'];
-    $component['extra']['optin_statement'] = $values['optin_statement'];
-    $component['extra']['no_is_optout'] = $values['no_is_optout'];
-    $component['extra']['optout_all_lists'] = $values['optout_all_lists'];
-  }
-
 }

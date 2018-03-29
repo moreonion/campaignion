@@ -63,6 +63,7 @@ function _webform_edit_newsletter($component) {
     '#title' => t('Description'),
     '#default_value' => $component['extra']['description'],
     '#weight' => 0,
+    '#parents' => ['extra', 'description'],
   );
 
   $form['value'] = array(
@@ -71,6 +72,7 @@ function _webform_edit_newsletter($component) {
     '#options' => array('subscribed' => t('The newsletter checkbox is checked by default.')),
     '#default_value' => $component['value'],
     '#element_validate' => array('_webform_value_validate_newsletter'),
+    '#parents' => ['value'],
   );
 
   natcasesort($newsletters);
@@ -85,6 +87,7 @@ function _webform_edit_newsletter($component) {
     '#empty_option' => t('Select newsletters'),
     '#multiple' => 1,
     '#select2' => array(),
+    '#parents' => ['extra', 'lists'],
   );
 
   $form['extra']['opt_in_implied'] = array(
@@ -95,12 +98,14 @@ function _webform_edit_newsletter($component) {
       0 => t("Newsletter provider: This form doesn't provide double-opt-in functionality the newsletter provider should take care of it."),
       1 => t('Included in this form: This form includes a double-opt-in process no further action is needed'),
     ),
+    '#parents' => ['extra', 'opt_in_implied'],
   );
 
   $form['extra']['send_welcome'] = array(
     '#type' => 'checkbox',
     '#title' => t('Send a welcome email (for new subscribers).'),
     '#default_value' => !empty($component['extra']['send_welcome']),
+    '#parents' => ['extra', 'send_welcome'],
   );
 
   $display_id = drupal_html_id('newsletter-display');
@@ -113,6 +118,7 @@ function _webform_edit_newsletter($component) {
     ),
     '#default_value' => $component['extra']['display'],
     '#id' => $display_id,
+    '#parents' => ['extra', 'display'],
   ];
 
   $form['extra']['checkbox_label'] = [
@@ -120,6 +126,7 @@ function _webform_edit_newsletter($component) {
     '#title' => t('Label for the checkbox'),
     '#default_value' => $component['extra']['checkbox_label'],
     '#states' => ['visible' => ["#$display_id" => ['value' => 'checkbox']]],
+    '#parents' => ['extra', 'checkbox_label'],
   ];
 
   $form['extra']['radio_labels'] = [
@@ -138,12 +145,14 @@ function _webform_edit_newsletter($component) {
       '#title' => t('Unsubscribe'),
       '#default_value' => $component['extra']['radio_labels'][0],
     ],
+    '#parents' => ['extra', 'radio_labels'],
   ];
 
   $form['extra']['optin_statement'] = [
     '#type' => 'textarea',
     '#title' => t('Opt-in statement'),
     '#default_value' => $component['extra']['optin_statement'],
+    '#parents' => ['extra', 'optin_statement'],
   ];
 
   $optout_id = drupal_html_id('newsletter-no-is-optout');
@@ -152,6 +161,7 @@ function _webform_edit_newsletter($component) {
     '#title' => t('No (radio) is taken as opt-out'),
     '#default_value' => !empty($component['extra']['no_is_optout']),
     '#id' => $optout_id,
+    '#parents' => ['extra', 'no_is_optout'],
   ];
 
   $form['extra']['optout_all_lists'] = [
@@ -159,6 +169,7 @@ function _webform_edit_newsletter($component) {
     '#title' => t('On opt-out: Remove all subscriptions for this email address.'),
     '#default_value' => !empty($component['extra']['optout_all_lists']),
     '#states' => ['visible' => ["#$optout_id" => ['checked' => TRUE]]],
+    '#parents' => ['extra', 'optout_all_lists'],
   ];
 
   return $form;
