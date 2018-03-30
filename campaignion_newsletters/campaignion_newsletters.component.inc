@@ -58,6 +58,11 @@ function _webform_edit_newsletter($component) {
     ->execute()
     ->fetchAllKeyed();
 
+  $form['behavior'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Behavior'),
+  ];
+
   $form['extra']['description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description'),
@@ -66,23 +71,27 @@ function _webform_edit_newsletter($component) {
     '#parents' => ['extra', 'description'],
   );
 
-  $form['value'] = array(
+  $form['behavior']['value'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Default state'),
-    '#options' => array('subscribed' => t('The newsletter checkbox is checked by default.')),
+    '#options' => array('subscribed' => t('The newsletter checkbox is checked by default, the radio default is set to “Yes”.')),
     '#default_value' => $component['value'],
     '#element_validate' => array('_webform_value_validate_newsletter'),
     '#parents' => ['value'],
   );
 
+  $form['list_management'] = [
+    '#type' => 'fieldset',
+    '#title' => t('List management'),
+  ];
+
   natcasesort($newsletters);
-  $form['extra']['lists'] = array(
+  $form['list_management']['lists'] = array(
     '#type' => module_exists('select2') && count($newsletters) > 5 ? 'select' : 'checkboxes',
     '#title' => t('Newsletter'),
     '#default_value' => $component['extra']['lists'],
     '#description' => t('Which lists should the user be subscribed to?'),
     '#options' => $newsletters,
-    '#weight' => 1,
     // Only relevant if type is 'select':
     '#empty_option' => t('Select newsletters'),
     '#multiple' => 1,
@@ -90,7 +99,7 @@ function _webform_edit_newsletter($component) {
     '#parents' => ['extra', 'lists'],
   );
 
-  $form['extra']['opt_in_implied'] = array(
+  $form['list_management']['opt_in_implied'] = array(
     '#type' => 'radios',
     '#title' => t('Double opt-in'),
     '#default_value' => $component['extra']['opt_in_implied'],
@@ -101,7 +110,17 @@ function _webform_edit_newsletter($component) {
     '#parents' => ['extra', 'opt_in_implied'],
   );
 
-  $form['extra']['send_welcome'] = array(
+
+  $form['list_management']['welcome'] = [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['form-item']],
+  ];
+  $form['list_management']['welcome']['label'] = [
+    '#theme' => 'form_element_label',
+    '#title' => t('Welcome email'),
+    '#title_display' => 'before',
+  ];
+  $form['list_management']['welcome']['enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Send a welcome email (for new subscribers).'),
     '#default_value' => !empty($component['extra']['send_welcome']),
@@ -151,24 +170,29 @@ function _webform_edit_newsletter($component) {
   $form['extra']['optin_statement'] = [
     '#type' => 'textarea',
     '#title' => t('Opt-in statement'),
+    '#description' => t('This opt-in statement will be recorded as part of the supporter record in Campaignion, so that you have a clear history of what the supporter has signed up to and when. Make sure it matches the visible text in the form!'),
     '#default_value' => $component['extra']['optin_statement'],
     '#parents' => ['extra', 'optin_statement'],
   ];
 
   $optout_id = drupal_html_id('newsletter-no-is-optout');
-  $form['extra']['no_is_optout'] = [
+  $form['behavior']['no_is_optout'] = [
     '#type' => 'checkbox',
     '#title' => t('No (radio) is taken as opt-out'),
     '#default_value' => !empty($component['extra']['no_is_optout']),
     '#id' => $optout_id,
     '#parents' => ['extra', 'no_is_optout'],
+    '#states' => ['visible' => ["#$display_id" => ['value' => 'radios']]],
   ];
 
-  $form['extra']['optout_all_lists'] = [
+  $form['behavior']['optout_all_lists'] = [
     '#type' => 'checkbox',
-    '#title' => t('On opt-out: Remove all subscriptions for this email address.'),
+    '#title' => t('If the email address is unsubscribed it will be unsubscribed from all email lists.'),
     '#default_value' => !empty($component['extra']['optout_all_lists']),
-    '#states' => ['visible' => ["#$optout_id" => ['checked' => TRUE]]],
+    '#states' => ['visible' => [
+      "#$optout_id" => ['checked' => TRUE],
+      "#$display_id" => ['value' => 'radios'],
+    ]],
     '#parents' => ['extra', 'optout_all_lists'],
   ];
 
