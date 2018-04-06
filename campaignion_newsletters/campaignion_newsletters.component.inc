@@ -156,12 +156,12 @@ function _webform_edit_newsletter($component) {
     '#states' => ['visible' => ["#$display_id" => ['value' => 'radios']]],
     1 => [
       '#type' => 'textfield',
-      '#title' => t('Subscribe'),
+      '#title' => t('Yes'),
       '#default_value' => $component['extra']['radio_labels'][1],
     ],
     0 => [
       '#type' => 'textfield',
-      '#title' => t('Unsubscribe'),
+      '#title' => t('No'),
       '#default_value' => $component['extra']['radio_labels'][0],
     ],
     '#parents' => ['extra', 'radio_labels'],
