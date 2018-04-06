@@ -79,7 +79,6 @@ function campaignion_newsletters_webform_component_info() {
     'description' => t('Offers a user to subscribe to a given newsletter.'),
     'features' => [
       'conditional' => TRUE,
-      'description' => FALSE,
     ],
     'file' => 'campaignion_newsletters.component.inc',
     'conditional_type' => 'newsletter',
@@ -193,7 +192,6 @@ function campaignion_newsletters_form_builder_element_types($form_type, $form_id
   $map = _form_builder_webform_property_map('newsletter');
   // Default value is handled by the newsletter property.
   unset($map['properties']['default_value']);
-  unset($map['properties']['description']);
   $fields['newsletter'] = array(
     'title' => t('Newsletter'),
     'class' => FormBuilderElementNewsletter::class,

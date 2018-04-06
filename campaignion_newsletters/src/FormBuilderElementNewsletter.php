@@ -12,6 +12,7 @@ class FormBuilderElementNewsletter extends \FormBuilderWebformElement {
    */
   public function configurationForm($form, &$form_state) {
     $form = parent::configurationForm($form, $form_state);
+    $form['description']['#weight'] = 0;
 
     $component = $this->element['#webform_component'];
 
@@ -26,7 +27,6 @@ class FormBuilderElementNewsletter extends \FormBuilderWebformElement {
     $form['lists'] = ['#type' => NULL] + $edit['list_management'];
     $form['lists']['#form_builder']['property_group'] = 'lists';
     $form['value'] = $edit['behavior']['value'];
-    $form['description'] = $edit['extra']['description'];
     $dp['#form_builder']['property_group'] = 'display';
     $form['display'] = $edit['extra']['display'] + $dp;
     $form['checkbox_label'] = $edit['extra']['checkbox_label'] + $dp;
