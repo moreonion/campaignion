@@ -5,10 +5,10 @@
  * Campaignion newsletter module.
  */
 
+use Drupal\campaignion_newsletters\Component;
 use Drupal\campaignion_newsletters\CronRunner;
 use Drupal\campaignion_newsletters\ProviderFactory;
-use Drupal\campaignion_newsletters\FormSubmission;
-use Drupal\campaignion_newsletters\Subscription;
+use Drupal\campaignion_newsletters\FormBuilderElementNewsletter;
 use Drupal\campaignion_newsletters\Subscriptions;
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 use Drupal\little_helpers\Webform\Submission;
@@ -79,7 +79,6 @@ function campaignion_newsletters_webform_component_info() {
     'description' => t('Offers a user to subscribe to a given newsletter.'),
     'features' => [
       'conditional' => TRUE,
-      'description' => FALSE,
     ],
     'file' => 'campaignion_newsletters.component.inc',
     'conditional_type' => 'newsletter',
@@ -117,7 +116,8 @@ function campaignion_newsletters_webform_conditional_form($node) {
         '#type' => 'select',
         '#options' => [
           'yes' => t('Opt-in'),
-          'no' => t('No opt-in'),
+          '' => t('No change'),
+          'no' => t('Opt-out'),
         ],
       ];
       $forms[$cid] = drupal_render($element);
@@ -150,19 +150,13 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
     return;
   }
   foreach ($s->webform->componentsByType('newsletter') as $component) {
-    if ($s->valueByCid($component['cid'])) {
-      $needs_opt_in = !$component['extra']['opt_in_implied'];
-      foreach ($component['extra']['lists'] as $list_id => $value) {
-        if (!empty($value)) {
-          $subscription = Subscription::byData($list_id, $email);
-          $subscription->delete = FALSE;
-          $subscription->source = $s;
-          $subscription->needs_opt_in = $needs_opt_in;
-          $subscription->send_welcome = (bool) $component['extra']['send_welcome'];
-          $subscription->optin_statement = $component['extra']['optin_statement'];
-          $subscription->optin_info = FormSubmission::fromWebformSubmission($s);
-          $subscription->save();
-        }
+    if ($value = $s->valueByCid($component['cid'])) {
+      $c = new Component($component);
+      if ($value == 'subscribed') {
+        $c->subscribe($email);
+      }
+      elseif ($value == 'unsubscribed') {
+        $c->unsubscribe($email);
       }
     }
   }
@@ -198,9 +192,9 @@ function campaignion_newsletters_form_builder_element_types($form_type, $form_id
   $map = _form_builder_webform_property_map('newsletter');
   // Default value is handled by the newsletter property.
   unset($map['properties']['default_value']);
-  unset($map['properties']['description']);
   $fields['newsletter'] = array(
     'title' => t('Newsletter'),
+    'class' => FormBuilderElementNewsletter::class,
     'properties' => array_keys($map['properties']),
     'default' => array(
       '#form_builder' => array('element_type' => 'newsletter'),
