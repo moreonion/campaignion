@@ -151,9 +151,9 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
   }
   foreach ($s->webform->componentsByType('newsletter') as $component) {
     if ($value = $s->valueByCid($component['cid'])) {
-      $c = new Component($component);
+      $c = Component::fromComponent($component);
       if ($value == 'subscribed') {
-        $c->subscribe($email);
+        $c->subscribe($email, $s);
       }
       elseif ($value == 'unsubscribed') {
         $c->unsubscribe($email);
