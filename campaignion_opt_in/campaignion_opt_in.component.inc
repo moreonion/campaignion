@@ -5,6 +5,8 @@
  * Campaignion newsletter component for webform.
  */
 
+use Drupal\campaignion_opt_in\Values;
+
 /**
  * Implements _webform_defaults_component().
  */
@@ -16,7 +18,7 @@ function _webform_defaults_opt_in() {
     'required' => 0,
     'pid' => 0,
     'weight' => 0,
-    'value' => serialize(['']),
+    'value' => Values::NOT_SELECTED,
     'extra' => array(
       'items' => '',
       'multiple' => NULL,
@@ -38,7 +40,6 @@ function _webform_defaults_opt_in() {
  * Implements _webform_edit_component().
  */
 function _webform_edit_opt_in($component) {
-  $component['value'] = unserialize($component['value']);
   $newsletters = db_select('campaignion_opt_ins_lists', 'l')
     ->fields('l', array('list_id', 'title'))
     ->execute()
@@ -58,11 +59,15 @@ function _webform_edit_opt_in($component) {
   );
 
   $form['behavior']['value'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Default state'),
-    '#options' => array('subscribed' => t('The newsletter checkbox is checked by default, the radio default is set to “Yes”.')),
+    '#type' => 'select',
+    '#title' => t('Default value'),
+    '#options' => [
+      Values::NOT_SELECTED => t('Not selected'),
+      Values::OPT_IN => t('Opt-in'),
+      Values::NO_CHANGE => t('No change'),
+      Values::OPT_OUT => t('Opt-out'),
+    ],
     '#default_value' => $component['value'],
-    '#element_validate' => array('_webform_value_validate_opt_in'),
     '#parents' => ['value'],
   );
 
@@ -134,19 +139,10 @@ function _webform_edit_opt_in($component) {
 }
 
 /**
- * Validate function.
- */
-function _webform_value_validate_opt_in(&$element, &$form_state) {
-  $values = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
-  $values = serialize($values);
-}
-
-/**
  * Implements _webform_render_component().
  */
 function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
-  $component['value'] = unserialize($component['value']);
-
+  $value = $value ? reset($value) : $component['value'];
   $element = array(
     '#required' => !empty($component['mandatory']) || !empty($component['required']),
     '#weight' => $component['weight'],
@@ -160,22 +156,22 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
 
   switch ($component['extra']['display']) {
     case 'checkbox':
-      $value = empty($component['extra']['invert_checkbox']) ? 'subscribed' : 'unsubscribed';
-      $options[$value] = $component['extra']['checkbox_label'];
+      $meaning = empty($component['extra']['invert_checkbox']) ? Values::OPT_IN : Values::OPT_OUT;
+      $options[$meaning] = $component['extra']['checkbox_label'];
       $element += [
         '#type' => 'checkboxes',
-        '#default_value' => $component['value'],
+        '#default_value' => [$value],
         '#options' => $options,
       ];
       break;
 
     case 'radios':
       $l = $component['extra']['radio_labels'];
-      $no_value = !empty($component['extra']['no_is_optout']) ? 'no' : '';
-      $options = ['yes' => $l[1], $no_value => $l[0]];
+      $no_value = !empty($component['extra']['no_is_optout']) ? Values::OPT_OUT : Values::NO_CHANGE;
+      $options = [Values::OPT_IN => $l[1], $no_value => $l[0]];
       $element += [
         '#type' => 'radios',
-        '#default_value' => !empty($component['value']['subscribed']) ? 'yes' : NULL,
+        '#default_value' => $value,
         '#options' => $options,
       ];
   }
@@ -189,18 +185,11 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
 function _webform_submit_opt_in($component, $value) {
   switch ($component['extra']['display']) {
     case 'checkbox':
-      $value = key($value);
-      return empty($value[$value]) ? [''] : [$value];
+      $k = key($value);
+      return empty($value[$k]) ? [Values::NO_CHANGE] : [$k];
 
     case 'radios':
-      switch ($value) {
-        case 'yes':
-          return ['subscribed'];
-        case 'no':
-          return ['unsubscribed'];
-        default:
-          return [''];
-      }
+      return $value ? [$value] : [Values::NO_CHANGE];
   }
 }
 
@@ -209,16 +198,16 @@ function _webform_submit_opt_in($component, $value) {
  */
 function _webform_opt_in_value_to_label($value) {
   if (!$value) {
-    return t('no change');
+    return t('No change');
   }
   $value = reset($value);
   switch ($value) {
-    case 'subscribed':
-      return t('subscribed');
-    case 'unsubscribed':
-      return t('unsubscribed');
+    case Values::OPT_IN:
+      return t('Opt-in');
+    case Values::OPT_OUT:
+      return t('Opt-out');
     default:
-      return t('no change');
+      return t('No change');
   }
 }
 
@@ -273,16 +262,11 @@ function _webform_csv_data_opt_in($component, $export_options, $value) {
  */
 function _webform_conditional_comparison_opt_in_equal(array $input_values, $rule_value, array $component) {
   if (!$input_values) {
-    return $rule_value == '';
+    return $rule_value == Values::NO_CHANGE;
   }
-  $look_for_map = [
-    '' => [0, ''],
-    'yes' => ['subscribed', 'yes'],
-    'no' => ['unsubscribed', 'no'],
-  ];
-  $look_for = $look_for_map[$rule_value];
+
   foreach ($input_values as $value) {
-    if (in_array($value, $look_for, TRUE)) {
+    if ($value == $rule_value) {
       return TRUE;
     }
   }

@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\campaignion_opt_in\FormBuilderElementOptIn;
+use Drupal\campaignion_opt_in\Values;
 
 /**
  * Implements hook_webform_component_info().
@@ -47,9 +48,9 @@ function campaignion_opt_in_webform_conditional_form($node) {
       $element = [
         '#type' => 'select',
         '#options' => [
-          'yes' => t('Opt-in'),
-          '' => t('No change'),
-          'no' => t('Opt-out'),
+          Values::OPT_IN => t('Opt-in'),
+          Values::NO_CHANGE => t('No change'),
+          Values::OPT_OUT => t('Opt-out'),
         ],
       ];
       $forms[$cid] = drupal_render($element);
