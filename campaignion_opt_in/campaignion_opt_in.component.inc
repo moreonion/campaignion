@@ -29,6 +29,7 @@ function _webform_defaults_opt_in() {
       'checkbox_label' => t('Subscribe me to the newsletter.'),
       'optin_statement' => '',
       'no_is_optout' => FALSE,
+      'invert_checkbox' => FALSE,
     ),
   );
 }
@@ -113,14 +114,20 @@ function _webform_edit_opt_in($component) {
     '#parents' => ['extra', 'optin_statement'],
   ];
 
-  $optout_id = drupal_html_id('newsletter-no-is-optout');
   $form['behavior']['no_is_optout'] = [
     '#type' => 'checkbox',
     '#title' => t('No (radio) is taken as opt-out'),
     '#default_value' => !empty($component['extra']['no_is_optout']),
-    '#id' => $optout_id,
     '#parents' => ['extra', 'no_is_optout'],
     '#states' => ['visible' => ["#$display_id" => ['value' => 'radios']]],
+  ];
+
+  $form['behavior']['invert_checkbox'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Invert the checkbox: Checked means opt-out.'),
+    '#default_value' => !empty($component['extra']['invert_checkbox']),
+    '#states' => ['visible' => ["#$display_id" => ['value' => 'checkbox']]],
+    '#parents' => ['extra', 'invert_checkbox'],
   ];
 
   return $form;
@@ -153,7 +160,8 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
 
   switch ($component['extra']['display']) {
     case 'checkbox':
-      $options['subscribed'] = $component['extra']['checkbox_label'];
+      $value = empty($component['extra']['invert_checkbox']) ? 'subscribed' : 'unsubscribed';
+      $options[$value] = $component['extra']['checkbox_label'];
       $element += [
         '#type' => 'checkboxes',
         '#default_value' => $component['value'],
@@ -181,7 +189,8 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
 function _webform_submit_opt_in($component, $value) {
   switch ($component['extra']['display']) {
     case 'checkbox':
-      return empty($value['subscribed']) ? [''] : ['subscribed'];
+      $value = key($value);
+      return empty($value[$value]) ? [''] : [$value];
 
     case 'radios':
       switch ($value) {
