@@ -12,8 +12,7 @@ use Drupal\campaignion_opt_in\Values;
  */
 function _webform_defaults_opt_in() {
   return array(
-    'name' => t('Newsletter Subscription'),
-    'form_key' => 'newsletter',
+    'name' => t('Opt-in'),
     'mandatory' => 0,
     'required' => 0,
     'pid' => 0,
@@ -27,8 +26,8 @@ function _webform_defaults_opt_in() {
       'private' => FALSE,
       'title_display' => 'none',
       'display' => 'checkbox',
-      'radio_labels' => [t('No'), t('Yes, I want to subscribe to the newsletter')],
-      'checkbox_label' => t('Subscribe me to the newsletter.'),
+      'radio_labels' => [t('No'), t('Yes, please contact me.')],
+      'checkbox_label' => t('Yes, please contact me.'),
       'optin_statement' => '',
       'no_is_optout' => FALSE,
       'invert_checkbox' => FALSE,
@@ -40,11 +39,6 @@ function _webform_defaults_opt_in() {
  * Implements _webform_edit_component().
  */
 function _webform_edit_opt_in($component) {
-  $newsletters = db_select('campaignion_opt_ins_lists', 'l')
-    ->fields('l', array('list_id', 'title'))
-    ->execute()
-    ->fetchAllKeyed();
-
   $form['behavior'] = [
     '#type' => 'fieldset',
     '#title' => t('Behavior'),
@@ -71,10 +65,10 @@ function _webform_edit_opt_in($component) {
     '#parents' => ['value'],
   );
 
-  $display_id = drupal_html_id('newsletter-display');
+  $display_id = drupal_html_id('opt-in-display');
   $form['extra']['display'] = [
     '#type' => 'select',
-    '#title' => t('Display the newsletter opt-in as …'),
+    '#title' => t('Display opt-in as …'),
     '#options' => array(
       'checkbox' => t('Checkbox'),
       'radios' => t('Radios'),

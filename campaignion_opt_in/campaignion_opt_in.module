@@ -8,8 +8,8 @@ use Drupal\campaignion_opt_in\Values;
  */
 function campaignion_opt_in_webform_component_info() {
   $info['opt_in'] = [
-    'label' => t('Newsletter Subscription'),
-    'description' => t('Offers a user to subscribe to a given opt_in.'),
+    'label' => t('Opt-in'),
+    'description' => t('Offers a user to opt-in to future communication.'),
     'features' => [
       'conditional' => TRUE,
     ],
