@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_newsletters;
 
+use Drupal\little_helpers\ArrayConfig;
+
 /**
  * Form builder integration for the newsletter webform component.
  */
@@ -36,6 +38,19 @@ class FormBuilderElementNewsletter extends \FormBuilderWebformElement {
     $form['optout_all_lists'] = $edit['behavior']['optout_all_lists'];
 
     return $form;
+  }
+
+  /**
+   * Store component configuration just like webform would do it.
+   *
+   * The values are already at their proper places in `$form_state['values']`
+   * because the `#parents` array is provided in `_webform_edit_opt_in()`.
+   */
+  public function configurationSubmit(&$form, &$form_state) {
+    $component = $form_state['values'];
+    ArrayConfig::mergeDefaults($component, $this->element['#webform_component']);
+    $this->element['#webform_component'] = $component;
+    parent::configurationSubmit($form, $form_state);
   }
 
 }
