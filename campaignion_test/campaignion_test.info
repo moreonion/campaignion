@@ -11,6 +11,7 @@ dependencies[] = campaignion_email_to_target_counter
 dependencies[] = campaignion_mp_fields
 dependencies[] = campaignion_newsletters
 dependencies[] = campaignion_newsletters_mailchimp
+dependencies[] = campaignion_opt_in
 dependencies[] = campaignion_supporter_tags
 dependencies[] = campaignion_source_tags
 dependencies[] = campaignion_webform_tokens
