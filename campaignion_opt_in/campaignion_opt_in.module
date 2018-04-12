@@ -99,6 +99,7 @@ function campaignion_opt_in_form_builder_element_types($form_type, $form_id) {
   if ($form_type != 'webform') {
     return;
   }
+  module_load_include('components.inc', 'form_builder_webform');
   require_once dirname(__FILE__) . '/campaignion_opt_in.component.inc';
   $map = _form_builder_webform_property_map('opt_in');
   // Default value is handled by the newsletter property.
