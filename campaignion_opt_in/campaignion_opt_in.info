@@ -1,5 +1,7 @@
 name = Campaignion opt-in
 description = Provides webform opt-in components and their form builder integration.
 core = 7.x
+dependencies[] = campaignion_activity
+dependencies[] = little_helpers
 dependencies[] = psr0
 dependencies[] = webform

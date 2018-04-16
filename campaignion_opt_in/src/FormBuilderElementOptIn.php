@@ -21,6 +21,7 @@ class FormBuilderElementOptIn extends \FormBuilderWebformElement {
     // Only top-level elements can be assigned to property groups.
     // @see form_builder_field_configure_pre_render()
     $edit = _webform_edit_opt_in($component);
+    $form['channel'] = $edit['extra']['channel'];
     $form['value'] = $edit['behavior']['value'];
     $dp['#form_builder']['property_group'] = 'display';
     $form['display'] = $edit['extra']['display'] + $dp;

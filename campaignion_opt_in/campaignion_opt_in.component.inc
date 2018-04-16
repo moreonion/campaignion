@@ -31,6 +31,7 @@ function _webform_defaults_opt_in() {
       'optin_statement' => '',
       'no_is_optout' => FALSE,
       'invert_checkbox' => FALSE,
+      'channel' => NULL,
     ),
   );
 }
@@ -50,6 +51,18 @@ function _webform_edit_opt_in($component) {
     '#default_value' => $component['extra']['description'],
     '#weight' => 0,
     '#parents' => ['extra', 'description'],
+  );
+
+  $channels = campaignion_opt_in_channel_info();
+  $form['extra']['channel'] = array(
+    '#type' => 'select',
+    '#title' => t('Channel'),
+    '#description' => t('The communication channel this is an opt-in for.'),
+    '#options' => array_map(function ($x) {
+      return $x['title'];
+    }, $channels),
+    '#required' => TRUE,
+    '#default_value' => $component['extra']['channel'],
   );
 
   $form['behavior']['value'] = array(

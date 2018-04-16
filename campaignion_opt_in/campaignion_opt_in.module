@@ -1,7 +1,9 @@
 <?php
 
+use Drupal\campaignion_activity\WebformSubmission as SubmissionActivity;
 use Drupal\campaignion_opt_in\FormBuilderElementOptIn;
 use Drupal\campaignion_opt_in\Values;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Implements hook_webform_component_info().
@@ -102,7 +104,7 @@ function campaignion_opt_in_form_builder_element_types($form_type, $form_id) {
   module_load_include('components.inc', 'form_builder_webform');
   require_once dirname(__FILE__) . '/campaignion_opt_in.component.inc';
   $map = _form_builder_webform_property_map('opt_in');
-  // Default value is handled by the newsletter property.
+  // Default value is handled by the form builder elment class.
   unset($map['properties']['default_value']);
   $fields['opt_in'] = [
     'title' => t('Opt-in'),
@@ -113,4 +115,51 @@ function campaignion_opt_in_form_builder_element_types($form_type, $form_id) {
     ] + _form_builder_webform_default('opt_in'),
   ];
   return $fields;
+}
+
+/**
+ * Implements hook_webform_submission_campaignion_action_taken().
+ */
+function campaignion_opt_in_campaignion_action_taken($node, Submission $submission) {
+  $activity = SubmissionActivity::byNidSid($node->nid, $submission->sid);
+  if (!$activity) {
+    watchdog('campaignion_opt_in', 'Can’t record opt-in without activity for submission [nid: %nid, sid: %sid].', ['%nid' => $node->nid, '%sid' => $submission->sid], WATCHDOG_ERROR);
+    return;
+  }
+
+  $components = $submission->webform->componentsByType('opt_in');
+  foreach ($components as $cid => $component) {
+    $value = $submission->valueByCid($component);
+    if (in_array($value, [Values::OPT_IN, Values::OPT_OUT])) {
+      db_insert('campaignion_opt_in')->fields([
+        'activity_id' => $activity->activity_id,
+        'operation' => $value,
+        'channel' => $component['extra']['channel'],
+        'statement' => $component['extra']['optin_statement'],
+      ]);
+    }
+  }
+}
+
+/**
+ * Implements hook_campaignion_opt_in_channel_info().
+ */
+function campaignion_opt_in_campaignion_opt_in_channel_info() {
+  $channels['email']['title'] = t('Email');
+  $channels['phone']['title'] = t('Phone');
+  $channels['post']['title'] = t('Post');
+  return $channels;
+}
+
+/**
+ * Get all configured opt-in channels.
+ *
+ * @return array
+ *   Channels keyed by their machine name. Each channel has these keys:
+ *   - title: The human-readable and translated title for the channel.
+ */
+function campaignion_opt_in_channel_info() {
+  $channels = module_invoke_all('campaignion_opt_in_channel_info');
+  drupal_alter('campaignion_opt_in_channel_info', $channels);
+  return $channels;
 }
