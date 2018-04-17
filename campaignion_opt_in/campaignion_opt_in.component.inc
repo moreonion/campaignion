@@ -63,6 +63,7 @@ function _webform_edit_opt_in($component) {
     }, $channels),
     '#required' => TRUE,
     '#default_value' => $component['extra']['channel'],
+    '#access' => empty($component['extra']['fixed_channel']) || empty($component['extra']['channel']),
   );
 
   $form['behavior']['value'] = array(

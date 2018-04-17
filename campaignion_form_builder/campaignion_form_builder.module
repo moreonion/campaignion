@@ -58,6 +58,7 @@ function campaignion_form_builder_form_builder_palette_fields_alter(&$fields, $f
         $fields[$key]['in_use'] = TRUE;
       }
     }
+    unset($fields['opt_in']);
   }
 }
 

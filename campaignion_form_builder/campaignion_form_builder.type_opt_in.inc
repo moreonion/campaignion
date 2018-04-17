@@ -24,10 +24,18 @@ function _campaignion_form_builder_form_builder_types_opt_in() {
   $fields['post_opt_in'] = $opt_in([
     'name' => 'Post Opt-In',
     'form_key' => 'post_opt_in',
+    'extra' => [
+      'channel' => 'post',
+      'fixed_channel' => TRUE,
+    ],
   ], 50);
   $fields['phone_opt_in'] = $opt_in([
     'name' => 'Phone Opt-In',
     'form_key' => 'phone_opt_in',
+    'extra' => [
+      'channel' => 'phone',
+      'fixed_channel' => TRUE,
+    ],
   ], 51);
 
   return $fields;
