@@ -139,6 +139,20 @@ function campaignion_opt_in_campaignion_action_taken($node, Submission $submissi
       ]);
     }
   }
+
+  // Compatibility with the newsletter component.
+  $components = $submission->webform->componentsByType('newsletter');
+  foreach ($components as $cid => $component) {
+    $value = $submission->valueByCid($component);
+    if (in_array($value, ['subscribed', 'unsubscribed'])) {
+      db_insert('campaignion_opt_in')->fields([
+        'activity_id' => $activity->activity_id,
+        'operation' => $value == 'subscribed' ? Values::OPT_IN : Values::OPT_OUT,
+        'channel' => 'email',
+        'statement' => $component['extra']['optin_statement'],
+      ]);
+    }
+  }
 }
 
 /**
