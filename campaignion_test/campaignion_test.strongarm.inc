@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * campaignion_petition.strongarm.inc
+ * campaignion_test.strongarm.inc
  */
 
 /**
