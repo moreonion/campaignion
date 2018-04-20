@@ -237,6 +237,20 @@ function campaignion_action_webform_confirm_email_confirmation_redirect_alter(&$
 }
 
 /**
+ * Implements hook_webform_paymethod_select_redirect_alter().
+ */
+function campaignion_action_webform_paymethod_select_redirect_alter(&$redirect, $submission) {
+  if ($action = Loader::instance()->actionFromNode($submission->node)) {
+    $delta = $submission->webform->needsConfirmation() ? Redirect::CONFIRMATION_PAGE : Redirect::THANK_YOU_PAGE;
+    if ($r = $action->redirect($submission, $delta)) {
+      $redirect = $r;
+      $redirect[1]['query']['share'] = "node/{$submission->node->nid}";
+      $redirect[1]['query']['sid'] = $submission->sid;
+    }
+  }
+}
+
+/**
  * Implements hook_webform_submission_insert().
  */
 function campaignion_action_webform_submission_insert($node, $submission) {
