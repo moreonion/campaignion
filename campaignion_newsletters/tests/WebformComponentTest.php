@@ -44,7 +44,7 @@ class WebformComponentTest extends \DrupalUnitTestCase {
 
     // Not checked checkbox.
     $v['subscribed'] = 0;
-    $this->assertEqual([''], _webform_submit_newsletter($c, $v));
+    $this->assertEqual(['no change'], _webform_submit_newsletter($c, $v));
 
     // Checked checkbox.
     $v['subscribed'] = 'subscribed';
@@ -61,13 +61,17 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     $v = 'no';
     $this->assertEqual(['unsubscribed'], _webform_submit_newsletter($c, $v));
 
+    // Radio no change.
+    $v = 'no change';
+    $this->assertEqual(['no change'], _webform_submit_newsletter($c, $v));
+
     // Radio yes.
     $v = 'yes';
     $this->assertEqual(['subscribed'], _webform_submit_newsletter($c, $v));
 
     // Not selected radio.
     $v = NULL;
-    $this->assertEqual([''], _webform_submit_newsletter($c, $v));
+    $this->assertEqual(['no change'], _webform_submit_newsletter($c, $v));
   }
 
   /**

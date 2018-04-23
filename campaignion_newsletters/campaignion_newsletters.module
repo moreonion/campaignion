@@ -116,7 +116,7 @@ function campaignion_newsletters_webform_conditional_form($node) {
         '#type' => 'select',
         '#options' => [
           'yes' => t('Opt-in'),
-          '' => t('No change'),
+          'no change' => t('No change'),
           'no' => t('Opt-out'),
         ],
       ];

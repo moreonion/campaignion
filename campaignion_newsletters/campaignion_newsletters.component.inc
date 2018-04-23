@@ -236,7 +236,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
 
     case 'radios':
       $l = $component['extra']['radio_labels'];
-      $no_value = !empty($component['extra']['no_is_optout']) ? 'no' : '';
+      $no_value = !empty($component['extra']['no_is_optout']) ? 'no' : 'no change';
       $options = ['yes' => $l[1], $no_value => $l[0]];
       $element += [
         '#type' => 'radios',
@@ -254,7 +254,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
 function _webform_submit_newsletter($component, $value) {
   switch ($component['extra']['display']) {
     case 'checkbox':
-      return empty($value['subscribed']) ? [''] : ['subscribed'];
+      return empty($value['subscribed']) ? ['no change'] : ['subscribed'];
 
     case 'radios':
       switch ($value) {
@@ -263,7 +263,7 @@ function _webform_submit_newsletter($component, $value) {
         case 'no':
           return ['unsubscribed'];
         default:
-          return [''];
+          return ['no change'];
       }
   }
 }
@@ -337,10 +337,10 @@ function _webform_csv_data_newsletter($component, $export_options, $value) {
  */
 function _webform_conditional_comparison_newsletter_equal(array $input_values, $rule_value, array $component) {
   if (!$input_values) {
-    return $rule_value == '';
+    return $rule_value == 'no change';
   }
   $look_for_map = [
-    '' => [0, ''],
+    'no change' => [0, '', 'no change'],
     'yes' => ['subscribed', 'yes'],
     'no' => ['unsubscribed', 'no'],
   ];

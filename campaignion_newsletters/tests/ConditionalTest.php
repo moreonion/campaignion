@@ -24,34 +24,34 @@ class ConditionalTest extends \DrupalUnitTestCase {
     // Possible input values:
     // - ['yes']: Yes radio is selected.
     // - ['no']: No radio is selected and no_is_optout is set.
-    // - ['']: No radio is selected and no_is_optout is not set.
+    // - ['no change']: No radio is selected and no_is_optout is not set.
     // - []: No radio is selected.
     // Input value, rule value, component.
     $this->assertTrue($eq(['yes'], 'yes', []));
     $this->assertFalse($eq(['yes'], 'no', []));
-    $this->assertFalse($eq(['yes'], '', []));
+    $this->assertFalse($eq(['yes'], 'no change', []));
     $this->assertFalse($eq(['no'], 'yes', []));
     $this->assertTrue($eq(['no'], 'no', []));
-    $this->assertFalse($eq(['no'], '', []));
-    $this->assertFalse($eq([''], 'yes', []));
-    $this->assertFalse($eq([''], 'no', []));
-    $this->assertTrue($eq([''], '', []));
+    $this->assertFalse($eq(['no'], 'no change', []));
+    $this->assertFalse($eq(['no change'], 'yes', []));
+    $this->assertFalse($eq(['no change'], 'no', []));
+    $this->assertTrue($eq(['no change'], 'no change', []));
     $this->assertFalse($eq([], 'yes', []));
     $this->assertFalse($eq([], 'no', []));
-    $this->assertTrue($eq([], '', []));
+    $this->assertTrue($eq([], 'no change', []));
 
     $this->assertFalse($ne(['yes'], 'yes', []));
     $this->assertTrue($ne(['yes'], 'no', []));
-    $this->assertTrue($ne(['yes'], '', []));
+    $this->assertTrue($ne(['yes'], 'no change', []));
     $this->assertTrue($ne(['no'], 'yes', []));
     $this->assertFalse($ne(['no'], 'no', []));
-    $this->assertTrue($ne(['no'], '', []));
-    $this->assertTrue($ne([''], 'yes', []));
-    $this->assertTrue($ne([''], 'no', []));
-    $this->assertFalse($ne([''], '', []));
+    $this->assertTrue($ne(['no'], 'no change', []));
+    $this->assertTrue($ne(['no change'], 'yes', []));
+    $this->assertTrue($ne(['no change'], 'no', []));
+    $this->assertFalse($ne(['no change'], 'no change', []));
     $this->assertTrue($ne([], 'yes', []));
     $this->assertTrue($ne([], 'no', []));
-    $this->assertFalse($ne([], '', []));
+    $this->assertFalse($ne([], 'no change', []));
   }
 
   /**
@@ -63,17 +63,17 @@ class ConditionalTest extends \DrupalUnitTestCase {
 
     $this->assertTrue($eq(['subscribed' => 'subscribed'], 'yes', []));
     $this->assertFalse($eq(['subscribed' => 'subscribed'], 'no', []));
-    $this->assertFalse($eq(['subscribed' => 'subscribed'], '', []));
+    $this->assertFalse($eq(['subscribed' => 'subscribed'], 'no change', []));
     $this->assertFalse($eq(['subscribed' => 0], 'yes', []));
     $this->assertFalse($eq(['subscribed' => 0], 'no', []));
-    $this->assertTrue($eq(['subscribed' => 0], '', []));
+    $this->assertTrue($eq(['subscribed' => 0], 'no change', []));
 
     $this->assertFalse($ne(['subscribed' => 'subscribed'], 'yes', []));
     $this->assertTrue($ne(['subscribed' => 'subscribed'], 'no', []));
-    $this->assertTrue($ne(['subscribed' => 'subscribed'], '', []));
+    $this->assertTrue($ne(['subscribed' => 'subscribed'], 'no change', []));
     $this->assertTrue($ne(['subscribed' => 0], 'yes', []));
     $this->assertTrue($ne(['subscribed' => 0], 'no', []));
-    $this->assertFalse($ne(['subscribed' => 0], '', []));
+    $this->assertFalse($ne(['subscribed' => 0], 'no change', []));
   }
 
   /**
@@ -85,23 +85,23 @@ class ConditionalTest extends \DrupalUnitTestCase {
 
     $this->assertTrue($eq(['subscribed'], 'yes', []));
     $this->assertFalse($eq(['subscribed'], 'no', []));
-    $this->assertFalse($eq(['subscribed'], '', []));
+    $this->assertFalse($eq(['subscribed'], 'no change', []));
     $this->assertFalse($eq(['unsubscribed'], 'yes', []));
     $this->assertTrue($eq(['unsubscribed'], 'no', []));
-    $this->assertFalse($eq(['unsubscribed'], '', []));
-    $this->assertFalse($eq([''], 'yes', []));
-    $this->assertFalse($eq([''], 'no', []));
-    $this->assertTrue($eq([''], '', []));
+    $this->assertFalse($eq(['unsubscribed'], 'no change', []));
+    $this->assertFalse($eq(['no change'], 'yes', []));
+    $this->assertFalse($eq(['no change'], 'no', []));
+    $this->assertTrue($eq(['no change'], 'no change', []));
 
     $this->assertFalse($ne(['subscribed'], 'yes', []));
     $this->assertTrue($ne(['subscribed'], 'no', []));
-    $this->assertTrue($ne(['subscribed'], '', []));
+    $this->assertTrue($ne(['subscribed'], 'no change', []));
     $this->assertTrue($ne(['unsubscribed'], 'yes', []));
     $this->assertFalse($ne(['unsubscribed'], 'no', []));
-    $this->assertTrue($ne(['unsubscribed'], '', []));
-    $this->assertTrue($ne([''], 'yes', []));
-    $this->assertTrue($ne([''], 'no', []));
-    $this->assertFalse($ne([''], '', []));
+    $this->assertTrue($ne(['unsubscribed'], 'no change', []));
+    $this->assertTrue($ne(['no change'], 'yes', []));
+    $this->assertTrue($ne(['no change'], 'no', []));
+    $this->assertFalse($ne(['no change'], 'no change', []));
   }
 
 }
