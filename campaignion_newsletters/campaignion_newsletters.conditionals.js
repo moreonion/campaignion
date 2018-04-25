@@ -18,7 +18,7 @@
       return element.querySelector('input:checked').value === ruleValue;
     }
     // If no radio is selected at the moment this counts as "no change".
-    return ruleValue === 'no change';
+    return ruleValue === 'no selection';
   };
   Drupal.webform.conditionalOperatorNewsletterNotEqual = function (element, existingValue, ruleValue) {
     return !Drupal.webform.conditionalOperatorNewsletterEqual(element, existingValue, ruleValue);

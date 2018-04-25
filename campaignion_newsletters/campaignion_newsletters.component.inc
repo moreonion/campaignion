@@ -262,8 +262,10 @@ function _webform_submit_newsletter($component, $value) {
           return ['subscribed'];
         case 'no':
           return ['unsubscribed'];
-        default:
+        case 'no change':
           return ['no change'];
+        default:
+          return ['no selection'];
       }
   }
 }
@@ -273,7 +275,7 @@ function _webform_submit_newsletter($component, $value) {
  */
 function _webform_newsletter_value_to_label($value) {
   if (!$value) {
-    return t('no change');
+    return t('Unknown value');
   }
   $value = reset($value);
   switch ($value) {
@@ -281,8 +283,12 @@ function _webform_newsletter_value_to_label($value) {
       return t('subscribed');
     case 'unsubscribed':
       return t('unsubscribed');
+    case 'no change':
+      return t('No change');
+    case 'no selection':
+      return t('No selection (radios)');
     default:
-      return t('no change');
+      return t('Unknown value');
   }
 }
 
@@ -337,12 +343,13 @@ function _webform_csv_data_newsletter($component, $export_options, $value) {
  */
 function _webform_conditional_comparison_newsletter_equal(array $input_values, $rule_value, array $component) {
   if (!$input_values) {
-    return $rule_value == 'no change';
+    return $rule_value == 'no selection';
   }
   $look_for_map = [
-    'no change' => [0, '', 'no change'],
+    'no change' => [0, 'no change'],
     'yes' => ['subscribed', 'yes'],
     'no' => ['unsubscribed', 'no'],
+    'no selection' => ['', 'no selection'],
   ];
   $look_for = $look_for_map[$rule_value];
   foreach ($input_values as $value) {

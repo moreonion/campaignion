@@ -71,7 +71,7 @@ class WebformComponentTest extends \DrupalUnitTestCase {
 
     // Not selected radio.
     $v = NULL;
-    $this->assertEqual(['no change'], _webform_submit_newsletter($c, $v));
+    $this->assertEqual(['no selection'], _webform_submit_newsletter($c, $v));
   }
 
   /**
@@ -81,12 +81,14 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     $export = function ($v) {
       return _webform_table_newsletter(NULL, $v);
     };
-    $this->assertEqual(t('no change'), $export(NULL));
-    $this->assertEqual(t('no change'), $export(['0']));
+    $this->assertEqual(t('Unknown value'), $export(NULL));
+    $this->assertEqual(t('Unknown value'), $export(['0']));
     $this->assertEqual(t('subscribed'), $export(['subscribed']));
     // Old format - backwards compatibility.
     $this->assertEqual(t('subscribed'), $export(['subscribed' => 'subscribed']));
     $this->assertEqual(t('unsubscribed'), $export(['unsubscribed']));
+    $this->assertEqual(t('No change'), $export(['no change']));
+    $this->assertEqual(t('No selection (radios)'), $export(['no selection']));
   }
 
   /**
@@ -96,8 +98,8 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     $export = function ($v) {
       return _webform_csv_data_newsletter(NULL, [], $v);
     };
-    $this->assertEqual(t('no change'), $export(NULL));
-    $this->assertEqual(t('no change'), $export(['0']));
+    $this->assertEqual(t('Unknown value'), $export(NULL));
+    $this->assertEqual(t('Unknown value'), $export(['0']));
     $this->assertEqual(t('subscribed'), $export(['subscribed']));
     // Old format - backwards compatibility.
     $this->assertEqual(t('subscribed'), $export(['subscribed' => 'subscribed']));
