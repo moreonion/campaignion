@@ -22,7 +22,7 @@ if ($after_submit['type'] == 'node') {
   ]);
 }
 else {
-  echo t('After submitting the last form step your supporters will be redirected one of the following pages:');
+  echo t('After submitting the last form step your supporters will be redirected to one of the following pages:');
   echo render($after_submit['redirects']);
 }
 ?>
@@ -35,7 +35,7 @@ if ($after_confirm) {
     ]);
   }
   else {
-    echo t('After clicking on the confirmation link your supporters will be redirected one of the following pages:');
+    echo t('After clicking on the confirmation link your supporters will be redirected to one of the following pages:');
     echo render($after_confirm['redirects']);
   }
 
