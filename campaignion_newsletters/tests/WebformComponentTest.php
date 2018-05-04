@@ -43,12 +43,12 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     $c['extra']['display'] = 'checkbox';
 
     // Not checked checkbox.
-    $v['subscribed'] = 0;
-    $this->assertEqual(['no change'], _webform_submit_newsletter($c, $v));
+    $v['opt-in'] = 0;
+    $this->assertEqual(['checkbox:no-change'], _webform_submit_newsletter($c, $v));
 
     // Checked checkbox.
-    $v['subscribed'] = 'subscribed';
-    $this->assertEqual(['subscribed'], _webform_submit_newsletter($c, $v));
+    $v['opt-in'] = 'opt-in';
+    $this->assertEqual(['checkbox:opt-in'], _webform_submit_newsletter($c, $v));
   }
 
   /**
@@ -58,20 +58,20 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     $c['extra']['display'] = 'radios';
 
     // Radio no.
-    $v = 'no';
-    $this->assertEqual(['unsubscribed'], _webform_submit_newsletter($c, $v));
+    $v = 'opt-out';
+    $this->assertEqual(['radios:opt-out'], _webform_submit_newsletter($c, $v));
 
     // Radio no change.
-    $v = 'no change';
-    $this->assertEqual(['no change'], _webform_submit_newsletter($c, $v));
+    $v = 'no-change';
+    $this->assertEqual(['radios:no-change'], _webform_submit_newsletter($c, $v));
 
     // Radio yes.
-    $v = 'yes';
-    $this->assertEqual(['subscribed'], _webform_submit_newsletter($c, $v));
+    $v = 'opt-in';
+    $this->assertEqual(['radios:opt-in'], _webform_submit_newsletter($c, $v));
 
     // Not selected radio.
     $v = NULL;
-    $this->assertEqual(['no selection'], _webform_submit_newsletter($c, $v));
+    $this->assertEqual(['radios:not-selected'], _webform_submit_newsletter($c, $v));
   }
 
   /**
@@ -83,12 +83,12 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     };
     $this->assertEqual(t('Unknown value'), $export(NULL));
     $this->assertEqual(t('Unknown value'), $export(['0']));
-    $this->assertEqual(t('subscribed'), $export(['subscribed']));
-    // Old format - backwards compatibility.
-    $this->assertEqual(t('subscribed'), $export(['subscribed' => 'subscribed']));
-    $this->assertEqual(t('unsubscribed'), $export(['unsubscribed']));
-    $this->assertEqual(t('No change'), $export(['no change']));
-    $this->assertEqual(t('No selection (radios)'), $export(['no selection']));
+    $this->assertEqual(t('Checkbox opt-in'), $export(['checkbox:opt-in']));
+    $this->assertEqual(t('Radio opt-in'), $export(['radios:opt-in']));
+    $this->assertEqual(t('Radio opt-out'), $export(['radios:opt-out']));
+    $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
+    $this->assertEqual(t('Radio no change'), $export(['radios:no-change']));
+    $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
   }
 
   /**
@@ -100,10 +100,12 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     };
     $this->assertEqual(t('Unknown value'), $export(NULL));
     $this->assertEqual(t('Unknown value'), $export(['0']));
-    $this->assertEqual(t('subscribed'), $export(['subscribed']));
-    // Old format - backwards compatibility.
-    $this->assertEqual(t('subscribed'), $export(['subscribed' => 'subscribed']));
-    $this->assertEqual(t('unsubscribed'), $export(['unsubscribed']));
+    $this->assertEqual(t('Checkbox opt-in'), $export(['checkbox:opt-in']));
+    $this->assertEqual(t('Radio opt-in'), $export(['radios:opt-in']));
+    $this->assertEqual(t('Radio opt-out'), $export(['radios:opt-out']));
+    $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
+    $this->assertEqual(t('Radio no change'), $export(['radios:no-change']));
+    $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
   }
 
 }

@@ -115,10 +115,12 @@ function campaignion_newsletters_webform_conditional_form($node) {
       $element = [
         '#type' => 'select',
         '#options' => [
-          'yes' => t('Opt-in'),
-          'no change' => t('No change'),
-          'no' => t('Opt-out'),
-          'no selection' => t('No selection (radios)'),
+          'checkbox:opt-in' => t('Checkbox opt-in'),
+          'checkbox:no-change' => t('Checkbox no change'),
+          'radios:opt-in' => t('Radio opt-in'),
+          'radios:no-change' => t('Radio no change'),
+          'radios:opt-out' => t('Radio opt-out'),
+          'radios:not-selected' => t('Radio not selected (no change)'),
         ],
       ];
       $forms[$cid] = drupal_render($element);

@@ -226,21 +226,23 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
 
   switch ($component['extra']['display']) {
     case 'checkbox':
-      $options['subscribed'] = $component['extra']['checkbox_label'];
+      $options['opt-in'] = $component['extra']['checkbox_label'];
       $element += [
         '#type' => 'checkboxes',
-        '#default_value' => $component['value'],
+        '#default_value' => [
+          'opt-in' => _campaignion_newsletters_prefix($component['value'], 'checkbox', FALSE)
+        ],
         '#options' => $options,
       ];
       break;
 
     case 'radios':
       $l = $component['extra']['radio_labels'];
-      $no_value = !empty($component['extra']['no_is_optout']) ? 'no' : 'no change';
-      $options = ['yes' => $l[1], $no_value => $l[0]];
+      $no_value = !empty($component['extra']['no_is_optout']) ? 'opt-out' : 'no-change';
+      $options = ['opt-in' => $l[1], $no_value => $l[0]];
       $element += [
         '#type' => 'radios',
-        '#default_value' => !empty($component['value']['subscribed']) ? 'yes' : NULL,
+        '#default_value' => _campaignion_newsletters_prefix($component['value'], 'radios', FALSE),
         '#options' => $options,
       ];
   }
@@ -252,22 +254,39 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
  * Implements _webform_submit_COMPONENT().
  */
 function _webform_submit_newsletter($component, $value) {
-  switch ($component['extra']['display']) {
-    case 'checkbox':
-      return empty($value['subscribed']) ? ['no change'] : ['subscribed'];
+  return [_campaignion_newsletters_prefix($value, $component['extra']['display'])];
+}
 
-    case 'radios':
-      switch ($value) {
-        case 'yes':
-          return ['subscribed'];
-        case 'no':
-          return ['unsubscribed'];
-        case 'no change':
-          return ['no change'];
-        default:
-          return ['no selection'];
-      }
+/**
+ * Helper function to add and remove prefixes from newletter values.
+ */
+function _campaignion_newsletters_prefix($value, $prefix = '', $add = TRUE) {
+  $no_value_map = [
+    'checkbox' => [0 => 'no-change'],
+    'radios' => [NULL => 'not-selected', 0 => 'not-selected'],
+  ];
+  if (is_array($value)) {
+    $value = reset($value);
   }
+  // Add prefix:
+  if ($add) {
+    if (!empty($no_value_map[$prefix]) && array_key_exists($value, $no_value_map[$prefix])) {
+      $value = $no_value_map[$prefix][$value];
+    }
+    $value = $prefix . ':' . $value;
+  }
+  // Remove prefix:
+  else {
+    $parts = explode(':', $value, 2);
+    $value = array_pop($parts);
+    if (!empty($parts)) {
+      $prefix = reset($parts);
+    }
+    if (!empty($no_value_map[$prefix]) && $key = array_search($value, $no_value_map[$prefix])) {
+      $value = $key;
+    }
+  }
+  return $value;
 }
 
 /**
@@ -279,14 +298,18 @@ function _webform_newsletter_value_to_label($value) {
   }
   $value = reset($value);
   switch ($value) {
-    case 'subscribed':
-      return t('subscribed');
-    case 'unsubscribed':
-      return t('unsubscribed');
-    case 'no change':
-      return t('No change');
-    case 'no selection':
-      return t('No selection (radios)');
+    case 'checkbox:opt-in':
+      return t('Checkbox opt-in');
+    case 'checkbox:no-change':
+      return t('Checkbox no change');
+    case 'radios:opt-in':
+      return t('Radio opt-in');
+    case 'radios:no-change':
+      return t('Radio no change');
+    case 'radios:opt-out':
+      return t('Radio opt-out');
+    case 'radios:not-selected':
+      return t('Radio not selected (no change)');
     default:
       return t('Unknown value');
   }
@@ -342,20 +365,15 @@ function _webform_csv_data_newsletter($component, $export_options, $value) {
  * Webform conditional comparison callback for 'equal'.
  */
 function _webform_conditional_comparison_newsletter_equal(array $input_values, $rule_value, array $component) {
+  $type = $component['extra']['display'];
   if (!$input_values) {
-    return $rule_value == 'no selection';
+    return $rule_value == $type . ':not-selected';
   }
-  $look_for_map = [
-    'no change' => [0, 'no change'],
-    'yes' => ['subscribed', 'yes'],
-    'no' => ['unsubscribed', 'no'],
-    'no selection' => ['', 'no selection'],
-  ];
-  $look_for = $look_for_map[$rule_value];
   foreach ($input_values as $value) {
-    if (in_array($value, $look_for, TRUE)) {
-      return TRUE;
+    if (strpos($value, $type) !== 0) {
+      $value = _campaignion_newsletters_prefix($value, $type);
     }
+    return $rule_value == $value;
   }
   return FALSE;
 }
