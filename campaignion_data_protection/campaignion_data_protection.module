@@ -1,0 +1,46 @@
+<?php
+
+function campaignion_data_protection_webform_submission_user_limit_check($node, $account = NULL) {
+  // Check if submission limiting is enabled.
+  if ($node->webform['submit_limit'] == '-1') {
+    return FALSE;
+  }
+  $threshold = $node->webform['submit_limit'];
+
+  $name = 'webform-submission-limit';
+  $identifier = $node->nid . '/' . ip_address();
+
+  if ($node->webform['submit_interval'] != -1) {
+    $window = $node->webform['submit_interval'];
+  }
+  else {
+    $window = 3600;
+  }
+  if (!flood_is_allowed($name, $threshold, $window, $identifier)) {
+    return TRUE;
+  }
+  // Limit not exceeded.
+  return FALSE;
+}
+
+function campaignion_data_protection_webform_submission_total_limit_check($node) {
+  return campaignion_data_protection_webform_submission_user_limit_check($node);
+}
+
+/**
+ * Implements hook_webform_submission_create().
+ */
+function campaignion_data_protection_webform_submission_create_alter($submission, $node, $account, $form_state) {
+  $name = 'webform-submission-limit';
+  $identifier = $node->nid . '/' . ip_address();
+
+  if ($node->webform['submit_interval'] != -1) {
+    $window = $node->webform['submit_interval'];
+  }
+  else {
+    $window = 3600;
+  }
+
+  flood_register_event($name, $window, $identifier);
+}
+

@@ -1,0 +1,7 @@
+name = Campaignion data protection
+description = Hooks for filtering or anonymizing data
+core = 7.x
+package = Campaignion
+project = campaignion
+
+dependencies[] = campaignion
