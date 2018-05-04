@@ -1,0 +1,85 @@
+From 0234e37630d0539b059890024ae9c11fe265e5fc Mon Sep 17 00:00:00 2001
+From: Alex Berger <alex@more-onion.com>
+Date: Fri, 4 May 2018 18:29:18 +0200
+Subject: [PATCH] Option to set custom limit check functions.
+
+- set different function per user or total limit check via variables
+- they apply site wide
+- if the configured functions are not found, fallback to standard
+  functions
+---
+ webform.module | 30 +++++++++++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/webform.module b/webform.module
+index bb33f855..05b2a13e 100644
+--- a/webform.module
++++ b/webform.module
+@@ -2014,11 +2014,17 @@ function webform_node_view($node, $view_mode) {
+   if ($node->webform['submit_limit'] != -1) {
+     module_load_include('inc', 'webform', 'includes/webform.submissions');
+ 
++    $user_limit_check_function = variable_get('webform_submission_user_limit_check_function', 'webform_submission_user_limit_check');
++    if (!function_exists($user_limit_check_function)) {
++      watchdog('webform', 'Configured user limit function does not exist: @fnname.', array('@fnname' => $user_limit_check_function), WATCHDOG_WARNING);
++      $user_limit_check_function = 'webform_submission_user_limit_check';
++    }
++
+     // Disable the form if the limit is exceeded and page cache is not active.
+     // This prevents one anonymous user from generated a disabled webform page
+     // for the cache, which would be shown to other anonymous users who have not
+     // exceeded the limit.
+-    if (($user_limit_exceeded = webform_submission_user_limit_check($node)) && !$cached) {
++    if (($user_limit_exceeded = $user_limit_check_function($node)) && !$cached) {
+       $enabled = FALSE;
+     }
+   }
+@@ -2029,6 +2035,12 @@ function webform_node_view($node, $view_mode) {
+   if ($node->webform['total_submit_limit'] != -1) {
+     module_load_include('inc', 'webform', 'includes/webform.submissions');
+ 
++    $total_limit_check_function = variable_get('webform_submission_total_limit_check_function', 'webform_submission_total_limit_check');
++    if (!function_exists($total_limit_check_function)) {
++      watchdog('webform', 'Configured total limit function does not exist: @fnname.', array('@fnname' => $total_limit_check_function), WATCHDOG_WARNING);
++      $total_limit_check_function = 'webform_submission_total_limit_check';
++    }
++
+     // Disable the form if the limit is exceeded. The cache is irrelevant for
+     // the total submission limit; when it is exceeded for one user, it is
+     // exceeded for any other user.
+@@ -2957,10 +2969,22 @@ function webform_client_form_prevalidate($form, &$form_state) {
+   // $allowed_role set by reference.
+   $allowed_roles = _webform_allowed_roles($node, $allowed_role);
+ 
++  $total_limit_check_function = variable_get('webform_submission_total_limit_check_function', 'webform_submission_total_limit_check');
++  if (!function_exists($total_limit_check_function)) {
++    watchdog('webform', 'Configured total limit function does not exist: @fnname.', array('@fnname' => $total_limit_check_function), WATCHDOG_WARNING);
++    $total_limit_check_function = 'webform_submission_total_limit_check';
++  }
++
+   // Check that the submissions have not exceeded the total submission limit.
+   $total_limit_exceeded = FALSE;
+   if ($node->webform['total_submit_limit'] != -1 && !$finished) {
+-    $total_limit_exceeded = webform_submission_total_limit_check($node);
++    $total_limit_exceeded = $total_limit_check_function($node);
++  }
++
++  $user_limit_check_function = variable_get('webform_submission_user_limit_check_function', 'webform_submission_user_limit_check');
++  if (!function_exists($user_limit_check_function)) {
++    watchdog('webform', 'Configured user limit function does not exist: @fnname.', array('@fnname' => $user_limit_check_function), WATCHDOG_WARNING);
++    $user_limit_check_function = 'webform_submission_user_limit_check';
+   }
+ 
+   // Check that the user has not exceeded the submission limit.
+@@ -2968,7 +2992,7 @@ function webform_client_form_prevalidate($form, &$form_state) {
+   // enabled, because they may submit the form even if they do not have access.
+   $user_limit_exceeded = FALSE;
+   if ($node->webform['submit_limit'] != -1 && !$finished) {
+-    $user_limit_exceeded = webform_submission_user_limit_check($node);
++    $user_limit_exceeded = $user_limit_check_function($node);
+   }
+ 
+   // Check that the form is still open at time of submission.
+-- 
+2.17.0
+
