@@ -36,4 +36,9 @@ class WrapperField implements ExportMapperInterface {
   public function setExporter(ExporterInterface $exporter) {
     $this->exporter = $exporter;
   }
+
+  public function getFieldName() {
+    return $this->key;
+  }
+
 }
