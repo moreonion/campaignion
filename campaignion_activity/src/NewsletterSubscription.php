@@ -17,6 +17,7 @@ class NewsletterSubscription extends ActivityBase {
   public $action;
   public $from_provider;
   public $optin_statement;
+  public $remote_addr;
 
   /**
    * Create a new activity object from a subscription object.
@@ -40,6 +41,7 @@ class NewsletterSubscription extends ActivityBase {
       'action' => $action,
       'from_provider' => (int) $from_provider,
       'optin_statement' => $subscription->optin_statement,
+      'remote_addr' => self::getRemoteAddr(),
     ]);
   }
 
@@ -53,6 +55,13 @@ class NewsletterSubscription extends ActivityBase {
     $query = static::buildJoins();
     $query->condition('a.activity_id', $activity_id);
     return $query->execute()->fetchObject(static::class);
+  }
+
+  /**
+   * Returns the remote IP address of the current request.
+   */
+  protected static function getRemoteAddr() {
+    return ip_address();
   }
 
   /**
@@ -78,6 +87,7 @@ class NewsletterSubscription extends ActivityBase {
         'action',
         'from_provider',
         'optin_statement',
+        'remote_addr',
       ]))
       ->execute();
   }

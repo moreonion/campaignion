@@ -176,6 +176,11 @@ function campaignion_activity_schema() {
         'type' => 'text',
         'not null' => FALSE,
       ],
+      'remote_addr' => array(
+        'description' => 'The IP address of the user that optted in.',
+        'type' => 'varchar',
+        'length' => 128,
+      ),
     ],
     'primary key' => ['activity_id'],
     'indexes' => [
@@ -202,6 +207,17 @@ function campaignion_activity_schema() {
  */
 function campaignion_activity_uninstall() {
   variable_del('campaignion_activity_log_contact_save');
+}
+
+/**
+ * Add opt-in remote_addr logging to newsletter subscription activities.
+ */
+function campaignion_activity_update_7() {
+  db_add_field('campaignion_activity_newsletter_subscription', 'remote_addr', array(
+    'description' => 'The IP address of the user that optted in.',
+    'type' => 'varchar',
+    'length' => 128,
+  ));
 }
 
 /**
