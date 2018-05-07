@@ -2,19 +2,23 @@
 
 namespace Drupal\campaignion_activity;
 
-use \Drupal\campaignion_newsletters\Subscription;
+use Drupal\campaignion_newsletters\Subscription;
 
 /**
  * Test newsletter subscription activities related to IP addresses.
  */
+class NewsletterSubscriptionWithMockedIPTest extends \DrupalWebTestCase {
 
-class NewsletterSubscriptionWithMockedIPTest extends \DrupalWebTestCase{
-
-  // https://api.drupal.org/api/drupal/modules%21simpletest%21tests%21bootstrap.test/class/BootstrapIPAddressTestCase/7.x
-  function setUp() {
+  /**
+   * Set up.
+   */
+  public function setUp() {
+    // Mocking the IP address see
+    // https://api.drupal.org/api/drupal/modules%21simpletest%21tests%21bootstrap.test/class/BootstrapIPAddressTestCase/7.x
     $this->oldserver = $_SERVER;
     $this->remote_ip = '127.1.0.1';
     drupal_static_reset('ip_address');
+    // @codingStandardsIgnoreLine
     $_SERVER['REMOTE_ADDR'] = $this->remote_ip;
 
     parent::setUp(['campaignion_activity', 'campaignion_newsletters']);
@@ -23,7 +27,10 @@ class NewsletterSubscriptionWithMockedIPTest extends \DrupalWebTestCase{
     db_delete('campaignion_activity_newsletter_subscription')->execute();
   }
 
-  function tearDown() {
+  /**
+   * Tear down.
+   */
+  public function tearDown() {
     $_SERVER = $this->oldserver;
     drupal_static_reset('ip_address');
 
@@ -35,7 +42,10 @@ class NewsletterSubscriptionWithMockedIPTest extends \DrupalWebTestCase{
     db_delete('campaignion_activity_newsletter_subscription')->execute();
   }
 
-  public function test_remote_addr() {
+  /**
+   * The remote address is saved with the activitiy.
+   */
+  public function testRemoteAddr() {
     $email = 'bydataduplicate@test.com';
     $list_id = 4711;
     $s = Subscription::byData($list_id, $email);

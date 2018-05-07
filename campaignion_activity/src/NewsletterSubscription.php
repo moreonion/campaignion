@@ -58,7 +58,10 @@ class NewsletterSubscription extends ActivityBase {
   }
 
   /**
-   * Returns the remote IP address of the current request.
+   * Get the IP address of the requesting client.
+   *
+   * @return string
+   *   Remote IP address
    */
   protected static function getRemoteAddr() {
     return ip_address();
@@ -97,6 +100,8 @@ class NewsletterSubscription extends ActivityBase {
    */
   protected function update() {
     parent::update();
+    // `optin_statement` and `remote_addr` intentionally left out, as
+    // these are not supposed to be changed.
     db_update('campaignion_activity_newsletter_subscription')
       ->fields($this->values(['list_id', 'action', 'from_provider']))
       ->condition('activity_id', $this->activity_id)
