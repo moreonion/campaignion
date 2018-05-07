@@ -3,7 +3,7 @@
  * Conditional operators for newsletter fields.
  */
 
-(function() {
+(function () {
 
   "use strict";
   Drupal.webform = Drupal.webform || {};

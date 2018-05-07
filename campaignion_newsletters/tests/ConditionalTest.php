@@ -25,7 +25,7 @@ class ConditionalTest extends \DrupalUnitTestCase {
     // Possible input values:
     // - ['radios:opt-in']: 'Yes' radio is selected.
     // - ['radios:opt-out']: 'No' radio is selected and no_is_optout is set.
-    // - ['radios:no-change']: 'No' radio is selected and no_is_optout is not set.
+    // - ['radios:no-change']: 'No' radio is selected but not no_is_optout.
     // - ['radios:not-selected']: No radio is selected.
     // Input value, rule value, component.
     $this->assertTrue($eq(['opt-in'], 'radios:opt-in', $radios));
