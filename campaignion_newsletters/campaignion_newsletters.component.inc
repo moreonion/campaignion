@@ -5,6 +5,8 @@
  * Campaignion newsletter component for webform.
  */
 
+use Drupal\campaignion_newsletters\ValuePrefix;
+
 /**
  * Implements _webform_defaults_component().
  */
@@ -223,7 +225,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
       $element += [
         '#type' => 'checkboxes',
         '#default_value' => [
-          'opt-in' => _campaignion_newsletters_prefix($component['value'], 'checkbox', FALSE),
+          'opt-in' => ValuePrefix::remove($component['value']),
         ],
         '#options' => $options,
       ];
@@ -235,7 +237,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
       $options = ['opt-in' => $l[1], $no_value => $l[0]];
       $element += [
         '#type' => 'radios',
-        '#default_value' => _campaignion_newsletters_prefix($component['value'], 'radios', FALSE),
+        '#default_value' => ValuePrefix::remove($component['value']),
         '#options' => $options,
       ];
   }
@@ -247,39 +249,7 @@ function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
  * Implements _webform_submit_COMPONENT().
  */
 function _webform_submit_newsletter($component, $value) {
-  return [_campaignion_newsletters_prefix($value, $component['extra']['display'])];
-}
-
-/**
- * Helper function to add and remove prefixes from newletter values.
- */
-function _campaignion_newsletters_prefix($value, $prefix = '', $add = TRUE) {
-  $no_value_map = [
-    'checkbox' => [0 => 'no-change'],
-    'radios' => [NULL => 'not-selected', 0 => 'not-selected'],
-  ];
-  if (is_array($value)) {
-    $value = reset($value);
-  }
-  // Add prefix:
-  if ($add) {
-    if (!empty($no_value_map[$prefix]) && array_key_exists($value, $no_value_map[$prefix])) {
-      $value = $no_value_map[$prefix][$value];
-    }
-    $value = $prefix . ':' . $value;
-  }
-  // Remove prefix:
-  else {
-    $parts = explode(':', $value, 2);
-    $value = array_pop($parts);
-    if (!empty($parts)) {
-      $prefix = reset($parts);
-    }
-    if (!empty($no_value_map[$prefix]) && $key = array_search($value, $no_value_map[$prefix])) {
-      $value = $key;
-    }
-  }
-  return $value;
+  return [ValuePrefix::add($value, $component['extra']['display'])];
 }
 
 /**
@@ -370,7 +340,7 @@ function _webform_conditional_comparison_newsletter_equal(array $input_values, $
   }
   foreach ($input_values as $value) {
     if (strpos($value, $type) !== 0) {
-      $value = _campaignion_newsletters_prefix($value, $type);
+      $value = ValuePrefix::add($value, $type);
     }
     return $rule_value == $value;
   }
