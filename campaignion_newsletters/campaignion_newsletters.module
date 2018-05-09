@@ -112,16 +112,26 @@ function campaignion_newsletters_webform_conditional_form($node) {
   $forms = [];
   foreach ($node->webform['components'] as $cid => $component) {
     if (webform_component_property($component['type'], 'conditional_type') == 'newsletter') {
+      $options = [];
+      // Checkbox options.
+      if ($component['extra']['display'] == 'checkbox') {
+        $options['checkbox:opt-in'] = t('Checkbox opt-in');
+        $options['checkbox:no-change'] = t('Checkbox no change');
+      }
+      // Radio options.
+      elseif ($component['extra']['display'] == 'radios') {
+        $options['radios:opt-in'] = t('Radio opt-in');
+        if (!empty($component['extra']['no_is_optout'])) {
+          $options['radios:opt-out'] = t('Radio opt-out');
+        }
+        else {
+          $options['radios:no-change'] = t('Radio no change');
+        }
+        $options['radios:not-selected'] = t('Radio not selected (no change)');
+      }
       $element = [
         '#type' => 'select',
-        '#options' => [
-          'checkbox:opt-in' => t('Checkbox opt-in'),
-          'checkbox:no-change' => t('Checkbox no change'),
-          'radios:opt-in' => t('Radio opt-in'),
-          'radios:no-change' => t('Radio no change'),
-          'radios:opt-out' => t('Radio opt-out'),
-          'radios:not-selected' => t('Radio not selected (no change)'),
-        ],
+        '#options' => $options,
       ];
       $forms[$cid] = drupal_render($element);
     }
