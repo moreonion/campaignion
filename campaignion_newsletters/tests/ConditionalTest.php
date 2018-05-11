@@ -23,10 +23,10 @@ class ConditionalTest extends \DrupalUnitTestCase {
     $radios = ['extra' => ['display' => 'radios']];
 
     // Possible input values:
-    // - ['radios:opt-in']: 'Yes' radio is selected.
-    // - ['radios:opt-out']: 'No' radio is selected and no_is_optout is set.
-    // - ['radios:no-change']: 'No' radio is selected but not no_is_optout.
-    // - ['radios:not-selected']: No radio is selected.
+    // - ['opt-in']: 'Yes' radio is selected.
+    // - ['opt-out']: 'No' radio is selected and no_is_optout is set.
+    // - ['no-change']: 'No' radio is selected but not no_is_optout.
+    // - []: No radio is selected.
     // Input value, rule value, component.
     $this->assertTrue($eq(['opt-in'], 'radios:opt-in', $radios));
     $this->assertFalse($eq(['opt-in'], 'radios:opt-out', $radios));
@@ -46,12 +46,12 @@ class ConditionalTest extends \DrupalUnitTestCase {
     $this->assertFalse($eq(['no-change'], 'radios:not-selected', $radios));
     $this->assertFalse($eq(['no-change'], 'checkbox:opt-in', $radios));
     $this->assertFalse($eq(['no-change'], 'checkbox:no-change', $radios));
-    $this->assertFalse($eq(['not-selected'], 'radios:opt-in', $radios));
-    $this->assertFalse($eq(['not-selected'], 'radios:opt-out', $radios));
-    $this->assertFalse($eq(['not-selected'], 'radios:no-change', $radios));
-    $this->assertTrue($eq(['not-selected'], 'radios:not-selected', $radios));
-    $this->assertFalse($eq(['not-selected'], 'checkbox:opt-in', $radios));
-    $this->assertFalse($eq(['not-selected'], 'checkbox:no-change', $radios));
+    $this->assertFalse($eq([], 'radios:opt-in', $radios));
+    $this->assertFalse($eq([], 'radios:opt-out', $radios));
+    $this->assertFalse($eq([], 'radios:no-change', $radios));
+    $this->assertTrue($eq([], 'radios:not-selected', $radios));
+    $this->assertFalse($eq([], 'checkbox:opt-in', $radios));
+    $this->assertFalse($eq([], 'checkbox:no-change', $radios));
 
     $this->assertFalse($ne(['opt-in'], 'radios:opt-in', $radios));
     $this->assertTrue($ne(['opt-in'], 'radios:opt-out', $radios));
