@@ -36,7 +36,7 @@ class FilterTest extends \DrupalWebTestCase {
    * Test opt-in filter with opt-in in the submission.
    */
   public function testMatchOptInSubmission() {
-    $stub_s['data'][1][0] = 'subscribed';
+    $stub_s['data'][1][0] = 'radios:opt-in';
     $stub_n['webform']['components'][1] = [
       'cid' => 1,
       'form_key' => 'emailopt',

@@ -5,6 +5,7 @@ namespace Drupal\campaignion_action\Redirects;
 use Drupal\little_helpers\DB\Model;
 use Drupal\little_helpers\Webform\Submission;
 use Drupal\campaignion_newsletters\Subscription;
+use Drupal\campaignion_newsletters\ValuePrefix;
 
 /**
  * Model class for redirect filters.
@@ -142,7 +143,7 @@ class Filter extends Model {
     // No opt-in so far. Look for an opt-in this this submission.
     $components = $submission->webform->componentsByType('newsletter');
     foreach ($components as $cid => $component) {
-      if ($submission->valueByCid($cid) == 'subscribed') {
+      if (ValuePrefix::remove($submission->valuesByCid($cid)) == 'opt-in') {
         return TRUE;
       }
     }
