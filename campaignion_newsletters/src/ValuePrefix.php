@@ -43,7 +43,9 @@ class ValuePrefix {
    *   Un-prefixed value for form API.
    */
   public static function remove($value) {
-    $value = reset($value);
+    if (is_array($value)) {
+      $value = reset($value);
+    }
     $parts = explode(':', $value, 2);
     return count($parts) > 1 ? $parts[1] : $value;
   }
