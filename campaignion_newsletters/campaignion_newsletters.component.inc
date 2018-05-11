@@ -54,7 +54,6 @@ function _webform_theme_newsletter() {
  * Implements _webform_edit_component().
  */
 function _webform_edit_newsletter($component) {
-  $component['value'] = unserialize($component['value']);
   $newsletters = db_select('campaignion_newsletters_lists', 'l')
     ->fields('l', ['list_id', 'title'])
     ->execute()
@@ -76,8 +75,8 @@ function _webform_edit_newsletter($component) {
   $form['behavior']['value'] = [
     '#type' => 'checkboxes',
     '#title' => t('Default state'),
-    '#options' => ['subscribed' => t('The newsletter checkbox is checked by default, the radio default is set to “Yes”.')],
-    '#default_value' => $component['value'],
+    '#options' => ['opt-in' => t('The newsletter checkbox is checked by default, the radio default is set to “Yes”.')],
+    '#default_value' => [$component['value']],
     '#element_validate' => ['_webform_value_validate_newsletter'],
     '#parents' => ['value'],
   ];
@@ -203,11 +202,19 @@ function _webform_edit_newsletter($component) {
 }
 
 /**
+ * Element validate callback for the default value.
+ *
+ * @see _webform_edit_newsletter()
+ */
+function _webform_value_validate_newsletter(&$element, &$form_state) {
+  $values = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  $values = reset($values) ? 'opt-in' : '';
+}
+
+/**
  * Implements _webform_render_component().
  */
 function _webform_render_newsletter($component, $value = NULL, $filter = TRUE) {
-  $component['value'] = unserialize($component['value']);
-
   $element = [
     '#required' => !empty($component['mandatory']) || !empty($component['required']),
     '#weight' => $component['weight'],
