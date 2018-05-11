@@ -48,13 +48,32 @@ function campaignion_opt_in_webform_conditional_form($node) {
   $forms = [];
   foreach ($node->webform['components'] as $cid => $component) {
     if (webform_component_property($component['type'], 'conditional_type') == 'opt_in') {
+      $options = [];
+      // Checkbox options.
+      if ($component['extra']['display'] == 'checkbox') {
+        if (!empty($component['extra']['invert_checkbox'])) {
+          $options['checkbox-inverted:' . Values::NO_CHANGE] = t('Inverted checkbox no change');
+          $options['checkbox-inverted:' . Values::OPT_IN] = t('Inverted checkbox opt-in');
+        }
+        else {
+          $options['checkbox:' . Values::OPT_IN] = t('Checkbox opt-in');
+          $options['checkbox:' . Values::NO_CHANGE] = t('Checkbox no change');
+        }
+      }
+      // Radio options.
+      elseif ($component['extra']['display'] == 'radios') {
+        $options['radios:' . Values::OPT_IN] = t('Radio opt-in');
+        if (!empty($component['extra']['no_is_optout'])) {
+          $options['radios:' . Values::OPT_OUT] = t('Radio opt-out');
+        }
+        else {
+          $options['radios:' . Values::NO_CHANGE] = t('Radio no change');
+        }
+        $options['radios:' . Values::NOT_SELECTED] = t('Radio not selected (no change)');
+      }
       $element = [
         '#type' => 'select',
-        '#options' => [
-          Values::OPT_IN => t('Opt-in'),
-          Values::NO_CHANGE => t('No change'),
-          Values::OPT_OUT => t('Opt-out'),
-        ],
+        '#options' => $options,
       ];
       $forms[$cid] = drupal_render($element);
     }

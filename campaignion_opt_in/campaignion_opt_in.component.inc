@@ -150,7 +150,8 @@ function _webform_edit_opt_in($component) {
  * Implements _webform_render_component().
  */
 function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
-  $value = $value ? reset($value) : $component['value'];
+  $value = $value ? $value : $component['value'];
+  $value = Values::removePrefix($value);
   $element = array(
     '#required' => !empty($component['mandatory']) || !empty($component['required']),
     '#weight' => $component['weight'],
@@ -168,7 +169,7 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
       $options[$meaning] = $component['extra']['checkbox_label'];
       $element += [
         '#type' => 'checkboxes',
-        '#default_value' => [$value],
+        '#default_value' => [$meaning => $value],
         '#options' => $options,
       ];
       break;
@@ -191,14 +192,7 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
  * Implements _webform_submit_COMPONENT().
  */
 function _webform_submit_opt_in($component, $value) {
-  switch ($component['extra']['display']) {
-    case 'checkbox':
-      $k = key($value);
-      return empty($value[$k]) ? [Values::NO_CHANGE] : [$k];
-
-    case 'radios':
-      return $value ? [$value] : [Values::NO_CHANGE];
-  }
+  return [Values::addPrefix($value, $component['extra']['display'])];
 }
 
 /**
@@ -206,16 +200,36 @@ function _webform_submit_opt_in($component, $value) {
  */
 function _webform_opt_in_value_to_label($value) {
   if (!$value) {
-    return t('No change');
+    return t('Unknown value');
   }
   $value = reset($value);
   switch ($value) {
-    case Values::OPT_IN:
-      return t('Opt-in');
-    case Values::OPT_OUT:
-      return t('Opt-out');
+    case 'checkbox:' . Values::OPT_IN:
+      return t('Checkbox opt-in');
+
+    case 'checkbox:' . Values::NO_CHANGE:
+      return t('Checkbox no change');
+
+    case 'checkbox-inverted:' . Values::NO_CHANGE:
+      return t('Inverted checkbox no change');
+
+    case 'checkbox-inverted:' . Values::OPT_IN:
+      return t('Inverted checkbox opt-in');
+
+    case 'radios:' . Values::OPT_IN:
+      return t('Radio opt-in');
+
+    case 'radios:' . Values::NO_CHANGE:
+      return t('Radio no change');
+
+    case 'radios:' . Values::OPT_OUT:
+      return t('Radio opt-out');
+
+    case 'radios:' . Values::NOT_SELECTED:
+      return t('Radio not selected (no change)');
+
     default:
-      return t('No change');
+      return t('Unknown value');
   }
 }
 
@@ -269,14 +283,18 @@ function _webform_csv_data_opt_in($component, $export_options, $value) {
  * Webform conditional comparison callback for 'equal'.
  */
 function _webform_conditional_comparison_opt_in_equal(array $input_values, $rule_value, array $component) {
-  if (!$input_values) {
-    return $rule_value == Values::NO_CHANGE;
+  $type = $component['extra']['display'];
+  if ($type == 'checkbox' && !empty($component['extra']['invert_checkbox'])) {
+    $type = $type . '-inverted';
   }
-
+  if (!$input_values) {
+    return $rule_value == $type . ':' . Values::NOT_SELECTED;
+  }
   foreach ($input_values as $value) {
-    if ($value == $rule_value) {
-      return TRUE;
+    if (strpos($value, $type) !== 0) {
+      $value = Values::addPrefix($value, $type);
     }
+    return $rule_value == $value;
   }
   return FALSE;
 }

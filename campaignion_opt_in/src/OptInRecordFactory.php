@@ -35,6 +35,7 @@ class OptInRecordFactory {
    *   The submission value for the webform component.
    */
   public function recordOptIn($component, $value) {
+    // TODO: correct prefixed values
     if (in_array($value, [Values::OPT_IN, Values::OPT_OUT])) {
       db_insert('campaignion_opt_in')->fields([
         'activity_id' => $this->activity->activity_id,
@@ -54,7 +55,8 @@ class OptInRecordFactory {
    *   The submission value for the webform component.
    */
   public function recordNewsletterSubscription($component, $value) {
-   if (in_array($value, ['subscribed', 'unsubscribed'])) {
+    // TODO: correct prefixed values
+    if (in_array($value, ['subscribed', 'unsubscribed'])) {
       db_insert('campaignion_opt_in')->fields([
         'activity_id' => $this->activity->activity_id,
         'operation' => $value == 'subscribed' ? Values::OPT_IN : Values::OPT_OUT,
