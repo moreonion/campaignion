@@ -137,7 +137,7 @@ function _webform_edit_opt_in($component) {
 
   $form['behavior']['invert_checkbox'] = [
     '#type' => 'checkbox',
-    '#title' => t('Invert the checkbox: Checked means opt-out.'),
+    '#title' => t('Invert the checkbox: checked means no change, unchecked is opt-in.'),
     '#default_value' => !empty($component['extra']['invert_checkbox']),
     '#states' => ['visible' => ["#$display_id" => ['value' => 'checkbox']]],
     '#parents' => ['extra', 'invert_checkbox'],
@@ -164,7 +164,7 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
 
   switch ($component['extra']['display']) {
     case 'checkbox':
-      $meaning = empty($component['extra']['invert_checkbox']) ? Values::OPT_IN : Values::OPT_OUT;
+      $meaning = empty($component['extra']['invert_checkbox']) ? Values::OPT_IN : Values::NO_CHANGE;
       $options[$meaning] = $component['extra']['checkbox_label'];
       $element += [
         '#type' => 'checkboxes',
