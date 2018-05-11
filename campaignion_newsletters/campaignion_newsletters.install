@@ -190,6 +190,23 @@ function campaignion_newsletters_uninstall() {
 }
 
 /**
+ * Migrate newsletter default values.
+ */
+function campaignion_newsletters_update_18() {
+  $map = [
+    '' => 'a:1:{s:10:"subscribed";i:0;}',
+    'opt-in' => 'a:1:{s:10:"subscribed";s:10:"subscribed";}',
+  ];
+  foreach ($map as $new => $old) {
+    db_update('webform_component')
+      ->fields(['value' => $new])
+      ->condition('type', 'newsletter')
+      ->condition('value', $old)
+      ->execute();
+  }
+}
+
+/**
  * Migrate old newsletter conditional filters to new filters.
  */
 function campaignion_newsletters_update_17() {
