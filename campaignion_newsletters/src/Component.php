@@ -4,6 +4,7 @@ namespace Drupal\campaignion_newsletters;
 
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 use Drupal\little_helpers\ArrayConfig;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Special functionality for the newsletter webform component.
@@ -65,7 +66,7 @@ class Component {
    *   The webform submission that is being submitted.
    */
   public function submit($email, WebformSubmission $s) {
-    if ($value = $s->valueByCid($this->component['cid'])) {
+    if ($value = $s->valuesByCid($this->component['cid'])) {
       $value = ValuePrefix::remove($value);
       if ($value == 'opt-in') {
         $this->subscribe($email, $s);
@@ -74,6 +75,21 @@ class Component {
         $this->unsubscribe($email);
       }
     }
+  }
+
+  /**
+   * Check whether the submitted value constitutes an opt-in.
+   *
+   * @param \Drupal\little_helpers\Webform\Submission $s
+   *   Check the submitted value of this submission.
+   *
+   * @return bool
+   *   TRUE if the value submitted constitutes an opt-in otherwise FALSE.
+   */
+  public function isOptIn(Submission $s) {
+    $value = $s->valuesByCid($this->component['cid']);
+    $value = ValuePrefix::remove($value);
+    return $value == 'opt-in';
   }
 
   /**
