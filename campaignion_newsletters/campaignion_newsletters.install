@@ -229,8 +229,8 @@ SQL;
 
   // Replace rule operators.
   $map = [
-    'empty' => 'equal',
-    'not_empty' => 'not_equal',
+    'equal' => 'empty',
+    'not_equal' => 'not_empty',
   ];
   foreach ($map as $new => $old) {
     $sql = <<<SQL
