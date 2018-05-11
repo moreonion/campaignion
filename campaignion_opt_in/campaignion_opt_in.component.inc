@@ -17,7 +17,7 @@ function _webform_defaults_opt_in() {
     'required' => 0,
     'pid' => 0,
     'weight' => 0,
-    'value' => Values::NOT_SELECTED,
+    'value' => 0,
     'extra' => array(
       'items' => '',
       'multiple' => NULL,
@@ -70,7 +70,7 @@ function _webform_edit_opt_in($component) {
     '#type' => 'select',
     '#title' => t('Default value'),
     '#options' => [
-      Values::NOT_SELECTED => t('Not selected'),
+      0 => t('Not selected'),
       Values::OPT_IN => t('Opt-in'),
       Values::NO_CHANGE => t('No change'),
       Values::OPT_OUT => t('Opt-out'),
