@@ -57,6 +57,26 @@ class Component {
   }
 
   /**
+   * Take appropriate actions when a webform submission is completed.
+   *
+   * @param string $email
+   *   The email address found in this submission.
+   * @param \Drupal\campaignion\CRM\Import\Source\WebformSubmission $source
+   *   The webform submission that is being submitted.
+   */
+  public function submit($email, WebformSubmission $s) {
+    if ($value = $s->valueByCid($this->component['cid'])) {
+      $value = ValuePrefix::remove($value);
+      if ($value == 'opt-in') {
+        $this->subscribe($email, $s);
+      }
+      elseif ($value == 'opt-out') {
+        $this->unsubscribe($email);
+      }
+    }
+  }
+
+  /**
    * Unsubscribe the email address from configured/all newsletter lists.
    *
    * @param string $email
