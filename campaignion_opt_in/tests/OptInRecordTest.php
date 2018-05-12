@@ -44,8 +44,8 @@ class OptInRecrodTest extends \DrupalUnitTestCase {
       'nid' => 1001,
       'sid' => 1001,
       'data' => [
-        1 => ['opt-in'],
-        2 => ['subscribed'],
+        1 => ['checkbox:opt-in'],
+        2 => ['radios:opt-in'],
       ],
     ];
     $this->submission = new Submission($node_stub, $submission_stub);

@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_opt_in;
 
 use Drupal\campaignion_activity\ActivityBase;
+use Drupal\campaignion_opt_in\Values;
 
 /**
  * Generate opt-in records for an activity.
@@ -34,12 +35,12 @@ class OptInRecordFactory {
    * @param mixed $value
    *   The submission value for the webform component.
    */
-  public function recordOptIn($component, $value) {
-    // TODO: correct prefixed values
+  public function recordOptIn($component, $values) {
+    $value = Values::removePrefix($values);
     if (in_array($value, [Values::OPT_IN, Values::OPT_OUT])) {
       db_insert('campaignion_opt_in')->fields([
         'activity_id' => $this->activity->activity_id,
-        'operation' => $value,
+        'operation' => reset($values),
         'channel' => $component['extra']['channel'],
         'statement' => $component['extra']['optin_statement'],
       ])->execute();
@@ -54,16 +55,9 @@ class OptInRecordFactory {
    * @param mixed $value
    *   The submission value for the webform component.
    */
-  public function recordNewsletterSubscription($component, $value) {
-    // TODO: correct prefixed values
-    if (in_array($value, ['subscribed', 'unsubscribed'])) {
-      db_insert('campaignion_opt_in')->fields([
-        'activity_id' => $this->activity->activity_id,
-        'operation' => $value == 'subscribed' ? Values::OPT_IN : Values::OPT_OUT,
-        'channel' => 'email',
-        'statement' => $component['extra']['optin_statement'],
-      ])->execute();
-    }
+  public function recordNewsletterSubscription($component, $values) {
+    $component['extra']['channel'] = 'email';
+    $this->recordOptIn($component, $values);
   }
 
 }
