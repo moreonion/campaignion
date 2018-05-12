@@ -10,8 +10,10 @@
   Drupal.webform.conditionalOperatorOptInEqual = function (element, existingValue, ruleValue) {
     var checkbox = element.querySelector('.form-type-checkbox input');
     if (checkbox) {
-      return checkbox.checked ? ruleValue === 'checkbox:opt-in' : ruleValue === 'checkbox:no-change';
-      // TODO: How to recognise inverted checkbox???
+      var isInverted = checkbox.value === 'no-change';
+      var uncheckedValue = isInverted ? 'opt-in' : 'no-change';
+      var value = checkbox.checked ? checkbox.value : uncheckedValue;
+      return ruleValue === 'checkbox:' + value;
     }
     var radio = element.querySelector('.form-type-radio input');
     if (radio) {
