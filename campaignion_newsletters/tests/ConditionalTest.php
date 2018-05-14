@@ -71,12 +71,12 @@ class ConditionalTest extends \DrupalUnitTestCase {
     $this->assertTrue($ne(['no-change'], 'radios:not-selected', $radios));
     $this->assertTrue($ne(['no-change'], 'checkbox:opt-in', $radios));
     $this->assertTrue($ne(['no-change'], 'checkbox:no-change', $radios));
-    $this->assertTrue($ne(['not-selected'], 'radios:opt-in', $radios));
-    $this->assertTrue($ne(['not-selected'], 'radios:opt-out', $radios));
-    $this->assertTrue($ne(['not-selected'], 'radios:no-change', $radios));
-    $this->assertFalse($ne(['not-selected'], 'radios:not-selected', $radios));
-    $this->assertTrue($ne(['not-selected'], 'checkbox:opt-in', $radios));
-    $this->assertTrue($ne(['not-selected'], 'checkbox:no-change', $radios));
+    $this->assertTrue($ne([], 'radios:opt-in', $radios));
+    $this->assertTrue($ne([], 'radios:opt-out', $radios));
+    $this->assertTrue($ne([], 'radios:no-change', $radios));
+    $this->assertFalse($ne([], 'radios:not-selected', $radios));
+    $this->assertTrue($ne([], 'checkbox:opt-in', $radios));
+    $this->assertTrue($ne([], 'checkbox:no-change', $radios));
   }
 
   /**
