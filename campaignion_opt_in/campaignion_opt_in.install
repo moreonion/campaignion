@@ -31,6 +31,12 @@ function campaignion_opt_in_schema() {
       ],
       'operation' => [
         'description' => 'Whether this is an opt-in (1) or an opt-out (0).',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ],
+      'value' => [
+        'description' => 'Value of the opt-in field.',
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
@@ -44,6 +50,7 @@ function campaignion_opt_in_schema() {
     'indexes' => [
       'activity' => ['activity_id'],
       'channel' => ['channel'],
+      'operation' => ['operation'],
     ],
   ];
   return $schema;
