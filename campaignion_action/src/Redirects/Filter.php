@@ -130,27 +130,30 @@ class Filter extends Model {
    *   otherwise FALSE.
    */
   protected function hasOptin(Submission $submission) {
-    // If there is at least one subscription then we assume we have an opt-in.
-    if (module_exists('campaignion_newsletters')) {
-      if ($email = $submission->valueByKey('email')) {
-        $subscriptions = Subscription::byEmail($email);
-        if ($subscriptions) {
-          return TRUE;
-        }
-      }
-    }
-
-    // No opt-in so far. Look for an opt-in this this submission.
+    // Check for opt-ins or opt-outs in this form.
     $components = $submission->webform->componentsByType('newsletter');
     foreach ($components as $cid => $component) {
-      if (ValuePrefix::remove($submission->valuesByCid($cid)) == 'opt-in') {
+      $value = ValuePrefix::remove($submission->valuesByCid($cid));
+      if ($value == 'opt-in') {
         return TRUE;
+      }
+      elseif ($value == 'opt-out') {
+        return FALSE;
       }
     }
 
     // A checked email_newsletter checkbox counts as opt-in.
     if ($submission->valueByKey('email_newsletter')) {
       return TRUE;
+    }
+
+    // If there is at least one subscription then we assume we have an opt-in.
+    if (module_exists('campaignion_newsletters')) {
+      if ($email = $submission->valueByKey('email')) {
+        if (Subscription::byEmail($email)) {
+          return TRUE;
+        }
+      }
     }
 
     return FALSE;

@@ -108,6 +108,31 @@ class FilterTest extends \DrupalWebTestCase {
   }
 
   /**
+   * Test opt-in filter with existing subscriptions, but opt-out.
+   */
+  public function testMatchOptInWithOptOut() {
+    $email = __FUNCTION__ . '@campaignion-action.test';
+    $stub_s['data'][1][0] = $email;
+    $stub_n['webform']['components'][1] = [
+      'cid' => 1,
+      'form_key' => 'email',
+      'type' => 'email',
+    ];
+    $stub_s['data'][2][0] = 'radios:opt-out';
+    $stub_n['webform']['components'][2] = [
+      'cid' => 2,
+      'form_key' => 'emailopt',
+      'type' => 'newsletter',
+    ];
+    $submission = new Submission((object) $stub_n, (object) $stub_s);
+    $subscription = Subscription::fromData(4711, $email);
+    $subscription->save(TRUE);
+
+    $fs = Filter::fromArray(['type' => 'opt-in', 'value' => TRUE]);
+    $this->assertFalse($fs->match($submission));
+  }
+
+  /**
    * Test submission value filter.
    */
   public function testMatchSubmissionValueContains() {
