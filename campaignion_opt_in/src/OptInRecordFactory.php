@@ -44,8 +44,16 @@ class OptInRecordFactory {
         'value' => reset($values),
         'channel' => $component['extra']['channel'],
         'statement' => $component['extra']['optin_statement'],
+        'ip_address' => $this->getIpAddress(),
       ])->execute();
     }
+  }
+
+  /**
+   * Return the user’s IP-address.
+   */
+  protected function getIpAddress() {
+    return ip_address();
   }
 
   /**
