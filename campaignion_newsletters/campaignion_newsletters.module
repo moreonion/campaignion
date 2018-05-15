@@ -37,26 +37,26 @@ function _campaignion_newsletters_poll() {
  * Implements hook_permission().
  */
 function campaignion_newsletters_permission() {
-  return array(
-    'administer newsletters' => array(
+  return [
+    'administer newsletters' => [
       'title' => t('Administer Newsletters'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
  * Implements hook_menu().
  */
 function campaignion_newsletters_menu() {
-  $items['admin/config/services/campaignion_newsletters'] = array(
+  $items['admin/config/services/campaignion_newsletters'] = [
     'title' => 'Newsletter settings',
     'description' => 'Configure newsletter API behavior',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('campaignion_newsletters_admin_settings'),
-    'access arguments' => array('administer newsletters'),
+    'page arguments' => ['campaignion_newsletters_admin_settings'],
+    'access arguments' => ['administer newsletters'],
     'file' => 'includes/pages.php',
     'type' => MENU_NORMAL_ITEM,
-  );
+  ];
   return $items;
 }
 
@@ -112,13 +112,26 @@ function campaignion_newsletters_webform_conditional_form($node) {
   $forms = [];
   foreach ($node->webform['components'] as $cid => $component) {
     if (webform_component_property($component['type'], 'conditional_type') == 'newsletter') {
+      $options = [];
+      // Checkbox options.
+      if ($component['extra']['display'] == 'checkbox') {
+        $options['checkbox:opt-in'] = t('Checkbox opt-in');
+        $options['checkbox:no-change'] = t('Checkbox no change');
+      }
+      // Radio options.
+      elseif ($component['extra']['display'] == 'radios') {
+        $options['radios:opt-in'] = t('Radio opt-in');
+        if (!empty($component['extra']['no_is_optout'])) {
+          $options['radios:opt-out'] = t('Radio opt-out');
+        }
+        else {
+          $options['radios:no-change'] = t('Radio no change');
+        }
+        $options['radios:not-selected'] = t('Radio not selected (no change)');
+      }
       $element = [
         '#type' => 'select',
-        '#options' => [
-          'yes' => t('Opt-in'),
-          '' => t('No change'),
-          'no' => t('Opt-out'),
-        ],
+        '#options' => $options,
       ];
       $forms[$cid] = drupal_render($element);
     }
@@ -150,15 +163,7 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
     return;
   }
   foreach ($s->webform->componentsByType('newsletter') as $component) {
-    if ($value = $s->valueByCid($component['cid'])) {
-      $c = Component::fromComponent($component);
-      if ($value == 'subscribed') {
-        $c->subscribe($email, $s);
-      }
-      elseif ($value == 'unsubscribed') {
-        $c->unsubscribe($email);
-      }
-    }
+    Component::fromComponent($component)->submit($email, $s);
   }
 }
 
@@ -192,14 +197,14 @@ function campaignion_newsletters_form_builder_element_types($form_type, $form_id
   $map = _form_builder_webform_property_map('newsletter');
   // Default value is handled by the newsletter property.
   unset($map['properties']['default_value']);
-  $fields['newsletter'] = array(
+  $fields['newsletter'] = [
     'title' => t('Newsletter'),
     'class' => FormBuilderElementNewsletter::class,
     'properties' => array_keys($map['properties']),
-    'default' => array(
-      '#form_builder' => array('element_type' => 'newsletter'),
-    ) + _form_builder_webform_default('newsletter'),
-  );
+    'default' => [
+      '#form_builder' => ['element_type' => 'newsletter'],
+    ] + _form_builder_webform_default('newsletter'),
+  ];
   return $fields;
 }
 
@@ -258,12 +263,12 @@ function campaignion_newsletters_entity_delete($entity, $entity_type) {
  * Implements hook_cronapi().
  */
 function campaignion_newsletters_cronapi($op, $job = NULL) {
-  $items['campaignion_newsletters_send_queue'] = array(
+  $items['campaignion_newsletters_send_queue'] = [
     'description' => 'Send queue data to newsletter providers',
     'rule' => '*/2+@ * * * *',
     'weight' => 100,
     'callback' => [CronRunner::class, 'cronSendQueue'],
-  );
+  ];
   $items['campaignion_newsletters_poll_subscriptions'] = [
     'descriptions' => 'Let providers poll their subscriptions in order to cach changes from the provider side.',
     'rule' => '*/2+@ * * * *',
