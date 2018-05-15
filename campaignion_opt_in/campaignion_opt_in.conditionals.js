@@ -13,7 +13,7 @@
       var isInverted = checkbox.value === 'no-change';
       var uncheckedValue = isInverted ? 'opt-in' : 'no-change';
       var value = checkbox.checked ? checkbox.value : uncheckedValue;
-      return ruleValue === 'checkbox:' + value;
+      return ruleValue === 'checkbox' + (isInverted ? '-inverted:' : ':') + value;
     }
     var radio = element.querySelector('.form-type-radio input');
     if (radio) {
