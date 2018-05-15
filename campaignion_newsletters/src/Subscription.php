@@ -131,16 +131,14 @@ class Subscription extends Model {
         $this->fingerprint = $fingerprint;
         $item->data = $data;
 
-        if ($item->isNew()) {
-          if ($this->new) {
-            $item->action = QueueItem::SUBSCRIBE;
-            $item->args['send_welcome'] = $this->send_welcome;
-            $item->args['send_optin'] = $this->needs_opt_in;
-            $item->optin_info = $this->optin_info;
-          }
-          else {
-            $item->action = QueueItem::UPDATE;
-          }
+        if ($this->new) {
+          $item->action = QueueItem::SUBSCRIBE;
+          $item->args['send_welcome'] = $this->send_welcome;
+          $item->args['send_optin'] = $this->needs_opt_in;
+          $item->optin_info = $this->optin_info;
+        }
+        else {
+          $item->action = QueueItem::UPDATE;
         }
 
         $item->save();
@@ -183,6 +181,7 @@ class Subscription extends Model {
     }
     parent::delete();
     module_invoke_all('campaignion_newsletters_subscription_deleted', $this, $from_provider);
+    $this->fingerprint = '';
   }
 
   /**
@@ -193,6 +192,7 @@ class Subscription extends Model {
       'list_id' => $this->list_id,
       'email' => $this->email,
       'action' => QueueItem::UNSUBSCRIBE,
+      'data' => NULL,
     ))->save();
   }
 
