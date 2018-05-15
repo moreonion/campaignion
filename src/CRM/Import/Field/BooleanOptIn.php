@@ -14,6 +14,7 @@ class BooleanOptIn extends Field {
    * Normalize values to boolean values.
    */
   protected function preprocessField($value) {
+    $value = Values::removePrefix($value);
     if (in_array($value, [Values::OPT_IN, Values::OPT_OUT])) {
       return $value == Values::OPT_IN ? TRUE : FALSE;
     }

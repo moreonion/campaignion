@@ -23,7 +23,7 @@ class BooleanOptInTest extends RedhenEntityTest {
    * Test importing an opt-in.
    */
   public function testImportOptIn() {
-    $this->importer->import(new ArraySource(['phone_opt_in' => 'opt-in']), $this->entity);
+    $this->importer->import(new ArraySource(['phone_opt_in' => 'checkbox:opt-in']), $this->entity);
     $this->assertTrue($this->entity->field_opt_in_phone->value());
   }
 
@@ -31,7 +31,7 @@ class BooleanOptInTest extends RedhenEntityTest {
    * Test importing an opt-out.
    */
   public function testImportOptOut() {
-    $this->importer->import(new ArraySource(['phone_opt_in' => 'opt-out']), $this->entity);
+    $this->importer->import(new ArraySource(['phone_opt_in' => 'radios:opt-out']), $this->entity);
     $this->assertFalse($this->entity->field_opt_in_phone->value());
   }
 
@@ -40,7 +40,7 @@ class BooleanOptInTest extends RedhenEntityTest {
    */
   public function testImportNoChange() {
     $this->entity->field_opt_in_phone->set(TRUE);
-    $this->importer->import(new ArraySource(['phone_opt_in' => 'no change']), $this->entity);
+    $this->importer->import(new ArraySource(['phone_opt_in' => 'radios:no-change']), $this->entity);
     $this->assertTrue($this->entity->field_opt_in_phone->value());
   }
 
