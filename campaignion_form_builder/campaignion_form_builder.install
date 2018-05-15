@@ -1,6 +1,50 @@
 <?php
 
 /**
+ * Migrate to campaignion_opt_in.
+ */
+function campaignion_form_builder_update_3() {
+  require_once drupal_get_path('module', 'webform') . '/components/select.inc';
+  if (!module_enable(['campaignion_opt_in'], TRUE)) {
+    new DrupalUpdateException("Unable to enable campaignion_opt_in. Please verify it (and all it's dependencies) can be found by Drupal.");
+  }
+
+  $sql = <<<SQL
+SELECT nid, cid
+FROM webform_component
+WHERE form_key='direct_mail_newsletter'
+ORDER BY nid
+SQL;
+  $cid_map = [];
+  foreach (db_query($sql) as $row) {
+    $cid_map[$row->nid][] = $row->cid;
+  }
+
+  foreach ($cid_map as $nid => $cids) {
+    $node = node_load($nid);
+    foreach ($cids as $cid) {
+      $old_component = $node->webform['components'][$cid];
+      $old_options = _webform_select_options($old_component, TRUE, FALSE);
+      $component = [
+        'type' => 'opt_in',
+        'cid' => $cid,
+        'pid' => $old_component['pid'],
+        'weight' => $old_component['weight'],
+        'form_key' => 'post_opt_in',
+        'extra' => [
+          'channel' => 'post',
+          'fixed_channel' => TRUE,
+          'checkbox_label' => reset($old_options),
+        ],
+      ];
+      webform_component_defaults($component);
+      $node->webform['components'][$cid] = $component;
+    }
+    node_save($node);
+  }
+}
+
+/**
  * Migrate to the country_list component provided by webform_country_list.
  */
 function campaignion_form_builder_update_2() {

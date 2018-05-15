@@ -58,6 +58,7 @@ function campaignion_form_builder_form_builder_palette_fields_alter(&$fields, $f
         $fields[$key]['in_use'] = TRUE;
       }
     }
+    unset($fields['opt_in']);
   }
 }
 
@@ -105,7 +106,7 @@ function campaignion_form_builder_form_builder_element_types($form_type, $form_i
 
   $fields = array();
 
-  $types = array('textfield', 'select', 'textarea');
+  $types = ['textfield', 'select', 'textarea', 'opt_in'];
 
   foreach ($types as $type) {
     module_load_include("type_{$type}.inc", 'campaignion_form_builder');

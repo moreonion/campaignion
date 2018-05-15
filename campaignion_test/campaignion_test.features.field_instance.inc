@@ -307,6 +307,49 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'redhen_contact-contact-field_opt_in_phone'.
+  $field_instances['redhen_contact-contact-field_opt_in_phone'] = array(
+    'bundle' => 'contact',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 18,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'redhen_contact',
+    'field_name' => 'field_opt_in_phone',
+    'label' => 'Phone opt-in',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 14,
+    ),
+  );
+
   // Exported field_instance: 'redhen_contact-contact-field_phone_number'.
   $field_instances['redhen_contact-contact-field_phone_number'] = array(
     'bundle' => 'contact',
@@ -663,6 +706,7 @@ function campaignion_test_field_default_field_instances() {
   t('Gender');
   t('IP-Adress');
   t('Phone number');
+  t('Phone opt-in');
   t('Preferred language');
   t('Salutation');
   t('Set this if the contact wants to receive direct mails');
