@@ -14,6 +14,7 @@ class WebformComponentTest extends \DrupalUnitTestCase {
    * Load the components include file.
    */
   public function setUp() {
+    require_once drupal_get_path('module', 'webform') . '/includes/webform.components.inc';
     require_once drupal_get_path('module', 'campaignion_newsletters') . '/campaignion_newsletters.component.inc';
   }
 
@@ -106,6 +107,32 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
     $this->assertEqual(t('Radio no change'), $export(['radios:no-change']));
     $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
+  }
+
+  /**
+   * Get the conditional form callback.
+   */
+  protected function getConditionalFormCallback() {
+    $info = campaignion_newsletters_webform_conditional_operator_info();
+    return $info['newsletter']['equal']['form callback'];
+  }
+
+  /**
+   * Test conditional options with radios.
+   */
+  public function testConditionalOptionsRadios() {
+    $fake_node['webform']['components'][1] = [
+      'type' => 'newsletter',
+      'extra' => [
+        'display' => 'radios',
+        'no_is_optout' => FALSE,
+      ],
+    ];
+    $fake_node = (object) $fake_node;
+    $form_callback = $this->getConditionalFormCallback();
+    $forms = $form_callback($fake_node);
+    $expected_select = '<select class="form-select"><option value="radios:opt-in">Radio opt-in</option><option value="radios:no-change">Radio no change</option><option value="radios:not-selected">Radio not selected (no change)</option></select>';
+    $this->assertContains($expected_select, $forms[1]);
   }
 
 }
