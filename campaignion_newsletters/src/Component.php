@@ -62,18 +62,15 @@ class Component {
    *
    * @param string $email
    *   The email address found in this submission.
-   * @param \Drupal\campaignion\CRM\Import\Source\WebformSubmission $source
+   * @param \Drupal\campaignion\CRM\Import\Source\WebformSubmission $s
    *   The webform submission that is being submitted.
    */
   public function submit($email, WebformSubmission $s) {
-    if ($value = $s->valuesByCid($this->component['cid'])) {
-      $value = ValuePrefix::remove($value);
-      if ($value == 'opt-in') {
-        $this->subscribe($email, $s);
-      }
-      elseif ($value == 'opt-out') {
-        $this->unsubscribe($email);
-      }
+    if ($this->isOptIn($s)) {
+      $this->subscribe($email, $s);
+    }
+    elseif ($this->isOptOut($s)) {
+      $this->unsubscribe($email);
     }
   }
 
@@ -90,6 +87,21 @@ class Component {
     $value = $s->valuesByCid($this->component['cid']);
     $value = ValuePrefix::remove($value);
     return $value == 'opt-in';
+  }
+
+  /**
+   * Check whether the submitted value constitutes an opt-out.
+   *
+   * @param \Drupal\little_helpers\Webform\Submission $s
+   *   Check the submitted value of this submission.
+   *
+   * @return bool
+   *   TRUE if the value submitted constitutes an opt-out otherwise FALSE.
+   */
+  public function isOptOut(Submission $s) {
+    $value = $s->valuesByCid($this->component['cid']);
+    $value = ValuePrefix::remove($value);
+    return $value == 'opt-out';
   }
 
   /**
