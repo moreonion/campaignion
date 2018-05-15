@@ -40,7 +40,7 @@ class OptInRecordFactory {
     if (in_array($value, [Values::OPT_IN, Values::OPT_OUT])) {
       db_insert('campaignion_opt_in')->fields([
         'activity_id' => $this->activity->activity_id,
-        'operation' => $values == Values::OPT_IN ? 1 : 0,
+        'operation' => $value == Values::OPT_IN ? 1 : 0,
         'value' => reset($values),
         'channel' => $component['extra']['channel'],
         'statement' => $component['extra']['optin_statement'],
