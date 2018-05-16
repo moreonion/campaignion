@@ -45,6 +45,11 @@ function campaignion_opt_in_schema() {
         'description' => 'Legally binding opt-in statement. This should reflect the language the user actually opted in.',
         'type' => 'text',
       ],
+      'ip_address' => [
+        'description' => 'The IP address used to make the opt-in.',
+        'type' => 'varchar',
+        'length' => 15,
+      ],
     ],
     'primary key' => ['id'],
     'indexes' => [
