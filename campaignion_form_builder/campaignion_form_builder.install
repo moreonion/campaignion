@@ -28,6 +28,7 @@ SQL;
       $component = [
         'type' => 'opt_in',
         'cid' => $cid,
+        'name' => $old_component['name'],
         'pid' => $old_component['pid'],
         'weight' => $old_component['weight'],
         'form_key' => 'post_opt_in',
