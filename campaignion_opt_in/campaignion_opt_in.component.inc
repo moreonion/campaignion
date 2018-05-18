@@ -193,7 +193,7 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
  * Implements _webform_submit_COMPONENT().
  */
 function _webform_submit_opt_in($component, $value) {
-  return [Values::addPrefix($value, $component['extra']['display'])];
+  return [Values::addPrefix($value, $component)];
 }
 
 /**
@@ -284,17 +284,11 @@ function _webform_csv_data_opt_in($component, $export_options, $value) {
  * Webform conditional comparison callback for 'equal'.
  */
 function _webform_conditional_comparison_opt_in_equal(array $input_values, $rule_value, array $component) {
-  $type = $component['extra']['display'];
-  if ($type == 'checkbox' && !empty($component['extra']['invert_checkbox'])) {
-    $type = $type . '-inverted';
-  }
-  if (!$input_values) {
-    return $rule_value == $type . ':' . Values::NOT_SELECTED;
+  if (!$input_values && $component['extra']['display'] == 'radios') {
+    return $rule_value === 'radios:' . Values::NOT_SELECTED;
   }
   foreach ($input_values as $value) {
-    if (strpos($value, $type) !== 0) {
-      $value = Values::addPrefix($value, $type);
-    }
+    $value = Values::addPrefix($value, $component);
     return $rule_value == $value;
   }
   return FALSE;

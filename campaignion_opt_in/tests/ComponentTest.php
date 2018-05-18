@@ -56,4 +56,124 @@ class ComponentTest extends \DrupalUnitTestCase {
     $this->assertEqual('Opt-in', $form['#title']);
   }
 
+  /**
+   * Test normalizing input values from a checkbox.
+   */
+  public function testSubmitCheckbox() {
+    $c['extra']['display'] = 'checkbox';
+
+    // Not checked checkbox.
+    $v['opt-in'] = 0;
+    $this->assertEqual(['checkbox:no-change'], _webform_submit_opt_in($c, $v));
+
+    // Checked checkbox.
+    $v['opt-in'] = 'opt-in';
+    $this->assertEqual(['checkbox:opt-in'], _webform_submit_opt_in($c, $v));
+  }
+
+  /**
+   * Test normalizing input values from an inverted checkbox.
+   */
+  public function testSubmitInvertedCheckbox() {
+    $c['extra']['display'] = 'checkbox';
+    $c['extra']['invert_checkbox'] = TRUE;
+
+    // Not checked checkbox.
+    $v['no-change'] = 0;
+    $this->assertEqual(['checkbox-inverted:opt-in'], _webform_submit_opt_in($c, $v));
+
+    // Checked checkbox.
+    $v['no-change'] = 'no-change';
+    $this->assertEqual(['checkbox-inverted:no-change'], _webform_submit_opt_in($c, $v));
+  }
+
+
+  /**
+   * Test normalizing input values from radios.
+   */
+  public function testSubmitRadios() {
+    $c['extra']['display'] = 'radios';
+
+    // Radio no.
+    $v = 'opt-out';
+    $this->assertEqual(['radios:opt-out'], _webform_submit_opt_in($c, $v));
+
+    // Radio no change.
+    $v = 'no-change';
+    $this->assertEqual(['radios:no-change'], _webform_submit_opt_in($c, $v));
+
+    // Radio yes.
+    $v = 'opt-in';
+    $this->assertEqual(['radios:opt-in'], _webform_submit_opt_in($c, $v));
+
+    // Not selected radio.
+    $v = NULL;
+    $this->assertEqual(['radios:not-selected'], _webform_submit_opt_in($c, $v));
+  }
+
+  /**
+   * Test rendering data for the table display.
+   */
+  public function testTable() {
+    $export = function ($v) {
+      return _webform_table_opt_in(NULL, $v);
+    };
+    $this->assertEqual(t('Unknown value'), $export(NULL));
+    $this->assertEqual(t('Unknown value'), $export(['0']));
+    $this->assertEqual(t('Checkbox opt-in'), $export(['checkbox:opt-in']));
+    $this->assertEqual(t('Radio opt-in'), $export(['radios:opt-in']));
+    $this->assertEqual(t('Radio opt-out'), $export(['radios:opt-out']));
+    $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
+    $this->assertEqual(t('Radio no change'), $export(['radios:no-change']));
+    $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
+    $this->assertEqual(t('Inverted checkbox opt-in'), $export(['checkbox-inverted:opt-in']));
+    $this->assertEqual(t('Inverted checkbox no change'), $export(['checkbox-inverted:no-change']));
+  }
+
+  /**
+   * Test rendering data for CSV output.
+   */
+  public function testCsvData() {
+    $export = function ($v) {
+      return _webform_csv_data_opt_in(NULL, [], $v);
+    };
+    $this->assertEqual(t('Unknown value'), $export(NULL));
+    $this->assertEqual(t('Unknown value'), $export(['0']));
+    $this->assertEqual(t('Checkbox opt-in'), $export(['checkbox:opt-in']));
+    $this->assertEqual(t('Radio opt-in'), $export(['radios:opt-in']));
+    $this->assertEqual(t('Radio opt-out'), $export(['radios:opt-out']));
+    $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
+    $this->assertEqual(t('Radio no change'), $export(['radios:no-change']));
+    $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
+    $this->assertEqual(t('Inverted checkbox opt-in'), $export(['checkbox-inverted:opt-in']));
+    $this->assertEqual(t('Inverted checkbox no change'), $export(['checkbox-inverted:no-change']));
+  }
+
+  /**
+   * Get the conditional form callback.
+   */
+  protected function getConditionalFormCallback() {
+    $info = campaignion_opt_in_webform_conditional_operator_info();
+    return $info['opt_in']['equal']['form callback'];
+  }
+
+  /**
+   * Test conditional options with radios.
+   */
+  public function testConditionalOptionsRadios() {
+    $fake_node['webform']['components'][1] = [
+      'type' => 'opt_in',
+      'extra' => [
+        'display' => 'radios',
+        'channel' => 'email',
+        'no_is_optout' => FALSE,
+      ],
+    ];
+    $fake_node = (object) $fake_node;
+    $form_callback = $this->getConditionalFormCallback();
+    $forms = $form_callback($fake_node);
+    $expected_select = '<select class="form-select"><option value="radios:opt-in">Radio opt-in</option><option value="radios:no-change">Radio no change</option><option value="radios:not-selected">Radio not selected (no change)</option></select>';
+    $this->assertContains($expected_select, $forms[1]);
+  }
+
 }

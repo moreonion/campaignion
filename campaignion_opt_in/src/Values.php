@@ -29,9 +29,18 @@ class Values {
    * @return string
    *   Prefixed value for storing in webform_submitted_data.
    */
-  public static function addPrefix($value, $prefix) {
+  public static function addPrefix($value, $component) {
     if (is_array($value)) {
       $value = reset($value);
+    }
+    if (strpos($value, ':') !== FALSE) {
+      // There is already a prefix.
+      return $value;
+    }
+
+    $prefix = $component['extra']['display'];
+    if ($prefix == 'checkbox' && !empty($component['extra']['invert_checkbox'])) {
+      $prefix .= '-inverted';
     }
     if (isset(static::$noValueMap[$prefix][$value])) {
       $value = static::$noValueMap[$prefix][$value];
