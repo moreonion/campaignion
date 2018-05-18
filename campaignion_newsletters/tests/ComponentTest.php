@@ -27,6 +27,7 @@ class ComponentTest extends \DrupalUnitTestCase {
     }
     db_delete('campaignion_newsletters_subscriptions')->execute();
     db_delete('campaignion_newsletters_queue')->execute();
+    db_delete('campaignion_newsletters_lists')->execute();
     parent::tearDown();
   }
 
@@ -75,6 +76,21 @@ class ComponentTest extends \DrupalUnitTestCase {
     $c->setAllListIds([1, 2, 3]);
     $c->unsubscribe($e);
     $this->assertNotEmpty(QueueItem::load(3, $e));
+  }
+
+  /**
+   * Test getting list IDs from the database.
+   */
+  public function testGetAllListIds() {
+    $l = NewsletterList::fromData([
+      'source' => 'test',
+      'identifier' => 'test',
+      'title' => 'Test',
+    ]);
+    $l->save();
+
+    $c = new Component([], TRUE);
+    $this->assertEqual([$l->list_id], $c->getAllListIds());
   }
 
 }
