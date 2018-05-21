@@ -5,4 +5,4 @@ package = Campaignion
 dependencies[] = campaignion_action
 dependencies[] = form_builder_webform
 dependencies[] = variable
-dependencies[] = webform_paymethod_select (>= 7.x-1.8)
+dependencies[] = webform_paymethod_select (>= 7.x-1.15)
