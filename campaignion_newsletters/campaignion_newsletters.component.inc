@@ -286,6 +286,9 @@ function _webform_newsletter_value_to_label($value) {
     case 'radios:not-selected':
       return t('Radio not selected (no change)');
 
+    case '':
+      return t('Private or hidden by conditionals (no change)');
+
     default:
       return t('Unknown value');
   }
