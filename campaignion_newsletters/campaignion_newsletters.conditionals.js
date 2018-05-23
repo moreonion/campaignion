@@ -3,11 +3,14 @@
  * Conditional operators for newsletter fields.
  */
 
-(function () {
+(function ($) {
 
   "use strict";
   Drupal.webform = Drupal.webform || {};
   Drupal.webform.conditionalOperatorNewsletterEqual = function (element, existingValue, ruleValue) {
+    if ($(element).closest('.webform-conditional-hidden').length > 0) {
+      return false;
+    }
     var checkbox = element.querySelector('.form-type-checkbox input');
     if (checkbox) {
       return checkbox.checked ? ruleValue === 'checkbox:opt-in' : ruleValue === 'checkbox:no-change';
@@ -24,4 +27,4 @@
     return !Drupal.webform.conditionalOperatorNewsletterEqual(element, existingValue, ruleValue);
   };
 
-})();
+})(jQuery);

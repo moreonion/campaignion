@@ -128,6 +128,7 @@ class ComponentTest extends \DrupalUnitTestCase {
     $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
     $this->assertEqual(t('Inverted checkbox opt-in'), $export(['checkbox-inverted:opt-in']));
     $this->assertEqual(t('Inverted checkbox no change'), $export(['checkbox-inverted:no-change']));
+    $this->assertEqual(t('Private or hidden by conditionals (no change)'), $export(['']));
   }
 
   /**
@@ -147,6 +148,7 @@ class ComponentTest extends \DrupalUnitTestCase {
     $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
     $this->assertEqual(t('Inverted checkbox opt-in'), $export(['checkbox-inverted:opt-in']));
     $this->assertEqual(t('Inverted checkbox no change'), $export(['checkbox-inverted:no-change']));
+    $this->assertEqual(t('Private or hidden by conditionals (no change)'), $export(['']));
   }
 
   /**

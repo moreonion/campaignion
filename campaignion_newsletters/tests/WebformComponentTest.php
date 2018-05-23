@@ -90,6 +90,7 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
     $this->assertEqual(t('Radio no change'), $export(['radios:no-change']));
     $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
+    $this->assertEqual(t('Private or hidden by conditionals (no change)'), $export(['']));
   }
 
   /**
@@ -107,6 +108,7 @@ class WebformComponentTest extends \DrupalUnitTestCase {
     $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
     $this->assertEqual(t('Radio no change'), $export(['radios:no-change']));
     $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
+    $this->assertEqual(t('Private or hidden by conditionals (no change)'), $export(['']));
   }
 
   /**
