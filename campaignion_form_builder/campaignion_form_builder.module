@@ -1,6 +1,18 @@
 <?php
 
 /**
+ * Implements hook_webform_component_info().
+ */
+function campaignion_form_builder_webform_component_info() {
+  $info['phone_number'] = [
+    'label' => t('Phone number'),
+    'description' => t('Textfield for entering a phone number with additional opt-in options.'),
+    'file' => 'components/phone_number.inc',
+  ] + webform_webform_component_info()['textfield'];
+  return $info;
+}
+
+/**
  * Implements hook_form_builder_element_types_alter().
  * remove elements from the default palette
  */
