@@ -11,7 +11,12 @@ require_once drupal_get_path('module', 'webform') . '/components/textfield.inc';
  * Implements _webform_defaults_component().
  */
 function _webform_defaults_phone_number() {
-  return _webform_defaults_textfield();
+  $defaults = _webform_defaults_textfield();
+  $defaults['extra'] += [
+    'implies_optin' => FALSE,
+    'optin_statement' => '',
+  ];
+  return $defaults;
 }
 
 /**
@@ -19,6 +24,25 @@ function _webform_defaults_phone_number() {
  */
 function _webform_edit_phone_number($component) {
   $form = _webform_edit_textfield($component);
+
+  $implies_id = drupal_html_id('implies-optin');
+  $form['extra']['implies_optin'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Giving a phone number implies a phone opt-in.'),
+    '#default_value' => !empty($component['extra']['implies_optin']),
+    '#parents' => ['extra', 'implies_optin'],
+    '#id' => $implies_id,
+  ];
+
+  $form['extra']['optin_statement'] = [
+    '#type' => 'textarea',
+    '#title' => t('Opt-in statement'),
+    '#description' => t('This opt-in statement will be recorded as part of the supporter record in Campaignion, so that you have a clear history of what the supporter has signed up to and when. Make sure it matches the visible text in the form!'),
+    '#default_value' => $component['extra']['optin_statement'],
+    '#parents' => ['extra', 'optin_statement'],
+    '#states' => ['visible' => ["#$implies_id" => ['checked' => TRUE]]],
+  ];
+
   return $form;
 }
 
