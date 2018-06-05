@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\campaignion_form_builder\PhoneElement;
+
 /**
  * Invoked by campaignion_form_builder_form_builder_element_types().
  */
@@ -58,12 +60,25 @@ function _campaignion_form_builder_form_builder_types_textfield() {
     'value' => '[current-page:query:p10]',
   ], [], -72);
 
-  $fields['phone_number'] = $text_element([
+  $phone_element = function($component, $extra, $weight) {
+    $element = [
+      'class' => PhoneElement::class,
+      'title' => $component['name'],
+      'weight' => $weight,
+      'properties' => ['default_value'],
+      'palette_group' => 'supporter_data',
+      'unique' => TRUE,
+      'default' => _form_builder_webform_default('phone_number', $extra, $component),
+    ];
+    return $element;
+  };
+
+  $fields['phone_number'] = $phone_element([
     'name' => t('Phone number'),
     'value' => '[current-page:query:p11]',
   ], [], -71);
 
-  $fields['mobile_number'] = $text_element([
+  $fields['mobile_number'] = $phone_element([
     'name' => t('Mobile number'),
     'value' => '[current-page:query:p12]',
   ], [], -70);
