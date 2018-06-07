@@ -13,8 +13,8 @@
     }
     var checkbox = element.querySelector('.form-type-checkbox input');
     if (checkbox) {
-      var isInverted = checkbox.value === 'no-change';
-      var uncheckedValue = isInverted ? 'opt-in' : 'no-change';
+      var uncheckedValue = checkbox.getAttribute('data-no-value');
+      var isInverted = uncheckedValue === 'opt-in';
       var value = checkbox.checked ? checkbox.value : uncheckedValue;
       return ruleValue === 'checkbox' + (isInverted ? '-inverted:' : ':') + value;
     }

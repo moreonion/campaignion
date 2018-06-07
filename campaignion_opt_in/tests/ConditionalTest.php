@@ -20,7 +20,7 @@ class ConditionalTest extends \DrupalUnitTestCase {
   public function testOperatorRadios() {
     $eq = '_webform_conditional_comparison_opt_in_equal';
     $ne = '_webform_conditional_comparison_opt_in_not_equal';
-    $radios = ['extra' => ['display' => 'radios']];
+    $radios = ['extra' => ['display' => 'radios', 'no_is_optout' => FALSE]];
 
     // Possible input values:
     // - ['opt-in']: 'Yes' radio is selected.
@@ -85,16 +85,19 @@ class ConditionalTest extends \DrupalUnitTestCase {
   public function testOperatorCheckbox() {
     $eq = '_webform_conditional_comparison_opt_in_equal';
     $ne = '_webform_conditional_comparison_opt_in_not_equal';
-    $checkbox = ['extra' => ['display' => 'checkbox']];
+    $checkbox = ['extra' => ['display' => 'checkbox', 'no_is_optout' => FALSE]];
 
     $this->assertTrue($eq(['opt-in' => 'opt-in'], 'checkbox:opt-in', $checkbox));
     $this->assertFalse($eq(['opt-in' => 'opt-in'], 'checkbox:no-change', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 'opt-in'], 'checkbox:opt-out', $checkbox));
     $this->assertFalse($eq(['opt-in' => 'opt-in'], 'radios:opt-in', $checkbox));
     $this->assertFalse($eq(['opt-in' => 'opt-in'], 'radios:opt-out', $checkbox));
     $this->assertFalse($eq(['opt-in' => 'opt-in'], 'radios:no-change', $checkbox));
     $this->assertFalse($eq(['opt-in' => 'opt-in'], 'radios:not-selected', $checkbox));
+
     $this->assertFalse($eq(['opt-in' => 0], 'checkbox:opt-in', $checkbox));
     $this->assertTrue($eq(['opt-in' => 0], 'checkbox:no-change', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 0], 'checkbox:opt-out', $checkbox));
     $this->assertFalse($eq(['opt-in' => 0], 'radios:opt-in', $checkbox));
     $this->assertFalse($eq(['opt-in' => 0], 'radios:opt-out', $checkbox));
     $this->assertFalse($eq(['opt-in' => 0], 'radios:no-change', $checkbox));
@@ -102,12 +105,56 @@ class ConditionalTest extends \DrupalUnitTestCase {
 
     $this->assertFalse($ne(['opt-in' => 'opt-in'], 'checkbox:opt-in', $checkbox));
     $this->assertTrue($ne(['opt-in' => 'opt-in'], 'checkbox:no-change', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 'opt-in'], 'checkbox:opt-out', $checkbox));
     $this->assertTrue($ne(['opt-in' => 'opt-in'], 'radios:opt-in', $checkbox));
     $this->assertTrue($ne(['opt-in' => 'opt-in'], 'radios:opt-out', $checkbox));
     $this->assertTrue($ne(['opt-in' => 'opt-in'], 'radios:no-change', $checkbox));
     $this->assertTrue($ne(['opt-in' => 'opt-in'], 'radios:not-selected', $checkbox));
+
     $this->assertTrue($ne(['opt-in' => 0], 'checkbox:opt-in', $checkbox));
     $this->assertFalse($ne(['opt-in' => 0], 'checkbox:no-change', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 0], 'checkbox:opt-out', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 0], 'radios:opt-in', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 0], 'radios:opt-out', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 0], 'radios:no-change', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 0], 'radios:not-selected', $checkbox));
+  }
+
+  /**
+   * Test operator with values from the form-API inverted-checkbox.
+   */
+  public function testOperatorCheckboxNoIsOptOut() {
+    $eq = '_webform_conditional_comparison_opt_in_equal';
+    $ne = '_webform_conditional_comparison_opt_in_not_equal';
+    $checkbox = ['extra' => ['display' => 'checkbox', 'no_is_optout' => TRUE]];
+
+    $this->assertTrue($eq(['opt-in' => 'opt-in'], 'checkbox:opt-in', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 'opt-in'], 'checkbox:no-change', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 'opt-in'], 'checkbox:opt-out', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 'opt-in'], 'radios:opt-in', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 'opt-in'], 'radios:opt-out', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 'opt-in'], 'radios:no-change', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 'opt-in'], 'radios:not-selected', $checkbox));
+
+    $this->assertFalse($eq(['opt-in' => 0], 'checkbox:opt-in', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 0], 'checkbox:no-change', $checkbox));
+    $this->assertTrue($eq(['opt-in' => 0], 'checkbox:opt-out', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 0], 'radios:opt-in', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 0], 'radios:opt-out', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 0], 'radios:no-change', $checkbox));
+    $this->assertFalse($eq(['opt-in' => 0], 'radios:not-selected', $checkbox));
+
+    $this->assertFalse($ne(['opt-in' => 'opt-in'], 'checkbox:opt-in', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 'opt-in'], 'checkbox:no-change', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 'opt-in'], 'checkbox:opt-out', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 'opt-in'], 'radios:opt-in', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 'opt-in'], 'radios:opt-out', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 'opt-in'], 'radios:no-change', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 'opt-in'], 'radios:not-selected', $checkbox));
+
+    $this->assertTrue($ne(['opt-in' => 0], 'checkbox:opt-in', $checkbox));
+    $this->assertTrue($ne(['opt-in' => 0], 'checkbox:no-change', $checkbox));
+    $this->assertFalse($ne(['opt-in' => 0], 'checkbox:opt-out', $checkbox));
     $this->assertTrue($ne(['opt-in' => 0], 'radios:opt-in', $checkbox));
     $this->assertTrue($ne(['opt-in' => 0], 'radios:opt-out', $checkbox));
     $this->assertTrue($ne(['opt-in' => 0], 'radios:no-change', $checkbox));
