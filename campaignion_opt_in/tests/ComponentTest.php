@@ -57,6 +57,28 @@ class ComponentTest extends \DrupalUnitTestCase {
   }
 
   /**
+   * Test rendering an inverted checkbox.
+   */
+  public function testRenderCheckboxInverted() {
+    $component['type'] = 'opt_in';
+    $component['extra'] = ['display' => 'checkbox-inverted'];
+    webform_component_defaults($component);
+    $form = webform_component_invoke('opt_in', 'render', $component);
+    $this->assertEqual(['no-change'], array_keys($form['#options']));
+  }
+
+  /**
+   * Test rendering a radio with "no is opt-out".
+   */
+  public function testRenderRadioNoIsOptOut() {
+    $component['type'] = 'opt_in';
+    $component['extra'] = ['display' => 'radios', 'no_is_optout' => TRUE];
+    webform_component_defaults($component);
+    $form = webform_component_invoke('opt_in', 'render', $component);
+    $this->assertEqual(['opt-in', 'opt-out'], array_keys($form['#options']));
+  }
+
+  /**
    * Test normalizing input values from a checkbox.
    */
   public function testSubmitCheckbox() {
