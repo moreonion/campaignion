@@ -156,4 +156,17 @@ class FilterTest extends \DrupalWebTestCase {
     $this->assertFalse($fs->match($submission));
   }
 
+  /**
+   * Test changing config with setData.
+   */
+  public function testSetDataChangeConfig() {
+    $c = ['type' => 'test', 'test' => 'unchanged'];
+    $f = Filter::fromArray($c);
+    $this->assertEqual('unchanged', $f->config['test']);
+
+    $c['test'] = 'changed';
+    $f->setData($c);
+    $this->assertEqual('changed', $f->config['test']);
+  }
+
 }

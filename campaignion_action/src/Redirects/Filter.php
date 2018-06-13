@@ -29,24 +29,26 @@ class Filter extends Model {
    *   Data representing the filter.
    */
   public static function fromArray(array $data) {
-    $config = $data + ['id' => NULL, 'weight' => 0];
-    unset($config['redirect_id']);
-    $data = [];
-    foreach (['id', 'weight', 'type'] as $k) {
-      $data[$k] = $config[$k];
-      unset($config[$k]);
-    }
-    $data['config'] = $config;
-    return new static($data);
+    $data += ['id' => NULL, 'weight' => 0];
+    $filter = new static();
+    $filter->id = $data['id'];
+    $filter->setData($data);
+    return $filter;
   }
 
   /**
    * Update filter data from array.
    */
-  public function setData($data) {
+  public function setData(array $data) {
     unset($data['id']);
     unset($data['redirect_id']);
-    $this->__construct($data);
+    foreach (['weight', 'type'] as $k) {
+      if (isset($data[$k])) {
+        $this->{$k} = $data[$k];
+        unset($data[$k]);
+      }
+    }
+    $this->config = $data;
   }
 
   /**
