@@ -97,7 +97,7 @@ class EndpointTest extends \DrupalWebTestCase {
   }
 
   /**
-   * Test updating filters.
+   * Test replacing a filter.
    */
   public function testPutExchangeFilter() {
     $data = ['nid' => 1, 'delta' => 0];
@@ -122,6 +122,24 @@ class EndpointTest extends \DrupalWebTestCase {
     $this->assertEqual(1, count($answer));
     $this->assertEqual(1, count($answer[0]['filters']));
     $this->assertEqual(2, $answer[0]['filters'][0]['test']);
+  }
+
+  /**
+   * Test changing a filter value.
+   */
+  public function testPutChangeFilterValue() {
+    $data = ['nid' => 1, 'delta' => 0];
+    $filter = Filter::fromArray(['test' => 'unchanged', 'type' => 'test']);
+    $r1 = new Redirect(['label' => 'First', 'filters' => [$filter]] + $data);
+    $r1->save();
+
+    $fakenode = (object) ['nid' => 1];
+    $endpoint = new Endpoint($fakenode, 0);
+
+    $data = $endpoint->get();
+    $data['redirects'][0]['filters'][0]['test'] = 'changed';
+    $new_data = $endpoint->put($data);
+    $this->assertEqual($data, $new_data);
   }
 
 }
