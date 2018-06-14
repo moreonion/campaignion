@@ -30,6 +30,7 @@ function _webform_defaults_opt_in() {
       'checkbox_label' => t('Yes, please contact me.'),
       'optin_statement' => '',
       'no_is_optout' => FALSE,
+      'disable_optin' => FALSE,
       'channel' => NULL,
     ),
   );
@@ -128,11 +129,21 @@ function _webform_edit_opt_in($component) {
     '#parents' => ['extra', 'optin_statement'],
   ];
 
+  $no_is_opt_out_id = drupal_html_id('no-is-opt-out');
   $form['behavior']['no_is_optout'] = [
     '#type' => 'checkbox',
     '#title' => t('No (radio) is taken as opt-out'),
     '#default_value' => !empty($component['extra']['no_is_optout']),
     '#parents' => ['extra', 'no_is_optout'],
+  ];
+  $visible["#$display_id"]['value'] = 'checkbox';
+  $visible["#$no_is_opt_out_id"]['checked'] = TRUE;
+  $form['behavior']['disable_optin'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Only allow opt-out.'),
+    '#default_value' => !empty($component['extra']['disable_optin']),
+    '#parents' => ['extra', 'disable_optin'],
+    '#states' => ['visible' => $visible],
   ];
 
   return $form;
@@ -155,25 +166,16 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
     '#translatable' => array('title', 'description', 'options'),
   );
 
-  $no_value = !empty($component['extra']['no_is_optout']) ? Values::OPT_OUT : Values::NO_CHANGE;
   switch ($component['extra']['display']) {
     case 'checkbox-inverted':
-      $options[$no_value] = $component['extra']['checkbox_label'];
-      $element += [
-        '#type' => 'checkboxes',
-        '#default_value' => [$value => $value],
-        '#options' => $options,
-        '#attributes' => ['data-no-value' => Values::OPT_IN]
-      ];
-      break;
-
     case 'checkbox':
-      $options[Values::OPT_IN] = $component['extra']['checkbox_label'];
+      list($checked, $unchecked) = Values::checkboxValues($component);
+      $options[$checked] = $component['extra']['checkbox_label'];
       $element += [
         '#type' => 'checkboxes',
         '#default_value' => [$value => $value],
         '#options' => $options,
-        '#attributes' => ['data-no-value' => $no_value]
+        '#attributes' => ['data-no-value' => $unchecked]
       ];
       break;
 
@@ -187,6 +189,7 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
         '#options' => $options,
       ];
   }
+  $element['#attributes']['data-prefix'] = $component['extra']['display'];
 
   return $element;
 }

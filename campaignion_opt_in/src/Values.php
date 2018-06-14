@@ -12,12 +12,6 @@ class Values {
   const NO_CHANGE = 'no-change';
   const NOT_SELECTED = 'not-selected';
 
-  public static $noValueMap = [
-    'checkbox' => [0 => [FALSE => self::NO_CHANGE, TRUE => self::OPT_OUT]],
-    'checkbox-inverted' => [0 => self::OPT_IN],
-    'radios' => [NULL => self::NOT_SELECTED, 0 => self::NOT_SELECTED],
-  ];
-
   /**
    * Convert form API values to stored values.
    *
@@ -38,14 +32,16 @@ class Values {
       return $value;
     }
 
-    $prefix = $component['extra']['display'];
-    if (isset(static::$noValueMap[$prefix][$value])) {
-      $value = static::$noValueMap[$prefix][$value];
-      if (is_array($value)) {
-        $value = $value[!empty($component['extra']['no_is_optout'])];
+    $display = $component['extra']['display'];
+    if (!$value) {
+      if ($display == 'radios') {
+        $value = static::NOT_SELECTED;
+      }
+      else {
+        $value = static::checkboxValues($component)[1];
       }
     }
-    return $prefix . ':' . $value;
+    return $display . ':' . $value;
   }
 
   /**
@@ -141,7 +137,12 @@ class Values {
     $display = $component['extra']['display'];
     $labels = static::labels()[$display];
     if (!empty($component['extra']['no_is_optout'])) {
-      unset($labels[Values::NO_CHANGE]);
+      if ($display != 'radios' && !empty($component['extra']['disable_optin'])) {
+        unset($labels[Values::OPT_IN]);
+      }
+      else {
+        unset($labels[Values::NO_CHANGE]);
+      }
     }
     else {
       unset($labels[Values::OPT_OUT]);
@@ -152,6 +153,29 @@ class Values {
       $prefixed_labels["$display:$value"] = $label;
     }
     return $prefixed_labels;
+  }
+
+  /**
+   * Get the pair of values for a checkbox.
+   *
+   * @param array $component
+   *   The webform component.
+   *
+   * @return string[]
+   *   Array of two strings: The checked value and the unchecked value.
+   */
+  public static function checkboxValues(array $component) {
+    $values = [static::OPT_IN, static::NO_CHANGE];
+    if (!empty($component['extra']['no_is_optout'])) {
+      $values[1] = static::OPT_OUT;
+      if (!empty($component['extra']['disable_optin'])) {
+        $values[0] = static::NO_CHANGE;
+      }
+    }
+    if ($component['extra']['display'] == 'checkbox-inverted') {
+      $values = array_reverse($values);
+    }
+    return $values;
   }
 
 }

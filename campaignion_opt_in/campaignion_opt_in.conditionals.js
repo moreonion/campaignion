@@ -14,9 +14,9 @@
     var checkbox = element.querySelector('.form-type-checkbox input');
     if (checkbox) {
       var uncheckedValue = checkbox.getAttribute('data-no-value');
-      var isInverted = uncheckedValue === 'opt-in';
+      var prefix = checkbox.getAttribute('data-prefix');
       var value = checkbox.checked ? checkbox.value : uncheckedValue;
-      return ruleValue === 'checkbox' + (isInverted ? '-inverted:' : ':') + value;
+      return ruleValue === prefix + ':' + value;
     }
     var radio = element.querySelector('.form-type-radio input');
     if (radio) {
