@@ -57,6 +57,28 @@ class ComponentTest extends \DrupalUnitTestCase {
   }
 
   /**
+   * Test rendering an inverted checkbox.
+   */
+  public function testRenderCheckboxInverted() {
+    $component['type'] = 'opt_in';
+    $component['extra'] = ['display' => 'checkbox-inverted'];
+    webform_component_defaults($component);
+    $form = webform_component_invoke('opt_in', 'render', $component);
+    $this->assertEqual(['no-change'], array_keys($form['#options']));
+  }
+
+  /**
+   * Test rendering a radio with "no is opt-out".
+   */
+  public function testRenderRadioNoIsOptOut() {
+    $component['type'] = 'opt_in';
+    $component['extra'] = ['display' => 'radios', 'no_is_optout' => TRUE];
+    webform_component_defaults($component);
+    $form = webform_component_invoke('opt_in', 'render', $component);
+    $this->assertEqual(['opt-in', 'opt-out'], array_keys($form['#options']));
+  }
+
+  /**
    * Test normalizing input values from a checkbox.
    */
   public function testSubmitCheckbox() {
@@ -75,8 +97,7 @@ class ComponentTest extends \DrupalUnitTestCase {
    * Test normalizing input values from an inverted checkbox.
    */
   public function testSubmitInvertedCheckbox() {
-    $c['extra']['display'] = 'checkbox';
-    $c['extra']['invert_checkbox'] = TRUE;
+    $c['extra']['display'] = 'checkbox-inverted';
 
     // Not checked checkbox.
     $v['no-change'] = 0;
@@ -86,7 +107,6 @@ class ComponentTest extends \DrupalUnitTestCase {
     $v['no-change'] = 'no-change';
     $this->assertEqual(['checkbox-inverted:no-change'], _webform_submit_opt_in($c, $v));
   }
-
 
   /**
    * Test normalizing input values from radios.
@@ -121,13 +141,15 @@ class ComponentTest extends \DrupalUnitTestCase {
     $this->assertEqual(t('Unknown value'), $export(NULL));
     $this->assertEqual(t('Unknown value'), $export(['0']));
     $this->assertEqual(t('Checkbox opt-in'), $export(['checkbox:opt-in']));
+    $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
+    $this->assertEqual(t('Checkbox opt-out'), $export(['checkbox:opt-out']));
     $this->assertEqual(t('Radio opt-in'), $export(['radios:opt-in']));
     $this->assertEqual(t('Radio opt-out'), $export(['radios:opt-out']));
-    $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
     $this->assertEqual(t('Radio no change'), $export(['radios:no-change']));
     $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
     $this->assertEqual(t('Inverted checkbox opt-in'), $export(['checkbox-inverted:opt-in']));
     $this->assertEqual(t('Inverted checkbox no change'), $export(['checkbox-inverted:no-change']));
+    $this->assertEqual(t('Inverted checkbox opt-out'), $export(['checkbox-inverted:opt-out']));
     $this->assertEqual(t('Private or hidden by conditionals (no change)'), $export(['']));
   }
 
@@ -141,13 +163,15 @@ class ComponentTest extends \DrupalUnitTestCase {
     $this->assertEqual(t('Unknown value'), $export(NULL));
     $this->assertEqual(t('Unknown value'), $export(['0']));
     $this->assertEqual(t('Checkbox opt-in'), $export(['checkbox:opt-in']));
+    $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
+    $this->assertEqual(t('Checkbox opt-out'), $export(['checkbox:opt-out']));
     $this->assertEqual(t('Radio opt-in'), $export(['radios:opt-in']));
     $this->assertEqual(t('Radio opt-out'), $export(['radios:opt-out']));
-    $this->assertEqual(t('Checkbox no change'), $export(['checkbox:no-change']));
     $this->assertEqual(t('Radio no change'), $export(['radios:no-change']));
     $this->assertEqual(t('Radio not selected (no change)'), $export(['radios:not-selected']));
     $this->assertEqual(t('Inverted checkbox opt-in'), $export(['checkbox-inverted:opt-in']));
     $this->assertEqual(t('Inverted checkbox no change'), $export(['checkbox-inverted:no-change']));
+    $this->assertEqual(t('Inverted checkbox opt-out'), $export(['checkbox-inverted:opt-out']));
     $this->assertEqual(t('Private or hidden by conditionals (no change)'), $export(['']));
   }
 

@@ -29,7 +29,7 @@ class FormBuilderElementOptIn extends \FormBuilderWebformElement {
     $form['radio_labels'] = $edit['extra']['radio_labels'] + $dp;
     $form['optin_statement'] = $edit['extra']['optin_statement'];
     $form['no_is_optout'] = $edit['behavior']['no_is_optout'];
-    $form['invert_checkbox'] = $edit['behavior']['invert_checkbox'];
+    $form['disable_optin'] = $edit['behavior']['disable_optin'];
 
     return $form;
   }

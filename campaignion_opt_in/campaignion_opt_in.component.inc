@@ -30,7 +30,7 @@ function _webform_defaults_opt_in() {
       'checkbox_label' => t('Yes, please contact me.'),
       'optin_statement' => '',
       'no_is_optout' => FALSE,
-      'invert_checkbox' => FALSE,
+      'disable_optin' => FALSE,
       'channel' => NULL,
     ),
   );
@@ -87,6 +87,7 @@ function _webform_edit_opt_in($component) {
     '#options' => array(
       'checkbox' => t('Checkbox'),
       'radios' => t('Radios'),
+      'checkbox-inverted' => t('Inverted Checkbox'),
     ),
     '#default_value' => $component['extra']['display'],
     '#id' => $display_id,
@@ -128,20 +129,21 @@ function _webform_edit_opt_in($component) {
     '#parents' => ['extra', 'optin_statement'],
   ];
 
+  $no_is_opt_out_id = drupal_html_id('no-is-opt-out');
   $form['behavior']['no_is_optout'] = [
     '#type' => 'checkbox',
     '#title' => t('No (radio) is taken as opt-out'),
     '#default_value' => !empty($component['extra']['no_is_optout']),
     '#parents' => ['extra', 'no_is_optout'],
-    '#states' => ['visible' => ["#$display_id" => ['value' => 'radios']]],
   ];
-
-  $form['behavior']['invert_checkbox'] = [
+  $visible["#$display_id"]['value'] = 'checkbox';
+  $visible["#$no_is_opt_out_id"]['checked'] = TRUE;
+  $form['behavior']['disable_optin'] = [
     '#type' => 'checkbox',
-    '#title' => t('Invert the checkbox: checked means no change, unchecked is opt-in.'),
-    '#default_value' => !empty($component['extra']['invert_checkbox']),
-    '#states' => ['visible' => ["#$display_id" => ['value' => 'checkbox']]],
-    '#parents' => ['extra', 'invert_checkbox'],
+    '#title' => t('Only allow opt-out.'),
+    '#default_value' => !empty($component['extra']['disable_optin']),
+    '#parents' => ['extra', 'disable_optin'],
+    '#states' => ['visible' => $visible],
   ];
 
   return $form;
@@ -165,13 +167,15 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
   );
 
   switch ($component['extra']['display']) {
+    case 'checkbox-inverted':
     case 'checkbox':
-      $meaning = empty($component['extra']['invert_checkbox']) ? Values::OPT_IN : Values::NO_CHANGE;
-      $options[$meaning] = $component['extra']['checkbox_label'];
+      list($checked, $unchecked) = Values::checkboxValues($component);
+      $options[$checked] = $component['extra']['checkbox_label'];
       $element += [
         '#type' => 'checkboxes',
-        '#default_value' => [$meaning => $value],
+        '#default_value' => [$value => $value],
         '#options' => $options,
+        '#attributes' => ['data-no-value' => $unchecked]
       ];
       break;
 
@@ -185,6 +189,7 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
         '#options' => $options,
       ];
   }
+  $element['#attributes']['data-prefix'] = $component['extra']['display'];
 
   return $element;
 }
@@ -197,51 +202,10 @@ function _webform_submit_opt_in($component, $value) {
 }
 
 /**
- * Helper function to create display labels for stored values.
- */
-function _webform_opt_in_value_to_label($value) {
-  if (!$value) {
-    return t('Unknown value');
-  }
-  $value = reset($value);
-  switch ($value) {
-    case 'checkbox:' . Values::OPT_IN:
-      return t('Checkbox opt-in');
-
-    case 'checkbox:' . Values::NO_CHANGE:
-      return t('Checkbox no change');
-
-    case 'checkbox-inverted:' . Values::NO_CHANGE:
-      return t('Inverted checkbox no change');
-
-    case 'checkbox-inverted:' . Values::OPT_IN:
-      return t('Inverted checkbox opt-in');
-
-    case 'radios:' . Values::OPT_IN:
-      return t('Radio opt-in');
-
-    case 'radios:' . Values::NO_CHANGE:
-      return t('Radio no change');
-
-    case 'radios:' . Values::OPT_OUT:
-      return t('Radio opt-out');
-
-    case 'radios:' . Values::NOT_SELECTED:
-      return t('Radio not selected (no change)');
-
-    case '':
-      return t('Private or hidden by conditionals (no change)');
-
-    default:
-      return t('Unknown value');
-  }
-}
-
-/**
  * Implements _webform_display_component().
  */
 function _webform_display_opt_in($component, $value, $format = 'html') {
-  $v['#markup'] = _webform_opt_in_value_to_label($value);
+  $v['#markup'] = Values::labelByValue($value);
   return $v;
 }
 
@@ -262,7 +226,7 @@ function _webform_form_builder_map_opt_in() {
  * Implements _webform_table_component().
  */
 function _webform_table_opt_in($component, $value) {
-  return _webform_opt_in_value_to_label($value);
+  return Values::labelByValue($value);
 }
 
 /**
@@ -280,7 +244,7 @@ function _webform_csv_headers_opt_in($component, $export_options) {
  * Implements _webform_csv_data_component().
  */
 function _webform_csv_data_opt_in($component, $export_options, $value) {
-  return _webform_opt_in_value_to_label($value);
+  return Values::labelByValue($value);
 }
 
 /**

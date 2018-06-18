@@ -60,3 +60,22 @@ function campaignion_opt_in_schema() {
   ];
   return $schema;
 }
+
+/**
+ * Migrate inverted checkboxes to their own display option.
+ */
+function campaignion_opt_in_update_1() {
+  $controller = entity_get_controller('node');
+  $result = db_query("SELECT nid, cid FROM {webform_component} WHERE type='opt_in'");
+  foreach ($result as $row) {
+    $node = node_load($row->nid);
+    $component = &$node->webform['components'][$row->cid];
+
+    if ($component['extra']['display'] == 'checkbox' && $component['extra']['invert_checkbox']) {
+      $component['extra']['display'] = 'checkbox-inverted';
+      $component['extra']['no_is_optout'] = FALSE;
+      webform_component_update($component);
+    }
+    $controller->resetCache();
+  }
+}
