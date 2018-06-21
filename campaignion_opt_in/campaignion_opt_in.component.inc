@@ -135,6 +135,7 @@ function _webform_edit_opt_in($component) {
     '#title' => t('No (radio) is taken as opt-out'),
     '#default_value' => !empty($component['extra']['no_is_optout']),
     '#parents' => ['extra', 'no_is_optout'],
+    '#id' => $no_is_opt_out_id,
   ];
   $visible["#$display_id"]['value'] = 'checkbox';
   $visible["#$no_is_opt_out_id"]['checked'] = TRUE;
