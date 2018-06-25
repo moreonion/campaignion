@@ -38,13 +38,22 @@ describe('campaignion_vue', () => {
 
   it('provides element-ui components', () => {
     expect(campVue.element.Button).to.exist;
+    expect(campVue.element.Col).to.exist;
+    expect(campVue.element.Collapse).to.exist;
+    expect(campVue.element.CollapseItem).to.exist;
+    expect(campVue.element.CollapseTransition).to.exist;
     expect(campVue.element.Dialog).to.exist;
     expect(campVue.element.Dropdown).to.exist;
     expect(campVue.element.DropdownMenu).to.exist;
     expect(campVue.element.DropdownItem).to.exist;
+    expect(campVue.element.Form).to.exist;
+    expect(campVue.element.FormItem).to.exist;
+    expect(campVue.element.Input).to.exist;
     expect(campVue.element.MessageBox).to.exist;
     expect(campVue.element.Option).to.exist;
+    expect(campVue.element.Row).to.exist;
     expect(campVue.element.Select).to.exist;
+    expect(campVue.element.Switch).to.exist;
   });
 
   it('provides element-ui locale', () => {

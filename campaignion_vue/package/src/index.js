@@ -6,14 +6,23 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import {
   Button,
+  Col,
+  Collapse,
+  CollapseItem,
   Dialog,
   Dropdown,
   DropdownItem,
   DropdownMenu,
+  Form,
+  FormItem,
+  Input,
   MessageBox,
   Option,
-  Select
+  Row,
+  Select,
+  Switch
 } from 'element-ui';
+import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 import elementLocale from 'element-ui/lib/locale';
 import draggable from 'vuedraggable';
 
@@ -23,13 +32,22 @@ export default {
   axios,
   element: {
     Button,
+    Col,
+    Collapse,
+    CollapseItem,
+    CollapseTransition,
     Dialog,
     Dropdown,
     DropdownItem,
     DropdownMenu,
+    Form,
+    FormItem,
+    Input,
     MessageBox,
     Option,
-    Select
+    Row,
+    Select,
+    Switch
   },
   elementLocale,
   draggable
