@@ -27,7 +27,7 @@ const config = {
   entry: __dirname + '/src/index.js',
   devtool: 'source-map',
   output: {
-    path: path.resolve(__dirname, '../js'),
+    path: path.join(__dirname, 'dist'),
     filename: outputFile,
     library: libraryName,
     libraryTarget: 'umd',
@@ -52,18 +52,18 @@ const config = {
       {
         test: /\.css$/,
         use: [
-          'file-loader?name=element-[name].[ext]&outputPath=../css/',
+          'file-loader?name=element-[name].[ext]&outputPath=./css/',
           'extract-loader',
           'css-loader?-minimize'
         ]
       },
       {
         test: /\.(jpg|jpeg|gif|png)$/,
-        loader: 'file-loader?name=../css/images/[name].[ext]'
+        loader: 'file-loader?name=[name].[ext]&outputPath=./images/'
       },
       {
         test: /\.(woff|woff2|eot|ttf|svg|svgz)$/,
-        loader: 'file-loader?name=../css/fonts/[name].[ext]'
+        loader: 'file-loader?name=[name].[ext]&outputPath=./fonts/'
       }
     ]
   },
