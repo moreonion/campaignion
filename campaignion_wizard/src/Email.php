@@ -83,6 +83,12 @@ class Email {
       'data' => $settings,
     );
     $email_form['#attached']['js'][] = drupal_get_path('module', 'campaignion_wizard') . '/js/email-text-format.js';
+
+    // Make this sub-form alterable by other modules.
+    $form_id = 'campaignion_wizard_email_form';
+    $hooks = ['form', "form_$form_id"];
+    drupal_alter($hooks, $email_form, $form_state, $form_id);
+
     return $email_form;
   }
 
