@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_wizard;
 
+require_once drupal_get_path('module', 'webform') . '/includes/webform.emails.inc';
+
 /**
  * @TODO: This class shouldn't be part of the wizard!
  */
@@ -18,7 +20,7 @@ class Email {
     $this->is_new  = !isset($node->webform['emails'][$eid]);
   }
 
-  protected function &getEmailForm(&$form_state) {
+  protected function getEmailForm(&$form_state) {
     $load_eid = $this->is_new ? 'new' : $this->eid;
     $email = webform_email_load($load_eid, $this->node->nid);
 
@@ -92,7 +94,7 @@ class Email {
     return $email_form;
   }
 
-  public function form($messages, &$form_state) {
+  public function form(array $message, array &$form_state) {
     $form[$this->form_id . '_toggle'] = array(
       '#type'        => 'fieldset',
     );
@@ -104,7 +106,7 @@ class Email {
     $checkbox_id = drupal_html_id($this->form_id . '_checkbox');
     $form[$this->form_id . '_toggle'][$this->form_id . '_check'] = array(
       '#type'          => 'checkbox',
-      '#title'         => $messages['toggle_title'],
+      '#title'         => $message['toggle_title'],
       '#id'            => $checkbox_id,
       '#return_value'  => 1,
       '#default_value' => $enabled,
@@ -112,7 +114,7 @@ class Email {
 
     $form[$this->form_id . '_email'] = array(
       '#type'        => 'fieldset',
-      '#title'       => $messages['email_title'],
+      '#title'       => $message['email_title'],
       '#attributes'  => array('class' => array('email-wrapper')),
       '#states' => array(
         'visible' => array(   // action to take.
