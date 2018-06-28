@@ -7,8 +7,8 @@ class ConfirmationEmail extends Email {
   /**
    * Add the request lifetime fieldset to the form.
    */
-  protected function &getEmailForm(&$form_state) {
-    $form = &parent::getEmailForm($form_state);
+  protected function getEmailForm(&$form_state) {
+    $form = parent::getEmailForm($form_state);
 
     form_load_include($form_state, 'module', 'webform_confirm_email', 'admin.inc');
     $e = webform_confirm_email_settings($form, $form_state, $this->node);
