@@ -55,7 +55,7 @@ class MessageTemplate extends Model {
 
     foreach ($new_filters as $nf) {
       if ($nf instanceof Filter) {
-        $f = $nf;
+        $f = $nf->message_id == $this->id ? $nf : clone $nf;
       }
       else {
         // Reuse filter objects if 'id' is passed and found.
