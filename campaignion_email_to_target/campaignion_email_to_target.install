@@ -51,7 +51,7 @@ function campaignion_email_to_target_schema() {
         'length' => 256,
       ],
       'header' => [
-        'description' => 'Message header',
+        'description' => 'Opening',
         'type' => 'text',
       ],
       'message' => [
@@ -59,7 +59,7 @@ function campaignion_email_to_target_schema() {
         'type' => 'text',
       ],
       'footer' => [
-        'description' => 'Message footer',
+        'description' => 'Closing',
         'type' => 'text',
       ],
     ],
