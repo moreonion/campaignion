@@ -18,6 +18,7 @@ import {
   Input,
   MessageBox,
   Option,
+  Popover,
   Row,
   Select,
   Switch
@@ -45,6 +46,7 @@ export default {
     Input,
     MessageBox,
     Option,
+    Popover,
     Row,
     Select,
     Switch
