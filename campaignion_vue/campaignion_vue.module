@@ -44,7 +44,7 @@ function _campaignion_vue_get_strings($language = NULL) {
   $module_path = drupal_get_path('module', 'campaignion_vue');
   $candidates = [$code, explode('-', $code, 2)[0]];
   foreach ($candidates as $lang_path) {
-    $path = $module_path . '/locale/' . $lang_path . '.json';
+    $path = DRUPAL_ROOT . '/' . $module_path . '/locale/' . $lang_path . '.json';
     if (file_exists($path)) {
       return file_get_contents($path);
     }
