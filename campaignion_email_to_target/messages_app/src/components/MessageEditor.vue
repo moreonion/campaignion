@@ -82,11 +82,11 @@ export default {
       switch (text) {
         case 'subject label': return Drupal.t('Subject')
         case 'subject help': return Drupal.t('This is the subject line of the message that will be sent to the target.')
-        case 'header label': return Drupal.t('Header')
+        case 'header label': return Drupal.t('Opening')
         case 'header help': return Drupal.t('This part of the message will not be editable by your supporters.')
         case 'body label': return Drupal.t('Body')
         case 'body help': return Drupal.t('This is the main part of the message that will be sent to the target. If you have chosen to make the message editable by your supporters, they will be able to edit this part of the message.')
-        case 'footer label': return Drupal.t('Footer')
+        case 'footer label': return Drupal.t('Closing')
         case 'footer help': return Drupal.t('This part of the message will not be editable by your supporters.')
         case 'exclusion label': return Drupal.t('Message shown if no target is available')
         case 'exclusion help': return Drupal.t('This message is shown if this exclusion comes into effect and no targets are found for a supporter.')
