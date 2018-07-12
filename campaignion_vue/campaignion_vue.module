@@ -18,19 +18,9 @@ function _campaignion_vue_add_assets() {
   drupal_add_js($module_path . '/js/interrupt-submit.js');
 
   // Add element-ui locale.
-  $lang = $GLOBALS['language']->language;
-  if (substr($lang, 0, 2) != 'en') {
-    $strings = file_get_contents($module_path . '/locale/' . $lang . '.json');
-  }
-  if (!empty($strings)) {
-    drupal_add_js(
-      array(
-        'campaignion_vue' => array(
-          'element_ui_strings' => json_decode($strings, TRUE),
-        )
-      ),
-      'setting'
-    );
+  if ($strings = _campaignion_vue_get_strings()) {
+    $settings['campaignion_vue']['element_ui_strings'] = json_decode($strings, TRUE);
+    drupal_add_js($settings, 'setting');
   }
 
   // Add element-ui stylesheets.
@@ -38,6 +28,28 @@ function _campaignion_vue_add_assets() {
   foreach ($stylesheets as $stylesheet) {
     drupal_add_css($module_path . '/css/' . $stylesheet);
   }
+}
+
+/**
+ * Read translation strings from the locale file.
+ *
+ * @param object $language
+ *   Language object. Defaults to the request wide language.
+ *
+ * @return string|null
+ *   JSON encoded strings or NULL if no strings were found.
+ */
+function _campaignion_vue_get_strings($language = NULL) {
+  $code = $language ? $language->language : $GLOBALS['language']->language;
+  $module_path = drupal_get_path('module', 'campaignion_vue');
+  $candidates = [$code, explode('-', $code, 2)[0]];
+  foreach ($candidates as $lang_path) {
+    $path = $module_path . '/locale/' . $lang_path . '.json';
+    if (file_exists($path)) {
+      return file_get_contents($path);
+    }
+  }
+  return NULL;
 }
 
 /**
