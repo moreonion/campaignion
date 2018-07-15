@@ -6,6 +6,10 @@
 (function ($) {
 
   "use strict";
+
+  /**
+   * Set “no is opt-out” label according to the display setting.
+   */
   Drupal.behaviors.campaignionOptInLabels = {
     attach: function (context, settings) {
       context = $(context).get(0);
@@ -25,6 +29,19 @@
               }
             });
           });
+
+          // Hack to only show the “disable opt-in” checkbox when (all of):
+          // - Display is not radio.
+          // - “no is opt-out“ is checked.
+          // #states is not capable of such complex logic.
+          var disable_optin = checkbox.form.querySelector('[name="extra[disable_optin]"]').parentNode;
+          var setVisibility = function() {
+            var visible = checkbox.checked && display.value != 'radios';
+            disable_optin.style.display = visible ? 'block' : 'none';
+          };
+          display.addEventListener('change', setVisibility);
+          checkbox.addEventListener('change', setVisibility);
+          setVisibility();
         }
       }
     }

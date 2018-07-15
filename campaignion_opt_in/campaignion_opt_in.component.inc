@@ -150,14 +150,12 @@ function _webform_edit_opt_in($component) {
     '#id' => $no_is_opt_out_id,
     '#attached' => $attached,
   ];
-  $visible["#$display_id"]['value'] = 'checkbox';
-  $visible["#$no_is_opt_out_id"]['checked'] = TRUE;
   $form['behavior']['disable_optin'] = [
     '#type' => 'checkbox',
     '#title' => t('Only allow opt-out.'),
     '#default_value' => !empty($component['extra']['disable_optin']),
     '#parents' => ['extra', 'disable_optin'],
-    '#states' => ['visible' => $visible],
+    // Visibility of this element is handled in campaignion_opt_in.admin.js .
   ];
 
   return $form;
