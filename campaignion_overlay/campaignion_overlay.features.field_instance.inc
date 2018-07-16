@@ -13,7 +13,7 @@ function campaignion_overlay_field_default_field_instances() {
 
   // Exported field_instance:
   // 'field_collection_item-campaignion_overlay_options-field_overlay_content'.
-  $field_instances['field_collection_item-campaignion_overlay_options-field_overlay_content'] = array(
+  $field_instances['campaignion_overlay-campaignion_overlay_options-campaignion_overlay_content'] = array(
     'bundle' => 'campaignion_overlay_options',
     'custom_add_another' => '',
     'custom_remove' => '',
@@ -26,7 +26,7 @@ function campaignion_overlay_field_default_field_instances() {
     'description' => 'The content displayed in the overlay.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'entityreference',
         'settings' => array(
           'bypass_access' => FALSE,
@@ -56,7 +56,7 @@ function campaignion_overlay_field_default_field_instances() {
 
   // Exported field_instance:
   // 'field_collection_item-campaignion_overlay_options-field_overlay_enabled'.
-  $field_instances['field_collection_item-campaignion_overlay_options-field_overlay_enabled'] = array(
+  $field_instances['campaignion_overlay-campaignion_overlay_options-campaignion_overlay_enabled'] = array(
     'bundle' => 'campaignion_overlay_options',
     'custom_add_another' => '',
     'custom_remove' => '',
@@ -69,7 +69,7 @@ function campaignion_overlay_field_default_field_instances() {
     'description' => 'Enable or disable display of the overlay.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
@@ -98,7 +98,7 @@ function campaignion_overlay_field_default_field_instances() {
 
   // Exported field_instance:
   // 'field_collection_item-campaignion_overlay_options-field_overlay_introduction'.
-  $field_instances['field_collection_item-campaignion_overlay_options-field_overlay_introduction'] = array(
+  $field_instances['campaignion_overlay-campaignion_overlay_options-campaignion_overlay_introduction'] = array(
     'bundle' => 'campaignion_overlay_options',
     'custom_add_another' => '',
     'custom_remove' => '',
@@ -111,7 +111,7 @@ function campaignion_overlay_field_default_field_instances() {
     'description' => 'A short introduction to the content displayed in the overlay.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
