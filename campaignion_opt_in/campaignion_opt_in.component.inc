@@ -130,21 +130,32 @@ function _webform_edit_opt_in($component) {
   ];
 
   $no_is_opt_out_id = drupal_html_id('no-is-opt-out');
+  $js_file = drupal_get_path('module', 'campaignion_opt_in') . '/campaignion_opt_in.admin.js';
+  $labels = [
+    'radios' => t('Interpret ‘no’ option as opt-out.'),
+    'checkbox' => t('Interpret an unchecked checkbox as opt-out.'),
+    'checkbox-inverted' => t('Interpret a checked inverted checkbox as opt-out.'),
+  ];
+  $settings['campaignionOptIn']['labels']["#$no_is_opt_out_id"] = [
+    'display_id' => "#$display_id",
+    'labels' => $labels,
+  ];
+  $attached['js'][$js_file] = [];
+  $attached['js'][] = ['data' => $settings, 'type' => 'setting'];
   $form['behavior']['no_is_optout'] = [
     '#type' => 'checkbox',
-    '#title' => t('No (radio) is taken as opt-out'),
+    '#title' => $labels[$component['extra']['display']],
     '#default_value' => !empty($component['extra']['no_is_optout']),
     '#parents' => ['extra', 'no_is_optout'],
     '#id' => $no_is_opt_out_id,
+    '#attached' => $attached,
   ];
-  $visible["#$display_id"]['value'] = 'checkbox';
-  $visible["#$no_is_opt_out_id"]['checked'] = TRUE;
   $form['behavior']['disable_optin'] = [
     '#type' => 'checkbox',
     '#title' => t('Only allow opt-out.'),
     '#default_value' => !empty($component['extra']['disable_optin']),
     '#parents' => ['extra', 'disable_optin'],
-    '#states' => ['visible' => $visible],
+    // Visibility of this element is handled in campaignion_opt_in.admin.js .
   ];
 
   return $form;
