@@ -19,6 +19,8 @@ import {
   MessageBox,
   Option,
   Popover,
+  Radio,
+  RadioGroup,
   Row,
   Select,
   Switch
@@ -47,6 +49,8 @@ export default {
     MessageBox,
     Option,
     Popover,
+    Radio,
+    RadioGroup,
     Row,
     Select,
     Switch

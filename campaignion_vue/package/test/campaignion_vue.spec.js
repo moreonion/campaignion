@@ -52,6 +52,8 @@ describe('campaignion_vue', () => {
     expect(campVue.element.MessageBox).to.exist;
     expect(campVue.element.Option).to.exist;
     expect(campVue.element.Popover).to.exist;
+    expect(campVue.element.Radio).to.exist;
+    expect(campVue.element.RadioGroup).to.exist;
     expect(campVue.element.Row).to.exist;
     expect(campVue.element.Select).to.exist;
     expect(campVue.element.Switch).to.exist;
