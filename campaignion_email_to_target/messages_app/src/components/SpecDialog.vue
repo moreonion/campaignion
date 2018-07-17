@@ -175,6 +175,7 @@ export default {
     this.$bus.$on('duplicateSpec', index => {
       const duplicate = clone(this.specs[index])
       duplicate.id = emptySpec(duplicate.type).id
+      duplicate.filters.forEach((filter) => { filter.id = null })
       duplicate.label = Drupal.t('Copy of @messageName', {'@messageName': duplicate.label})
       this.currentSpec = duplicate
       this.$store.commit('editNewSpec')
