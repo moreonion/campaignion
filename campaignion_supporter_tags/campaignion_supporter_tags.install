@@ -14,7 +14,7 @@ function campaignion_supporter_tags_install() {
     'name' => 'Supporter Tags',
     'machine_name' => 'supporter_tags',
     'description' => 'Vocabulary for Campaignion supporter tags.',
-    'module' => 'campaignion_supportert_tags',
+    'module' => 'campaignion_supporter_tags',
   );
   $vocabulary = (object) $edit;
 
