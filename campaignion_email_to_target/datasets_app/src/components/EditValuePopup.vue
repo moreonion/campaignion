@@ -28,19 +28,7 @@ export default {
     return {
       value: '',
       validator: new RegExp(''),
-      showError: false,
-      clickHandler: e => {
-        // close the editing tooltip if the user clicks somewhere else
-        // do nothing if no value is being edited
-        if (!this.editValue) return
-        // do nothing if the user clicked inside the tooltip
-        if (this.$el.tagName && this.$el.contains(e.target)) return
-        // do nothing if user clicked on the cell that’s being edited
-        if (e.target.classList.contains('dsa-edited')) return
-        this.highlightCell(false)
-        if (this.changed) this.flashCell()
-        this.$store.commit({ type: 'leaveValue' })
-      }
+      showError: false
     }
   },
 
@@ -99,6 +87,19 @@ export default {
   },
 
   methods: {
+    clickHandler (e) {
+      // close the editing tooltip if the user clicks somewhere else
+      // do nothing if no value is being edited
+      if (!this.editValue) return
+      // do nothing if the user clicked inside the tooltip
+      if (this.$el.tagName && this.$el.contains(e.target)) return
+      // do nothing if user clicked on the cell that’s being edited
+      if (e.target.classList.contains('dsa-edited')) return
+      this.highlightCell(false)
+      if (this.changed) this.flashCell()
+      this.$store.commit({ type: 'leaveValue' })
+    },
+
     save () {
       if (this.valid) {
         const nextCell = this.editValue.el.nextSibling
