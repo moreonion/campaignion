@@ -2,6 +2,15 @@ import api from '@/utils/api'
 import {clone} from '@/utils'
 
 export default {
+  /**
+   * Load datasets.
+   * Show the spinner in the App component while loading.
+   * Set `datasets` in the store. If a preselected dataset is passed,
+   * also set `selectedDataset`.
+   * @param {Object} context - The vuex context.
+   * @param {Object} payload - The action’s payload.
+   * @param {string} payload.selected - The identifier of the currently selected dataset.
+   */
   loadDatasets (context, {selected}) {
     context.commit('showSpinner', true)
     api.getDatasets().then(data => {
@@ -19,6 +28,14 @@ export default {
     })
   },
 
+  /**
+   * Load the list of contacts for a given dataset.
+   * Show the spinner in the App component while loading.
+   * Close the selecting dialog, open the editing dialog and store the contacts with vuex.
+   * @param {Object} context - The vuex context.
+   * @param {Object} payload - The action’s payload.
+   * @param {Object} payload.dataset - The dataset of which we want to load the contacts.
+   */
   loadContacts (context, {dataset}) {
     context.commit('showSpinner', true)
     context.commit('closeSelectDialog')
@@ -32,6 +49,12 @@ export default {
     })
   },
 
+  /**
+   * Save the current dataset and its list of contacts.
+   * Show the spinner in the App component while saving.
+   * For a new dataset, generate a key. Remove dummy ids from contacts.
+   * @param {Object} context - The vuex context.
+   */
   saveDataset (context) {
     const dataset = clone(context.state.currentDataset)
     const contacts = clone(context.state.contacts)
@@ -46,7 +69,7 @@ export default {
       dataset.key = slug + '--' + dataset.uuid
       delete dataset.uuid
     }
-    // remove dummy ids
+    // Remove dummy ids needed to identify contacts when editing their fields.
     for (var i = 0, j = contacts.length; i < j; i++) {
       if (typeof contacts[i].id === 'string' && contacts[i].id.indexOf('new') === 0) {
         delete contacts[i].id

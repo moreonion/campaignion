@@ -1,6 +1,13 @@
 // For authoring Nightwatch tests, see
 // http://nightwatchjs.org/guide#usage
 
+/**
+ * Return a CSS selector string to target a specific table cell.
+ * @param {string} tBodySelector - CSS selector targeting the body of the table in question.
+ * @param {(integer|string)} row - Row number, 1-based.
+ * @param {(integer|string)} col - Column number, 1-based.
+ * @return {string} CSS selector of the cell.
+ */
 function cellSelector (tBodySelector, row, col) {
   return tBodySelector + ' > tr:nth-of-type(' + row + ') > td:nth-of-type(' + col + ')'
 }

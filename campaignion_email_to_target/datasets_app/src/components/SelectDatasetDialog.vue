@@ -31,16 +31,24 @@ export default {
 
   computed: {
     ...mapState([
-      'showSelectDialog'
+      'showSelectDialog' /** {boolean} Visibility of the dialog. */
     ])
   },
 
   methods: {
+    /**
+     * Close the select dialog and start editing a new dataset.
+     */
     editNewDataset () {
       this.$store.commit('closeSelectDialog')
       this.$store.commit('editNewDataset')
     },
 
+    /**
+     * Handle cancelling of the element-ui dialog.
+     * Close the select dialog and call done().
+     * @param {function} done - Passed by element-ui dialog. Call done() to finish closing the dialog.
+     */
     dialogCancelHandler (done) {
       this.$store.commit('closeSelectDialog')
       done()

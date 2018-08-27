@@ -26,37 +26,44 @@ var popper = {}
 export default {
   data: function () {
     return {
-      value: '',
-      validator: new RegExp(''),
-      showError: false
+      value: '',                 /** {string} The value of the editing field. */
+      validator: new RegExp(''), /** {RegExp} The regular expression to test the value against, depeding on the column being edited. */
+      showError: false           /** {boolean} Visibility of the validation error message. */
     }
   },
 
   computed: {
+    /** @return {boolean} Does the editing field’s value differ from the selected cell’s value? */
     changed () {
       return !!this.editValue && (this.value !== this.editValue.row[this.editValue.col])
     },
+
+    /** @return {boolean} Does the editing field’s value pass the validation for the edited column? */
     valid () {
       return this.validator.test(this.value)
     },
+
+    /** @return {string} The title of the edited column (or if falsey, the column key). */
     label () {
       return find(this.columns, {key: this.editValue.col}).title || this.editValue.col
     },
+
     ...mapState([
-      'editValue',
-      'columns',
-      'validations'
+      'editValue',  /** {(Object|null)} Object describing the table cell being edited. */
+      'columns',    /** {Object[]} Array of objects describing each column: {key: 'foo', title: 'Foo', description: 'The foo column.'} */
+      'validations' /** {Object} Validations for each column: strings containing regular expressions, keyed by columns key. */
     ])
   },
 
   watch: {
     editValue (val) {
       if (val) {
-        // initialize
+        // Set initial values.
         this.showError = false
         this.validator = new RegExp(this.validations[val.col])
         this.value = val.row[val.col]
         this.highlightCell(true)
+        // Open popup.
         this.$nextTick(() => {
           popper = new Popper(val.el, this.$el, {
             placement: 'top',
@@ -66,6 +73,7 @@ export default {
               }
             }
           })
+          // Give popper time before focusing the input to prevent random auto-scrolling.
           setTimeout(() => {
             if (this.$refs.input) {
               this.$refs.input.focus()
@@ -73,6 +81,7 @@ export default {
           }, 30)
         })
       } else {
+        // Close popup.
         popper.destroy()
       }
     }
@@ -87,31 +96,46 @@ export default {
   },
 
   methods: {
+    /**
+     * Handle clicks that bubbled all the way up to document.
+     * @param {Event} e - The click event.
+     */
     clickHandler (e) {
-      // close the editing tooltip if the user clicks somewhere else
-      // do nothing if no value is being edited
+      // Close the editing popup if the user clicks somewhere else.
+      // Do nothing if no value is being edited.
       if (!this.editValue) return
-      // do nothing if the user clicked inside the tooltip
+      // Do nothing if the user clicked inside the popup.
       if (this.$el.tagName && this.$el.contains(e.target)) return
-      // do nothing if user clicked on the cell that’s being edited
+      // Do nothing if user clicked on the cell that’s being edited.
       if (e.target.classList.contains('dsa-edited')) return
+      // Remove cell highlighting.
       this.highlightCell(false)
+      // Flash the cell to indicate that the changes are being dismissed.
       if (this.changed) this.flashCell()
+      // Stop editing the cell, causing the popup to close.
       this.$store.commit({ type: 'leaveValue' })
     },
 
+    /**
+     * Validate the edited value and save it to the store.
+     * If the next cell is empty (as when editing a cell in a new row), edit the next cell.
+     */
     save () {
       if (this.valid) {
         const nextCell = this.editValue.el.nextSibling
+        // Remove cell highlighting.
         this.highlightCell(false)
+        // Update the value in the store.
         this.$store.commit({
           type: 'updateValue',
           value: this.value
         })
+        // If the next field is blank, edit it.
         this.$nextTick(() => {
-          // if the next field is blank, edit it
           if (nextCell && !nextCell.textContent && !(nextCell.children[0] && nextCell.children[0].classList.contains('dsa-delete-contact'))) {
-            nextCell.classList.add('dsa-edited') // for click handler
+            // Cause the click handler to return and leave the popup open.
+            nextCell.classList.add('dsa-edited')
+            // Click the next cell to open the popup.
             dispatch(nextCell, 'click')
           }
         })
@@ -120,11 +144,18 @@ export default {
       }
     },
 
+    /**
+     * Cancel editing a cell.
+     */
     cancel () {
       this.highlightCell(false)
       this.$store.commit({ type: 'leaveValue' })
     },
 
+    /**
+     * Set cell highlighting by adding or removing the dsa-edited class.
+     * @param {boolean} highlight - To highlight or not to highlight.
+     */
     highlightCell (highlight) {
       if (highlight) {
         this.editValue.el.classList.add('dsa-edited')
@@ -133,6 +164,9 @@ export default {
       }
     },
 
+    /**
+     * Trigger a flash effect by adding the dsa-flash class for 1 second.
+     */
     flashCell () {
       const el = this.editValue.el
       el.classList.add('dsa-flash')

@@ -15,32 +15,38 @@ import {mapState} from 'vuex'
 export default {
   data () {
     return {
-      filter: ''
+      filter: '' // Value of the filter input.
     }
   },
 
   computed: {
+    /** @return {Object[]} Array of datasets with titles matching the filter string. */
     filteredDatasets () {
       return this.datasets.filter(dataset => {
         return dataset.title.toLowerCase().indexOf(this.filter.toLowerCase()) > -1
       })
     },
     ...mapState([
-      'datasets',
-      'showSelectDialog'
+      'datasets',        /** {Object[]} Array of all available datasets. */
+      'showSelectDialog' /** {boolean} Visibility of the select dataset dialog. */
     ])
   },
 
   watch: {
     showSelectDialog (val) {
+      // Clear filter when dialog is shown.
       if (val) {
-        // init list
         this.filter = ''
       }
     }
   },
 
   methods: {
+    /**
+     * Select a dataset. Close the select dialog.
+     * If it’s a custom dataset, load its contacts and edit it.
+     * @param {Object} dataset - The selected dataset.
+     */
     select (dataset) {
       this.$store.commit('closeSelectDialog')
       if (dataset.is_custom) {

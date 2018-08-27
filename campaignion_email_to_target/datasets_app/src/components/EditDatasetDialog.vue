@@ -57,9 +57,9 @@
 
     <EditValuePopup />
 
-    <span slot="footer" :class="{'dialog-footer': true, 'dialog-alert': modalDirty}">
+    <span slot="footer" :class="{'dialog-footer': true, 'dialog-alert': showUnsavedChangesWarning}">
       <el-button @click="chooseDataset()" class="dsa-choose-dataset" :disabled="datasetChanged || showSpinner">{{ text('choose dataset') }}</el-button>
-      <span v-if="modalDirty" class="dialog-alert-message">{{ text('unsaved changes') }}</span>
+      <span v-if="showUnsavedChangesWarning" class="dialog-alert-message">{{ text('unsaved changes') }}</span>
       <el-button :disabled="showSpinner" @click="cancelButtonHandler()" class="js-modal-cancel">{{ text('Cancel') }}</el-button>
       <el-button type="primary" :disabled="datasetIsEmpty || showSpinner" @click="saveDataset" class="js-modal-save">{{ text('Save') }}</el-button>
     </span>
@@ -81,10 +81,10 @@ export default {
 
   data () {
     return {
-      options: {
-        sortable: [],
-        perPage: 20,
-        perPageValues: [20],
+      options: {             // Options for vue-tables-2.
+        sortable: [],        // None of the columns is sortable.
+        perPage: 20,         // Initial records per page.
+        perPageValues: [20], // Records per page options.
         texts: {
           count: Drupal.t('Showing {from} to {to} of {count} records|{count} records|One record'),
           filter: '',
@@ -98,43 +98,51 @@ export default {
           columns: Drupal.t('Columns')
         }
       },
-      modalDirty: false,
-      showContactErrors: false
+      showUnsavedChangesWarning: false, // True if there are unsaved changes and the user tried to cancel the dialog.
+      showContactErrors: false          // Visibility of the error column for marking contacts where validation failed.
     }
   },
 
   computed: {
+    /** @return {string} Dialog title containing the dataset name or saying 'new dataset'. */
     dialogTitle () {
       return this.datasetIsNew
         ? Drupal.t('Edit new dataset')
         : Drupal.t('Edit "@dataset"', {'@dataset': this.currentDataset.title})
     },
+
+    /** @return {boolean} Is the dataset being edited a new one? */
     datasetIsNew () {
       return !this.currentDataset.key
     },
+
+    /** @return {boolean} Is the dataset lacking the minimal content (a title and one contact)? */
     datasetIsEmpty () {
       return !this.currentDataset.title.length || !this.contacts.length
     },
+
+    /** @return {boolean} Are the contacts valid? Check for __error properties. */
     contactsAreValid () {
       return !find(this.contacts, '__error')
     },
+
     ...mapState([
-      'currentDataset',
-      'contacts',
-      'tableColumns',
-      'standardColumns',
-      'contactsTable',
-      'showEditDialog',
-      'showSpinner',
-      'datasetChanged'
+      'currentDataset',  /** {(Object|null)} The dataset being edited. */
+      'contacts',        /** {Object[]} Array of contacts belonging to the current dataset. */
+      'tableColumns',    /** {string[]} Array of column identifiers. */
+      'standardColumns', /** {Object[]} Array of objects describing the standard columns. */
+      'contactsTable',   /** {(Object|undefined)} vue-tables-2 state via vuex. */
+      'showEditDialog',  /** {boolean} Visibility of the edit dataset dialog. */
+      'showSpinner',     /** {boolean} Visibility of the loading spinner. */
+      'datasetChanged'   /** {boolean} True if the user has made changes on the current dataset. */
     ])
   },
 
   watch: {
     showEditDialog (val) {
       if (val) {
-        // init dialog
-        this.modalDirty = false
+        // Initialize dialog.
+        this.showUnsavedChangesWarning = false
         this.showContactErrors = false
         if (this.$refs.contactsTable) {
           this.$refs.contactsTable.setPage(1)
@@ -147,8 +155,8 @@ export default {
     },
 
     contacts (contacts) {
-      // in case a contact has been deleted, check if there are still contacts on the current page
-      // if there aren’t, go to the last page
+      // In case a contact has been deleted, check if there are still contacts on the current page.
+      // If there aren’t, go to the last page.
       if (contacts.length && this.contactsTable && this.contactsTable.page > Math.ceil(contacts.length / this.contactsTable.limit)) {
         this.$refs.contactsTable.setPage(Math.ceil(contacts.length / this.contactsTable.limit))
       }
@@ -156,14 +164,21 @@ export default {
   },
 
   methods: {
+    /**
+     * Append a contact to the list, clear the table filter and show the last page.
+     */
     addContact () {
       this.$store.commit('addContact')
       this.$nextTick(() => {
-        this.$refs.contactsTable.setFilter('') // clear the filter so the new row is sure to be displayed
-        this.$refs.contactsTable.setPage(Math.ceil(this.contacts.length / this.contactsTable.limit)) // go to last page
+        this.$refs.contactsTable.setFilter('') // Clear the filter so the new row is sure to be displayed.
+        this.$refs.contactsTable.setPage(Math.ceil(this.contacts.length / this.contactsTable.limit)) // Go to last page.
       })
     },
 
+    /**
+     * Delete a contact from the list (with confirmation).
+     * @param {integer} id - The id of the contact to delete.
+     */
     deleteContact (id) {
       this.$store.commit('leaveValue')
       this.$confirm(Drupal.t('Do you really want to remove this target?'), Drupal.t('Delete contact'), {
@@ -175,14 +190,27 @@ export default {
       }, () => {})
     },
 
+    /**
+     * Handle input on the title field.
+     * @param {Event} e - The native event.
+     */
     updateTitle (e) {
       this.$store.commit('updateTitle', e.target.value)
     },
 
+    /**
+     * Handle input on the description field.
+     * @param {Event} e - The native event.
+     */
     updateDescription (e) {
       this.$store.commit('updateDescription', e.target.value)
     },
 
+    /**
+     * Handle click on the file input’s label.
+     * Warn if there are contacts in the list.
+     * @param {Event} e - The native event.
+     */
     chooseFile (e) {
       if (this.contacts.length) {
         e.preventDefault()
@@ -197,6 +225,11 @@ export default {
       }
     },
 
+    /**
+     * Parse CSV files. Show a spinner while processing.
+     * Handle parsing errors. Load the parsed contacts to the contact list.
+     * Validate the parsed contacts and filter the list for invalid rows.
+     */
     processFile () {
       this.$store.commit('showSpinner', true)
       Papa.parse(this.$refs.fileInput.files[0], {
@@ -253,6 +286,12 @@ export default {
       })
     },
 
+    /**
+     * Handle clicks on the Save button.
+     * If there are changes in the dataset, check for invalid contacts and eventually filter the list
+     * before saving the dataset and closing the dialog. If there aren’t any changes, set the selected
+     * dataset and close the dialog.
+     */
     saveDataset () {
       if (this.datasetChanged) {
         if (this.contactsAreValid) {
@@ -267,14 +306,22 @@ export default {
       }
     },
 
+    /**
+     * Close the edit dataset dialog and open the dialog to select a dataset.
+     */
     chooseDataset () {
       this.$store.commit('closeEditDialog')
       this.$store.commit('openSelectDialog')
     },
 
+    /**
+     * Handle cancelling of the dialog via the X button or the ESC key.
+     * Show a warning about unsaved changes and scroll there, or close the dialog.
+     * @param {function} done - Passed by element-ui dialog. Call done() to finish closing the dialog.
+     */
     dialogCancelHandler (done) {
       if (this.datasetChanged) {
-        this.modalDirty = true // show warning
+        this.showUnsavedChangesWarning = true
         animatedScrollTo(
           this.$root.$el.querySelector('.el-dialog__wrapper.dsa-edit-dataset-dialog'),
           this.$el.querySelector('.js-modal-cancel').offsetTop,
@@ -286,9 +333,13 @@ export default {
       }
     },
 
+    /**
+     * Handle cancelling of the dialog via the Cancel button.
+     * Show a warning about unsaved changes, or close the dialog.
+     */
     cancelButtonHandler () {
-      if (this.datasetChanged && !this.modalDirty) {
-        this.modalDirty = true // show warning
+      if (this.datasetChanged && !this.showUnsavedChangesWarning) {
+        this.showUnsavedChangesWarning = true
       } else {
         this.$store.commit('closeEditDialog')
       }
@@ -308,7 +359,7 @@ export default {
         case 'delete': return Drupal.t('Delete')
         case 'choose dataset': return Drupal.t('Choose a different dataset')
         case 'unsaved changes': return Drupal.t('You have unsaved changes!')
-        case 'Cancel': return this.modalDirty ? Drupal.t('Discard my changes') : Drupal.t('Cancel')
+        case 'Cancel': return this.showUnsavedChangesWarning ? Drupal.t('Discard my changes') : Drupal.t('Cancel')
         case 'Save': return Drupal.t('Save')
       }
     }

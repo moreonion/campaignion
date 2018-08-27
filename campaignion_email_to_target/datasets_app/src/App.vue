@@ -28,37 +28,46 @@ export default {
 
   data: function () {
     return {
-      livingInWizard: !!this.$root.$options.datasetField
+      livingInWizard: !!this.$root.$options.datasetField // The presence of a dataset field tells us whether the app is mounted in the wizard.
     }
   },
 
   computed: {
+    /**
+     * @return {string} - A sentence informing the user about the chosen dataset or telling them to choose one.
+     */
     introText () {
       return this.selectedDataset
         ? Drupal.t('You have chosen the dataset <strong>"@dataset".</strong> If you would like to edit the dataset or choose a different one click the "edit" button.', {'@dataset': this.selectedDataset.title})
         : Drupal.t('Click the button to choose a dataset.')
     },
+
+    /**
+     * @return {string} - Label of the wizard button to choose a dataset.
+     */
     buttonText () {
       return this.selectedDataset
         ? Drupal.t('Edit your target dataset')
         : Drupal.t('Choose your target dataset')
     },
+
     ...mapState([
-      'selectedDataset',
-      'apiError',
-      'showSelectDialog',
-      'showEditDialog',
-      'showSpinner'
+      'selectedDataset',  /** {(Object|null)} The dataset currently selected in the wizard field. */
+      'apiError',         /** {boolean} Was there an error when trying to reach the API? */
+      'showSelectDialog', /** {boolean} Is the dialog to select a dataset visible? */
+      'showEditDialog',   /** {boolean} Is the dialog to edit a dataset visible? */
+      'showSpinner'       /** {boolean} Is the loading spinner visible? */
     ])
   },
 
   watch: {
+    // When another dataset is selected, update the the wizard dataset field.
     selectedDataset (dataset) {
       if (this.livingInWizard && dataset) {
         this.$root.$options.datasetField.value = dataset.key
       }
     },
-    // don’t accidentially submit drupal form while dialogs are open
+    // Don’t accidentially submit drupal form while dialogs are open.
     showSelectDialog (val) {
       this.disableDrupalSubmits(val)
     },
@@ -68,6 +77,10 @@ export default {
   },
 
   methods: {
+    /**
+     * Handle the select/edit button.
+     * If a custom dataset is selected, edit it. If not, open the dialog to select a dataset.
+     */
     openDialog () {
       if (this.selectedDataset && this.selectedDataset.is_custom) {
         this.$store.dispatch({type: 'loadContacts', dataset: this.selectedDataset})
@@ -76,6 +89,10 @@ export default {
       }
     },
 
+    /**
+     * Set the disabled status of the Campaignion wizard buttons.
+     * @param {boolean} bool - Set the disabled attribute to this value.
+     */
     disableDrupalSubmits (bool) {
       const inputs = document.querySelectorAll('input[type=submit]')
       for (var i = 0, j = inputs.length; i < j; i++) {
@@ -92,10 +109,12 @@ export default {
   },
 
   created () {
+    // Initialize some properties in the store.
     this.$store.commit({
       type: 'init',
       settings: clone(this.$root.$options.settings)
     })
+    // Load all datasets from the server and set the selected dataset (wizard only).
     this.$store.dispatch({
       type: 'loadDatasets',
       selected: this.livingInWizard ? this.$root.$options.datasetField.value : undefined
