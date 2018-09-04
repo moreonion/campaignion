@@ -55,7 +55,7 @@
   },
   setup = function(options) {
     options = options || {};
-    xdomain = options.domain || '*';
+    xdomain = options.domain || '.*';
     element = options.element || 'iframe-embed';
     container = document.getElementById(element);
     el = !ie ? 'iframe' : '<iframe name="' + element + '"></iframe>';
