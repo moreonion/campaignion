@@ -1,7 +1,7 @@
 (function() {
 
   var el, iframe, i, script, messageHandler, element, container, options, xdomain,
-  resize = window.IframeResize = {};
+  resize = window.IframeResize = {},
   id = 'iframe-4ee0adbddd0ca',
   props = {
     src : '',
