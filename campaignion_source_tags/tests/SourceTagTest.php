@@ -2,6 +2,7 @@
 
 namespace Drupal\campaignion_source_tags;
 
+use Drupal\campaignion\Contact;
 use Drupal\campaignion\CRM\ImporterBase;
 use Drupal\campaignion\CRM\Import\Field\Name;
 use Drupal\campaignion\CRM\Import\Source\ArraySource;
@@ -11,6 +12,8 @@ use Drupal\campaignion_supporter_tags\Tagger;
  * Test for setting source tags.
  */
 class SourceTagTest extends \DrupalWebTestCase {
+
+  protected $testEmail = 'testsetsourcetagduringimport@example.com';
 
   /**
    * Test setting the source tag during an import.
@@ -25,14 +28,22 @@ class SourceTagTest extends \DrupalWebTestCase {
     $source = new ArraySource([
       'first_name' => 'F',
       'last_name' => 'L',
-      'email' => 'testsetsourcetagduringimport@example.com',
+      'email' => $this->testEmail,
     ]);
     $contact = $importer->findOrCreateContact($source);
     $tagger->tag($contact->supporter_tags, ['test-source'], TRUE);
     $importer->import($source, $contact);
     $contact->save();
     $this->assertNotEmpty($contact->source_tag[LANGUAGE_NONE][0]);
-    entity_delete('redhen_contact', $contact->contact_id);
+  }
+
+  /**
+   * Delete test contact.
+   */
+  public function tearDown() {
+    if ($contact = Contact::byEmail($this->testEmail)) {
+      $contact->delete();
+    }
   }
 
 }
