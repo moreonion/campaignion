@@ -1,4 +1,5 @@
 var messageParent = function(scrollTop){
+  // be sure this code runs when document.body is defined
   var h = document.body.scrollHeight;
   h = (scrollTop)? h+'s':h;
   if(top.postMessage){
@@ -48,16 +49,18 @@ function gaLinkerHandler() {
   }
 }
 
+function registerListeners() {
+  if (window.addEventListener) {
+    window.addEventListener("DOMSubtreeModified", function(){messageParent();}, true);
+    document.addEventListener("DOMContentLoaded", gaLinkerHandler);
+  } else if (window.attachEvent) {
+    window.attachEvent("onDOMSubtreeModified", function(){messageParent();});
+  }
+}
 window.onload = function() {
   messageParent();
+  registerListeners();
 }
 window.onresize = function() {
   messageParent();
-}
- 
-if (window.addEventListener) {
-  window.addEventListener("DOMSubtreeModified", function(){messageParent();}, true);
-  document.addEventListener("DOMContentLoaded", gaLinkerHandler);
-} else if (window.attachEvent) {
-  window.attachEvent("onDOMSubtreeModified", function(){messageParent();});
 }
