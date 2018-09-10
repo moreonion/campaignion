@@ -83,7 +83,7 @@ export default {
      */
     openDialog () {
       if (this.selectedDataset && this.selectedDataset.is_custom) {
-        this.$store.dispatch({type: 'loadContacts', dataset: this.selectedDataset})
+        this.$store.dispatch({type: 'loadContactsAndEdit', dataset: this.selectedDataset})
       } else {
         this.$store.commit('openSelectDialog')
       }

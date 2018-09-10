@@ -36,7 +36,7 @@ export default {
    * @param {Object} payload - The action’s payload.
    * @param {Object} payload.dataset - The dataset of which we want to load the contacts.
    */
-  loadContacts (context, {dataset}) {
+  loadContactsAndEdit (context, {dataset}) {
     context.commit('showSpinner', true)
     context.commit('closeSelectDialog')
     api.getContacts(dataset.key).then(data => {
@@ -55,10 +55,10 @@ export default {
    * For a new dataset, generate a key. Remove dummy ids from contacts.
    * @param {Object} context - The vuex context.
    */
-  saveDataset (context) {
+  saveDatasetAndContacts (context) {
     const dataset = clone(context.state.currentDataset)
     const contacts = clone(context.state.contacts)
-    const isNewDataset = !!dataset.uuid
+    const isNewDataset = !!dataset._uuid
     if (!dataset.is_custom) return
     if (isNewDataset) {
       // construct the key
@@ -66,8 +66,8 @@ export default {
       slug = slug.replace(/(^-|-$)/g, '') // trim dashes
       slug = slug.replace(/(-+)/g, '-') // remove multiple dashes
       slug = encodeURIComponent(slug) // encode remaining bad characters
-      dataset.key = slug + '--' + dataset.uuid
-      delete dataset.uuid
+      dataset.key = slug + '--' + dataset._uuid
+      delete dataset._uuid
     }
     // Remove dummy ids needed to identify contacts when editing their fields.
     for (var i = 0, j = contacts.length; i < j; i++) {

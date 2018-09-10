@@ -295,7 +295,7 @@ export default {
     saveDataset () {
       if (this.datasetChanged) {
         if (this.contactsAreValid) {
-          this.$store.dispatch('saveDataset') // dialog is closed by action
+          this.$store.dispatch('saveDatasetAndContacts') // dialog is closed by action
         } else {
           this.$refs.contactsTable.setFilter(INVALID_CONTACT_STRING)
           this.showContactErrors = true

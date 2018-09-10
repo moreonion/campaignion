@@ -12,7 +12,7 @@ function uuid (a) { return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : 
 
 /**
  * Generate a fresh dataset with the standard contact columns as attributes and a new uuid.
- * The uuid is used for generating the key in the `saveDataset` action, and then deleted.
+ * The uuid is used for generating the key in the `saveDatasetAndContacts` action, and then deleted.
  * @param {Object} state - vuex state.
  * @return {Object} The new dataset.
  */
@@ -29,6 +29,6 @@ export function emptyDataset (state) {
     is_custom: true,
     key: null,
     title: '',
-    uuid: uuid()
+    _uuid: uuid() // New datasets only. Will be deleted before persisting to server.
   }
 }

@@ -51,7 +51,7 @@ export default {
       this.$store.commit('closeSelectDialog')
       if (dataset.is_custom) {
         this.$store.dispatch({
-          type: 'loadContacts',
+          type: 'loadContactsAndEdit',
           dataset
         })
       } else {
