@@ -10,8 +10,8 @@
     "build": "node build/build.js",
     "build:dev": "cross-env CAMP_APP_DEV_BUILD=1 node build/build.js",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
-    "e2e": "concurrently \"node test/e2e/runner.js\" \"node build/api-server.js\"",
-    "test": "npm run unit && npm run e2e",
+    "e2e": "concurrently --kill-others --success first \"node test/e2e/runner.js\" \"node build/api-server.js\"",
+    "test": "yarn e2e",
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
