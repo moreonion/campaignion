@@ -1,75 +1,44 @@
-# campaignion_vue_project
+# dataset_app
 
-Template for Vue apps in Campaignion.
-Replace `my_vue_app` with your app’s name.
-
-Webpack compiles js and css into the respective module subdirectories:
-```
-campaignion_my_module
- │
- ├── my_vue_app (= root of this template)
- │    ├── build
- │    ├── config
- │    ├── src
- │    ...
- │    └── package.json
- │
- ├── js (drupal_add_js from here)
- │    ├── my_vue_app
- │    │    ├── my_vue_app.vue.min.js
- │    │    └── my_vue_app.vue.js.map
- │    └── some_behavior.js
- │
- ├── css (drupal_add_css from here)
- │    ├── my_vue_app
- │    │    └── my_vue_app.css
- │    └── my_module_styles.js
- │
- ├── campaignion_my_module.info
- └── campaignion_my_module.module
-```
-
-You don’t have to add the assets campaignion_vue provides, it adds them when it detects Vue apps that have the extensions `.vue.min.js`. So all you have to do is enable campaignion_vue and
-```
-drupal_add_js(
-  drupal_get_path('module', 'campaignion_my_module') . '/js/my_vue_app/app.vue.min.js',
-  {'scope' => 'footer', 'preprocess' => FALSE}
-);
-```
-and campaignion_vue will automatically add all the assets you need.
+Select and edit datasets via the e2t_api.
+The app can be loaded in two environments: The wizard’s target step and as a standalone dataset manager (the latter is yet to be implemented).
 
 ## Dev mode
 
-If you need to preview your app inside Campaignion, you have to run `npm run build` or `yarn build` and reload the page in the browser.
-For faster development using hot module replacement you can run `yarn dev` and visit `localhost:8080`. All you need from the `Drupal` global is stubbed via `build/drupal-fixture.js`. API calls to Drupal won’t work though.
+When running `yarn dev`, an instance of json-server is launched and used as the development API. You can use the real API though by setting the `E2T_API_TOKEN` environment variable to a valid JWT token.
+
+``` bash
+E2T_API_TOKEN="<here goes the token>" yarn dev
+```
 
 ## Production mode
 
 In production mode, Webpack is configured to leave certain vendor libraries out of the bundle and take them from the `campaignion_vue` global provided by the `campaignion_vue` module.
+The app uses the API url and token passed via `Drupal.settings.campaignion_email_to_target.endpoints['e2t-api']`.
 
-## Build Setup
+## Usage
 
 ``` bash
 # install dependencies
-npm install
+yarn install
 
 # serve with hot reload at localhost:8080
-npm run dev
+yarn dev
 
 # build for production with minification
-npm run build
+yarn build
 
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
+# run e2e tests in Chrome
+yarn e2e
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## Settings
+
+The app needs the following settings in the `Drupal.settings.campaignion_email_to_target` dictionary:
+
+| Key               | Type     | Value                                                                                                           | Example                                                          | Default |
+|-------------------|----------|-----------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|---------|
+| `contactPrefix`   | string   | A prefix used to identify a contact attribute in a dataset’s attributes list.                                   | `'contact.'`                                                     | `''`    |
+| `standardColumns` | Object[] | Array of objects describing the columns that have to be present in every dataset.                               | `[{key: 'email', description: '', title: 'Email address'}, ...]` | `[]`    |
+| `validations`     | Object   | Validations for each column. Dictionary of regex strings, keyed by column name. Backslashes have to be escaped! | `{'first_name': '\\S+'}`                                         | `{}`    |
+| `endpoints`       | Object   | For now, this is only the `e2t-api` endpoint.                                                                   | `{'e2t-api': {url: 'http://example.com', token: 'JWT token'}}`   |         |
