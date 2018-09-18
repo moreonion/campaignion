@@ -86,7 +86,7 @@ function _campaignion_email_to_target_options_field_widget_form($item) {
   $element['dataset_name'] = [
     '#type' => 'hidden',
     '#attributes' => ['class' => ['datasets-app-selected-dataset']],
-    '#value' => $item['dataset_name'],
+    '#default_value' => $item['dataset_name'],
   ];
   $element['datasets_app'] = [
     '#type' => 'container',
