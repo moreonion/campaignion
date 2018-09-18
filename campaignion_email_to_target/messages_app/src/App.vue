@@ -2,6 +2,7 @@
   <div class="email-to-target-messages-widget e2tmw" data-interrupt-submit :data-has-unsaved-changes="unsavedChanges">
     <el-button @click="newSpec('message-template')">{{ text('Create message') }}</el-button>
     <el-button @click="newSpec('exclusion')">{{ text('Create exclusion') }}</el-button>
+    <div class="e2t-col"><p>{{ text('messages help') }}</p></div>
     <spec-list></spec-list>
     <section class="default-message">
       <message-editor :value="defaultMessage.message" @input="updateDefaultMessage" type="message-template">
@@ -20,7 +21,8 @@
 <script>
 import {mapState} from 'vuex'
 import {clone, dispatch, isEmptyMessage} from '@/utils'
-import {isEqual, omit} from 'lodash'
+import isEqual from 'lodash.isequal'
+import omit from 'lodash.omit'
 import SpecList from './components/SpecList'
 import MessageEditor from './components/MessageEditor'
 import TokensList from './components/TokensList'
@@ -64,6 +66,7 @@ export default {
   methods: {
     text (text) {
       switch (text) {
+        case 'messages help': return Drupal.t('Order your messages and exceptions below with the most specific messages at the top. The target will receive the first message that they meet the criteria for.')
         case 'Create message': return Drupal.t('Add specific message')
         case 'Create exclusion': return Drupal.t('Add exclusion')
         case 'message to remaining targets': return Drupal.t('Message to all remaining targets')
@@ -177,5 +180,8 @@ export default {
     padding: 0;
     margin: 0;
   }
+  .e2t-col {
+    margin-top: 1rem;
+  } 
 }
 </style>

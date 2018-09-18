@@ -1,6 +1,16 @@
 <?php
 
-function campaignion_activity_schema() { 
+/**
+ * @file
+ * Schema definitions and migration functions.
+ */
+
+use Drupal\campaignion_activity\WebformSubmission;
+
+/**
+ * Implements hook_schema().
+ */
+function campaignion_activity_schema() {
   $unsigned_int_not_null = array(
     'type' => 'int',
     'not null' => TRUE,
@@ -161,6 +171,16 @@ function campaignion_activity_schema() {
       'from_provider' => [
         'description' => 'Flag for whether the change was initiated by the provider',
       ] + $unsigned_int_not_null,
+      'optin_statement' => [
+        'description' => 'Opt-in statement',
+        'type' => 'text',
+        'not null' => FALSE,
+      ],
+      'remote_addr' => array(
+        'description' => 'The IP address of the user that optted in.',
+        'type' => 'varchar',
+        'length' => 128,
+      ),
     ],
     'primary key' => ['activity_id'],
     'indexes' => [
@@ -187,6 +207,28 @@ function campaignion_activity_schema() {
  */
 function campaignion_activity_uninstall() {
   variable_del('campaignion_activity_log_contact_save');
+}
+
+/**
+ * Add opt-in remote_addr logging to newsletter subscription activities.
+ */
+function campaignion_activity_update_7() {
+  db_add_field('campaignion_activity_newsletter_subscription', 'remote_addr', array(
+    'description' => 'The IP address of the user that optted in.',
+    'type' => 'varchar',
+    'length' => 128,
+  ));
+}
+
+/**
+ * Add opt-in statement to newsletter subscription activities.
+ */
+function campaignion_activity_update_6() {
+  db_add_field('campaignion_activity_newsletter_subscription', 'optin_statement', array(
+    'description' => 'Opt-in statement',
+    'type' => 'text',
+    'not null' => FALSE,
+  ));
 }
 
 /**
@@ -265,7 +307,7 @@ function campaignion_activity_update_2() {
   $sql = "SELECT activity_id FROM {campaignion_activity_webform} a INNER JOIN {campaignion_activity} ca USING(activity_id) INNER JOIN {webform_submissions} w USING(nid,sid) WHERE a.confirmed IS NULL AND w.confirmed=1 AND created>=1406851200 LIMIT 1000";
   while ($ids = db_query($sql)->fetchCol()) {
     foreach ($ids as $id) {
-      if ($activity = \Drupal\campaignion_activity\WebformSubmission::load($id)) {
+      if ($activity = WebformSubmission::load($id)) {
         $activity->confirmed = time();
         $activity->save();
       }
@@ -280,8 +322,12 @@ function campaignion_activity_update_1() {
   if (!module_exists('message')) {
     return;
   }
+  /**
+   * Ad-hoc EntityAPIController without cache.
+   */
   class NoCacheEntityController extends EntityAPIController {
     protected $cache = FALSE;
+
   }
 
   $sql = <<<SQL
@@ -303,9 +349,19 @@ SQL;
     $mids = db_query($sql)->fetchCol();
     drupal_static_reset();
   }
-  
-  module_disable(array('ae_engagement_scores', 'redhen_activity', 'redhen_engagement', 'message'));
-  drupal_uninstall_modules(array('ae_engagement_scores', 'redhen_activity', 'redhen_engagement', 'message'));
+
+  module_disable(array(
+    'ae_engagement_scores',
+    'redhen_activity',
+    'redhen_engagement',
+    'message',
+  ));
+  drupal_uninstall_modules(array(
+    'ae_engagement_scores',
+    'redhen_activity',
+    'redhen_engagement',
+    'message',
+  ));
 
   field_delete_field('message_redhen_contact');
   field_delete_field('message_redhen_org');

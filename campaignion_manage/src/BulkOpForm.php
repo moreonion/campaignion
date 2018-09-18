@@ -65,6 +65,12 @@ class BulkOpForm {
     }
     $op = $this->ops[$op_name];
     $op_parameters = isset($values['op-wrapper']['op'][$op_name]) ? $values['op-wrapper']['op'][$op_name] : NULL;
-    $op->apply($result, $op_parameters);
+    $messages = $op->apply($result, $op_parameters);
+
+    if (is_array($messages)) {
+      foreach ($messages as $msg) {
+        drupal_set_message($msg, 'error');
+      }
+    }
   }
 }

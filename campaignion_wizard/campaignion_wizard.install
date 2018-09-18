@@ -35,6 +35,15 @@ function campaignion_wizard_update_dependencies() {
 }
 
 /**
+ * Enable campaignion_vue if needed.
+ */
+function campaignion_wizard_update_6() {
+  if (!module_enable(['campaignion_vue'], TRUE)) {
+    throw new DrupalUpdateException('Unable to enable campaignion_vue.');
+  }
+}
+
+/**
  * Update the request_lifetime of all confirmation emails.
  */
 function campaignion_wizard_update_3() {

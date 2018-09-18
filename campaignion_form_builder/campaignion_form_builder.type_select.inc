@@ -49,14 +49,5 @@ function _campaignion_form_builder_form_builder_types_select() {
   $fields['email_newsletter']['title'] = t('Newsletter');
   $fields['email_newsletter']['default']['#form_builder']['element_type'] = 'checkboxes';
 
-  $fields['direct_mail_newsletter'] = $select_element(
-    ['name' => t('Direct Mail Newsletter'), 'value' => 1],
-    ['aslist' => FALSE, 'multiple' => TRUE],
-    ['1' => t("Yes, I'd like to get direct mail newsletters")],
-    -68
-  );
-  $fields['direct_mail_newsletter']['title'] = t('Snail Mail Opt-In');
-  $fields['direct_mail_newsletter']['default']['#form_builder']['element_type'] = 'checkboxes';
-
   return $fields;
 }

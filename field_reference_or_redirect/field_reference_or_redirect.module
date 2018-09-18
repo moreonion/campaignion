@@ -1,9 +1,9 @@
 <?php
+
 /**
  * @file
- * Implementation of the field field_reference_or_redirect
+ * Implementation of the reference_or_redirect field type.
  */
-
 
 /**
  * Implements hook_field_info().
@@ -22,6 +22,9 @@ function field_reference_or_redirect_field_info() {
   );
 }
 
+/**
+ * Implements hook_field_widget_info().
+ */
 function field_reference_or_redirect_field_widget_info() {
   $info['reference_or_redirect_widget'] = array(
     'label'       => t('Node Reference or Redirect URL widget'),
@@ -35,6 +38,9 @@ function field_reference_or_redirect_field_widget_info() {
   return $info;
 }
 
+/**
+ * Implements hook_field_formatter_info().
+ */
 function field_reference_or_redirect_field_formatter_info() {
   $info['reference_or_redirect_formatter'] = array(
     'label'       => t('Node Reference or Redirect URL widget'),
@@ -69,10 +75,11 @@ function field_reference_or_redirect_field_presave($entity_type, $entity, $field
 }
 
 /**
- * Prepare new node as a translation of an existing one
- * just like i18n_node/translation would do it.
+ * Prepare new node as a translation of an existing one.
  *
- * translation uses $_GET-parameters to get the source node
+ * This simulates the behavior of i18n_node/translation.
+ *
+ * Translation uses $_GET-parameters to get the source node
  * and the target language. So we need to emulate that.
  */
 function _field_reference_or_redirect_copy_node_for_translation($source, $target) {
@@ -91,7 +98,8 @@ function _field_reference_or_redirect_copy_node_for_translation($source, $target
   foreach (array('translation', 'target') as $key) {
     if (isset($original[$key])) {
       $_GET[$key] = $original[$key];
-    } else {
+    }
+    else {
       unset($_GET[$key]);
     }
   }
@@ -113,7 +121,8 @@ function field_reference_or_redirect_field_prepare_translation($entity_type, $en
         $nid = node_reference_find_translation($reference_node, $entity->language);
         if ($nid != $reference_node->nid) {
           $item['node_reference_nid'] = $nid;
-        } else {
+        }
+        else {
           $new_node = _field_reference_or_redirect_copy_node_for_translation($reference_node, $entity->language);
           $new_node->status = $entity->status;
           $item['node'] = $new_node;

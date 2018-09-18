@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import {clone, isEmptyMessage} from '@/utils'
 import {emptySpec, messageObj} from '@/utils/defaults'
-import {find} from 'lodash'
+import find from 'lodash.find'
 
 export default {
   initializeData (state, {messageSelection, targetAttributes, tokens, hardValidation}) {

@@ -22,16 +22,28 @@ class ActivityBase implements ActivityInterface {
       $this->original = clone $this;
     }
   }
-  
+
+  /**
+   * Load an activity by it’s id.
+   *
+   * @param int $activity_id
+   *   The ID of the activity to load.
+   */
   public static function load($activity_id) {
-    $activity = db_select('campaignion_activity', 'a')
-      ->fields('a')
-      ->condition('activity_id', $activity_id)
-      ->execute()
-      ->fetchObject(get_called_class());
-    return $activity;
+    $query = static::buildJoins();
+    $query->condition('a.activity_id', $activity_id);
+    return $query->execute()->fetchObject(static::class);
   }
-  
+
+  /**
+   * Build the database query for getting activities.
+   */
+  protected static function buildJoins() {
+    $query = db_select('campaignion_activity', 'a')
+      ->fields('a');
+    return $query;
+  }
+
   public function save() {
     if (isset($this->activity_id)) {
       $this->update();

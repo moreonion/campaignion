@@ -2,9 +2,9 @@
 
 namespace Drupal\campaignion_activity;
 
-use \Drupal\campaignion\ContactTypeManager;
-use \Drupal\campaignion\CRM\Import\Source\ArraySource;
-use \Drupal\campaignion_newsletters\Subscription;
+use Drupal\campaignion\ContactTypeManager;
+use Drupal\campaignion\CRM\Import\Source\ArraySource;
+use Drupal\campaignion_newsletters\Subscription;
 
 /**
  * Partial model object to store newsletter subscription data for activities.
@@ -16,6 +16,8 @@ class NewsletterSubscription extends ActivityBase {
   public $list_id;
   public $action;
   public $from_provider;
+  public $optin_statement;
+  public $remote_addr;
 
   /**
    * Create a new activity object from a subscription object.
@@ -38,6 +40,8 @@ class NewsletterSubscription extends ActivityBase {
       'list_id' => $subscription->list_id,
       'action' => $action,
       'from_provider' => (int) $from_provider,
+      'optin_statement' => $subscription->optin_statement,
+      'remote_addr' => self::getRemoteAddr(),
     ]);
   }
 
@@ -51,6 +55,16 @@ class NewsletterSubscription extends ActivityBase {
     $query = static::buildJoins();
     $query->condition('a.activity_id', $activity_id);
     return $query->execute()->fetchObject(static::class);
+  }
+
+  /**
+   * Get the IP address of the requesting client.
+   *
+   * @return string
+   *   Remote IP address
+   */
+  protected static function getRemoteAddr() {
+    return ip_address();
   }
 
   /**
@@ -75,6 +89,8 @@ class NewsletterSubscription extends ActivityBase {
         'list_id',
         'action',
         'from_provider',
+        'optin_statement',
+        'remote_addr',
       ]))
       ->execute();
   }
@@ -84,6 +100,8 @@ class NewsletterSubscription extends ActivityBase {
    */
   protected function update() {
     parent::update();
+    // `optin_statement` and `remote_addr` intentionally left out, as
+    // these are not supposed to be changed.
     db_update('campaignion_activity_newsletter_subscription')
       ->fields($this->values(['list_id', 'action', 'from_provider']))
       ->condition('activity_id', $this->activity_id)

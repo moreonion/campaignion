@@ -36,6 +36,16 @@ class AddressTest extends RedhenEntityTest {
   static protected function filteredData($keys) {
     return array_intersect_key(self::$testdata, array_flip($keys));
   }
+
+  /**
+   * Set up test data.
+   */
+  public function setUp() {
+    $this->importer = new Address('field_address', self::$mapping);
+    $this->contact = $this->newRedhenContact();
+    $this->fakeContact = $this->createMock('EntityMetadataWrapper');
+    $this->fakeContact->field_address = $this->contact->field_address[0];
+  }
   
   function testWithAllFields() {
     $importer = new Address('field_address', self::$mapping);
@@ -67,6 +77,43 @@ class AddressTest extends RedhenEntityTest {
     $this->assertFalse($importer->import(new ArraySource(self::$testdata), $entity), 'Import of identical datat returned TRUE twice.');
     $data = self::filteredData(array('street_address'));
     $this->assertFalse($importer->import(new ArraySource($data), $entity), 'Import of identical street_address/throughfare returned TRUE instead of FALSE.');
+  }
+
+  /**
+   * Test single-value field with full address.
+   */
+  public function testSingleFullAddress() {
+    $source = new ArraySource(self::$testdata);
+
+    // Import full address.
+    $changed = $this->importer->import($source, $this->fakeContact);
+    $this->assertTrue($changed);
+    $expected = $this->mapped(self::$testdata);
+    $this->assertEqual($expected, $this->contact->field_address->value()[0]);
+
+    // Setting again should not change anything.
+    $changed = $this->importer->import($source, $this->fakeContact);
+    $this->assertFalse($changed);
+  }
+
+  /**
+   * Test adding new data to existing address.
+   */
+  public function testSingleChangeAddress() {
+    // Import only country.
+    $data = self::filteredData(['country']);
+    $source = new ArraySource($data);
+    $expected = $this->mapped($data);
+    $changed = $this->importer->import($source, $this->fakeContact);
+    $this->assertTrue($changed);
+    $this->assertEqual($expected, $this->contact->field_address->value()[0]);
+
+    // Add rest of the address data.
+    $source = new ArraySource(self::$testdata);
+    $expected = $this->mapped(self::$testdata);
+    $changed = $this->importer->import($source, $this->fakeContact);
+    $this->assertTrue($changed);
+    $this->assertEqual($expected, $this->contact->field_address->value()[0]);
   }
 
 }

@@ -26,6 +26,10 @@ class Tagger {
    *
    * @return static
    *   An instance of this class.
+   *
+   * @throws \InvalidArgumentException
+   *   When $parent_uuid is not the UUID of an existing taxonomy term an
+   *   exception is thrown.
    */
   public static function byNameAndParentUuid($vocabulary_name, $parent_uuid = NULL, $reset = FALSE) {
     if (!isset(static::$instances[$vocabulary_name][$parent_uuid]) || $reset) {
@@ -33,6 +37,9 @@ class Tagger {
       if ($parent_uuid) {
         $ids = entity_get_id_by_uuid('taxonomy_term', [$parent_uuid]);
         $ptid = reset($ids);
+        if (!$ptid) {
+          throw new \InvalidArgumentException("Unknown parent term passed: $parent_uuid.");
+        }
       }
       $vid = taxonomy_vocabulary_machine_name_load($vocabulary_name)->vid;
       static::$instances[$vocabulary_name][$parent_uuid] = new static($vid, $ptid);
@@ -41,7 +48,7 @@ class Tagger {
   }
 
   /**
-   * Associative array mapping taxonomy term names to their tids.
+   * Associative array mapping normalized taxonomy term names to their tids.
    *
    * @var int[]
    */
@@ -69,13 +76,13 @@ class Tagger {
     $sql = 'SELECT tid, name FROM {taxonomy_term_data} INNER JOIN {taxonomy_term_hierarchy} USING(tid) WHERE vid=:vid AND parent=:parent';
     $result = db_query($sql, [
       ':vid' => $vid,
-      ':parent' => $parent_tid,
+      ':parent' => (int) $parent_tid,
     ]);
     foreach ($result as $row) {
-      $this->map[$row->name] = $row->tid;
+      $this->map[strtolower($row->name)] = $row->tid;
     }
     $this->vid = $vid;
-    $this->parentTid = $parent_tid;
+    $this->parentTid = (int) $parent_tid;
   }
 
   /**
@@ -102,7 +109,12 @@ class Tagger {
     }
 
     foreach ($tags as $tag) {
-      if (!isset($this->map[$tag])) {
+      // Normalize tags before searching for them:
+      // - Make tags case-insensitive. MySQL is set to be case-insensitive by
+      //   default.
+      // - Trim tags as they are trimmed by taxonomy_term_save().
+      $ltag = strtolower(trim($tag));
+      if (!isset($this->map[$ltag])) {
         if ($add) {
           $term = entity_create('taxonomy_term', [
             'name' => $tag,
@@ -110,13 +122,13 @@ class Tagger {
             'parent' => $this->parentTid,
           ]);
           entity_save('taxonomy_term', $term);
-          $this->map[$tag] = $term->tid;
+          $this->map[$ltag] = $term->tid;
         }
         else {
           continue;
         }
       }
-      $tid = $this->map[$tag];
+      $tid = $this->map[$ltag];
       if (!isset($items[$tid])) {
         $changed = TRUE;
         $items[$tid] = ['tid' => $tid];

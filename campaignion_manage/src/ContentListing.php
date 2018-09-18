@@ -127,11 +127,14 @@ class ContentListing {
       }
     }
     foreach (array($edit_path_part => t('Edit'), 'translate' => t('Translate'), 'view' => t('View page'), 'delete' => t('Delete')) as $path => $title) {
-      $links[$path] = array(
-        'href' => "node/{$node->nid}/$path",
-        'title' => $title,
-        'query' => array('destination' => 'admin/manage/content_and_actions')
-      );
+      $action = in_array($path, ['wizard', 'edit']) ? 'update' : $path;
+      if (node_access($action, $node)) {
+        $links[$path] = array(
+          'href' => "node/{$node->nid}/$path",
+          'title' => $title,
+          'query' => array('destination' => 'admin/manage/content_and_actions')
+        );
+      }
     }
     return $links;
   }

@@ -19,12 +19,21 @@ STR;
     $element['warn']['message']['#markup'] = t($message, array('!count' => '<span class="bulkop-count"></span>'));
   }
   public function apply($nids, $values) {
+    $messages = [];
     $nodes = node_load_multiple($nids);
+
     foreach ($nodes as $node) {
       if (!$node->status) {
-        node_publish_action($node);
-        node_save($node);
+        if (node_access('update', $node)) {
+          node_publish_action($node);
+          node_save($node);
+        }
+        else {
+          array_push($messages, t("Could not publish '!node' due to lacking permissions.", ['!node' => $node->title]));
+        }
       }
     }
+
+    return $messages;
   }
 }

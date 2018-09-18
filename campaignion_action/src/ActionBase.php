@@ -2,6 +2,10 @@
 
 namespace Drupal\campaignion_action;
 
+use Drupal\campaignion_action\Redirects\Redirect;
+use Drupal\little_helpers\Webform\Webform;
+use Drupal\little_helpers\Webform\Submission;
+
 class ActionBase {
   protected $type;
   protected $node;
@@ -100,6 +104,29 @@ class ActionBase {
       '#path' => $l->path,
       '#options' => ['query' => $l->hashedQuery()] + $options,
     ];
+  }
+
+  /**
+   * Evaluate the redirect logic.
+   */
+  public function redirect(Submission $submission, $delta) {
+    $field = $this->type->parameters['thank_you_page']['reference'];
+
+    $item = field_get_items('node', $this->node, $field)[$delta];
+    switch ($item['type']) {
+      case 'node':
+        $o = ['query' => [], 'fragment' => ''];
+        return ["node/{$item['node_reference_nid']}", $o];
+
+      case 'redirect':
+        $redirects = Redirect::byNid($this->node->nid, $delta);
+        foreach ($redirects as $r) {
+          if ($r->checkFilters($submission)) {
+            return $r->normalized();
+          }
+        }
+        break;
+    }
   }
 
 }

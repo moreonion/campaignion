@@ -85,7 +85,7 @@ class MenuFileParser {
 
     // Set default language
     $langs = array_keys(language_list());
-    $path = '';
+    $path = 'node';
 
     // JSON is used.
     if (($json_start = strpos($line, '{"')) != 0) {
@@ -100,7 +100,7 @@ class MenuFileParser {
       }
 
       // Extract details.
-      $path              = !empty($details->url) ? trim($details->url) : '';
+      $path              = !empty($details->url) ? trim($details->url) : $path;
       $item->description = !empty($details->description) ? trim($details->description) : '';
       $item->expanded    = !empty($details->expanded);
       $item->hidden      = !empty($details->hidden);

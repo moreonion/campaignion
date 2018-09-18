@@ -1,16 +1,17 @@
 <?php
+
 /**
  * @file
  * Campaignion newsletter module.
  */
 
-use \Drupal\campaignion_newsletters\CronRunner;
-use \Drupal\campaignion_newsletters\ProviderFactory;
-use \Drupal\campaignion_newsletters\FormSubmission;
-use \Drupal\campaignion_newsletters\Subscription;
-use \Drupal\campaignion_newsletters\Subscriptions;
-use \Drupal\campaignion\CRM\Import\Source\WebformSubmission;
-use \Drupal\little_helpers\Webform\Submission;
+use Drupal\campaignion_newsletters\Component;
+use Drupal\campaignion_newsletters\CronRunner;
+use Drupal\campaignion_newsletters\ProviderFactory;
+use Drupal\campaignion_newsletters\FormBuilderElementNewsletter;
+use Drupal\campaignion_newsletters\Subscriptions;
+use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Implements hook_cron().
@@ -36,32 +37,32 @@ function _campaignion_newsletters_poll() {
  * Implements hook_permission().
  */
 function campaignion_newsletters_permission() {
-  return array(
-    'administer newsletters' => array(
+  return [
+    'administer newsletters' => [
       'title' => t('Administer Newsletters'),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
  * Implements hook_menu().
  */
 function campaignion_newsletters_menu() {
-  $items['admin/config/services/campaignion_newsletters'] = array(
-    'title' => t('Newsletter settings'),
-    'description' => t('Configure newsletter API behavior'),
+  $items['admin/config/services/campaignion_newsletters'] = [
+    'title' => 'Newsletter settings',
+    'description' => 'Configure newsletter API behavior',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('campaignion_newsletters_admin_settings'),
-    'access arguments' => array('administer newsletters'),
+    'page arguments' => ['campaignion_newsletters_admin_settings'],
+    'access arguments' => ['administer newsletters'],
     'file' => 'includes/pages.php',
     'type' => MENU_NORMAL_ITEM,
-  );
+  ];
   return $items;
 }
 
-
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
  * Implements hook_form_redhen_contact_contact_form_alter().
  */
 function campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form, &$form_state) {
@@ -73,17 +74,83 @@ function campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form, 
  * Implements hook_webform_component_info().
  */
 function campaignion_newsletters_webform_component_info() {
-  return array(
-    'newsletter' => array(
-      'label' => t('Newsletter Subscription'),
-      'description' => t('Offers a user to subscribe to a given newsletter.'),
-      'features' => array(
-        'conditional' => TRUE,
-        'description' => FALSE,
-      ),
-      'file' => 'campaignion_newsletters.component.inc',
-    ),
-  );
+  $info['newsletter'] = [
+    'label' => t('Newsletter Subscription'),
+    'description' => t('Offers a user to subscribe to a given newsletter.'),
+    'features' => [
+      'conditional' => TRUE,
+    ],
+    'file' => 'campaignion_newsletters.component.inc',
+    'conditional_type' => 'newsletter',
+  ];
+  return $info;
+}
+
+/**
+ * Implements hook_webform_conditional_operator_info().
+ */
+function campaignion_newsletters_webform_conditional_operator_info() {
+  $operators['newsletter']['equal'] = [
+    'label' => t('is'),
+    'comparison callback' => '_webform_conditional_comparison_newsletter_equal',
+    'js comparison callback' => 'conditionalOperatorNewsletterEqual',
+    'form callback' => 'campaignion_newsletters_webform_conditional_form',
+  ];
+  $operators['newsletter']['not_equal'] = [
+    'label' => t('is not'),
+    'comparison callback' => '_webform_conditional_comparison_newsletter_not_equal',
+    'js comparison callback' => 'conditionalOperatorNewsletterNotEqual',
+    'form callback' => 'campaignion_newsletters_webform_conditional_form',
+  ];
+  return $operators;
+}
+
+/**
+ * Form callback for newsletter conditionals.
+ */
+function campaignion_newsletters_webform_conditional_form($node) {
+  $forms = [];
+  foreach ($node->webform['components'] as $cid => $component) {
+    if (webform_component_property($component['type'], 'conditional_type') == 'newsletter') {
+      $options = [];
+      // Checkbox options.
+      if ($component['extra']['display'] == 'checkbox') {
+        $options['checkbox:opt-in'] = t('Checkbox opt-in');
+        $options['checkbox:no-change'] = t('Checkbox no change');
+      }
+      // Radio options.
+      elseif ($component['extra']['display'] == 'radios') {
+        $options['radios:opt-in'] = t('Radio opt-in');
+        if (!empty($component['extra']['no_is_optout'])) {
+          $options['radios:opt-out'] = t('Radio opt-out');
+        }
+        else {
+          $options['radios:no-change'] = t('Radio no change');
+        }
+        $options['radios:not-selected'] = t('Radio not selected (no change)');
+      }
+      $element = [
+        '#type' => 'select',
+        '#options' => $options,
+      ];
+      $forms[$cid] = drupal_render($element);
+    }
+  }
+  return $forms;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for webform_client_form().
+ *
+ * Load the JavaScript needed for same-page conditionals.
+ */
+function campaignion_newsletters_form_webform_client_form_alter(&$form, &$form_state) {
+  // Webfrom (4.16) provides no concise way to test whether a component with the
+  // 'newsletter' conditional type is the source for a same-page conditional on
+  // the current webform page. For simplicity we simply do the same as webform
+  // does: Load the JavaScript for every webform.
+  $path = drupal_get_path('module', 'campaignion_newsletters');
+  $form['#attached']['js'][] = "$path/campaignion_newsletters.conditionals.js";
 }
 
 /**
@@ -91,25 +158,12 @@ function campaignion_newsletters_webform_component_info() {
  */
 function campaignion_newsletters_webform_submission_confirmed(Submission $submission) {
   $s = new WebformSubmission($submission->node, $submission);
-  // use value of the component with key 'email' as email address
+  // Use value of the component with key 'email' as email address.
   if (!($email = $s->value('email'))) {
     return;
   }
   foreach ($s->webform->componentsByType('newsletter') as $component) {
-    if ($s->valueByCid($component['cid'])) {
-      $needs_opt_in = !$component['extra']['opt_in_implied'];
-      foreach ($component['extra']['lists'] as $list_id => $value) {
-        if (!empty($value)) {
-          $subscription = Subscription::byData($list_id, $email);
-          $subscription->delete = FALSE;
-          $subscription->source = $s;
-          $subscription->needs_opt_in = $needs_opt_in;
-          $subscription->send_welcome = (bool) $component['extra']['send_welcome'];
-          $subscription->optin_info = FormSubmission::fromWebformSubmission($s);
-          $subscription->save();
-        }
-      }
-    }
+    Component::fromComponent($component)->submit($email, $s);
   }
 }
 
@@ -118,17 +172,22 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
  *
  * Defines a new form_builder field:
  * - 'title'
- * - in which ['palette_group'] it appears. @see hook_form_builder_palette_groups().
- * - it's ['default'] representation (is used when dragging it into the preview area) including:
- *   - ['#webform_component'] the component array for webform (most important it's ['#webform_component']['type'].
- *     @see hook_webform_component_info().
- *   - ['#type'] the form-API type is used as the default form_builder element_type.
- *     @see hook_element_info().
+ * - in which ['palette_group'] it appears.
+ * - it's ['default'] representation (is used when dragging it into the preview
+ *   area) including:
+ *   - ['#webform_component'] the component array for webform (most important
+ *     it's ['#webform_component']['type'].
+ *   - ['#type'] the form-API type is used as the default form_builder
+ *     element_type.
  *   - ['#form_builder'] the form_builder type (again).
- *     @see hook_form_builder_element_types().
  * - whether or not the field is ['unique'].
  *
  * Fields are defined per form_type (so far only 'webform' is relevant for us).
+ *
+ * @see hook_form_builder_palette_groups()
+ * @see hook_webform_component_info()
+ * @see hook_element_info()
+ * @see hook_form_builder_element_types()
  */
 function campaignion_newsletters_form_builder_element_types($form_type, $form_id) {
   if ($form_type != 'webform') {
@@ -136,16 +195,16 @@ function campaignion_newsletters_form_builder_element_types($form_type, $form_id
   }
   require_once dirname(__FILE__) . '/campaignion_newsletters.component.inc';
   $map = _form_builder_webform_property_map('newsletter');
-  // default value is handled by the newsletter property.
+  // Default value is handled by the newsletter property.
   unset($map['properties']['default_value']);
-  unset($map['properties']['description']);
-  $fields['newsletter'] = array(
+  $fields['newsletter'] = [
     'title' => t('Newsletter'),
+    'class' => FormBuilderElementNewsletter::class,
     'properties' => array_keys($map['properties']),
-    'default' =>  array(
-      '#form_builder' => array('element_type' => 'newsletter'),
-    ) + _form_builder_webform_default('newsletter'),
-  );
+    'default' => [
+      '#form_builder' => ['element_type' => 'newsletter'],
+    ] + _form_builder_webform_default('newsletter'),
+  ];
   return $fields;
 }
 
@@ -204,12 +263,12 @@ function campaignion_newsletters_entity_delete($entity, $entity_type) {
  * Implements hook_cronapi().
  */
 function campaignion_newsletters_cronapi($op, $job = NULL) {
-  $items['campaignion_newsletters_send_queue'] = array(
+  $items['campaignion_newsletters_send_queue'] = [
     'description' => 'Send queue data to newsletter providers',
     'rule' => '*/2+@ * * * *',
     'weight' => 100,
     'callback' => [CronRunner::class, 'cronSendQueue'],
-  );
+  ];
   $items['campaignion_newsletters_poll_subscriptions'] = [
     'descriptions' => 'Let providers poll their subscriptions in order to cach changes from the provider side.',
     'rule' => '*/2+@ * * * *',

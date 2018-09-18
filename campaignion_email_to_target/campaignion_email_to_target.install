@@ -5,6 +5,9 @@
  * campaignion_email_to_target.install
  */
 
+use Drupal\campaignion_email_to_target\Api\Client;
+use Drupal\campaignion_email_to_target\Api\ConfigError;
+
 /**
  * Implements hook_schema()
  */
@@ -132,6 +135,39 @@ function campaignion_email_to_target_field_schema($field) {
  */
 function campaignion_email_to_target_enable() {
   variable_set('cache_class_cache_token', '\\Drupal\\campaignion_email_to_target\\NullCacheBin');
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function campaignion_email_to_target_requirements($phase) {
+  if ($phase == 'runtime') {
+    $requirements['e2t_api']['title'] = 'Email to target API connection.';
+    try {
+      Client::fromConfig();
+      $requirements['e2t_api'] += [
+        'severity' => REQUIREMENT_OK,
+        'description' => t('e2t API connection is configured.'),
+      ];
+    }
+    catch (ConfigError $e) {
+      $requirements['e2t_api'] += [
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $e->getMessage(),
+      ];
+    }
+    return $requirements;
+  }
+}
+
+/**
+ * Enable the variable module.
+ */
+function campaignion_email_to_target_update_8() {
+  if (!module_enable(['variable'])) {
+    $err = 'Could not enable variable.';
+    throw new \DrupalUpdateException($err);
+  }
 }
 
 /**

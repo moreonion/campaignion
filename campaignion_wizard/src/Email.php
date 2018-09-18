@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_wizard;
 
+require_once drupal_get_path('module', 'webform') . '/includes/webform.emails.inc';
+
 /**
  * @TODO: This class shouldn't be part of the wizard!
  */
@@ -18,7 +20,7 @@ class Email {
     $this->is_new  = !isset($node->webform['emails'][$eid]);
   }
 
-  protected function &getEmailForm(&$form_state) {
+  protected function getEmailForm(&$form_state) {
     $load_eid = $this->is_new ? 'new' : $this->eid;
     $email = webform_email_load($load_eid, $this->node->nid);
 
@@ -73,7 +75,6 @@ class Email {
     $email_form['template']['template']['#type']         = 'text_format';
     $email_form['template']['template']['#format']       = $email['html'] ? $formats['html'] : $formats['plain'];
     $email_form['template']['template']['#wysiwyg']      = TRUE;
-    $email_form['template']['template']['#pre_render'][] = 'wysiwyg_pre_render_text_format';
     // needed for ['template']['tokens'] which does not load js via #collapsible
     // tokens it is only html markup
     drupal_add_library("system", "drupal.collapse");
@@ -84,10 +85,16 @@ class Email {
       'data' => $settings,
     );
     $email_form['#attached']['js'][] = drupal_get_path('module', 'campaignion_wizard') . '/js/email-text-format.js';
+
+    // Make this sub-form alterable by other modules.
+    $form_id = 'campaignion_wizard_email_form';
+    $hooks = ['form', "form_$form_id"];
+    drupal_alter($hooks, $email_form, $form_state, $form_id);
+
     return $email_form;
   }
 
-  public function form($messages, &$form_state) {
+  public function form(array $message, array &$form_state) {
     $form[$this->form_id . '_toggle'] = array(
       '#type'        => 'fieldset',
     );
@@ -99,7 +106,7 @@ class Email {
     $checkbox_id = drupal_html_id($this->form_id . '_checkbox');
     $form[$this->form_id . '_toggle'][$this->form_id . '_check'] = array(
       '#type'          => 'checkbox',
-      '#title'         => $messages['toggle_title'],
+      '#title'         => $message['toggle_title'],
       '#id'            => $checkbox_id,
       '#return_value'  => 1,
       '#default_value' => $enabled,
@@ -107,7 +114,7 @@ class Email {
 
     $form[$this->form_id . '_email'] = array(
       '#type'        => 'fieldset',
-      '#title'       => $messages['email_title'],
+      '#title'       => $message['email_title'],
       '#attributes'  => array('class' => array('email-wrapper')),
       '#states' => array(
         'visible' => array(   // action to take.

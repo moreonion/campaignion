@@ -26,4 +26,40 @@ class SubscriptionTest extends \DrupalWebTestCase {
     Subscription::fromData(4711, 'this@doesnot.exist')->delete();
   }
 
+  /**
+   * Test that a proper QueueItem exists a user does first opt-out then opt-in.
+   */
+  public function testOptOutThenOptIn() {
+    $email = 'bydataduplicate@test.com';
+    $list_id = 4711;
+    $provider = $this->createMock(ProviderInterface::class);
+    $provider->method('data')->willReturn([['data'], 'fingerprint']);
+    $s = $this->getMockBuilder(Subscription::class)
+      ->setMethods(['provider'])
+      ->setConstructorArgs([[
+        'list_id' => $list_id,
+        'email' => $email,
+      ], TRUE])
+      ->getMock();
+    $s->method('provider')->willReturn($provider);
+
+    // Initial opt-in.
+    $s->save(TRUE);
+    // Opt-out.
+    $s->delete();
+
+    // New unsubscribe QueueItem.
+    $item = QueueItem::load($list_id, $email);
+    $this->assertEqual(QueueItem::UNSUBSCRIBE, $item->action);
+    $this->assertNull($item->data);
+
+    // Opt-in again.
+    $s->save();
+
+    // QueueItem was changed into a subscription again.
+    $item = QueueItem::load($list_id, $email);
+    $this->assertEqual(QueueItem::SUBSCRIBE, $item->action);
+    $this->assertEqual(['data'], $item->data);
+  }
+
 }

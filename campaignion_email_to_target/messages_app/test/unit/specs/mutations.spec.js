@@ -1,7 +1,7 @@
 import mutations from '@/store/mutations'
 import initialState from '@/store/state'
 import testData from '../fixtures/example-data'
-import {find} from 'lodash'
+import find from 'lodash.find'
 
 describe('mutations', function () {
   var state
