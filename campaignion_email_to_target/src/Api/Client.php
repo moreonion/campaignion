@@ -96,22 +96,17 @@ class Client extends _Client {
    *
    * @param string $dataset_key
    *   The key of the dataset which’s targets we want to query.
-   * @param string|null $selector
-   *   An optional selector to narrow down the number of targets. The meaning
-   *   of this selector depends on the dataset.
+   * @param string[] $selector
+   *   An associate array of URL query parameters used as filters to narrow down
+   *   the number of targets. The meaning of the filters depends on the dataset.
    *
    * @param array
-   *   A nested array of targets.
+   *   An array of targets.
    */
   public function getTargets($dataset_key, $selector) {
     $ds = $this->getDataset($dataset_key);
     try {
-      if ($ds->isCustom) {
-        return $this->getAllTargets($dataset_key);
-      }
-      else {
-        return $this->getTargetsByPostcode($dataset_key, $selector);
-      }
+      return $this->get("$dataset_key/select", ['query' => $selector]);
     }
     catch (HttpError $e) {
       if (in_array($e->getCode(), [400, 404])) {
@@ -122,27 +117,8 @@ class Client extends _Client {
   }
 
   /**
-   * Gets all contacts for a dataset.
-   *
-   * This should only be used for custom datasets.
-   *
-   * @param string $dataset_key
-   *   The key of the dataset.
-   *
-   * @param array
-   *   A nested array of targets.
+   * Get a JWT access token for client-side access.
    */
-  protected function getAllTargets($dataset_key) {
-    $targets = $this->get("$dataset_key/contact");
-    $constituences[]['contacts'] = $targets;
-    return $constituences;
-  }
-
-  public function getTargetsByPostcode($dataset_key, $postcode) {
-    $postcode = urlencode($postcode);
-    return $this->get("$dataset_key/postcode/$postcode");
-  }
-
   public function getAccessToken() {
     $res = $this->post('access-token');
     return $res['access_token'];

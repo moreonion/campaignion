@@ -2,9 +2,10 @@
 
 namespace Drupal\campaignion_email_to_target;
 
-use \Drupal\campaignion_action\ActionBase;
-use \Drupal\campaignion_action\TypeInterface;
-use \Drupal\campaignion_email_to_target\Api\Client;
+use Drupal\campaignion_action\ActionBase;
+use Drupal\campaignion_action\TypeInterface;
+use Drupal\campaignion_email_to_target\Api\Client;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Defines special behavior for email to target actions.
@@ -87,6 +88,35 @@ class Action extends ActionBase {
   }
 
   /**
+   * Build selector for querying targets.
+   *
+   * @param \Drupal\little_helpers\Webform\Submission $submission
+   *   A webform submission object used to determine the selector values.
+   *
+   * @return string[]
+   *   Query parameters used for filtering targets.
+   *
+   * For the moment the chosen selector as well as the filter mapping is
+   * hard-coded.
+   *
+   * @TODO: Make the selector configurable for datasets with more than one
+   * possible selector.
+   * @TODO: Make the mapping of form_keys to filter values configurable.
+   */
+  public function buildSelector(Submission $submission) {
+    $dataset = $this->api->getDataset($this->options['dataset_name']);
+    $selector_metadata = reset($dataset->selectors);
+    $selector = [];
+    foreach (array_keys($selector_metadata['filters']) as $filter_name) {
+      $selector[$filter_name] = $submission->valueByKey($filter_name);
+    }
+    if (isset($selector['postcode'])) {
+      $selector['postcode'] = preg_replace('/[ -]/', '', $selector['postcode']);
+    }
+    return $selector;
+  }
+
+  /**
    * Generate target message pairs for a submission.
    *
    * @param \Drupal\little_helpers\Webform\Submission $submission_o
@@ -100,14 +130,18 @@ class Action extends ActionBase {
    *   2. The element that should be rendered if no target was found.
    */
   public function targetMessagePairs($submission_o, $test_mode = FALSE) {
-    $dataset = $this->options['dataset_name'];
     $email_override = $test_mode ? $submission_o->valueByKey('email') : NULL;
-    $postcode = preg_replace('/[ -]/', '', $submission_o->valueByKey('postcode'));
-    $constituencies = $this->api->getTargets($dataset, $postcode);
 
     $pairs = [];
     $no_target_message = NULL;
-    foreach ($constituencies as $constituency) {
+
+    $selector = $this->buildSelector($submission_o);
+    $contacts = $this->api->getTargets($this->options['dataset_name'], $selector);
+
+    foreach ($contacts as $target) {
+      $target += ['constituency' => []];
+      $constituency = $target['constituency'];
+      unset($target['constituency']);
       if ($exclusion = $this->getExclusion($constituency)) {
         $exclusion->replaceTokens([], $constituency, $submission_o);
         if (!$no_target_message) {
@@ -115,30 +149,32 @@ class Action extends ActionBase {
         }
         continue;
       }
-      $targets = $constituency['contacts'];
-      foreach ($targets as $target) {
-        if ($message = $this->getMessage($target, $constituency)) {
-          if ($email_override) {
-            $target['email'] = $email_override;
+      if (!$target) {
+        // This was an empty contact record only used to send an empty
+        // constituency.
+        continue;
+      }
+      if ($message = $this->getMessage($target, $constituency)) {
+        if ($email_override) {
+          $target['email'] = $email_override;
+        }
+        $message->replaceTokens($target, $constituency, $submission_o);
+        if ($message->type == 'exclusion') {
+          // The first exclusion-message is used.
+          if (!$no_target_message) {
+            $no_target_message = $message->message;
           }
-          $message->replaceTokens($target, $constituency, $submission_o);
-          if ($message->type == 'exclusion') {
-            // The first exclusion-message is used.
-            if (!$no_target_message) {
-              $no_target_message = $message->message;
-            }
-          }
-          else {
-            $pairs[] = [$target, $constituency, $message];
-          }
+        }
+        else {
+          $pairs[] = [$target, $constituency, $message];
         }
       }
     }
 
     if (empty($pairs)) {
-      watchdog('campaignion_email_to_target', 'The API found no targets (dataset=@dataset, postcode=@postcode).', [
+      watchdog('campaignion_email_to_target', 'The API found no targets (dataset=@dataset, selector=@selector).', [
         '@dataset' => $this->options['dataset_name'],
-        '@postcode' => $postcode,
+        '@selector' => drupal_http_build_query($selector),
       ], WATCHDOG_WARNING);
     }
 

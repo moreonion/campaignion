@@ -16,6 +16,10 @@ class ActionTest extends \DrupalUnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $api->method('getTargets')->will($this->returnValue($targets));
+    $api->method('getDataset')->will($this->returnValue((object) [
+      'dataset_name' => 'test_dataset',
+      'selectors' => [['title' => 'test_selector', 'filters' => []]],
+    ]));
     $node = (object) ['nid' => 47114711];
     $type = new TypeBase('test');
     $action = $this->getMockBuilder(Action::class)
@@ -23,7 +27,7 @@ class ActionTest extends \DrupalUnitTestCase {
       ->setMethods(['getOptions', 'getExclusion', 'getMessage'])
       ->getMock();
     $action->method('getOptions')->will($this->returnValue([
-      'dataset_name' => 'mp',
+      'dataset_name' => 'test_dataset',
     ]));
     $submission_o = $this->getMockBuilder(Submission::class)
       ->disableOriginalConstructor()
@@ -45,24 +49,14 @@ class ActionTest extends \DrupalUnitTestCase {
    * Test targetMessagePairs() with messages and all types of exclusions.
    */
   public function testTargetMessagePairs() {
+    $c1 = ['name' => 'Constituency 1'];
     $contacts = [
-      ['first_name' => 'Alice'],
-      ['first_name' => 'Bob'],
-      ['first_name' => 'Claire'],
+      ['first_name' => 'Alice', 'constituency' => $c1],
+      ['first_name' => 'Bob', 'constituency' => $c1],
+      ['first_name' => 'Claire', 'constituency' => $c1],
+      ['first_name' => 'David', 'constituency' => ['name' => 'Excluded']],
     ];
-    $c1 = [
-      'name' => 'Constituency 1',
-      'contacts' => $contacts,
-    ];
-    list($action, $api, $submission_o) = $this->mockAction([
-      $c1,
-      [
-        'name' => 'Excluded',
-        'contacts' => [
-          ['first_name' => 'David'],
-        ]
-      ],
-    ]);
+    list($action, $api, $submission_o) = $this->mockAction($contacts);
     $m = $this->createMessage([
       'type' => 'message',
       'label' => 'Default message',
@@ -90,7 +84,10 @@ class ActionTest extends \DrupalUnitTestCase {
         ]);
       }
     }));
-    list($pairs, $no_target_element) = $action->TargetMessagePairs($submission_o);
+    list($pairs, $no_target_element) = $action->targetMessagePairs($submission_o);
+    foreach ($contacts as &$c) {
+      unset($c['constituency']);
+    }
     $this->assertEqual([[$contacts[0], $c1, $m], [$contacts[2], $c1, $m]], $pairs);
     $this->assertEqual(['#markup' => "<p>excluded first!</p>\n"], $no_target_element);
   }
