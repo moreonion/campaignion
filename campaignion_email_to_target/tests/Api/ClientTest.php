@@ -7,6 +7,14 @@ namespace Drupal\campaignion_email_to_target\Api;
  */
 class ClientTest extends \DrupalUnitTestCase {
 
+  protected $dataset = [
+    'key' => 'test',
+    'title' => 'Test',
+    'description' => '',
+    'attributes' => [],
+    'is_custom' => FALSE,
+  ];
+
   /**
    * Reset static cache.
    */
@@ -32,7 +40,7 @@ class ClientTest extends \DrupalUnitTestCase {
     $api = $this->instrumentedApi();
     $api->expects($this->once())
       ->method('send')
-      ->will($this->returnValue(['key' => 'test', 'attributes' => []]));
+      ->will($this->returnValue($this->dataset));
     $api->getDataset('test');
     $api->getDataset('test');
   }
@@ -44,7 +52,7 @@ class ClientTest extends \DrupalUnitTestCase {
     $api = $this->instrumentedApi();
     $api->expects($this->once())
       ->method('send')
-      ->will($this->returnValue(['key' => 'test', 'attributes' => []]));
+      ->will($this->returnValue($this->dataset));
     $api->getDataset('test');
 
     $api2 = $this->instrumentedApi();
