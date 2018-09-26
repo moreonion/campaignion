@@ -1,7 +1,7 @@
 (function() {
 
   var el, iframe, i, script, messageHandler, element, container, options, xdomain,
-  resize = window.IframeResize = {};
+  resize = window.IframeResize = {},
   id = 'iframe-4ee0adbddd0ca',
   props = {
     src : '',
@@ -23,7 +23,7 @@
     var height, r,
       regex = new RegExp(xdomain + '$'),
       matches = e.origin.match(regex);
-    if(matches.length == 1){
+    if(matches){
       strD = e.data + "";
       r = strD.match(/^(\d+)(s?)$/);
       if(r && r.length == 3){
@@ -55,7 +55,7 @@
   },
   setup = function(options) {
     options = options || {};
-    xdomain = options.domain || '*';
+    xdomain = options.domain || '.*';
     element = options.element || 'iframe-embed';
     container = document.getElementById(element);
     el = !ie ? 'iframe' : '<iframe name="' + element + '"></iframe>';
