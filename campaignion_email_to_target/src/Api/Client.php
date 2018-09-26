@@ -2,18 +2,24 @@
 
 namespace Drupal\campaignion_email_to_target\Api;
 
-use \Dflydev\Hawk\Credentials\Credentials;
-use \Dflydev\Hawk\Client\ClientBuilder;
+use Dflydev\Hawk\Credentials\Credentials;
+use Dflydev\Hawk\Client\ClientBuilder;
 
-use \Drupal\little_helpers\Rest\Client as _Client;
-use \Drupal\little_helpers\Rest\HttpError;
+use Drupal\little_helpers\Rest\Client as _Client;
+use Drupal\little_helpers\Rest\HttpError;
 
+/**
+ * API client for the e2t-api service.
+ */
 class Client extends _Client {
-  CONST API_VERSION = 'v2';
+  const API_VERSION = 'v2';
   protected $hawk;
   protected $credentials;
   protected $datasets;
 
+  /**
+   * Create a new instance from global configuration.
+   */
   public static function fromConfig() {
     $c = variable_get('campaignion_email_to_target_credentials', []);
     foreach (['url', 'public_key', 'secret_key'] as $v) {
@@ -27,6 +33,16 @@ class Client extends _Client {
     return new static($c['url'], $c['public_key'], $c['secret_key']);
   }
 
+  /**
+   * Create a new instance.
+   *
+   * @param string $url
+   *   The URL for the API endpoint (withut the version prefix).
+   * @param string $pk
+   *   The public API-key used for HAWK authentication.
+   * @param string $sk
+   *   The secret API-key used for HAWK authentication.
+   */
   public function __construct($url, $pk, $sk) {
     parent::__construct($url . '/' . static::API_VERSION);
     $this->credentials = new Credentials($sk, 'sha256', $pk);
@@ -100,10 +116,10 @@ class Client extends _Client {
    *   An associate array of URL query parameters used as filters to narrow down
    *   the number of targets. The meaning of the filters depends on the dataset.
    *
-   * @param array
+   * @return array
    *   An array of targets.
    */
-  public function getTargets($dataset_key, $selector) {
+  public function getTargets($dataset_key, array $selector) {
     try {
       return $this->get("$dataset_key/select", $selector);
     }
