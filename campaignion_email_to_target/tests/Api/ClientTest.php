@@ -60,4 +60,16 @@ class ClientTest extends \DrupalUnitTestCase {
     $api2->getDataset('test');
   }
 
+  /**
+   * Test that selectors are properly encoded as query parameters.
+   */
+  public function testSelectorQueryParameters() {
+    $api = $this->instrumentedApi();
+    $args = ['foo' => 1, 'bar' => 'baz'];
+    $api->expects($this->once())
+      ->method('send')
+      ->with($this->equalTo('test-dataset/select'), $this->equalTo($args));
+    $api->getTargets('test-dataset', $args);
+  }
+
 }

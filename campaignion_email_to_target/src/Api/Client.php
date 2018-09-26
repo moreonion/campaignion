@@ -104,9 +104,8 @@ class Client extends _Client {
    *   An array of targets.
    */
   public function getTargets($dataset_key, $selector) {
-    $ds = $this->getDataset($dataset_key);
     try {
-      return $this->get("$dataset_key/select", ['query' => $selector]);
+      return $this->get("$dataset_key/select", $selector);
     }
     catch (HttpError $e) {
       if (in_array($e->getCode(), [400, 404])) {
