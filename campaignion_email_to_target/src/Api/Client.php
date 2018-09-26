@@ -12,6 +12,7 @@ class Client extends _Client {
   CONST API_VERSION = 'v2';
   protected $hawk;
   protected $credentials;
+  protected $datasets;
 
   public static function fromConfig() {
     $c = variable_get('campaignion_email_to_target_credentials', []);
@@ -30,6 +31,7 @@ class Client extends _Client {
     parent::__construct($url . '/' . static::API_VERSION);
     $this->credentials = new Credentials($sk, 'sha256', $pk);
     $this->hawk = ClientBuilder::create()->build();
+    $this->datasets = &drupal_static(__CLASS__ . '.datasets', []);
   }
 
   /**
@@ -58,22 +60,35 @@ class Client extends _Client {
     return parent::sendRequest($url, $options);
   }
 
+  /**
+   * Get all datasets from the API.
+   *
+   * @return \Drupal\campaignion_email_to_target\Api\Dataset[]
+   *   An array of datasets keyed by their machine names.
+   */
   public function getDatasetList() {
-    $datasets = [];
     $dataset_list = $this->get('');
     foreach ($dataset_list as $dataset) {
-      $datasets[] = Dataset::fromArray($dataset);
+      $ds = Dataset::fromArray($dataset);
+      $this->datasets[$ds->key] = $ds;
     }
-    return $datasets;
+    return $this->datasets;
   }
 
+  /**
+   * Get a single dataset from the API.
+   *
+   * @param string $key
+   *   Machine name of the dataset to get.
+   *
+   * @return \Drupal\campaignion_email_to_target\Api\Dataset
+   *   The dataset.
+   */
   public function getDataset($key) {
-    foreach ($this->getDatasetList() as $dataset) {
-      if ($dataset->key == $key) {
-        return $dataset;
-      }
+    if (!array_key_exists($key, $this->datasets)) {
+      $this->datasets[$key] = Dataset::fromArray($this->get($key));
     }
-    return NULL;
+    return $this->datasets[$key];
   }
 
   /**
