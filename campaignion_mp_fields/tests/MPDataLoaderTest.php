@@ -16,25 +16,23 @@ class MPDataLoaderTest extends \DrupalUnitTestCase {
   public function createDataLoader(&$output) {
     $api = $this->createMock(Client::class);
     $test_data[0] = [
-      'contacts' => [
-        [
-          'last_name' => 'Test',
-          'political_affiliation' => 'Labour',
-          'salutation' => 'Catherine Test MP',
-          'title' => 'Ms',
-          'id' => '387269',
-          'email' => 'mp@parliament.uk',
-          'first_name' => 'Catherine',
+      'last_name' => 'Test',
+      'political_affiliation' => 'Labour',
+      'salutation' => 'Catherine Test MP',
+      'title' => 'Ms',
+      'id' => '387269',
+      'email' => 'mp@parliament.uk',
+      'first_name' => 'Catherine',
+      'constituency' => [
+        'country' => [
+          'code' => 'E',
+          'name' => 'England',
+          'id' => 1,
         ],
-      ],
-      'country' => [
-        'code' => 'E',
-        'name' => 'England',
-        'id' => 1,
-      ],
-      'name' => 'Hornsey and Wood Green',
-      'type' => 'WMC',
-      'id' => 22544,
+        'name' => 'Hornsey and Wood Green',
+        'type' => 'WMC',
+        'id' => 22544,
+      ]
     ];
     $api->method('getTargets')->willReturn($test_data);
     // The field itself is unused in this test. we can use any existing field.
@@ -53,7 +51,7 @@ class MPDataLoaderTest extends \DrupalUnitTestCase {
     $output = NULL;
     list($api, $mpd) = $this->createDataLoader($output);
     $api->expects($this->once())->method('getTargets')
-      ->with($this->equalTo('mp'), $this->equalTo('N103DE'));
+      ->with($this->equalTo('mp'), $this->equalTo(['postcode' => 'N103DE']));
 
     $contact = entity_create('redhen_contact', ['type' => 'contact']);
     $contact->wrap()->field_address->set([
