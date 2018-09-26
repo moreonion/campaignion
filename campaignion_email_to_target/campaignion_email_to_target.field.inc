@@ -84,10 +84,13 @@ function _campaignion_email_to_target_options_field_widget_form($item) {
     drupal_set_message(t('We are sorry! The service is temporary unavailable. The administrators have been informed. Please try again in a few minutes …'), 'error');
   }
   $element['dataset_name'] = [
-    '#type' => 'select',
-    '#title' => t('Choose which target dataset you would like to use for this action'),
-    '#options' => $options,
+    '#type' => 'hidden',
+    '#attributes' => ['class' => ['datasets-app-selected-dataset']],
     '#default_value' => $item['dataset_name'],
+  ];
+  $element['datasets_app'] = [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['datasets-app']],
   ];
   $element['users_may_edit'] = [
     '#type' => 'checkbox',

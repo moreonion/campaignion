@@ -43,6 +43,7 @@ describe('campaignion_vue', () => {
     expect(campVue.element.DropdownMenu).to.exist;
     expect(campVue.element.DropdownItem).to.exist;
     expect(campVue.element.MessageBox).to.exist;
+    expect(campVue.element.Loading).to.exist;
     expect(campVue.element.Option).to.exist;
     expect(campVue.element.Select).to.exist;
   });

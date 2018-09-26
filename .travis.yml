@@ -16,7 +16,7 @@ cache:
 
 install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - composer global require drush/drush:8.1.*
+  - composer global require drush/drush:8.1.* dflydev/hawk phpunit/phpunit:6.4.*
 
 before_script:
   - repo=`pwd`
@@ -33,7 +33,7 @@ before_script:
 
 script:
   - cd $repo
-  - UPAL_ROOT=$root UPAL_DB_URL=mysql://root:@127.0.0.1/drupal UPAL_WEB_URL=http://127.0.0.1 phpunit -c phpunit.xml --bootstrap $upal/bootstrap.php --coverage-clover=coverage.xml .
+  - UPAL_ROOT=$root UPAL_DB_URL=mysql://root:@127.0.0.1/drupal UPAL_WEB_URL=http://127.0.0.1 ~/.composer/vendor/bin/phpunit -c phpunit.xml --bootstrap $upal/bootstrap.php --coverage-clover=coverage.xml .
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
