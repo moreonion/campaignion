@@ -18,6 +18,14 @@ function campaignion_test_ctools_plugin_api($module = NULL, $api = NULL) {
  */
 function campaignion_test_node_info() {
   $items = array(
+    'email_to_target' => array(
+      'name' => t('Email to Target action'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'petition' => array(
       'name' => t('Petition'),
       'base' => 'node_content',

@@ -8,6 +8,12 @@ use \Drupal\campaignion_email_to_target\Api\Client;
 class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
   protected $step  = 'target';
   protected $title = 'Target';
+  protected $api;
+
+  public function __construct($wizard, $api = NULL) {
+    parent::__construct($wizard);
+    $this->api = $api ? $api : Client::fromConfig();
+  }
 
   public function stepForm($form, &$form_state) {
     $form = parent::stepForm($form, $form_state);
@@ -15,8 +21,6 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
     $this->fieldForm = new EntityFieldForm('node', $this->wizard->node, [$field]);
     $form += $this->fieldForm->formArray($form_state);
 
-    $client = Client::fromConfig();
-    $token = $client->getAccessToken();
 
     $settings = [];
     $settings['contactPrefix'] = 'contact.';  // identifies contact fields within a dataset’s attributes
@@ -54,8 +58,8 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
       'salutation' => '\\S+',
     ];
     $settings['endpoints']['e2t-api'] = [
-      'url' => $client->getEndpoint(),
-      'token' => $token
+      'url' => $this->api->getEndpoint(),
+      'token' => $this->api->getAccessToken(),
     ];
 
     $settings = ['campaignion_email_to_target' => $settings];
