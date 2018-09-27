@@ -114,10 +114,10 @@ class MPDataLoader {
       }
     }
     if ($postcode) {
-      $data = $this->api->getTargets('mp', $postcode);
+      $data = $this->api->getTargets('mp', ['postcode' => $postcode]);
       if ($data) {
-        $constituency = !empty($data[0]) ? $data[0] : NULL;
-        $target = !empty($constituency['contacts'][0]) ? $constituency['contacts'][0] : NULL;
+        $target = !empty($data[0]) ? $data[0] : NULL;
+        $constituency = !empty($target['constituency']) ? $target['constituency'] : NULL;
         $wrapped = entity_metadata_wrapper($entity_type, $entity);
         foreach ($target_fields as $field_name => $field) {
           $this->setters[$field_name]($wrapped->{$field_name}, $constituency, $target);
