@@ -176,6 +176,7 @@ export default {
     this.$root.$on('duplicateRedirect', index => {
       const duplicate = clone(this.redirects[index])
       duplicate.id = emptyRedirect().id
+      duplicate.filters.forEach((filter) => { filter.id = null })
       duplicate.label = Drupal.t('Copy of @redirectLabel', {'@redirectLabel': duplicate.label})
       this.currentRedirect = duplicate
       this.$store.commit('editNewRedirect')
