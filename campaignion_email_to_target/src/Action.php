@@ -135,6 +135,12 @@ class Action extends ActionBase {
 
     $pairs = [];
     $no_target_message = NULL;
+    $token_defaults = [
+      'first_name' => '',
+      'last_name' => '',
+      'title' => '',
+      'salutation' => '',
+    ];
 
     $selector = $this->buildSelector($submission_o);
     $contacts = $this->api->getTargets($this->options['dataset_name'], $selector);
@@ -153,10 +159,12 @@ class Action extends ActionBase {
         continue;
       }
       if ($message = $this->getMessage($target)) {
+        // Add default values for hard-coded tokens.
+
         if ($email_override) {
           $target['email'] = $email_override;
         }
-        $message->replaceTokens($target, $submission_o);
+        $message->replaceTokens($target + $token_defaults, $submission_o);
         if ($message->type == 'exclusion') {
           // The first exclusion-message is used.
           if (!$no_target_message) {
