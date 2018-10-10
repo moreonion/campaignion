@@ -65,24 +65,21 @@ class ActionTest extends \DrupalUnitTestCase {
       'message' => 'Default message',
       'footer' => 'Default footer',
     ]);
-    $e = $this->createMessage([
-      'type' => 'exclusion',
-      'message' => 'excluded first!',
-    ]);
-    $action->method('getMessage')->will($this->returnCallback(function ($t) use ($e, $m) {
-      if ($t['first_name'] == 'Bob') {
-        return $e;
-      }
-      return $m;
-    }));
     $self = $this;
-    $action->method('getExclusion')->will($this->returnCallback(function ($t) use ($self) {
+    $action->method('getMessage')->will($this->returnCallback(function ($t) use ($m, $self) {
+      if ($t['first_name'] == 'Bob') {
+        return $self->createMessage([
+          'type' => 'exclusion',
+          'message' => 'excluded first!',
+        ]);
+      }
       if ($t['constituency']['name'] == 'Excluded') {
         return $self->createMessage([
           'type' => 'exclusion',
           'message' => 'excluded!',
         ]);
       }
+      return $m;
     }));
     list($pairs, $no_target_element) = $action->targetMessagePairs($submission_o);
     $this->assertEqual([[$contacts[0], $m], [$contacts[2], $m]], $pairs);

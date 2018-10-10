@@ -28,24 +28,13 @@ class Action extends ActionBase {
   }
 
   /**
-   * Choose an appropritae exclusion for a given target.
-   */
-  public function getExclusion($target) {
-    $target = ['constituency' => $target['constituency']];
-    foreach (MessageTemplate::byNid($this->node->nid) as $t) {
-      if ($t->type == 'exclusion' && $t->checkFilters($target)) {
-        return Message::fromTemplate($t);
-      }
-    }
-  }
-
-  /**
    * Choose an appropriate message for a given target.
    */
   public function getMessage($target) {
+    $is_stub = empty($target['email']);
     $templates = MessageTemplate::byNid($this->node->nid);
     foreach ($templates as $t) {
-      if ($t->checkFilters($target)) {
+      if ((!$is_stub || $t->type == 'exclusion') && $t->checkFilters($target)) {
         return Message::fromTemplate($t);
       }
     }
@@ -146,18 +135,6 @@ class Action extends ActionBase {
     $contacts = $this->api->getTargets($this->options['dataset_name'], $selector);
 
     foreach ($contacts as $target) {
-      $target += ['constituency' => []];
-      if ($exclusion = $this->getExclusion($target)) {
-        $exclusion->replaceTokens($target, $submission_o);
-        if (!$no_target_message) {
-          $no_target_message = $exclusion->message;
-        }
-        continue;
-      }
-      if (count($target) <= 1) {
-        // The target is a stub containing only the constituency data.
-        continue;
-      }
       if ($message = $this->getMessage($target)) {
         // Add default values for hard-coded tokens.
 
