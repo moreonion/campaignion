@@ -65,30 +65,24 @@ class ActionTest extends \DrupalUnitTestCase {
       'message' => 'Default message',
       'footer' => 'Default footer',
     ]);
-    $e = $this->createMessage([
-      'type' => 'exclusion',
-      'message' => 'excluded first!',
-    ]);
-    $action->method('getMessage')->will($this->returnCallback(function ($t, $c) use ($e, $m) {
-      if ($t['first_name'] == 'Bob') {
-        return $e;
-      }
-      return $m;
-    }));
     $self = $this;
-    $action->method('getExclusion')->will($this->returnCallback(function ($c) use ($self) {
-      if ($c['name'] == 'Excluded') {
+    $action->method('getMessage')->will($this->returnCallback(function ($t) use ($m, $self) {
+      if ($t['first_name'] == 'Bob') {
+        return $self->createMessage([
+          'type' => 'exclusion',
+          'message' => 'excluded first!',
+        ]);
+      }
+      if ($t['constituency']['name'] == 'Excluded') {
         return $self->createMessage([
           'type' => 'exclusion',
           'message' => 'excluded!',
         ]);
       }
+      return $m;
     }));
     list($pairs, $no_target_element) = $action->targetMessagePairs($submission_o);
-    foreach ($contacts as &$c) {
-      unset($c['constituency']);
-    }
-    $this->assertEqual([[$contacts[0], $c1, $m], [$contacts[2], $c1, $m]], $pairs);
+    $this->assertEqual([[$contacts[0], $m], [$contacts[2], $m]], $pairs);
     $this->assertEqual(['#markup' => "<p>excluded first!</p>\n"], $no_target_element);
   }
 

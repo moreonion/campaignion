@@ -77,10 +77,14 @@ class Filter extends Model {
     return $data;
   }
 
-  public function match($target, $constituency) {
+  public function match($target) {
     if ($this->type == 'target-attribute') {
       $data['contact'] = $target;
-      $data['constituency'] = $constituency;
+      foreach ($target as $key => $sub_array) {
+        if (is_array($sub_array)) {
+          $data[$key] = $sub_array;
+        }
+      }
       $name = $this->config['attributeName'];
       $key_exists = NULL;
       $value = drupal_array_get_nested_value($data, explode('.', $name), $key_exists);

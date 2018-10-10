@@ -28,23 +28,13 @@ class Action extends ActionBase {
   }
 
   /**
-   * Choose an appropritae exclusion for a given target.
-   */
-  public function getExclusion($constituency) {
-    foreach (MessageTemplate::byNid($this->node->nid) as $t) {
-      if ($t->type == 'exclusion' && $t->checkFilters([], $constituency)) {
-        return Message::fromTemplate($t);
-      }
-    }
-  }
-
-  /**
    * Choose an appropriate message for a given target.
    */
-  public function getMessage($target, $constituency) {
+  public function getMessage($target) {
+    $is_stub = empty($target['email']);
     $templates = MessageTemplate::byNid($this->node->nid);
     foreach ($templates as $t) {
-      if ($t->checkFilters($target, $constituency)) {
+      if ((!$is_stub || $t->type == 'exclusion') && $t->checkFilters($target)) {
         return Message::fromTemplate($t);
       }
     }
@@ -134,31 +124,24 @@ class Action extends ActionBase {
 
     $pairs = [];
     $no_target_message = NULL;
+    $token_defaults = [
+      'first_name' => '',
+      'last_name' => '',
+      'title' => '',
+      'salutation' => '',
+    ];
 
     $selector = $this->buildSelector($submission_o);
     $contacts = $this->api->getTargets($this->options['dataset_name'], $selector);
 
     foreach ($contacts as $target) {
-      $target += ['constituency' => []];
-      $constituency = $target['constituency'];
-      unset($target['constituency']);
-      if ($exclusion = $this->getExclusion($constituency)) {
-        $exclusion->replaceTokens([], $constituency, $submission_o);
-        if (!$no_target_message) {
-          $no_target_message = $exclusion->message;
-        }
-        continue;
-      }
-      if (!$target) {
-        // This was an empty contact record only used to send an empty
-        // constituency.
-        continue;
-      }
-      if ($message = $this->getMessage($target, $constituency)) {
+      if ($message = $this->getMessage($target)) {
+        // Add default values for hard-coded tokens.
+
         if ($email_override) {
           $target['email'] = $email_override;
         }
-        $message->replaceTokens($target, $constituency, $submission_o);
+        $message->replaceTokens($target + $token_defaults, $submission_o);
         if ($message->type == 'exclusion') {
           // The first exclusion-message is used.
           if (!$no_target_message) {
@@ -166,7 +149,7 @@ class Action extends ActionBase {
           }
         }
         else {
-          $pairs[] = [$target, $constituency, $message];
+          $pairs[] = [$target, $message];
         }
       }
     }

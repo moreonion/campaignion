@@ -141,10 +141,12 @@ function campaignion_email_to_target_tokens($type, array $tokens, array $data = 
     return;
   }
 
-  $my_data = [
-    'contact' => $data['email-to-target'],
-    'constituency' => isset($data['email-to-target-constituency']) ? $data['email-to-target-constituency'] : [],
-  ];
+  $my_data['contact'] = $data['email-to-target'];
+  foreach ($my_data['contact'] as $key => $sub_array) {
+    if (is_array($sub_array)) {
+      $my_data[$key] = $sub_array;
+    }
+  }
 
   $replacements = [];
   foreach ($tokens as $name => $original) {
