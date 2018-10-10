@@ -8,6 +8,9 @@
   "use strict";
   Drupal.webform = Drupal.webform || {};
   Drupal.webform.conditionalOperatorNewsletterEqual = function (element, existingValue, ruleValue) {
+    if (!element) {
+      return false;
+    }
     if ($(element).closest('.webform-conditional-hidden').length > 0) {
       return false;
     }
