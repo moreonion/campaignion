@@ -113,12 +113,11 @@ class Component {
 
     $last_id = NULL;
     foreach ($pairs as $p) {
-      list($target, $constituency, $message) = $p;
+      list($target, $message) = $p;
       $t = [
         '#type' => 'container',
         '#attributes' => ['class' => ['email-to-target-target']],
         '#target' => $target,
-        '#constituency' => $constituency,
         '#message' => $message->toArray(),
       ];
       $t['send'] = [
@@ -181,7 +180,6 @@ class Component {
         $values[] = serialize([
           'message' => $edited_message + $e['#message'],
           'target' => $e['#target'],
-          'constituency' => $e['#constituency'],
         ]);
       }
     }
@@ -202,7 +200,7 @@ class Component {
     foreach ($data as $serialized) {
       $m = unserialize($serialized);
       $message = new Message($m['message']);
-      $message->replaceTokens(NULL, NULL, $submission->unwrap());
+      $message->replaceTokens(NULL, $submission->unwrap());
       unset($m);
 
       // Set the HTML property based on availablity of MIME Mail.

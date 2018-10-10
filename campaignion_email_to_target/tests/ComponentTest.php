@@ -41,7 +41,7 @@ class ComponentTest extends \DrupalUnitTestCase {
    */
   public function testRenderEscaping() {
     list($componentObj, $submission_o) = $this->mockComponent([
-      [['id' => 't1', 'salutation' => 'T1'], ['name' => 'C1'], new Message([
+      [['id' => 't1', 'salutation' => 'T1', 'constituency' => ['name' => 'C1']], new Message([
         'subject' => "Subject's string",
         'header' => "Header's string",
         'message' => "Message's string",
@@ -75,7 +75,7 @@ class ComponentTest extends \DrupalUnitTestCase {
    */
   public function testRenderSelectionAllSingleTarget() {
     list($component, $submission_o) = $this->mockComponent([
-      [['id' => 't1', 'salutation' => 'T1'], ['name' => 'C1'], new Message([
+      [['id' => 't1', 'salutation' => 'T1', 'constituency' => ['name' => 'C1']], new Message([
         'subject' => "Subject's string",
         'header' => "Header's string",
         'message' => "Message's string",
@@ -95,13 +95,13 @@ class ComponentTest extends \DrupalUnitTestCase {
    */
   public function testRenderSelectionAllMultipleTargets() {
     list($component, $submission_o) = $this->mockComponent([
-      [['id' => 't1', 'salutation' => 'T1'], ['name' => 'C1'], new Message([
+      [['id' => 't1', 'salutation' => 'T1', 'constituency' => ['name' => 'C1']], new Message([
         'subject' => "Subject's string",
         'header' => "Header's string",
         'message' => "Message's string",
         'footer' => "Footer's string",
       ])],
-      [['id' => 't2', 'salutation' => 'T2'], ['name' => 'C1'], new Message([
+      [['id' => 't2', 'salutation' => 'T2', 'constituency' => ['name' => 'C1']], new Message([
         'subject' => "Subject's string",
         'header' => "Header's string",
         'message' => "Message's string",
