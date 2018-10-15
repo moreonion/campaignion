@@ -141,7 +141,7 @@ class Action extends ActionBase {
         if ($email_override) {
           $target['email'] = $email_override;
         }
-        $message->replaceTokens($target + $token_defaults, $submission_o);
+        $message->replaceTokens($target + $token_defaults, $submission_o, TRUE);
         if ($message->type == 'exclusion') {
           // The first exclusion-message is used.
           if (!$no_target_message) {
