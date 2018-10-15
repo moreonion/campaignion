@@ -45,6 +45,9 @@ class ComponentTest extends \DrupalUnitTestCase {
     $component = webform_menu_component_load('new', 0, 'opt_in');
     $form = drupal_get_form('webform_component_edit_form', $node_stub, $component);
     $this->assertEqual('Opt-in Test', $form['name']['#default_value']);
+    $display_id = "#{$form['extra']['display']['#id']}";
+    $states['invisible'][$display_id]['value'] = 'radios';
+    $this->assertEqual($states, $form['extra']['checkbox_label']['#states']);
   }
 
   /**

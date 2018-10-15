@@ -98,11 +98,7 @@ function _webform_edit_opt_in($component) {
     '#type' => 'textfield',
     '#title' => t('Label for the checkbox'),
     '#default_value' => $component['extra']['checkbox_label'],
-    '#states' => ['visible' => [[
-      ["#$display_id" => ['value' => 'checkbox']],
-      'or',
-      ["#$display_id" => ['value' => 'checkbox-inverted']]
-    ]]],
+    '#states' => ['invisible' => ["#$display_id" => ['value' => 'radios']]],
     '#parents' => ['extra', 'checkbox_label'],
   ];
 
