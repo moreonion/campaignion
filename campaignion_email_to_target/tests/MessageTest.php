@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_email_to_target;
 
+use Drupal\little_helpers\Webform\Submission;
+
 /**
  * Test the message objects.
  */
@@ -25,6 +27,46 @@ class MessageTest extends \DrupalUnitTestCase {
     $message = new Message(['message' => '[email-to-target:constituency.country]']);
     $message->replaceTokens($target);
     $this->assertEqual('Wales', $message->message);
+  }
+
+  /**
+   * Test replacing tokens from a hidden component.
+   */
+  public function testReplaceTokensWithHiddenComponent() {
+    $components[1] = [
+      'cid' => 1,
+      'type' => 'textfield',
+      'form_key' => 'text',
+      'page_num' => 1,
+    ];
+    $components[2] = [
+      'cid' => 2,
+      'type' => 'textfield',
+      'form_key' => 'other',
+      'page_num' => 1,
+    ];
+    $conditionals[1]['rules'][] = [
+      'source_type' => 'component',
+      'source' => 2,
+      'operator' => 'equal',
+      'value' => 'foo',
+    ];
+    $conditionals[1]['actions'][] = [
+      'target_type' => 'component',
+      'target' => 1,
+      'action' => 'show',
+    ];
+    $data[1] = ['text'];
+    $data[2] = ['not-foo'];
+    $submission = (object) ['data' => $data];
+    $node_array['webform'] = [
+      'components' => $components,
+      'conditionals' => $conditionals,
+    ];
+    $submission = new Submission((object) $node_array, $submission);
+    $message = new Message(['message' => '[submission:values:text]']);
+    $message->replaceTokens(NULL, $submission, TRUE);
+    $this->assertEqual('', $message->message);
   }
 
 }

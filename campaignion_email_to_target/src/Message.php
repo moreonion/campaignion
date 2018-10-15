@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_email_to_target;
 
+use Drupal\little_helpers\Webform\Submission;
+
 /**
  * Common datastructure for handling protest messages.
  */
@@ -35,13 +37,17 @@ class Message {
     ]);
   }
 
-  public function replaceTokens($target = NULL, $submission = NULL) {
+  public function replaceTokens($target = NULL, $submission = NULL, $clear = FALSE) {
     $data['email-to-target'] = $target;
     $data['webform-submission'] = $submission;
+    if ($submission instanceof Submission) {
+      $data['node'] = $submission->node;
+    }
     // It's ok to not sanitize values here. We will sanitize them later
     // when it's clear whether we use it in a plain text email (no escaping)
     // or in HTML output (check_plain).
     $options['sanitize'] = FALSE;
+    $options['clear'] = $clear;
     foreach ($this->tokenEnabledFields as $f) {
       $this->{$f} = token_replace($this->{$f}, $data, $options);
     }
