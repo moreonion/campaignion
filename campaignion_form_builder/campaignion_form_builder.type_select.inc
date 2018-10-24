@@ -46,7 +46,7 @@ function _campaignion_form_builder_form_builder_types_select() {
     ['1' => t("Yes, I'd like to get email newsletters")],
     -69
   );
-  $fields['email_newsletter']['title'] = t('Newsletter');
+  $fields['email_newsletter']['title'] = t('Email Opt-In');
   $fields['email_newsletter']['default']['#form_builder']['element_type'] = 'checkboxes';
 
   return $fields;

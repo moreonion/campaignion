@@ -53,6 +53,10 @@ msgstr "anders"
 msgid "Newsletter"
 msgstr "Newsletter"
 
+#: modules/campaignion_form_builder/campaignion_form_builder.module:83
+msgid "Email Opt-In"
+msgstr "E-Mail Opt-In"
+
 #: modules/campaignion_form_builder/campaignion_form_builder.module:86
 msgid "Yes, I'd like to get email newsletters"
 msgstr "Ja, ich möchte den E-Mail Newsletter erhalten"
