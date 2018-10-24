@@ -120,8 +120,8 @@ msgid "Schedule publishing"
 msgstr "Zeitgesteuerte Veröffentlichung"
 
 #: modules/ae_wizard/includes/wizard.inc.php:259
-msgid "Save as draft"
-msgstr "Als Entwurf speichern"
+msgid "Save as draft (unpublish)"
+msgstr "Als Entwurf speichern (Veröffentlichung rückgängig machen)"
 
 #: modules/ae_wizard/plugins/donation.inc.php:53
 #: modules/ae_wizard/plugins/petition.inc.php:52

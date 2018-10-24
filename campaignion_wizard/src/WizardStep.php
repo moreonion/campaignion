@@ -30,7 +30,7 @@ abstract class WizardStep extends _WizardStep {
     $form['buttons']['next']['#value'] = t('Next');
 
     if (isset($form['buttons']['return'])) {
-      $label = (isset($this->wizard->node->status) && $this->wizard->node->status) ? t('Save & return') : t('Save as draft');
+      $label = (isset($this->wizard->node->status) && $this->wizard->node->status) ? t('Save & return') : t('Save as draft (unpublish)');
       $form['buttons']['return']['#value'] = $label;
     }
     return $form;

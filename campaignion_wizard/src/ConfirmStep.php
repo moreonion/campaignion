@@ -68,7 +68,7 @@ class ConfirmStep extends WizardStep {
     ];
     $buttons['draft'] = [
       '#type' => 'submit',
-      '#value' => t('Save as draft'),
+      '#value' => t('Save as draft (unpublish)'),
       '#name' => 'draft',
       '#weight' => 1020,
       '#wizard type' => 'return',

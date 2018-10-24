@@ -116,7 +116,7 @@ msgid "Schedule publishing"
 msgstr ""
 
 #: modules/ae_wizard/includes/wizard.inc.php:259
-msgid "Save as draft"
+msgid "Save as draft (unpublish)"
 msgstr ""
 
 #: modules/ae_wizard/plugins/donation.inc.php:53
