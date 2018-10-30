@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * campaignion_overlay.features.field_base.inc
@@ -27,24 +26,17 @@ function campaignion_overlay_field_default_field_bases() {
     'locked' => 0,
     'module' => 'entityreference',
     'settings' => array(
-      'handler' => 'base',
+      'handler' => 'views',
       'handler_settings' => array(
         'behaviors' => array(
           'views-select-list' => array(
             'status' => 0,
           ),
         ),
-        'sort' => array(
-          'direction' => 'DESC',
-          'property' => 'changed',
-          'type' => 'property',
-        ),
-        'target_bundles' => array(
-          'donation' => 'donation',
-          'email_protest' => 'email_protest',
-          'email_to_target' => 'email_to_target',
-          'petition' => 'petition',
-          'webform' => 'webform',
+        'view' => array(
+          'args' => array(),
+          'display_name' => 'entityreference_1',
+          'view_name' => 'actions_reference',
         ),
       ),
       'target_type' => 'node',
