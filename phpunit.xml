@@ -28,6 +28,7 @@
       <directory suffix=".features.field_instance.inc">.</directory>
       <directory suffix=".features.taxonomy.inc">.</directory>
       <directory suffix=".features.uuid_term.inc">.</directory>
+      <directory suffix=".views_default.inc">.</directory>
     </exclude>
   </whitelist>
 </filter>
