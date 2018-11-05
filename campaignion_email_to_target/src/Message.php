@@ -15,9 +15,15 @@ class Message {
   public $header;
   public $message;
   public $footer;
-  protected $tokenEnabledFields = ['to', 'from', 'subject', 'header', 'message', 'footer'];
+  public $display;
+  protected $tokenEnabledFields = ['to', 'from', 'subject', 'header', 'message', 'footer', 'display'];
 
   public function __construct($data) {
+    $data += [
+      'from' => '[submission:values:first_name] [submission:values:last_name] <[submission:values:email]>',
+      'to' => '[email-to-target:contact.title] [email-to-target:contact.first_name] [email-to-target:contact.last_name] <[email-to-target:contact.email]>',
+      'display' => '[email-to-target:contact.display_name]',
+    ];
     foreach ($data as $k => $v) {
       $this->$k = $v;
     }
@@ -31,13 +37,13 @@ class Message {
       'message' => $t->message,
       'footer' => $t->footer,
     ];
-    return new static($data + [
-      'from' => '[submission:values:first_name] [submission:values:last_name] <[submission:values:email]>',
-      'to' => '[email-to-target:contact.title] [email-to-target:contact.first_name] [email-to-target:contact.last_name] <[email-to-target:contact.email]>',
-    ]);
+    return new static($data);
   }
 
   public function replaceTokens($target = NULL, $submission = NULL, $clear = FALSE) {
+    if (empty($target['display_name']) && !empty($target['salutation'])) {
+      $target['display_name'] = $target['salutation'];
+    }
     $data['email-to-target'] = $target;
     $data['webform-submission'] = $submission;
     if ($submission instanceof Submission) {

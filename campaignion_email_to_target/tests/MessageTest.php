@@ -30,6 +30,22 @@ class MessageTest extends \DrupalUnitTestCase {
   }
 
   /**
+   * Test rendering display_name token with fallback to salutation.
+   */
+  public function testRenderDisplayNameToken() {
+    $target = ['salutation' => 'S'];
+    $message = new Message([]);
+    $this->assertContains('contact.display_name', $message->display);
+    $message->replaceTokens($target);
+    $this->assertEqual('S', $message->display);
+
+    $target = ['display_name' => 'D', 'salutation' => 'S'];
+    $message = new Message([]);
+    $message->replaceTokens($target);
+    $this->assertEqual('D', $message->display);
+  }
+
+  /**
    * Test replacing tokens from a hidden component.
    */
   public function testReplaceTokensWithHiddenComponent() {

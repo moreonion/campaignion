@@ -119,7 +119,20 @@ class ComponentTest extends \DrupalUnitTestCase {
     $element['#parents'] = [];
     $component->validate($element, $form_state);
     $this->assertEqual(count($form_state['values']), 2);
+  }
 
+  /**
+   * Test that display is used as label for the targets.
+   */
+  public function testRenderDisplayName() {
+    list($component, $submission_o) = $this->mockComponent([
+      [['id' => 't1'], new Message(['display' => 'D1'])],
+    ], ['selection_mode' => 'all']);
+    $element = [];
+    $form = [];
+    $form_state = form_state_defaults();
+    $component->render($element, $form, $form_state);
+    $this->assertContains('D1', $element['t1']['send']['#markup']);
   }
 
 }

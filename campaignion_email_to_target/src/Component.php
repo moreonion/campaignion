@@ -122,7 +122,7 @@ class Component {
       ];
       $t['send'] = [
         '#type' => 'checkbox',
-        '#title' => $target['salutation'],
+        '#title' => $message->display,
         '#default_value' => TRUE,
       ];
       $t['subject'] = [
