@@ -55,6 +55,11 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
         'title' => 'Display name of target',
         'description' => 'The name/description of the target that the users see',
       ],
+      [
+        'key' => 'group',
+        'title' => 'Group',
+        'description' => '',
+      ],
     ];
     $settings['validations'] = [              // used by the front end, a set of 'key' => 'regex' pairs
       'email' => '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$', // backslashes have to be escaped so JS won’t interpret them as escape sequence.
