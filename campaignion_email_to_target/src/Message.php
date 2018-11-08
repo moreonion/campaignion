@@ -59,11 +59,14 @@ class Message {
     }
   }
 
+  /**
+   * Return an with all public variables.
+   *
+   * @return array
+   *   Associative array containing all public variables.
+   */
   public function toArray() {
-    $r = [];
-    foreach (['type', 'to', 'from', 'subject', 'header', 'message', 'footer'] as $f) {
-      $r[$f] = $this->$f;
-    }
-    return $r;
+    return call_user_func('get_object_vars', $this);
   }
+
 }
