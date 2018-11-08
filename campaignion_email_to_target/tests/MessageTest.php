@@ -85,4 +85,16 @@ class MessageTest extends \DrupalUnitTestCase {
     $this->assertEqual('', $message->message);
   }
 
+  /**
+   * Test serializing and unserializing the message.
+   */
+  public function testToArrayFromArray() {
+    foreach (array_keys(get_class_vars(Message::class)) as $key) {
+      $data[$key] = 'not the default';
+    }
+    $m1 = new Message($data);
+    $m2 = new Message($m1->toArray());
+    $this->assertEqual($m1, $m2);
+  }
+
 }
