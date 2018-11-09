@@ -38,6 +38,32 @@ class SourceTagTest extends \DrupalWebTestCase {
   }
 
   /**
+   * Test that adding tags via hook_campaignion_action_contact_alter() works.
+   */
+  public function testContactAlter() {
+    $contact = Contact::fromEmail($this->testEmail);
+    $submission_stub = (object) [
+      'tracking' => (object) [
+        'source' => 'first-source',
+        'campaign' => 'first-campaign',
+      ],
+    ];
+    $changed = campaignion_source_tags_campaignion_action_contact_alter($contact, $submission_stub, NULL);
+    $this->assertTrue($changed);
+    $wrapped = $contact->wrap();
+    $this->assertEmpty($wrapped->source_tag->value());
+    $this->assertEmpty($wrapped->campaign_tag->value());
+    $contact->save();
+
+    $tag = $wrapped->source_tag->value();
+    $this->assertNotEmpty($tag);
+    $this->assertEqual('first-source', $tag->name);
+    $tag = $wrapped->campaign_tag->value();
+    $this->assertNotEmpty($tag);
+    $this->assertEqual('first-campaign', $tag->name);
+  }
+
+  /**
    * Delete test contact.
    */
   public function tearDown() {
