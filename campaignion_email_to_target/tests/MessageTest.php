@@ -4,6 +4,8 @@ namespace Drupal\campaignion_email_to_target;
 
 use Drupal\little_helpers\Webform\Submission;
 
+module_load_include('inc', 'webform', 'includes/webform.components');
+
 /**
  * Test the message objects.
  */
@@ -61,6 +63,10 @@ class MessageTest extends \DrupalUnitTestCase {
       'form_key' => 'other',
       'page_num' => 1,
     ];
+    foreach ($components as &$c) {
+      webform_component_defaults($c);
+    }
+    $conditionals[1]['andor'] = 'and';
     $conditionals[1]['rules'][] = [
       'source_type' => 'component',
       'source' => 2,
@@ -71,17 +77,19 @@ class MessageTest extends \DrupalUnitTestCase {
       'target_type' => 'component',
       'target' => 1,
       'action' => 'show',
+      'invert' => FALSE,
     ];
     $data[1] = ['text'];
     $data[2] = ['not-foo'];
-    $submission = (object) ['data' => $data];
+    $submission = (object) ['data' => $data, 'completed' => 1, 'sid' => 1];
+    $node_array = ['nid' => 1, 'type' => 'webform', 'status' => 1];
     $node_array['webform'] = [
       'components' => $components,
       'conditionals' => $conditionals,
     ];
     $submission = new Submission((object) $node_array, $submission);
     $message = new Message(['message' => '[submission:values:text]']);
-    $message->replaceTokens(NULL, $submission, TRUE);
+    $message->replaceTokens([], $submission, TRUE);
     $this->assertEqual('', $message->message);
   }
 
