@@ -21,6 +21,7 @@ use \Drupal\campaignion_email_to_target\Component;
 use \Drupal\campaignion_email_to_target\MessageEndpoint;
 use \Drupal\campaignion_email_to_target\Api\Client;
 use \Drupal\campaignion_email_to_target\SelectionMode\All;
+use \Drupal\campaignion_email_to_target\SelectionMode\One;
 use \Drupal\campaignion_email_to_target\SelectionMode\OneOrMore;
 
 /**
@@ -55,6 +56,7 @@ function campaignion_email_to_target_campaignion_email_to_target_selection_modes
   return [
     'one_or_more' => OneOrMore::class,
     'all' => All::class,
+    'one' => One::class,
   ];
 }
 
