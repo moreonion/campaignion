@@ -20,6 +20,8 @@ use \Drupal\campaignion_action\Loader;
 use \Drupal\campaignion_email_to_target\Component;
 use \Drupal\campaignion_email_to_target\MessageEndpoint;
 use \Drupal\campaignion_email_to_target\Api\Client;
+use \Drupal\campaignion_email_to_target\SelectionMode\All;
+use \Drupal\campaignion_email_to_target\SelectionMode\OneOrMore;
 
 /**
  * Implements hook_permission().
@@ -44,6 +46,16 @@ function campaignion_email_to_target_menu() {
     'delivery callback' => 'campaignion_email_to_target_deliver_json',
   ];
   return $menu;
+}
+
+/**
+ * Implemnts hook_campaignion_email_to_target_selection_modes().
+ */
+function campaignion_email_to_target_campaignion_email_to_target_selection_modes() {
+  return [
+    'one_or_more' => OneOrMore::class,
+    'all' => All::class,
+  ];
 }
 
 /**
