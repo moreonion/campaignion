@@ -8,16 +8,6 @@ namespace Drupal\campaignion_email_to_target\SelectionMode;
 class All extends Common {
 
   /**
-   * Get the user readable title for this selectiom mode plugin.
-   *
-   * @return string
-   *   Translated title for this plugin.
-   */
-  public static function title() {
-    return t('Send email to all the targets.');
-  }
-
-  /**
    * Get message edit form for a single target/message pair.
    */
   protected function messageForm($target, $message) {

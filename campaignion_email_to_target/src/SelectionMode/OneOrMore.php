@@ -8,16 +8,6 @@ namespace Drupal\campaignion_email_to_target\SelectionMode;
 class OneOrMore extends Common {
 
   /**
-   * Get the user readable title for this selectiom mode plugin.
-   *
-   * @return string
-   *   Translated title for this plugin.
-   */
-  public static function title() {
-    return t('Let users deselect specific targets. (default)');
-  }
-
-  /**
    * Get message edit form for a single target/message pair.
    */
   protected function messageForm($target, $message) {

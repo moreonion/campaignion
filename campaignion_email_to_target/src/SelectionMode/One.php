@@ -8,16 +8,6 @@ namespace Drupal\campaignion_email_to_target\SelectionMode;
 class One extends Common {
 
   /**
-   * Get the user readable title for this selectiom mode plugin.
-   *
-   * @return string
-   *   Translated title for this plugin.
-   */
-  public static function title() {
-    return t('Let users choose exactly one target.');
-  }
-
-  /**
    * Get form element for choosing targets and previewing/editing messages.
    */
   public function formElement(array $pairs) {

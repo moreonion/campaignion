@@ -53,11 +53,19 @@ function campaignion_email_to_target_menu() {
  * Implemnts hook_campaignion_email_to_target_selection_modes().
  */
 function campaignion_email_to_target_campaignion_email_to_target_selection_modes() {
-  return [
-    'one_or_more' => OneOrMore::class,
-    'all' => All::class,
-    'one' => One::class,
+  $plugins['one_or_more'] = [
+    'class' => OneOrMore::class,
+    'title' => t('At least one — Let users deselect specific targets. (checkboxes)'),
   ];
+  $plugins['all'] = [
+    'class' => All::class,
+    'title' => t('All — Messages are sent to all targets.'),
+  ];
+  $plugins['one'] = [
+    'class' => One::class,
+    'title' => t('Exactly one — Users can choose exactly one target. (select box)')
+  ];
+  return $plugins;
 }
 
 /**

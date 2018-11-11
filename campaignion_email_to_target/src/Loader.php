@@ -55,7 +55,7 @@ class Loader {
    *   The class name.
    */
   public function getMode($mode_id) {
-    return $this->selectionModes[$mode_id];
+    return $this->selectionModes[$mode_id]['class'];
   }
 
   /**
@@ -65,8 +65,8 @@ class Loader {
    *   Plugin titles keyed by plugin ID.
    */
   public function options() {
-    return array_map(function ($class) {
-      return $class::title();
+    return array_map(function ($info) {
+      return $info['title'];
     }, $this->selectionModes);
   }
 
