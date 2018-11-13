@@ -12,8 +12,8 @@ function campaignion_overlay_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance:
-  // 'field_collection_item-campaignion_overlay_options-field_overlay_content'.
-  $field_instances['campaignion_overlay-campaignion_overlay_options-campaignion_overlay_content'] = array(
+  // 'field_collection_item-campaignion_overlay_options-campaignion_overlay_content'.
+  $field_instances['field_collection_item-campaignion_overlay_options-campaignion_overlay_content'] = array(
     'bundle' => 'campaignion_overlay_options',
     'custom_add_another' => '',
     'custom_remove' => '',
@@ -43,20 +43,29 @@ function campaignion_overlay_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'use_select2' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 3,
     ),
   );
 
   // Exported field_instance:
-  // 'field_collection_item-campaignion_overlay_options-field_overlay_enabled'.
-  $field_instances['campaignion_overlay-campaignion_overlay_options-campaignion_overlay_enabled'] = array(
+  // 'field_collection_item-campaignion_overlay_options-campaignion_overlay_enabled'.
+  $field_instances['field_collection_item-campaignion_overlay_options-campaignion_overlay_enabled'] = array(
     'bundle' => 'campaignion_overlay_options',
     'custom_add_another' => '',
     'custom_remove' => '',
@@ -97,8 +106,8 @@ function campaignion_overlay_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'field_collection_item-campaignion_overlay_options-field_overlay_introduction'.
-  $field_instances['campaignion_overlay-campaignion_overlay_options-campaignion_overlay_introduction'] = array(
+  // 'field_collection_item-campaignion_overlay_options-campaignion_overlay_introduction'.
+  $field_instances['field_collection_item-campaignion_overlay_options-campaignion_overlay_introduction'] = array(
     'bundle' => 'campaignion_overlay_options',
     'custom_add_another' => '',
     'custom_remove' => '',
