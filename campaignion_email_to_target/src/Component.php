@@ -6,6 +6,7 @@ use \Drupal\little_helpers\Webform\Webform;
 use \Drupal\campaignion_action\Loader;
 
 use \Drupal\campaignion_email_to_target\Api\Client;
+use \Drupal\campaignion_email_to_target\Loader as ModeLoader;
 
 /**
  * Implement behavior for the email to target message webform component.
@@ -111,59 +112,13 @@ class Component {
       return;
     }
 
-    $last_id = NULL;
-    foreach ($pairs as $p) {
-      list($target, $message) = $p;
-      $t = [
-        '#type' => 'container',
-        '#attributes' => ['class' => ['email-to-target-target']],
-        '#target' => $target,
-        '#message' => $message->toArray(),
-      ];
-      $t['send'] = [
-        '#type' => 'checkbox',
-        '#title' => $message->display,
-        '#default_value' => TRUE,
-      ];
-      $t['subject'] = [
-        '#type' => 'textfield',
-        '#title' => t('Subject'),
-        '#default_value' => $message->subject,
-        '#disabled' => empty($options['users_may_edit']),
-      ];
-      $t['header'] = [
-        '#prefix' => '<pre class="email-to-target-header">',
-        '#markup' => check_plain($message->header),
-        '#suffix' => '</pre>',
-      ];
-      $t['message'] = [
-        '#type' => 'textarea',
-        '#title' => t('Message'),
-        '#default_value' => $message->message,
-        '#disabled' => empty($options['users_may_edit']),
-      ];
-      $t['footer'] = [
-        '#prefix' => '<pre class="email-to-target-footer">',
-        '#markup' => check_plain($message->footer),
-        '#suffix' => '</pre>',
-      ];
-      $element[$target['id']] = $t;
-      $last_id = $target['id'];
+    $class = ModeLoader::instance()->getMode($options['selection_mode']);
+    $mode = new $class(!empty($options['users_may_edit']));
+    if (count($pairs) == 1) {
+      $mode = $mode->singleMode();
     }
-
-    $form_state['send_all'] = FALSE;
-    if (count($pairs) == 1 || $options['selection_mode'] == 'all') {
-      $form_state['send_all'] = TRUE;
-      foreach (element_children($element) as $k) {
-        $c = &$element[$k];
-        $c['#attributes']['class'][] = 'email-to-target-single';
-        $c['send']['#type'] = 'markup';
-        $c['send']['#markup'] = "<p class=\"target\">{$c['send']['#title']} </p>";
-      }
-    }
-    if (count($pairs) > 1) {
-      $element['#attached']['js'] = [drupal_get_path('module', 'campaignion_email_to_target') . '/js/target_selector.js'];
-    }
+    $form_state['selection_mode'] = $mode;
+    $element += $mode->formElement($pairs);
   }
 
   /**
@@ -171,21 +126,7 @@ class Component {
    */
   public function validate(array $element, array &$form_state) {
     $values = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
-
-    $original_values = $values;
-    $values = [];
-    foreach ($original_values as $id => $edited_message) {
-      if (!empty($edited_message['send']) || $form_state['send_all']) {
-        $e = &$element[$id];
-        $values[] = serialize([
-          'message' => $edited_message + $e['#message'],
-          'target' => $e['#target'],
-        ]);
-      }
-    }
-    if (empty($values)) {
-      form_error($element, t('Please select at least one target'));
-    }
+    $values = $form_state['selection_mode']->getValues($element, $values);
   }
 
   /**
