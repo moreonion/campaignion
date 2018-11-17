@@ -16,6 +16,7 @@
       <directory suffix=".features.inc">.</directory>
       <directory suffix=".features.field_base.inc">.</directory>
       <directory suffix=".features.field_instance.inc">.</directory>
+      <directory suffix=".features.filter.inc">.</directory>
       <directory suffix=".features.taxonomy.inc">.</directory>
       <directory suffix=".features.uuid_term.inc">.</directory>
     </exclude>

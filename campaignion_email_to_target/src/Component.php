@@ -2,11 +2,12 @@
 
 namespace Drupal\campaignion_email_to_target;
 
-use \Drupal\little_helpers\Webform\Webform;
-use \Drupal\campaignion_action\Loader;
+use Drupal\little_helpers\Webform\Webform;
+use Drupal\little_helpers\Webform\Submission;
+use Drupal\campaignion_action\Loader;
 
-use \Drupal\campaignion_email_to_target\Api\Client;
-use \Drupal\campaignion_email_to_target\Loader as ModeLoader;
+use Drupal\campaignion_email_to_target\Api\Client;
+use Drupal\campaignion_email_to_target\Loader as ModeLoader;
 
 /**
  * Implement behavior for the email to target message webform component.
@@ -58,6 +59,29 @@ class Component {
   }
 
   /**
+   * Save submission before redirecting.
+   */
+  protected function saveSubmission($form, $form_state) {
+    $form_state['save_draft'] = TRUE;
+    webform_client_form_submit($form, $form_state);
+    return Submission::load($this->component['nid'], $form_state['values']['details']['sid']);
+  }
+
+  /**
+   * Execute the redirect.
+   */
+  protected function redirect($redirect, $form, &$form_state) {
+    $form_state['redirect'] = $redirect->toFormStateRedirect();
+    if (isset($form['webform_ajax_wrapper_id'])) {
+      $form_state['webform_completed'] = TRUE;
+      unset($form_state['save_draft']);
+    }
+    else {
+      call_user_func_array('drupal_goto', $form_state['redirect']);
+    }
+  }
+
+  /**
    * Render the webform component.
    */
   public function render(&$element, &$form, &$form_state) {
@@ -92,7 +116,7 @@ class Component {
     $element['#attributes']['class'][] = 'webform-prefill-exclude';
 
     try {
-      list($pairs, $no_target_element) = $this->action->targetMessagePairs($submission_o, $test_mode);
+      $pairs_or_exclusion = $this->action->targetMessagePairs($submission_o, $test_mode);
     }
     catch (\Exception $e) {
       watchdog_exception('campaignion_email_to_target', $e);
@@ -105,13 +129,20 @@ class Component {
       return;
     }
 
-    if (empty($pairs)) {
-      $element['no_target'] = $no_target_element;
+    if ($pairs_or_exclusion instanceof Exclusion) {
+      $exclusion = $pairs_or_exclusion;
+      $element['no_target'] = $exclusion->renderable();
       $element['#attributes']['class'][] = 'email-to-target-no-targets';
       $this->disableSubmits($form);
+      if ($redirect = $exclusion->redirect()) {
+        $submission = $this->saveSubmission($form, $form_state);
+        drupal_alter('webform_redirect', $redirect, $submission);
+        $this->redirect($redirect, $form, $form_state);
+      }
       return;
     }
 
+    $pairs = $pairs_or_exclusion;
     $class = ModeLoader::instance()->getMode($options['selection_mode']);
     $mode = new $class(!empty($options['users_may_edit']));
     if (count($pairs) == 1) {

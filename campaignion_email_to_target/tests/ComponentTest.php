@@ -22,17 +22,21 @@ class ComponentTest extends \DrupalUnitTestCase {
       'user_may_edit' => TRUE,
       'selection_mode' => 'one_or_more',
     ]);
-    $action->method('targetMessagePairs')->willReturn([$pairs, 'no target']);
+    $action->method('targetMessagePairs')->willReturn($pairs);
     $submission_o = $this->getMockBuilder(Submission::class)
       ->disableOriginalConstructor()
       ->getMock();
     $webform = $this->createMock(Webform::class);
     $webform->method('formStateToSubmission')->willReturn($submission_o);
-    $component = new Component([
-      'name' => 'e2t',
-      'extra' => ['description' => 'e2t'],
-      'cid' => 7,
-    ], $webform, $action);
+    $component = $this->getMockBUilder(Component::class)
+      ->setMethods(['saveSubmission'])
+      ->setConstructorArgs([
+        ['name' => 'e2t', 'extra' => ['description' => 'e2t'], 'cid' => 7],
+        $webform,
+        $action,
+      ])
+      ->getMock();
+    $component->method('saveSubmission')->willReturn($submission_o);
     return [$component, $submission_o];
   }
 
@@ -133,6 +137,22 @@ class ComponentTest extends \DrupalUnitTestCase {
     $form_state = form_state_defaults();
     $component->render($element, $form, $form_state);
     $this->assertContains('D1', $element['t1']['send']['#markup']);
+  }
+
+  /**
+   * Test rendering the component with a redirect.
+   */
+  public function testRenderExclusionAjaxRedirect() {
+    list($component, $submission_o) = $this->mockComponent(
+      new Exclusion(['url' => 'http://example.com']),
+      ['selection_mode' => 'all']
+    );
+    $element = [];
+    $form = ['webform_ajax_wrapper_id' => []];
+    $form_state = form_state_defaults();
+    $component->render($element, $form, $form_state);
+    $this->assertEquals('http://example.com', $form_state['redirect'][0]);
+    $this->assertTrue($form_state['webform_completed']);
   }
 
 }

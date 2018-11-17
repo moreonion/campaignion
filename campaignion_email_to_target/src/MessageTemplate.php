@@ -8,7 +8,11 @@ use \Drupal\little_helpers\DB\Model;
 class MessageTemplate extends Model {
   protected static $table  = 'campaignion_email_to_target_messages';
   protected static $key = ['id'];
-  protected static $values = ['nid', 'weight', 'type', 'label', 'subject', 'header', 'message', 'footer'];
+  protected static $values = ['nid', 'weight', 'type', 'label', 'subject', 'header', 'message', 'footer', 'url'];
+  protected static $types = [
+    'message' => Message::class,
+    'exclusion' => Exclusion::class,
+  ];
 
   public $id;
   public $nid;
@@ -20,6 +24,7 @@ class MessageTemplate extends Model {
   public $message = '';
   public $footer = '';
   public $filters = [];
+  public $url = NULL;
 
   public function __construct($data = [], $new = TRUE) {
     parent::__construct($data, $new);
@@ -144,6 +149,15 @@ class MessageTemplate extends Model {
       }
     }
     return TRUE;
+  }
+
+  /**
+   * Create a new instance of this template.
+   */
+  public function createInstance() {
+    $class = static::$types[$this->type];
+    $vars = array_intersect_key(get_object_vars($this), get_class_vars($class));
+    return new $class($vars);
   }
 
   /**

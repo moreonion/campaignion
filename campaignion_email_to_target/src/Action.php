@@ -35,7 +35,7 @@ class Action extends ActionBase {
     $templates = MessageTemplate::byNid($this->node->nid);
     foreach ($templates as $t) {
       if ((!$is_stub || $t->type == 'exclusion') && $t->checkFilters($target)) {
-        return Message::fromTemplate($t);
+        return $t->createInstance();
       }
     }
     watchdog('campaignion_email_to_target', 'No message found for target');
@@ -58,9 +58,10 @@ class Action extends ActionBase {
   /**
    * Get configured no target message.
    */
-  public function noTargetMessage() {
+  public function defaultExclusion() {
     $field = $this->type->parameters['email_to_target']['no_target_message_field'];
-    return field_view_field('node', $this->node, $field, ['label' => 'hidden']);
+    $renderable = field_view_field('node', $this->node, $field, ['label' => 'hidden']);
+    return new Exclusion(['message' => $renderable]);
   }
 
   /**
@@ -114,16 +115,15 @@ class Action extends ActionBase {
    * @param bool $test_mode
    *   Whether to replace all target email addresses.
    *
-   * @return array
-   *   Array with two members:
-   *   1. An array of target / message pairs.
-   *   2. The element that should be rendered if no target was found.
+   * @return array|\Drupal\campaignion_email_to_target\Exclusion
+   *   Either an array of target messages pairs or an exclusion if no targets
+   *   were found or all targets were excluded.
    */
   public function targetMessagePairs(Submission $submission_o, $test_mode = FALSE) {
     $email_override = $test_mode ? $submission_o->valueByKey('email') : NULL;
 
     $pairs = [];
-    $no_target_message = NULL;
+    $exclusion = NULL;
     $token_defaults = [
       'first_name' => '',
       'last_name' => '',
@@ -140,10 +140,10 @@ class Action extends ActionBase {
           $target['email'] = $email_override;
         }
         $message->replaceTokens($target + $token_defaults, $submission_o, TRUE);
-        if ($message->type == 'exclusion') {
+        if ($message instanceof Exclusion) {
           // The first exclusion-message is used.
-          if (!$no_target_message) {
-            $no_target_message = $message->message;
+          if (!$exclusion) {
+            $exclusion = $message;
           }
         }
         else {
@@ -157,16 +157,10 @@ class Action extends ActionBase {
         '@dataset' => $this->options['dataset_name'],
         '@selector' => drupal_http_build_query($selector),
       ], WATCHDOG_WARNING);
+      return $exclusion ? $exclusion : $this->defaultExclusion();
     }
 
-    if ($no_target_message) {
-      $no_target_element = ['#markup' => _filter_autop(check_plain($no_target_message))];
-    }
-    else {
-      $no_target_element = $this->noTargetMessage();
-    }
-
-    return [$pairs, $no_target_element];
+    return $pairs;
   }
 
 }
