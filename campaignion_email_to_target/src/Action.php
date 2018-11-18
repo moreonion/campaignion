@@ -80,18 +80,18 @@ class Action extends ActionBase {
   /**
    * Build selector for querying targets.
    *
-   * @param \Drupal\little_helpers\Webform\Submission $submission
-   *   A webform submission object used to determine the selector values.
-   *
-   * @return string[]
-   *   Query parameters used for filtering targets.
-   *
    * For the moment the chosen selector as well as the filter mapping is
    * hard-coded.
    *
    * @TODO: Make the selector configurable for datasets with more than one
    * possible selector.
    * @TODO: Make the mapping of form_keys to filter values configurable.
+   *
+   * @param \Drupal\little_helpers\Webform\Submission $submission
+   *   A webform submission object used to determine the selector values.
+   *
+   * @return string[]
+   *   Query parameters used for filtering targets.
    */
   public function buildSelector(Submission $submission) {
     $dataset = $this->api->getDataset($this->options['dataset_name']);
@@ -119,7 +119,7 @@ class Action extends ActionBase {
    *   1. An array of target / message pairs.
    *   2. The element that should be rendered if no target was found.
    */
-  public function targetMessagePairs($submission_o, $test_mode = FALSE) {
+  public function targetMessagePairs(Submission $submission_o, $test_mode = FALSE) {
     $email_override = $test_mode ? $submission_o->valueByKey('email') : NULL;
 
     $pairs = [];
@@ -136,9 +136,7 @@ class Action extends ActionBase {
 
     foreach ($contacts as $target) {
       if ($message = $this->getMessage($target)) {
-        // Add default values for hard-coded tokens.
-
-        if ($email_override) {
+        if ($email_override && isset($target['email'])) {
           $target['email'] = $email_override;
         }
         $message->replaceTokens($target + $token_defaults, $submission_o, TRUE);
@@ -170,6 +168,5 @@ class Action extends ActionBase {
 
     return [$pairs, $no_target_element];
   }
-
 
 }
