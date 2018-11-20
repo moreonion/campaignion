@@ -139,20 +139,4 @@ class ComponentTest extends \DrupalUnitTestCase {
     $this->assertContains('D1', $element['t1']['send']['#markup']);
   }
 
-  /**
-   * Test rendering the component with a redirect.
-   */
-  public function testRenderExclusionAjaxRedirect() {
-    list($component, $submission_o) = $this->mockComponent(
-      new Exclusion(['url' => 'http://example.com']),
-      ['selection_mode' => 'all']
-    );
-    $element = [];
-    $form = ['webform_ajax_wrapper_id' => []];
-    $form_state = form_state_defaults();
-    $component->render($element, $form, $form_state);
-    $this->assertEquals('http://example.com', $form_state['redirect'][0]);
-    $this->assertTrue($form_state['webform_completed']);
-  }
-
 }

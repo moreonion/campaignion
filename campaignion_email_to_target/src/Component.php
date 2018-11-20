@@ -61,10 +61,13 @@ class Component {
   /**
    * Save submission before redirecting.
    */
-  protected function saveSubmission($form, $form_state) {
+  protected function saveSubmission($form, &$original_form_state) {
+    $form_state = $original_form_state;
     $form_state['save_draft'] = TRUE;
     webform_client_form_submit($form, $form_state);
-    return Submission::load($this->component['nid'], $form_state['values']['details']['sid']);
+    $sid = $form_state['values']['details']['sid'];
+    $original_form_state['values']['details']['sid'] = $sid;
+    return Submission::load($this->component['nid'], $sid);
   }
 
   /**
@@ -72,7 +75,7 @@ class Component {
    */
   protected function redirect($redirect, $form, &$form_state) {
     $form_state['redirect'] = $redirect->toFormStateRedirect();
-    if (isset($form['webform_ajax_wrapper_id'])) {
+    if (module_exists('webform_ajax') && $form['#node']->webform['webform_ajax'] != WEBFORM_AJAX_NO_AJAX) {
       $form_state['webform_completed'] = TRUE;
       unset($form_state['save_draft']);
     }
