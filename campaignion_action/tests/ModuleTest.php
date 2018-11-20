@@ -13,6 +13,7 @@ class ModuleTest extends \DrupalUnitTestCase {
    * Prepare test data.
    */
   public function setUp() {
+    parent::setUp();
     $this->node = (object) ['type' => 'petition'];
     node_object_prepare($this->node);
     $this->node->webform['components'] = [];
@@ -26,6 +27,7 @@ class ModuleTest extends \DrupalUnitTestCase {
     node_delete($this->node->nid);
     db_delete('campaignion_action_redirect');
     db_delete('campaignion_action_redirect_filter');
+    parent::tearDown();
   }
 
   /**
