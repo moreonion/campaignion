@@ -5,6 +5,8 @@ namespace Drupal\campaignion_email_to_target;
 use Drupal\campaignion_action\Loader;
 use Drupal\little_helpers\Webform\Submission;
 
+use Drupal\campaignion_email_to_target\Api\Client;
+
 /**
  * Tests for the component that require a fully configured and saved node.
  */
@@ -37,9 +39,10 @@ class ComponentIntegrationTest extends \DrupalUnitTestCase {
   protected function createNode($components, $settings = []) {
     module_load_include('components.inc', 'webform', 'includes/webform');
     $node = (object) ['type' => 'email_to_target'];
+    $client = $this->createMock(Client::class);
     $type = Loader::instance()->type($node->type);
     $node->action = $this->getMockBuilder(Action::class)
-      ->setConstructorArgs([$type, $node, NULL])
+      ->setConstructorArgs([$type, $node, $client])
       ->setMethods(['getOptions', 'targetMessagePairs'])
       ->getMock();
     node_object_prepare($node);

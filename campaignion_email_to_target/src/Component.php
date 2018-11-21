@@ -6,7 +6,6 @@ use Drupal\little_helpers\Webform\Webform;
 use Drupal\little_helpers\Webform\Submission;
 use Drupal\campaignion_action\Loader;
 
-use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_email_to_target\Loader as ModeLoader;
 
 /**
@@ -29,6 +28,16 @@ class Component {
     return new static($component, $webform, $action);
   }
 
+  /**
+   * Create a new component instance.
+   *
+   * @param array $component
+   *   The webform component configuration.
+   * @param \Drupal\little_helpers\Webform\Webform $webform
+   *   A webform wrapper for the form’s node.
+   * @param \Drupal\campaignion_email_to_target\Action $action
+   *   An email_to_target action instance.
+   */
   public function __construct(array $component, Webform $webform, Action $action) {
     $this->component = $component;
     $this->webform = $webform;

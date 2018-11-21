@@ -13,8 +13,22 @@ class Message extends MessageTemplateInstance {
   public $message;
   public $footer;
   public $display;
-  protected $tokenEnabledFields = ['to', 'from', 'subject', 'header', 'message', 'footer', 'display'];
+  protected $tokenEnabledFields = [
+    'to',
+    'from',
+    'subject',
+    'header',
+    'message',
+    'footer',
+    'display',
+  ];
 
+  /**
+   * Create a message instance by passing the data as object or array.
+   *
+   * @param mixed $data
+   *   The data to initialize the message with.
+   */
   public function __construct($data) {
     $data += [
       'from' => '[submission:values:first_name] [submission:values:last_name] <[submission:values:email]>',

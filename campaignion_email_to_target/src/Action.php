@@ -17,11 +17,24 @@ class Action extends ActionBase {
   protected $options;
   protected $api;
 
+  /**
+   * Create a new instance by reading the global Api\Client config.
+   */
   public static function fromTypeAndNode(TypeInterface $type, $node) {
     return new static($type, $node, Client::fromConfig());
   }
 
-  public function __construct(TypeInterface $type, $node, $api) {
+  /**
+   * Create a new action instance.
+   *
+   * @param \Drupal\campaignion_action\TypeInterface $type
+   *   The action type of this action.
+   * @param object $node
+   *   The action’s node.
+   * @param \Drupal\campaignion_email_to_target\Api\Client $api
+   *   Api client for the e2t_api serivce.
+   */
+  public function __construct(TypeInterface $type, $node, Client $api) {
     parent::__construct($type, $node);
     $this->options = $this->getOptions();
     $this->api = $api;
@@ -84,15 +97,15 @@ class Action extends ActionBase {
    * For the moment the chosen selector as well as the filter mapping is
    * hard-coded.
    *
-   * @TODO: Make the selector configurable for datasets with more than one
-   * possible selector.
-   * @TODO: Make the mapping of form_keys to filter values configurable.
-   *
    * @param \Drupal\little_helpers\Webform\Submission $submission
    *   A webform submission object used to determine the selector values.
    *
    * @return string[]
    *   Query parameters used for filtering targets.
+   *
+   * @TODO: Make the selector configurable for datasets with more than one
+   * possible selector.
+   * @TODO: Make the mapping of form_keys to filter values configurable.
    */
   public function buildSelector(Submission $submission) {
     $dataset = $this->api->getDataset($this->options['dataset_name']);
