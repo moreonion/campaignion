@@ -22,17 +22,21 @@ class ComponentTest extends \DrupalUnitTestCase {
       'user_may_edit' => TRUE,
       'selection_mode' => 'one_or_more',
     ]);
-    $action->method('targetMessagePairs')->willReturn([$pairs, 'no target']);
+    $action->method('targetMessagePairs')->willReturn($pairs);
     $submission_o = $this->getMockBuilder(Submission::class)
       ->disableOriginalConstructor()
       ->getMock();
     $webform = $this->createMock(Webform::class);
     $webform->method('formStateToSubmission')->willReturn($submission_o);
-    $component = new Component([
-      'name' => 'e2t',
-      'extra' => ['description' => 'e2t'],
-      'cid' => 7,
-    ], $webform, $action);
+    $component = $this->getMockBUilder(Component::class)
+      ->setMethods(['saveSubmission'])
+      ->setConstructorArgs([
+        ['name' => 'e2t', 'extra' => ['description' => 'e2t'], 'cid' => 7],
+        $webform,
+        $action,
+      ])
+      ->getMock();
+    $component->method('saveSubmission')->willReturn($submission_o);
     return [$component, $submission_o];
   }
 

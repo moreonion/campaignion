@@ -10,6 +10,16 @@ class Attribute {
   public $title;
   public $description;
 
+  /**
+   * Create an attribute object by passing its data.
+   *
+   * @param string $key
+   *   The key for this attribute (ie. used in the token names).
+   * @param string $title
+   *   Human readable title for this attribute.
+   * @param string $description
+   *   More explanation about the attribute.
+   */
   public function __construct($key, $title = '', $description = '') {
     $this->key = $key;
     $this->title = $title;
