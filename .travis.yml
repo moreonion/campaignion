@@ -21,7 +21,7 @@ install:
 before_script:
   - repo=`pwd`
   - cd ..
-  - git clone https://github.com/torotil/upal.git
+  - git clone https://github.com/torotil/upal.git -b 1.0.1
   - upal=`pwd`/upal
   - mysql -e 'create database drupal'
   - php -d include_path=`pwd` -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes core-quick-drupal --core=drupal-7.x --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --root=`pwd`/test-root
