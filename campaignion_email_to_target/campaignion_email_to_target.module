@@ -202,9 +202,9 @@ function campaignion_email_to_target_libraries_info() {
   ];
   $libraries['RandomLib'] = [
     'name' => 'RandomLib — A library for generating random numbers and strings of various strengths.',
-    'vendor url' => 'https://github.com/ircmaxell/RandomLib',
-    'download url' => 'https://github.com/ircmaxell/RandomLib',
-    'version' => '1.1.0',
+    'vendor url' => 'https://github.com/paragonie/RandomLib',
+    'download url' => 'https://github.com/paragonie/RandomLib',
+    'version' => '2.0.0',
     'xautoload' => function ($adapter) {
       $adapter->composerJson('composer.json');
     },
