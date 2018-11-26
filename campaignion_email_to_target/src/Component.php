@@ -175,7 +175,7 @@ class Component {
   /**
    * Send emails to all selected targets.
    */
-  public function sendEmails($data, $submission) {
+  public function sendEmails($data, Submission $submission) {
     $nid = $submission->nid;
     $node = $submission->webform->node;
     $root_node = $node->tnid ? node_load($node->tnid) : $node;
@@ -184,7 +184,7 @@ class Component {
     foreach ($data as $serialized) {
       $m = unserialize($serialized);
       $message = new Message($m['message']);
-      $message->replaceTokens(NULL, $submission->unwrap());
+      $message->replaceTokens(NULL, $submission);
       unset($m);
 
       // Set the HTML property based on availablity of MIME Mail.
@@ -220,11 +220,18 @@ class Component {
       );
 
       // Mail the submission.
-      $m = drupal_mail('campaignion_email_to_target', 'email_to_target', $message->to, $language, $mail_params, $email['from']);
+      $m = $this->mail($message->to, $language, $mail_params, $email['from']);
       if ($m['result']) {
         $send_count += 1;
       }
     }
+  }
+
+  /**
+   * Wrapper for drupal_mail().
+   */
+  protected function mail($to, $language, $mail_params, $from) {
+    return drupal_mail('campaignion_email_to_target', 'email_to_target', $to, $language, $mail_params, $from);
   }
 
 }

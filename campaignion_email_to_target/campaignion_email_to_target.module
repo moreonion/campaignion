@@ -159,7 +159,7 @@ function campaignion_email_to_target_token_info() {
  * Implements hook_tokens().
  */
 function campaignion_email_to_target_tokens($type, array $tokens, array $data = array(), array $options = array()) {
-  if ($type != 'email-to-target') {
+  if ($type != 'email-to-target' || empty($data['email-to-target'])) {
     return;
   }
 
