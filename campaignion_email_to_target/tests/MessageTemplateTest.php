@@ -71,7 +71,8 @@ class MessageTemplateTest extends \DrupalUnitTestCase {
   /**
    * Test creating a message instance.
    */
-  public function testCreateMessageFromInstane() {
+  public function testCreateMessageFromInstance() {
+    // The type used in the default messages.
     $t = new MessageTemplate([
       'type' => 'message',
       'message' => 'non-default',
@@ -80,11 +81,20 @@ class MessageTemplateTest extends \DrupalUnitTestCase {
     $this->assertInstanceOf(Message::class, $m);
     $this->assertEquals('non-default', $m->message);
 
+    // This is type used in the vue-app.
+    $t = new MessageTemplate([
+      'type' => 'message-template',
+      'message' => 'non-default',
+    ]);
+    $m = $t->createInstance();
+    $this->assertInstanceOf(Message::class, $m);
+    $this->assertEquals('non-default', $m->message);
     $t = new MessageTemplate([
       'type' => 'exclusion',
       'message' => 'non-default',
       'url' => 'redirect',
     ]);
+
     $m = $t->createInstance();
     $this->assertInstanceOf(Exclusion::class, $m);
     $this->assertEquals('non-default', $m->message);

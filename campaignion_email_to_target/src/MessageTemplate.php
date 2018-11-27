@@ -24,6 +24,7 @@ class MessageTemplate extends Model {
   ];
   protected static $types = [
     'message' => Message::class,
+    'message-template' => Message::class,
     'exclusion' => Exclusion::class,
   ];
 
