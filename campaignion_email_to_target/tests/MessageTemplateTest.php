@@ -4,6 +4,7 @@ namespace Drupal\campaignion_email_to_target;
 
 
 class MessageTemplateTest extends \DrupalUnitTestCase {
+
   public function test_toArray() {
     $t = new MessageTemplate([
       'subject' => 'Test Subject',
@@ -18,6 +19,7 @@ class MessageTemplateTest extends \DrupalUnitTestCase {
       'header' => '',
       'message' => '',
       'footer' => '',
+      'url' => NULL,
     ], $t->toArray());
   }
 
@@ -64,6 +66,39 @@ class MessageTemplateTest extends \DrupalUnitTestCase {
     $this->assertTrue($t2->filters[0]->isNew());
     $t2->filters[0]->config['value'] = 2;
     $this->assertEqual(1, $t1->filters[0]->config['value']);
+  }
+
+  /**
+   * Test creating a message instance.
+   */
+  public function testCreateMessageFromInstance() {
+    // The type used in the default messages.
+    $t = new MessageTemplate([
+      'type' => 'message',
+      'message' => 'non-default',
+    ]);
+    $m = $t->createInstance();
+    $this->assertInstanceOf(Message::class, $m);
+    $this->assertEquals('non-default', $m->message);
+
+    // This is type used in the vue-app.
+    $t = new MessageTemplate([
+      'type' => 'message-template',
+      'message' => 'non-default',
+    ]);
+    $m = $t->createInstance();
+    $this->assertInstanceOf(Message::class, $m);
+    $this->assertEquals('non-default', $m->message);
+    $t = new MessageTemplate([
+      'type' => 'exclusion',
+      'message' => 'non-default',
+      'url' => 'redirect',
+    ]);
+
+    $m = $t->createInstance();
+    $this->assertInstanceOf(Exclusion::class, $m);
+    $this->assertEquals('non-default', $m->message);
+    $this->assertEquals('redirect', $m->url);
   }
 
 }
