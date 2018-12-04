@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * Code for the campaignion_overlay feature.
+ */
+
+include_once 'campaignion_overlay.features.inc';
 
 /**
  * @file
