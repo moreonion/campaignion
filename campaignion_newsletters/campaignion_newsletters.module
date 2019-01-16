@@ -209,17 +209,6 @@ function campaignion_newsletters_form_builder_element_types($form_type, $form_id
 }
 
 /**
- * Implements hook_form_builder_element_types_alter().
- *
- * Remove the email_newsletter field from campaignion_form_builder.
- */
-function campaignion_newsletters_form_builder_element_types_alter(&$fields, $form_type, $form_id) {
-  if ($form_type == 'webform') {
-    unset($fields['email_newsletter']);
-  }
-}
-
-/**
  * Implements hook_entity_insert().
  *
  * Save all subscriptions for the redhen_contact.
