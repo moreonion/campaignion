@@ -32,4 +32,22 @@ class OneTest extends \DrupalUnitTestcase {
     $this->assertCount(1, $values);
   }
 
+  /**
+   * Test that fields are disabled when users are not allowed to edit them.
+   */
+  public function testUsersMayEdit() {
+    $pairs = [
+      [['id' => 'target1'], new Message([])],
+    ];
+    $mode = new One(TRUE);
+    $element = $mode->formElement($pairs);
+    $this->assertEmpty($element['target1']['subject']['#disabled']);
+    $this->assertEmpty($element['target1']['message']['#disabled']);
+
+    $mode = new One(FALSE);
+    $element = $mode->formElement($pairs);
+    $this->assertNotEmpty($element['target1']['subject']['#disabled']);
+    $this->assertNotEmpty($element['target1']['message']['#disabled']);
+  }
+
 }

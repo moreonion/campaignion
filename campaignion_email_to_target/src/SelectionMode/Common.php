@@ -48,7 +48,7 @@ abstract class Common {
       '#type' => 'textarea',
       '#title' => t('Message'),
       '#default_value' => $message->message,
-      '#disabled' => $this->editable,
+      '#disabled' => !$this->editable,
     ];
     $t['footer'] = [
       '#prefix' => '<pre class="email-to-target-footer">',
