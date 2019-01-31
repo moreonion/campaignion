@@ -12,7 +12,7 @@ function campaignion_form_builder_update_4() {
   $sql = <<<SQL
 SELECT nid, cid
 FROM webform_component
-WHERE form_key='email_newsletter' ANY type<>'newsletter'
+WHERE form_key='email_newsletter' AND type<>'newsletter'
 ORDER BY nid
 SQL;
   $cid_map = [];
