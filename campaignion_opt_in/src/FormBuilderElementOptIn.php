@@ -2,12 +2,13 @@
 
 namespace Drupal\campaignion_opt_in;
 
+use Drupal\form_builder_webform\Element;
 use Drupal\little_helpers\ArrayConfig;
 
 /**
  * Form builder integration for the newsletter webform component.
  */
-class FormBuilderElementOptIn extends \FormBuilderWebformElement {
+class FormBuilderElementOptIn extends Element {
 
   /**
    * {@inheritdoc}

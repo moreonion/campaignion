@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_form_builder;
 
-use \FormBuilderLoader;
+use Drupal\form_builder\Loader;
 
 /**
  * Test for additional fields we’ve put into the form builder palette.
@@ -14,7 +14,7 @@ class PaletteTest extends \DrupalUnitTestCase {
    */
   public function testOptInFields() {
     $form_type = 'webform';
-    $loader = FormBuilderLoader::instance();
+    $loader = Loader::instance();
     $fields = $loader->getElementTypeInfo('webform', 0);
 
     $this->assertArrayHasKey('post_opt_in', $fields);

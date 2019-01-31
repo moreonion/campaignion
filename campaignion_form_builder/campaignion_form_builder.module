@@ -2,6 +2,7 @@
 
 use Drupal\campaignion_activity\WebformSubmission as SubmissionActivity;
 use Drupal\campaignion_opt_in\OptInRecordFactory;
+use Drupal\form_builder\Loader;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
@@ -90,7 +91,7 @@ function campaignion_form_builder_form_builder_webform_property_map_alter(&$map,
  */
 function campaignion_form_builder_form_builder_palette_fields_alter(&$fields, $form_type, $form_id) {
   if ($form_type == 'webform') {
-    $elements = FormBuilderLoader::instance()
+    $elements = Loader::instance()
       ->fromCache($form_type, $form_id)
       ->getFormArray();
     $active_keys = campaignion_form_builder_get_element_keys($elements);

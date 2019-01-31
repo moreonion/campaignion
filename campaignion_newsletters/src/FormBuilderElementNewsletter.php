@@ -2,12 +2,13 @@
 
 namespace Drupal\campaignion_newsletters;
 
+use Drupal\form_builder_webform\Element;
 use Drupal\little_helpers\ArrayConfig;
 
 /**
  * Form builder integration for the newsletter webform component.
  */
-class FormBuilderElementNewsletter extends \FormBuilderWebformElement {
+class FormBuilderElementNewsletter extends Element {
 
   /**
    * {@inheritdoc}
