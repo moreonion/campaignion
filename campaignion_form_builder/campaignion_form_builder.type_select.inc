@@ -40,14 +40,5 @@ function _campaignion_form_builder_form_builder_types_select() {
     -81
   );
 
-  $fields['email_newsletter'] = ['unique' => FALSE] + $select_element(
-    ['name' => t('Email Newsletter'), 'value' => 1],
-    ['aslist' => FALSE, 'multiple' => TRUE],
-    ['1' => t("Yes, I'd like to get email newsletters")],
-    -69
-  );
-  $fields['email_newsletter']['title'] = t('Newsletter');
-  $fields['email_newsletter']['default']['#form_builder']['element_type'] = 'checkboxes';
-
   return $fields;
 }

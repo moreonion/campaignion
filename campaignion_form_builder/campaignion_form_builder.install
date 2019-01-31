@@ -1,6 +1,56 @@
 <?php
 
 /**
+ * Migrate old-style checkboxes to campaignion_newsletters.
+ */
+function campaignion_form_builder_update_4() {
+  require_once drupal_get_path('module', 'webform') . '/components/select.inc';
+  if (!module_enable(['campaignion_newsletters'], TRUE)) {
+    new DrupalUpdateException("Unable to enable campaignion_newsletters. Please verify it (and all it's dependencies) can be found by Drupal.");
+  }
+
+  $sql = <<<SQL
+SELECT nid, cid
+FROM webform_component
+WHERE form_key='email_newsletter' ANY type<>'newsletter'
+ORDER BY nid
+SQL;
+  $cid_map = [];
+  foreach (db_query($sql) as $row) {
+    $cid_map[$row->nid][] = $row->cid;
+  }
+
+  foreach ($cid_map as $nid => $cids) {
+    $node = node_load($nid);
+    foreach ($cids as $cid) {
+      $old_component = $node->webform['components'][$cid];
+      $old_options = _webform_select_options($old_component, TRUE, FALSE);
+      if (count($old_options) > 1) {
+        new DrupalUpdateException('Unable to migrate a “email_newsletter” component with multiple options.');
+      }
+      $component = [
+        'type' => 'newsletter',
+        'cid' => $cid,
+        'name' => $old_component['name'],
+        'pid' => $old_component['pid'],
+        'weight' => $old_component['weight'],
+        'required' => $old_component['required'],
+        'value' => $old_component['value'] ? 'opt-in' : '',
+        'form_key' => 'newsletter',
+        'extra' => [
+          'checkbox_label' => reset($old_options),
+          'optin_statement' => reset($old_options),
+          'title_display' => $old_component['extra']['title_display'],
+        ],
+      ];
+      webform_component_defaults($component);
+      $node->webform['components'][$cid] = $component;
+    }
+    node_save($node);
+  }
+}
+
+/**
  * Migrate to campaignion_opt_in.
  */
 function campaignion_form_builder_update_3() {
