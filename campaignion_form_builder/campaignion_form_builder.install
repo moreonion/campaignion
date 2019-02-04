@@ -9,6 +9,15 @@ function campaignion_form_builder_update_4() {
     new DrupalUpdateException("Unable to enable campaignion_newsletters. Please verify it (and all it's dependencies) can be found by Drupal.");
   }
 
+    // Map old to new values.
+  $sql = <<<SQL
+UPDATE webform_submitted_data d
+INNER JOIN webform_component c USING(nid, cid)
+SET d.data=CASE WHEN d.data='' THEN 'no-change' ELSE 'opt-in' END
+WHERE c.form_key='email_newsletter' AND c.type<>'newsletter'
+SQL;
+  db_query($sql);
+
   $sql = <<<SQL
 SELECT nid, cid
 FROM webform_component
