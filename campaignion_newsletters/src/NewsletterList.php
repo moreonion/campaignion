@@ -2,17 +2,24 @@
 
 namespace Drupal\campaignion_newsletters;
 
-class NewsletterList extends \Drupal\little_helpers\DB\Model {
+use Drupal\little_helpers\DB\Model;
+
+/**
+ * DB-Model for {campaignion_newsletters_lists}.
+ */
+class NewsletterList extends Model {
+
   public $list_id;
   public $source;
   public $identifier;
   public $language;
   public $title;
   public $data;
+  public $updated;
 
   protected static $table = 'campaignion_newsletters_lists';
   protected static $key = array('list_id');
-  protected static $values = array('source', 'identifier', 'title', 'language', 'data');
+  protected static $values = array('source', 'identifier', 'title', 'language', 'data', 'updated');
   protected static $serial = TRUE;
   protected static $serialize = array('data' => TRUE);
 
@@ -29,7 +36,13 @@ class NewsletterList extends \Drupal\little_helpers\DB\Model {
   protected static function loadQuery($conditions = [], $order_by = []) {
     $q = db_select(static::$table, 'l')->fields('l');
     foreach ($conditions as $field => $value) {
-      $q->condition($field, $value);
+      if (is_numeric($field)) {
+        list($field, $value, $op) = $value;
+      }
+      else {
+        $op = NULL;
+      }
+      $q->condition($field, $value, $op);
     }
     foreach ($order_by as $field => $direction) {
       $q->orderBy($field, $direction);
@@ -49,6 +62,10 @@ class NewsletterList extends \Drupal\little_helpers\DB\Model {
     if ($rows = static::loadQuery(['list_id' => $id])) {
       return $rows[$id];
     }
+  }
+
+  public static function notUpdatedSince($time) {
+    return static::loadQuery([['updated', $time, '<']]);
   }
 
   public static function byIdentifier($source, $identifier) {

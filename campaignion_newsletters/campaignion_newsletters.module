@@ -31,6 +31,7 @@ function _campaignion_newsletters_poll() {
       $list->save();
     }
   }
+  variable_set('campaignion_newsletters_last_list_poll', REQUEST_TIME);
 }
 
 /**
@@ -262,6 +263,11 @@ function campaignion_newsletters_cronapi($op, $job = NULL) {
     'descriptions' => 'Let providers poll their subscriptions in order to cach changes from the provider side.',
     'rule' => '*/2+@ * * * *',
     'callback' => [CronRunner::class, 'cronPoll'],
+  ];
+  $items['campaignion_newsletters_remove_stale_lists'] = [
+    'descriptions' => 'Remove lists that haven’t been seen in a while.',
+    //'rule' => 'daily',
+    'callback' => [CronRunner::class, 'removeStaleLists'],
   ];
   return $items;
 }
