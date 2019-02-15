@@ -53,7 +53,8 @@ class Component {
    *   Whether to try to unsubscribe even from lists without a subscription.
    */
   public function __construct(array $component, $unsubscribe_unknown) {
-    ArrayConfig::mergeDefaults($component, webform_component_invoke('opt_in', 'defaults'));
+    module_load_include('components.inc', 'webform', 'includes/webform');
+    webform_component_defaults($component);
     $this->component = $component;
     $this->unsubscribeUnknown = $unsubscribe_unknown;
   }
