@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_newsletters;
 
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+use Drupal\campaignion_opt_in\Values;
 use Drupal\little_helpers\ArrayConfig;
 use Drupal\little_helpers\Webform\Submission;
 
@@ -52,7 +53,7 @@ class Component {
    *   Whether to try to unsubscribe even from lists without a subscription.
    */
   public function __construct(array $component, $unsubscribe_unknown) {
-    ArrayConfig::mergeDefaults($component, webform_component_invoke('newsletter', 'defaults'));
+    ArrayConfig::mergeDefaults($component, webform_component_invoke('opt_in', 'defaults'));
     $this->component = $component;
     $this->unsubscribeUnknown = $unsubscribe_unknown;
   }
@@ -67,7 +68,7 @@ class Component {
    */
   public function submit($email, WebformSubmission $s) {
     if ($value = $s->valuesByCid($this->component['cid'])) {
-      $value = ValuePrefix::remove($value);
+      $value = Values::removePrefix($value);
       if ($value == 'opt-in') {
         $this->subscribe($email, $s);
       }

@@ -190,6 +190,29 @@ function campaignion_newsletters_uninstall() {
 }
 
 /**
+ * Migrate to using opt_in components.
+ */
+function campaignion_newsletters_update_19() {
+  if (!module_enable(['campaignion_opt_in'], TRUE)) {
+    throw new \DrupalUpdateException('Unable to enable campaignion_opt_in. Please verify it (and all it’s dependencies) can be found by Drupal.');
+  }
+
+  // Loop through all nodes with newsletter field(s).
+  $rows = db_select('webform_component', 'c')
+    ->fields('c', ['nid', 'cid'])
+    ->condition('type', 'newsletter')
+    ->execute();
+  foreach ($rows as $row) {
+    $node = node_load($row->nid);
+    $component = &$node->webform['components'][$row->cid];
+    $component['type'] = 'opt_in';
+    $component['extra']['channel'] = 'email';
+    $component['extra']['fixed_channel'] = TRUE;
+    node_save($node);
+  }
+}
+
+/**
  * Migrate newsletter default values.
  */
 function campaignion_newsletters_update_18() {
