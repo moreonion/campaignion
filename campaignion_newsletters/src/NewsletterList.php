@@ -19,7 +19,14 @@ class NewsletterList extends Model {
 
   protected static $table = 'campaignion_newsletters_lists';
   protected static $key = array('list_id');
-  protected static $values = array('source', 'identifier', 'title', 'language', 'data', 'updated');
+  protected static $values = [
+    'source',
+    'identifier',
+    'title',
+    'language',
+    'data',
+    'updated',
+  ];
   protected static $serial = TRUE;
   protected static $serialize = array('data' => TRUE);
 
@@ -54,20 +61,32 @@ class NewsletterList extends Model {
     return $lists;
   }
 
+  /**
+   * Get list of all newsletter lists sorted by title.
+   */
   public static function listAll() {
     return static::loadQuery([], ['title' => 'ASC']);
   }
 
+  /**
+   * Load a list by it’s ID.
+   */
   public static function load($id) {
     if ($rows = static::loadQuery(['list_id' => $id])) {
       return $rows[$id];
     }
   }
 
+  /**
+   * Load all lists not seen since a specific time.
+   */
   public static function notUpdatedSince($time) {
     return static::loadQuery([['updated', $time, '<']]);
   }
 
+  /**
+   * Load list by source and identifier.
+   */
   public static function byIdentifier($source, $identifier) {
     $rows = static::loadQuery([
       'source' => $source,
@@ -76,6 +95,9 @@ class NewsletterList extends Model {
     return reset($rows);
   }
 
+  /**
+   * Load or create a list from a data object or array.
+   */
   public static function fromData($data) {
     $adata = array();
     foreach ($data as $k => $v) {
@@ -85,11 +107,15 @@ class NewsletterList extends Model {
       unset($adata['list_id']);
       $item->__construct($adata);
       return $item;
-    } else {
+    }
+    else {
       return new static($data, TRUE);
     }
   }
 
+  /**
+   * Initialize a new list instance.
+   */
   public function __construct($data = array(), $new = FALSE) {
     parent::__construct($data, $new);
     foreach ($data as $k => $v) {
@@ -100,6 +126,12 @@ class NewsletterList extends Model {
     }
   }
 
+  /**
+   * Get the newsletter provider of this list.
+   *
+   * @return \Drupal\campaignion_newsletter\ProviderInterface
+   *   The newletter provider of this list.
+   */
   public function provider() {
     return ProviderFactory::getInstance()->providerByKey($this->source);
   }
@@ -128,6 +160,9 @@ class NewsletterList extends Model {
     }
   }
 
+  /**
+   * Unsubscribe an email address from this list.
+   */
   public function unsubscribe($email, $fromProvider = FALSE) {
     db_delete('campaignion_newsletters_subscriptions')
       ->condition('list_id', $this->list_id)
@@ -142,4 +177,5 @@ class NewsletterList extends Model {
       ))->save();
     }
   }
+
 }
