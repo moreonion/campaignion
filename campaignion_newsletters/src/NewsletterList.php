@@ -178,4 +178,21 @@ class NewsletterList extends Model {
     }
   }
 
+  /**
+   * Save this list to the database.
+   */
+  public function save() {
+    module_invoke_all('campaignion_newsletters_list_presave', $this);
+    parent::save();
+    module_invoke_all('campaignion_newsletters_list_saved', $this);
+  }
+
+  /**
+   * Delete this list.
+   */
+  public function delete() {
+    parent::delete();
+    module_invoke_all('campaignion_newsletters_list_deleted', $this);
+  }
+
 }
