@@ -270,7 +270,7 @@ function campaignion_newsletters_cronapi($op, $job = NULL) {
   $items['campaignion_newsletters_remove_stale_lists'] = [
     'descriptions' => 'Remove lists that haven’t been seen in a while.',
     'rule' => '0+@ 0 * * *',
-    'callback' => [CronRunner::class, 'removeStaleLists'],
+    'callback' => [NewsletterList::class, 'deleteStaleLists'],
   ];
   return $items;
 }

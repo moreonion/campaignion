@@ -30,13 +30,6 @@ class CronRunner {
     static::fromConfig()->poll();
   }
 
-  public static function removeStaleLists() {
-    $threshold = variable_get('campaignion_newsletters_last_list_poll', 0) - variable_get('campaignion_newsletters_list_expiry', 86400);
-    $lists = NewsletterList::notUpdatedSince($threshold);
-    foreach ($lists as $list) {
-      $list->delete();
-    }
-  }
 
   public function __construct($batch_size, $poll_time) {
     $this->sendBatchSize = $batch_size;

@@ -19,7 +19,7 @@ class NewsletterListTest extends \DrupalUnitTestCase {
     db_delete('campaignion_newsletters_subscriptions')->execute();
     db_delete('campaignion_newsletters_queue')->execute();
     db_delete('campaignion_newsletters_lists')->execute();
-    if ($this->node) {
+    if (isset($this->node)) {
       node_delete($this->node->nid);
     }
     parent::tearDown();
@@ -84,6 +84,36 @@ class NewsletterListTest extends \DrupalUnitTestCase {
     }, $subscriptions);
     $this->assertNotContains($l1->list_id, $list_ids);
     $this->assertContains($l2->list_id, $list_ids);
+  }
+
+  /**
+   * Test that stale lists are deleted.
+   */
+  public function testStaleListRemoval() {
+    $l1 = NewsletterList::fromData([
+      'source' => 'test',
+      'identifier' => 'l1',
+      'title' => 'List1',
+      'updated' => 0,
+    ]);
+    $l1->save();
+    $l2 = NewsletterList::fromData([
+      'source' => 'test',
+      'identifier' => 'l2',
+      'title' => 'List2',
+      'updated' => REQUEST_TIME,
+    ]);
+    $l2->save();
+    NewsletterList::deleteStaleLists();
+
+    $this->assertNotEmpty(NewsletterList::load($l1->list_id));
+    $this->assertNotEmpty(NewsletterList::load($l2->list_id));
+
+    _campaignion_newsletters_poll();
+
+    NewsletterList::deleteStaleLists();
+    $this->assertEmpty(NewsletterList::load($l1->list_id));
+    $this->assertNotEmpty(NewsletterList::load($l2->list_id));
   }
 
 }

@@ -196,4 +196,19 @@ class NewsletterList extends Model {
     module_invoke_all('campaignion_newsletters_list_deleted', $this);
   }
 
+  /**
+   * Delete stale newsletter lists.
+   *
+   * For most newsletter providers we don’t get any notification when a list is
+   * deleted. So we keep track of when a list was last seen when pollig lists
+   * and delete all lists that haven’t been seen in a while.
+   */
+  public static function deleteStaleLists() {
+    $threshold = variable_get('campaignion_newsletters_last_list_poll', 0) - variable_get('campaignion_newsletters_list_expiry', 86400);
+    $lists = static::notUpdatedSince($threshold);
+    foreach ($lists as $list) {
+      $list->delete();
+    }
+  }
+
 }
