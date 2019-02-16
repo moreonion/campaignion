@@ -52,16 +52,6 @@ class CronRunner {
         }
       }
 
-      $num_subscriptions = db_select('campaignion_newsletters_subscriptions')
-        ->condition('list_id', $list->list_id)
-        ->countQuery()
-        ->execute()
-        ->fetchField();
-      db_delete('campaignion_newsletters_subscriptions')
-        ->condition('list_id', $list->list_id)
-        ->execute();
-      echo "- Deleted {$num_subscriptions} subscriptions.\n";
-
       $list->delete();
     }
   }
