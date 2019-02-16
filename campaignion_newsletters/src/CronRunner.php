@@ -34,24 +34,6 @@ class CronRunner {
     $threshold = variable_get('campaignion_newsletters_last_list_poll', 0) - variable_get('campaignion_newsletters_list_expiry', 86400);
     $lists = NewsletterList::notUpdatedSince($threshold);
     foreach ($lists as $list) {
-      $node_controller = entity_get_controller('node');
-
-      $result = db_select('webform_component', 'c')
-        ->fields('c', ['nid', 'cid'])
-        ->condition('type', 'newsletter')
-        ->execute();
-      foreach ($result as $row) {
-        $node = node_load($row->nid);
-        $component = $node->webform['components'][$row->cid];
-        if (!empty($component['extra']['lists'][$list->list_id])) {
-          unset($component['extra']['lists'][$list->list_id]);
-          //webform_component_update($component);
-          //$node_controller->resetCache([$row->nid]);
-          $left = count(array_filter($component['extra']['lists']));
-          echo "Removed stale list from node#{$node->nid}({$node->type}) “{$node->title}” ($left lists left).\n";
-        }
-      }
-
       $list->delete();
     }
   }

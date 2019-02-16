@@ -278,6 +278,7 @@ function campaignion_newsletters_cronapi($op, $job = NULL) {
  * Implements hook_campaignion_newsletters_list_deleted().
  */
 function campaignion_newsletters_campaignion_newsletters_list_deleted(NewsletterList $list) {
+  Component::pruneList($list->list_id);
   Subscription::bulkDelete($list->list_id);
   QueueItem::bulkDelete($list->list_id);
 }
