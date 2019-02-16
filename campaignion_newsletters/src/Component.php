@@ -178,7 +178,7 @@ class Component {
         unset($component['extra']['lists'][$list_id]);
         webform_component_update($component);
         $node_controller->resetCache([$row->nid]);
-        $left = count(array_filter($component['extra']['lists']));
+        $left = array_filter($component['extra']['lists']);
         if ($node->status) {
           watchdog('campaignion_newsletters', 'Removed list from published node#%nid(%type) “%title” lists left: %lists', [
             '%nid' => $node->nid,
