@@ -191,6 +191,7 @@ class NewsletterList extends Model {
    * Delete this list.
    */
   public function delete() {
+    $transaction = db_transaction();
     parent::delete();
     module_invoke_all('campaignion_newsletters_list_deleted', $this);
   }

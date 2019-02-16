@@ -62,21 +62,7 @@ class CronRunner {
         ->execute();
       echo "- Deleted {$num_subscriptions} subscriptions.\n";
 
-      $num_items = db_select('campaignion_newsletters_queue')
-        ->condition('list_id', $list->list_id)
-        ->countQuery()
-        ->execute()
-        ->fetchField();
-      db_delete('campaignion_newsletters_queue')
-        ->condition('list_id', $list->list_id)
-        ->execute();
-      echo "- Deleted {$num_items} queue items.\n";
-
       $list->delete();
-      db_delete('campaignion_newsletters_lists')
-        ->condition('list_id', $list->list_id)
-        ->execute();
-      echo "- Deleted list.\n";
     }
   }
 

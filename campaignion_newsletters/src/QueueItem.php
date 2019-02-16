@@ -117,6 +117,21 @@ class QueueItem extends Model {
   }
 
   /**
+   * Bulk delete queue items based on their list.
+   *
+   * @param int $list_id
+   *   All queue items with this $list_id will be deleted.
+   *
+   * @return int
+   *   Number of affected rows.
+   */
+  public static function bulkDelete($list_id) {
+    return db_delete(static::$table)
+      ->condition('list_id', $list_id)
+      ->execute();
+  }
+
+  /**
    * Prepare a new queue item instance.
    */
   public function __construct($data = array(), $new = TRUE) {
