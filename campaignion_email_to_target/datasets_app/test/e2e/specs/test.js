@@ -12,6 +12,8 @@ function cellSelector (tBodySelector, row, col) {
   return tBodySelector + ' > tr:nth-of-type(' + row + ') > td:nth-of-type(' + col + ')'
 }
 
+var newCustomDatasetKey
+
 module.exports = {
   'app is being rendered': function (client) {
     var app = client.page.wizardStep()
@@ -125,11 +127,11 @@ module.exports = {
 
     editDialog.click('@save')
     app.waitForElementNotVisible(editDialog.selector, 1000)
-    app.expect.element('@chosenDataset').value.to.contain('My-first-pretty-dataset--')
+    app.expect.element('@chosenDataset').value.to.match(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/)
     app.expect.element('@introText').text.to.contain('My first "pretty" dataset')
 
     app.getValue('@chosenDataset', function (result) {
-      var datasetKey = result.value
+      var datasetKey = newCustomDatasetKey = result.value
 
       client.getXHR('/', 1000, function (xhrs) {
         client.assert.equal(xhrs.length, 2)
@@ -208,7 +210,7 @@ module.exports = {
     editDialog.click('@cancel')
 
     app.waitForElementNotVisible(editDialog.selector, 1000)
-    app.expect.element('@chosenDataset').value.to.contain('My-first-pretty-dataset--')
+    app.expect.element('@chosenDataset').value.to.equal(newCustomDatasetKey)
     app.expect.element('@introText').text.to.contain('My first "pretty" dataset')
   },
 
@@ -313,7 +315,7 @@ module.exports = {
     editDialog.click('@save')
 
     app.waitForElementNotVisible(editDialog.selector, 1000)
-    app.expect.element('@chosenDataset').value.to.contain('my-custom-dataset--39f93565-d491-4e3f-99a5-fc5c83446e2f')
+    app.expect.element('@chosenDataset').value.to.equal('39f93565-d491-4e3f-99a5-fc5c83446e2f')
     app.expect.element('@introText').text.to.contain('My really fancy dataset')
 
     client.getXHR('/', 1000, function (xhrs) {
@@ -326,7 +328,7 @@ module.exports = {
       var dataset = JSON.parse(xhrs[0].requestData)
       var contacts = JSON.parse(xhrs[1].requestData)
 
-      client.assert.equal(dataset.key, 'my-custom-dataset--39f93565-d491-4e3f-99a5-fc5c83446e2f')
+      client.assert.equal(dataset.key, '39f93565-d491-4e3f-99a5-fc5c83446e2f')
       client.assert.equal(dataset.title, 'My really fancy dataset')
       client.assert.equal(dataset.description, 'Lorem ipsum...')
       client.assert.equal(dataset.is_custom, true)
