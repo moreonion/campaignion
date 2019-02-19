@@ -11,11 +11,11 @@
       <section class="dsa-dataset-meta">
         <div>
           <label for="dsa-dataset-title">{{ text('dataset title') }} <small>{{ text('only for internal use') }}</small></label>
-          <input type="text" :value="currentDataset.title" @input="updateTitle" class="field-input" id="dsa-dataset-title" />
+          <input type="text" :value="currentDataset.title" @input="updateTitle" maxlength="255" class="field-input" id="dsa-dataset-title" />
         </div>
         <div>
           <label for="dsa-dataset-description">{{ text('dataset description') }} <small>{{ text('only for internal use') }}</small></label>
-          <input type="text" :value="currentDataset.description" @input="updateDescription" class="field-input" id="dsa-dataset-description">
+          <input type="text" :value="currentDataset.description" @input="updateDescription" maxlength="1000" class="field-input" id="dsa-dataset-description">
         </div>
       </section>
 
