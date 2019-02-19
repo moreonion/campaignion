@@ -95,7 +95,10 @@ module.exports = {
 
     client.click(cellSelector(editDialog.elements.tableBody.selector, 1, 5)) // last_name
     app.waitForElementVisible(popup.selector, 1000)
-    popup.setValue('@input', 'Muster')
+    popup.setValue('@input', Array(301).join('x')) // Try a string with 300 characters...
+    popup.click('@save')
+    app.waitForElementVisible(popup.selector + ' .dsa-edit-value-error', 1000) // Should show an error message.
+    popup.clearValue('@input').setValue('@input', 'Muster')
     popup.click('@save')
     app.waitForElementNotPresent(popup.selector, 1000)
     app.expect.element(cellSelector(editDialog.elements.tableBody.selector, 1, 5)).text.to.equal('Muster')

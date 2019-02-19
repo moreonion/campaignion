@@ -42,6 +42,13 @@
           <a href="#" class="dsa-delete-contact" @click.prevent.stop="deleteContact(props.row.id)">{{ text('delete') }}</a>
         </template>
 
+        <template v-for="col in contentColumns" :slot="col" scope="props">
+          <div :class="{
+            'dsa-contact-field': true,
+            'dsa-contact-field-invalid': showContactErrors && !isValidValue(col, props.row[col])
+          }">{{ props.row[col] }}</div>
+        </template>
+
         <template :slot="'h__' + attribute.key" scope="props" v-for="attribute in currentDataset.attributes">
           <span class="VueTables__heading" :title="attribute.description">{{ attribute.title }}</span>
         </template>
@@ -126,12 +133,19 @@ export default {
       return !find(this.contacts, '__error')
     },
 
+    /** @return {string[]} All columns in the table that don’t start with a double underscore. */
+    contentColumns () {
+      return this.tableColumns.filter(col => col.indexOf('__') !== 0)
+    },
+
     ...mapState([
       'currentDataset',  /** {(Object|null)} The dataset being edited. */
       'contacts',        /** {Object[]} Array of contacts belonging to the current dataset. */
       'tableColumns',    /** {string[]} Array of column identifiers. */
       'standardColumns', /** {Object[]} Array of objects describing the standard columns. */
       'contactsTable',   /** {(Object|undefined)} vue-tables-2 state via vuex. */
+      'validations',     /** {Object} Validations for each column. Dictionary of regex strings, keyed by column name. */
+      'maxFieldLengths', /** {Object} Maximum characters for each column. Dictionary of integers, keyed by column name. */
       'showEditDialog',  /** {boolean} Visibility of the edit dataset dialog. */
       'showSpinner',     /** {boolean} Visibility of the loading spinner. */
       'datasetChanged'   /** {boolean} True if the user has made changes on the current dataset. */
@@ -164,6 +178,21 @@ export default {
   },
 
   methods: {
+    /**
+     * Checks whether a value is valid for a specific column or not.
+     * @param {string} col - The column identifier.
+     * @param {string} val - The value to test.
+     * @return {boolean} Is the value valid for this column?
+     */
+    isValidValue (col, val) {
+      var valid = true
+      if ((typeof this.maxFieldLengths[col] !== 'undefined' && val.length > this.maxFieldLengths[col]) ||
+        (typeof this.validations[col] !== 'undefined' && new RegExp(this.validations[col]).test(val) === false)) {
+        valid = false
+      }
+      return valid
+    },
+
     /**
      * Append a contact to the list, clear the table filter and show the last page.
      */
