@@ -181,7 +181,10 @@ class NewsletterList extends Model {
   /**
    * Save this list to the database.
    */
-  public function save() {
+  public function save($updated = TRUE) {
+    if ($updated) {
+      $this->updated = REQUEST_TIME;
+    }
     module_invoke_all('campaignion_newsletters_list_presave', $this);
     parent::save();
     module_invoke_all('campaignion_newsletters_list_saved', $this);
