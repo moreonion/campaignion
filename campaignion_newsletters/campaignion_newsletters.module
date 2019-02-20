@@ -75,20 +75,6 @@ function campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form, 
 }
 
 /**
- * Implements hook_form_FORM_ID_alter() for webform_client_form().
- *
- * Load the JavaScript needed for same-page conditionals.
- */
-function campaignion_newsletters_form_webform_client_form_alter(&$form, &$form_state) {
-  // Webfrom (4.16) provides no concise way to test whether a component with the
-  // 'newsletter' conditional type is the source for a same-page conditional on
-  // the current webform page. For simplicity we simply do the same as webform
-  // does: Load the JavaScript for every webform.
-  $path = drupal_get_path('module', 'campaignion_newsletters');
-  $form['#attached']['js'][] = "$path/campaignion_newsletters.conditionals.js";
-}
-
-/**
  * Implements hook_webform_submission_confirmed().
  */
 function campaignion_newsletters_webform_submission_confirmed(Submission $submission) {
