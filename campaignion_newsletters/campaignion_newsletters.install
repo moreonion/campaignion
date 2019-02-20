@@ -54,6 +54,11 @@ function campaignion_newsletters_schema() {
           'type' => 'blob',
           'size' => 'big',
         ],
+        'updated' => [
+          'description' => 'The timestamp of the last time this list was synced from the provider.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+        ],
       ],
       'primary key' => ['list_id'],
     ],
@@ -186,7 +191,22 @@ function campaignion_newsletters_install() {
  */
 function campaignion_newsletters_uninstall() {
   variable_del('campaignion_newsletters_batch_size');
+  variable_del('campaignion_newsletters_last_list_poll');
   variable_del('campaignion_newsletters_poll_time');
+}
+
+/**
+ * Add {campaignion_newsletters_lists}.updated column.
+ */
+function campaignion_newsletters_update_19() {
+  db_add_field('campaignion_newsletters_lists', 'updated', [
+    'description' => 'The timestamp of the last time this list was synced from the provider.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+  ]);
+  db_update('campaignion_newsletters_lists')
+    ->fields(['updated' => REQUEST_TIME])
+    ->execute();
 }
 
 /**

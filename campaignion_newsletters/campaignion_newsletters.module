@@ -7,8 +7,11 @@
 
 use Drupal\campaignion_newsletters\Component;
 use Drupal\campaignion_newsletters\CronRunner;
-use Drupal\campaignion_newsletters\ProviderFactory;
 use Drupal\campaignion_newsletters\FormBuilderElementNewsletter;
+use Drupal\campaignion_newsletters\NewsletterList;
+use Drupal\campaignion_newsletters\ProviderFactory;
+use Drupal\campaignion_newsletters\QueueItem;
+use Drupal\campaignion_newsletters\Subscription;
 use Drupal\campaignion_newsletters\Subscriptions;
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 use Drupal\little_helpers\Webform\Submission;
@@ -31,6 +34,7 @@ function _campaignion_newsletters_poll() {
       $list->save();
     }
   }
+  variable_set('campaignion_newsletters_last_list_poll', REQUEST_TIME);
 }
 
 /**
@@ -263,5 +267,19 @@ function campaignion_newsletters_cronapi($op, $job = NULL) {
     'rule' => '*/2+@ * * * *',
     'callback' => [CronRunner::class, 'cronPoll'],
   ];
+  $daily['scheduler']['simple']['rules'] = ['0+@ 0 * * *'];
+  $items['campaignion_newsletters_remove_stale_lists'] = [
+    'descriptions' => 'Remove lists that haven’t been seen in a while.',
+    'callback' => [NewsletterList::class, 'deleteStaleLists'],
+  ] + $daily;
   return $items;
+}
+
+/**
+ * Implements hook_campaignion_newsletters_list_deleted().
+ */
+function campaignion_newsletters_campaignion_newsletters_list_deleted(NewsletterList $list) {
+  Component::pruneList($list->list_id);
+  Subscription::bulkDelete($list->list_id);
+  QueueItem::bulkDelete($list->list_id);
 }
