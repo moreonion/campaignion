@@ -96,14 +96,16 @@ class NewsletterListTest extends \DrupalUnitTestCase {
       'title' => 'List1',
       'updated' => 0,
     ]);
-    $l1->save();
+    $l1->save(FALSE);
+    $this->assertEqual(0, $l1->updated);
     $l2 = NewsletterList::fromData([
       'source' => 'test',
       'identifier' => 'l2',
       'title' => 'List2',
-      'updated' => REQUEST_TIME,
+      'updated' => 0,
     ]);
     $l2->save();
+    $this->assertEqual(REQUEST_TIME, $l2->updated);
     NewsletterList::deleteStaleLists();
 
     $this->assertNotEmpty(NewsletterList::load($l1->list_id));
