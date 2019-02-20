@@ -204,7 +204,9 @@ function campaignion_newsletters_update_19() {
     'type' => 'int',
     'unsigned' => TRUE,
   ]);
-
+  db_update('campaignion_newsletters_lists')
+    ->fields(['updated' => REQUEST_TIME])
+    ->execute();
 }
 
 /**
