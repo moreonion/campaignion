@@ -2,7 +2,15 @@
 
 namespace Drupal\campaignion_newsletters;
 
-class QueueItem extends \Drupal\little_helpers\DB\Model {
+use Drupal\little_helpers\DB\Model;
+
+/**
+ * Model class for newsletter queue items.
+ *
+ * Queue items represent data that’s to be sent to the newsletter provider.
+ */
+class QueueItem extends Model {
+
   const SUBSCRIBE = 'subscribe';
   const UNSUBSCRIBE = 'unsubscribe';
   const UPDATE = 'update';
@@ -19,10 +27,26 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
 
   protected static $table = 'campaignion_newsletters_queue';
   protected static $key = ['id'];
-  protected static $values = ['list_id', 'email', 'created', 'locked', 'action', 'args', 'data', 'optin_info'];
-  protected static $serialize = ['args' => TRUE, 'data' => TRUE, 'optin_info' => TRUE];
+  protected static $values = [
+    'list_id',
+    'email',
+    'created',
+    'locked',
+    'action',
+    'args',
+    'data',
+    'optin_info',
+  ];
+  protected static $serialize = [
+    'args' => TRUE,
+    'data' => TRUE,
+    'optin_info' => TRUE,
+  ];
   protected static $serial = TRUE;
 
+  /**
+   * Load a queue item by its primary keys.
+   */
   public static function load($list_id, $email) {
     $table = static::$table;
     $keys = [':list_id' => $list_id, ':email' => $email, ':now' => REQUEST_TIME];
@@ -32,6 +56,9 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     }
   }
 
+  /**
+   * Load a queue item by its id.
+   */
   public static function byId($id) {
     $table = static::$table;
     $keys = [':id' => $id];
@@ -41,6 +68,9 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     }
   }
 
+  /**
+   * Load or create queue item.
+   */
   public static function byData($data) {
     if ($item = static::load($data['list_id'], $data['email'])) {
       $item->__construct($data, FALSE);
@@ -51,6 +81,17 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     return $item;
   }
 
+  /**
+   * Load and lock queue items in order to process them.
+   *
+   * @param int $limit
+   *   Maximum number of queue items to load.
+   * @param int $time
+   *   Duration of the lock.
+   *
+   * @return \Drupal\campaignion_newsletters\QueueItem[]
+   *   An array of locked queue items.
+   */
   public static function claimOldest($limit, $time = 600) {
     $transaction = db_transaction();
     $t = static::$table;
@@ -75,6 +116,24 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     return $items;
   }
 
+  /**
+   * Bulk delete queue items based on their list.
+   *
+   * @param int $list_id
+   *   All queue items with this $list_id will be deleted.
+   *
+   * @return int
+   *   Number of affected rows.
+   */
+  public static function bulkDelete($list_id) {
+    return db_delete(static::$table)
+      ->condition('list_id', $list_id)
+      ->execute();
+  }
+
+  /**
+   * Prepare a new queue item instance.
+   */
   public function __construct($data = array(), $new = TRUE) {
     parent::__construct($data, $new);
     if (!isset($this->created)) {
