@@ -38,6 +38,15 @@ const Drupal = {
         'last_name': '\\S+',
         'salutation': '\\S+'
       },
+      maxFieldLengths: {
+        'email': 255,
+        'title': 255,
+        'first_name': 255,
+        'last_name': 255,
+        'salutation': 255,
+        'display_name': 255,
+        'group': 255
+      },
       endpoints: {
         'e2t-api': {
           url: process.env.E2T_API_URL, // url injected by webpack.DefinePlugin

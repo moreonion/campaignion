@@ -67,6 +67,15 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
       'last_name' => '\\S+',
       'salutation' => '\\S+',
     ];
+    $settings['maxFieldLengths'] = [  // used by the front end to validate field max length.
+      'email' => 255,
+      'title' => 255,
+      'first_name' => 255,
+      'last_name' => 255,
+      'salutation' => 255,
+      'display_name' => 255,
+      'group' => 255,
+    ];
     $settings['endpoints']['e2t-api'] = [
       'url' => $this->api->getEndpoint(),
       'token' => $this->api->getAccessToken(),

@@ -45,7 +45,7 @@
       ],
       "description": "Lorem ipsum...",
       "is_custom": true,
-      "key": "my-custom-dataset--39f93565-d491-4e3f-99a5-fc5c83446e2f",
+      "key": "39f93565-d491-4e3f-99a5-fc5c83446e2f",
       "title": "My custum dataset"
     }
   ],
@@ -100,7 +100,7 @@
     },
     {
       "key": 2,
-      "datasetId": "my-custom-dataset--39f93565-d491-4e3f-99a5-fc5c83446e2f",
+      "datasetId": "39f93565-d491-4e3f-99a5-fc5c83446e2f",
       "contacts": [
         {
           "title": "Mr",
