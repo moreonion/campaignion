@@ -13,8 +13,7 @@ include_once 'campaignion_source_tags.features.inc';
  * Implements hook_campaignion_action_contact_alter().
  */
 function campaignion_source_tags_campaignion_action_contact_alter($contact, $submission, $action_node) {
-  $wrapped = $contact->wrap();
-  if (!isset($wrapped->supporter_tags)) {
+  if (!isset($contact->supporter_tags)) {
     return FALSE;
   }
   $add_tags = variable_get_value('campaignion_source_tags_new_tags');
@@ -35,8 +34,8 @@ function campaignion_source_tags_campaignion_action_contact_alter($contact, $sub
  * Implements hook_entity_presave().
  */
 function campaignion_source_tags_entity_presave($entity, $entity_type) {
-  $wrapped = entity_metadata_wrapper($entity_type, $entity);
-  if (isset($wrapped->supporter_tags)) {
+  if (isset($entity->supporter_tags)) {
+    $wrapped = entity_metadata_wrapper($entity_type, $entity);
     foreach (_campaignion_source_tags_map() as $property => $uuid) {
       $attr = "{$property}_tag";
       if (!isset($wrapped->$attr) || $wrapped->$attr->value()) {
