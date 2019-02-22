@@ -8,7 +8,7 @@
     class="dsa-edit-dataset-dialog"
     >
     <div v-loading="showSpinner" class="dsa-edit-dataset-dialog-body-wrapper">
-      <section class="dsa-dataset-meta">
+      <section class="dsa-edit-dataset-top-1">
         <div>
           <label for="dsa-dataset-title">{{ text('dataset title') }} <small>{{ text('only for internal use') }}</small></label>
           <input type="text" :value="currentDataset.title" @input="updateTitle" maxlength="255" class="field-input" id="dsa-dataset-title" />
@@ -17,6 +17,11 @@
           <label for="dsa-dataset-description">{{ text('dataset description') }} <small>{{ text('only for internal use') }}</small></label>
           <input type="text" :value="currentDataset.description" @input="updateDescription" maxlength="1000" class="field-input" id="dsa-dataset-description">
         </div>
+      </section>
+
+      <section class="dsa-edit-dataset-top-2">
+        <p>{{ text('dataset guidance 1') }}</p>
+        <p>{{ text('dataset guidance 2') }}</p>
       </section>
 
       <div class="dsa-target-data ae-legend">{{ text('target data') }}</div>
@@ -40,6 +45,8 @@
           classes: 'dsa-filter-tooltip',
           popperOptions: {modifiers: {offset: {offset: '-60px, 8px'}}}
         }" class="dsa-filter-tooltip-icon show-help-text" slot="afterFilter"><span>?</span></a>
+
+        <p v-if="showContactErrors && !contactsAreValid" class="dsa-invalid-contacts-message" slot="beforeTable">{{ text('invalid contacts message') }}</p>
 
         <template slot="__error" scope="props">
           <span v-if="showContactErrors && props.row.__error" class="dsa-invalid-contact">✘</span>
@@ -287,7 +294,7 @@ export default {
           }
           // validate result
           if (!meta.fields) {
-            this.$alert(Drupal.t('Your file seems to be crap.'), Drupal.t('Invalid data'))
+            this.$alert(Drupal.t('Please upload the dataset in the CSV format.'), Drupal.t('Invalid format'))
             this.$store.commit('showSpinner', false)
             return
           }
@@ -298,7 +305,7 @@ export default {
             }
           }
           if (missingCols.length) {
-            this.$alert(Drupal.t('The following columns are missing in the headers line: ') + missingCols.join(', '), Drupal.t('Invalid data'))
+            this.$alert(Drupal.t('Please upload the dataset in the CSV format, with these columns: ') + missingCols.join(', '), Drupal.t('Invalid format'))
             this.$store.commit('showSpinner', false)
             return
           }
@@ -419,6 +426,8 @@ export default {
         case 'dataset title': return Drupal.t('Name of your dataset')
         case 'dataset description': return Drupal.t('Description')
         case 'only for internal use': return Drupal.t('for internal use only')
+        case 'dataset guidance 1': return Drupal.t('All fields except display name and group are mandatory for each target.')
+        case 'dataset guidance 2': return Drupal.t('Before uploading your own csv, click ‘Download dataset’ to see the required columns and use this file as a template.')
         case 'download dataset': return Drupal.t('Download current dataset')
         case 'download tooltip': return Drupal.t('Download your current dataset including column headings.')
         case 'upload dataset': return Drupal.t('Upload dataset (CSV)')
@@ -428,6 +437,7 @@ export default {
         case 'proceed': return Drupal.t('Yes, proceed')
         case 'target data': return Drupal.t('The target data')
         case 'filter tooltip': return Drupal.t('The filter functionality can help you find and edit records in a long list, but the filter will not affect the dataset itself.')
+        case 'invalid contacts message': return Drupal.t('There is an error in the displayed target record(s). Make sure all mandatory fields are completed. If the error persists, please contact support@more-onion.com.')
         case 'add row': return Drupal.t('Add a new target')
         case 'delete': return Drupal.t('Delete')
         case 'choose dataset': return Drupal.t('Choose a different dataset')
