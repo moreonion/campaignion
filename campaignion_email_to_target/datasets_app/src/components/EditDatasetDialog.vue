@@ -31,6 +31,7 @@
         class="dsa-contacts-table"
       >
         <span class="dsa-upload-data-wrapper" slot="beforeFilter">
+          <el-button @click="saveBlob(serializeContacts(), generateFilename(currentDataset.title))" v-tooltip.top="text('download tooltip')">{{ text('download dataset') }}</el-button>
           <label for="dsa-updoad-data" @click="chooseFile" v-tooltip.top="text('upload tooltip')" class="el-button">{{ text('upload dataset') }}</label>
         </span>
 
@@ -86,9 +87,10 @@
 import EditValuePopup from '@/components/EditValuePopup'
 import {mapState} from 'vuex'
 import {INVALID_CONTACT_STRING} from '@/utils'
-import {find} from 'lodash'
+import {find, pick} from 'lodash'
 import animatedScrollTo from 'animated-scrollto'
 import Papa from 'papaparse'
+import {saveAs} from 'file-saver'
 
 export default {
   components: {
@@ -326,6 +328,34 @@ export default {
     },
 
     /**
+     * Generate a string containing all contacts in CSV format.
+     * @return {string} CSV with a header row.
+     */
+    serializeContacts () {
+      const cols = this.columns.map(col => col.key) // We want to omit the id and __error cols...
+      const contacts = this.contacts.map(contact => pick(contact, cols))
+      return contacts.length ? Papa.unparse(contacts, {columns: cols}) : cols.join(',')
+    },
+
+    generateFilename (string) {
+      var slug = string.replace(/[\s,.;/?!:@=&"'<>#%{}|\\^~[\]`()*]+/g, '-') // strip ugly characters
+      slug = slug.replace(/(^-|-$)/g, '') // trim dashes
+      slug = slug.replace(/(-+)/g, '-') // remove multiple dashes
+      slug = encodeURIComponent(slug) // encode remaining bad characters
+      return `${slug || 'dataset'}.csv`
+    },
+
+    /**
+     * Download data using FileSaver.js
+     * @param {string} data - The data to save.
+     * @param {string} filename - The name for the download file.
+     */
+    saveBlob (data, filename) {
+      const blob = new Blob([data], {type: 'text/csv;charset=utf-8'})
+      saveAs(blob, filename)
+    },
+
+    /**
      * Handle clicks on the Save button.
      * If there are changes in the dataset, check for invalid contacts and eventually filter the list
      * before saving the dataset and closing the dialog. If there aren’t any changes, set the selected
@@ -389,6 +419,8 @@ export default {
         case 'dataset title': return Drupal.t('Name of your dataset')
         case 'dataset description': return Drupal.t('Description')
         case 'only for internal use': return Drupal.t('for internal use only')
+        case 'download dataset': return Drupal.t('Download current dataset')
+        case 'download tooltip': return Drupal.t('Download your current dataset including column headings.')
         case 'upload dataset': return Drupal.t('Upload dataset (CSV)')
         case 'upload tooltip': return Drupal.t('If you have a large dataset, you might find it quicker to upload the whole set using the ‘Upload dataset’ button.')
         case 'upload warning': return Drupal.t('The existing dataset will be replaced with the CSV data. The existing data will be removed.')

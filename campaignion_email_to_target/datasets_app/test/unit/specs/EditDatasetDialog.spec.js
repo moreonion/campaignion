@@ -39,5 +39,45 @@ describe('EditDatasetDialog', function () {
         assert.equal(isValidValue('title', 'Sir'), true)
       })
     })
+
+    describe('serializeContacts', function () {
+      const serializeContacts = EditDatasetDialog.methods.serializeContacts
+      const contacts = [
+        {a: '1', b: '2', foo: 'bar', c: '3'},
+        {a: 'A', b: 'B', foo: 'baz', c: 'C'},
+        {a: 'a', b: 'b', foo: 'bim', c: 'c'}
+      ]
+      const columns = [
+        {key: 'a', title: 'aaa'},
+        {key: 'b', title: 'bbb'},
+        {key: 'c', titel: 'ccc'}
+      ]
+      const csv = 'a,b,c\r\n1,2,3\r\nA,B,C\r\na,b,c'
+      it('returns CSV, omitting the foo column.', function () {
+        assert.equal(serializeContacts.call({contacts, columns}), csv)
+      })
+      it('returns comma-separated headers if the contacts are empty.', function () {
+        assert.equal(serializeContacts.call({contacts: [], columns}), 'a,b,c')
+      })
+    })
+
+    describe('generateFilename', function () {
+      const generateFilename = EditDatasetDialog.methods.generateFilename
+      it('turns special characters into single dashes.', function () {
+        assert.equal(generateFilename('a,b.;/c?!d:@=e&"\'<>f#%g{}|\\^~['), 'a-b-c-d-e-f-g.csv')
+      })
+      it('turns whitespace into single dashes.', function () {
+        assert.equal(generateFilename('a    b c\nd\r\n e'), 'a-b-c-d-e.csv')
+      })
+      it('trims leading and trailing whitespace or special characters.', function () {
+        assert.equal(generateFilename(' ;#"abc ?  '), 'abc.csv')
+      })
+      it('encodes utf characters.', function () {
+        assert.equal(generateFilename('✓'), '%E2%9C%93.csv')
+      })
+      it('returns dataset.csv as a default.', function () {
+        assert.equal(generateFilename(''), 'dataset.csv')
+      })
+    })
   })
 })
