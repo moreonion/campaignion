@@ -40,11 +40,20 @@ export default {
   },
 
   computed: {
+    /**
+     * Get an errors collection for the default message in case it’s empty.
+     * @return {(Object[]|undefined)} An errors collection with an error object for the default message.
+     */
     defaultMessageErrors () {
       if (isEmptyMessage(this.defaultMessage.message)) {
         return [{type: 'message', message: 'Message is empty'}]
       }
     },
+
+    /**
+     * Compare the specs and the default message with initial state.
+     * @return {boolean} Is there a difference to initial state?
+     */
     unsavedChanges () {
       for (let i = 0, j = this.$store.state.specs.length; i < j; i++) {
         if (!isEqual(omit(this.$store.state.specs[i], ['errors', 'filterStr']), omit(this.$store.state.initialData.specs[i], ['errors', 'filterStr']))) {
@@ -56,10 +65,11 @@ export default {
       }
       return false
     },
+
     ...mapState([
-      'specs',
-      'defaultMessage',
-      'tokenCategories'
+      'specs',          /** {Object[]} Specifications for specific targets, these are either of type `message-template` or `exclusion`. */
+      'defaultMessage', /** {Object} The spec object representing the message sent to all remaining targets. */
+      'tokenCategories' /** {Object[]} Collection of categories with a `title`, a `description` and a collection of `tokens`. The `tokens` each have a `title`, a `description` and a `token`. */
     ])
   },
 
@@ -84,9 +94,19 @@ export default {
         case 'Save anyway': return Drupal.t('Save anyway')
       }
     },
+
+    /**
+     * Emit a `newSpec` event on the global bus, with the spec type as the payload.
+     * @param {string} type - The type of the spec to create.
+     */
     newSpec (type) {
       this.$bus.$emit('newSpec', type)
     },
+
+    /**
+     * Set the default message.
+     * @param {Object} val - The message object to store.
+     */
     updateDefaultMessage (val) {
       this.$store.commit({type: 'updateDefaultMessage', message: val})
     }
@@ -99,15 +119,19 @@ export default {
 
   mounted () {
     const listener = e => {
+      /** Answer back to interrupt-submit.js, it’s ok to leave the page. */
       const leavePage = () => {
         dispatch(this.$el, 'resume-leave-page')
       }
 
+      /** Answer back to interrupt-submit.js, don’t leave the page. */
       const stayOnPage = () => {
         dispatch(this.$el, 'cancel-leave-page')
       }
 
+      /** Persist the data to the server. */
       const putData = () => {
+        // Append the default message to the specs array.
         const messages = clone(this.$store.state.specs)
         messages.push(clone(this.$store.state.defaultMessage))
         const data = JSON.stringify({
@@ -125,6 +149,7 @@ export default {
         })
       }
 
+      // Does the user want to leave the page without saving?
       if (e.type === 'request-leave-page') {
         if (this.unsavedChanges) {
           this.$confirm(this.text('unsaved changes'), this.text('unsaved changes title'), {
@@ -135,17 +160,22 @@ export default {
         } else {
           leavePage()
         }
+        // By now, we’ve established that it’s ok to leave the page or or the user decided to stay,
+        // so we don’t proceed.
         return
       }
 
+      // Should we warn the user before saving invalid data?
       if (this.$store.state.hardValidation) {
         var validationFailed = false
+        // Check each of the specs for errors.
         for (let i = 0, j = this.specs.length; i < j; i++) {
           if (this.$store.state.specs[i].errors && this.$store.state.specs[i].errors.length) {
             validationFailed = true
             break
           }
         }
+        // Check the default message for errors.
         if (this.defaultMessageErrors && this.defaultMessageErrors.length) {
           validationFailed = true
         }
@@ -159,9 +189,12 @@ export default {
         }
       }
 
+      // This is the standard procedure for unpublished actions. The user has clicked
+      // 'Save as draft' or 'Next', and we persist the data even if there are errors.
       putData()
     }
 
+    // Listen to events dispatched by campaignion_vue’s interrupt-submit.js
     this.$el.addEventListener('request-submit-page', listener)
     this.$el.addEventListener('request-leave-page', listener)
   }
