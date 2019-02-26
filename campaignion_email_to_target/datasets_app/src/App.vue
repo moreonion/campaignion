@@ -168,4 +168,12 @@ td.dsa-edited .dsa-contact-field-invalid {
   10% { background: #d66540; }
   100% { background: transparent; }
 }
+
+.v-tooltip {
+  display: block !important;
+  z-index: 10000;
+}
+.v-tooltip .tooltip-inner {
+  background-color: #ddd;
+}
 </style>

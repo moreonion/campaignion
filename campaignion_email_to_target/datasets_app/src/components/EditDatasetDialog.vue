@@ -19,6 +19,9 @@
         </div>
       </section>
 
+      <div class="dsa-target-data ae-legend">{{ text('target data') }}</div>
+      <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
+
       <v-client-table
         :data="contacts"
         :columns="tableColumns"
@@ -27,12 +30,15 @@
         ref="contactsTable"
         class="dsa-contacts-table"
       >
-        <span slot="beforeFilter" class="dsa-target-data ae-legend">{{ text('target data') }}</span>
-
-        <span class="dsa-upload-data-wrapper" slot="afterFilter">
-          <label for="dsa-updoad-data" @click="chooseFile" class="el-button">{{ text('upload dataset') }}</label>
-          <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
+        <span class="dsa-upload-data-wrapper" slot="beforeFilter">
+          <label for="dsa-updoad-data" @click="chooseFile" v-tooltip.top="text('upload tooltip')" class="el-button">{{ text('upload dataset') }}</label>
         </span>
+
+        <a href="#" @click.prevent v-tooltip.top="{
+          content: text('filter tooltip'),
+          classes: 'dsa-filter-tooltip',
+          popperOptions: {modifiers: {offset: {offset: '-60px, 8px'}}}
+        }" class="dsa-filter-tooltip-icon show-help-text" slot="afterFilter"><span>?</span></a>
 
         <template slot="__error" scope="props">
           <span v-if="showContactErrors && props.row.__error" class="dsa-invalid-contact">✘</span>
@@ -49,8 +55,11 @@
           }">{{ props.row[col] }}</div>
         </template>
 
-        <template :slot="'h__' + attribute.key" scope="props" v-for="attribute in currentDataset.attributes">
-          <span class="VueTables__heading" :title="attribute.description">{{ attribute.title }}</span>
+        <template :slot="'h__' + column.key" scope="props" v-for="column in columns">
+          <span class="VueTables__heading" v-tooltip.top="{
+            content: column.description,
+            boundariesElement: $el.children[0]
+          }">{{ column.title }}</span>
         </template>
 
         <template slot="h____error" scope="props"></template>
@@ -141,6 +150,7 @@ export default {
     ...mapState([
       'currentDataset',  /** {(Object|null)} The dataset being edited. */
       'contacts',        /** {Object[]} Array of contacts belonging to the current dataset. */
+      'columns',         /** {Object[]} Array of objects describing each column in the current dataset: {key: 'foo', title: 'Foo', description: 'The foo column.'} */
       'tableColumns',    /** {string[]} Array of column identifiers. */
       'standardColumns', /** {Object[]} Array of objects describing the standard columns. */
       'contactsTable',   /** {(Object|undefined)} vue-tables-2 state via vuex. */
@@ -380,10 +390,12 @@ export default {
         case 'dataset description': return Drupal.t('Description')
         case 'only for internal use': return Drupal.t('for internal use only')
         case 'upload dataset': return Drupal.t('Upload dataset (CSV)')
+        case 'upload tooltip': return Drupal.t('If you have a large dataset, you might find it quicker to upload the whole set using the ‘Upload dataset’ button.')
         case 'upload warning': return Drupal.t('The existing dataset will be replaced with the CSV data. The existing data will be removed.')
         case 'Data will be lost': return Drupal.t('Data will be lost')
         case 'proceed': return Drupal.t('Yes, proceed')
         case 'target data': return Drupal.t('The target data')
+        case 'filter tooltip': return Drupal.t('The filter functionality can help you find and edit records in a long list, but the filter will not affect the dataset itself.')
         case 'add row': return Drupal.t('Add a new target')
         case 'delete': return Drupal.t('Delete')
         case 'choose dataset': return Drupal.t('Choose a different dataset')

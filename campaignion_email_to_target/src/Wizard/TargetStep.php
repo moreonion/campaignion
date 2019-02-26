@@ -47,7 +47,7 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
       ],
       [
         'key' => 'salutation',
-        'description' => 'Full name and titles',
+        'description' => 'This field is how the target will be addressed in the email opening so should include any appropriate honorifics e.g. ‘Rt Hon John Smith MP’',
         'title' => 'Salutation',
       ],
       [
@@ -58,7 +58,7 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
       [
         'key' => 'group',
         'title' => 'Group',
-        'description' => '',
+        'description' => 'Use this field to segment your list if you want to send different versions of the email to different people, e.g. ‘Chair’ vs ‘Member’. You can set these specific messages up on the next step of the page builder.',
       ],
     ];
     $settings['validations'] = [              // used by the front end, a set of 'key' => 'regex' pairs

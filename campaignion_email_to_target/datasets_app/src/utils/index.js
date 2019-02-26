@@ -1,6 +1,7 @@
 import Vue from 'vue'
 
 export const INVALID_CONTACT_STRING = 'has:error'
+export const TOOLTIP_CLASS = 'v-tooltip'
 
 /**
  * Deep-copy an object.
