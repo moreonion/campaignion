@@ -20,6 +20,7 @@
       </section>
 
       <div class="dsa-target-data ae-legend">{{ text('target data') }}</div>
+      <!-- HACK: The input field has to be outside the table’s `beforeFilter` slot until this issue is fixed: https://github.com/matfish2/vue-tables-2/issues/670 -->
       <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
 
       <v-client-table
