@@ -8,6 +8,10 @@ Vue.use(Vuex)
 
 const debug = process.env.NODE_ENV !== 'production'
 
+/**
+ * Store factory function.
+ * @return {Store} A new instance of Vuex.Store.
+ */
 export function createStore () {
   return new Vuex.Store({
     state: createState(),
