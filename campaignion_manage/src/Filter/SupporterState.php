@@ -11,7 +11,7 @@ class SupporterState extends Base implements FilterInterface {
    * {@inheritdoc}
    */
   public function defaults() {
-    return ['value' => 1];
+    return ['value' => REDHEN_STATE_ACTIVE];
   }
 
   /**
@@ -19,10 +19,10 @@ class SupporterState extends Base implements FilterInterface {
    */
   public function formElement(array &$element, array &$form_state, array &$values) {
     $element['value'] = [
-      '#type' => 'checkbox',
-      '#title' => t('Exclude archived contacts.'),
+      '#type' => 'radios',
+      '#title' => t('Status is …'),
+      '#options' => redhen_state_options(),
       '#default_value' => !empty($values['value']),
-      '#disabled' => TRUE,
     ];
   }
 
@@ -30,15 +30,15 @@ class SupporterState extends Base implements FilterInterface {
    * Return the title of this filter used in the filter listing.
    */
   public function title() {
-    return t('Exclude archived supporters');
+    return t('Status');
   }
 
   /**
    * Apply the filter to a query.
    */
   public function apply($query, array $values) {
-    if (!empty($values['value'])) {
-      $query->condition('r.redhen_state', 1);
+    if (isset($values['value'])) {
+      $query->condition('r.redhen_state', $values['value']);
     }
   }
 
