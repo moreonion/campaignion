@@ -10,7 +10,8 @@ class SupporterPage extends Page {
     foreach ($filter_info as $name => $class) {
       $filters[$name] = new $class($this->baseQuery->query());
     }
-    $default[] = array('type' => 'name', 'removable' => FALSE);
+    $default[] = ['type' => 'name', 'removable' => FALSE];
+    $default[] = ['type' => 'state', 'values' => ['value' => 1]];
     $this->filterForm = new FilterForm('supporter', $filters, $default);
 
     $bulkOps = array();
