@@ -46,7 +46,7 @@
           popperOptions: {modifiers: {offset: {offset: '-60px, 8px'}}}
         }" class="dsa-filter-tooltip-icon show-help-text" slot="afterFilter"><span>?</span></a>
 
-        <p v-if="showContactErrors && !contactsAreValid" class="dsa-invalid-contacts-message" slot="beforeTable">{{ text('invalid contacts message') }}</p>
+        <div v-if="showContactErrors && !contactsAreValid" class="dsa-invalid-contacts-message messages error" slot="beforeTable">{{ text('invalid contacts message') }}</div>
 
         <template slot="__error" scope="props">
           <span v-if="showContactErrors && props.row.__error" class="dsa-invalid-contact">✘</span>
