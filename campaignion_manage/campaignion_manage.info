@@ -12,6 +12,7 @@ dependencies[] = ctools
 dependencies[] = date_popup
 dependencies[] = node
 dependencies[] = psr0
+dependencies[] = redhen_contact
 
 scripts[] = "js/content_translations.js"
 
