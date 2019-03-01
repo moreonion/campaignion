@@ -65,7 +65,7 @@
 
         <template :slot="'h__' + column.key" scope="props" v-for="column in columns">
           <span class="VueTables__heading" v-tooltip.top="{
-            content: column.description,
+            content: columnHeaderTooltipText(column),
             boundariesElement: $el.children[0]
           }">{{ column.title }}</span>
         </template>
@@ -419,6 +419,16 @@ export default {
       } else {
         this.$store.commit('closeEditDialog')
       }
+    },
+
+    /**
+     * Get a column’s description from the `standardColumns` collection.
+     * @param {Object} column - The column object, containing a `key` property.
+     * @return {string} The corresponding description taken from `this.standardColumns`.
+     */
+    columnHeaderTooltipText (column) {
+      const standardCol = find(this.standardColumns, {key: column.key})
+      return standardCol ? standardCol.description : column.description
     },
 
     text (text) {
