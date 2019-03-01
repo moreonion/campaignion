@@ -4,7 +4,7 @@
     'dsa-has-error': showError && !valid
   }">
     <div v-if="showError && !valid" class="dsa-edit-value-error">
-      {{ text('Please enter a valid value.') }}
+      {{ errorMessage }}
     </div>
     <div v-else class="dsa-edit-value-label">
       {{ label }}
@@ -45,6 +45,16 @@ export default {
         return this.validator.test(this.value) && this.value.length <= maxlength
       } else {
         return this.validator.test(this.value)
+      }
+    },
+
+    /** @return {string} A specific error message if maxlength is exceeded, or else a generic one. */
+    errorMessage () {
+      const maxlength = this.maxFieldLengths[this.editValue.col]
+      if (typeof maxlength !== 'undefined' && this.value.length > maxlength) {
+        return Drupal.t('Make sure that this field is not longer than @maxlength characters.', {'@maxlength': maxlength})
+      } else {
+        return Drupal.t('Please enter a valid @fieldName', {'@fieldName': this.label.toLowerCase()})
       }
     },
 
@@ -183,7 +193,6 @@ export default {
 
     text (text) {
       switch (text) {
-        case 'Please enter a valid value.': return Drupal.t('Please enter a valid @fieldName', {'@fieldName': this.label.toLowerCase()})
         case 'save': return Drupal.t('Save')
         case 'cancel': return Drupal.t('Cancel')
       }
