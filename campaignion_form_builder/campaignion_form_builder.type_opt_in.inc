@@ -21,6 +21,14 @@ function _campaignion_form_builder_form_builder_types_opt_in() {
     return $element;
   };
 
+  $fields['newsletter'] = $opt_in([
+    'name' => 'Email Opt-In',
+    'form_key' => 'newsletter',
+    'extra' => [
+      'channel' => 'email',
+      'fixed_channel' => TRUE,
+    ],
+  ], 49);
   $fields['post_opt_in'] = $opt_in([
     'name' => 'Post Opt-In',
     'form_key' => 'post_opt_in',

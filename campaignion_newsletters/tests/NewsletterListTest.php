@@ -47,8 +47,9 @@ class NewsletterListTest extends \DrupalUnitTestCase {
     $component = [
       'cid' => 1,
       'form_key' => 'newsletter',
-      'type' => 'newsletter',
+      'type' => 'opt_in',
       'extra' => [
+        'channel' => 'email',
         'lists' => [$l1->list_id => $l1->list_id, $l2->list_id => $l2->list_id],
       ],
     ];
@@ -106,6 +107,8 @@ class NewsletterListTest extends \DrupalUnitTestCase {
     ]);
     $l2->save();
     $this->assertEqual(REQUEST_TIME, $l2->updated);
+    variable_set('campaignion_newsletters_last_list_poll', 0);
+
     NewsletterList::deleteStaleLists();
 
     $this->assertNotEmpty(NewsletterList::load($l1->list_id));
