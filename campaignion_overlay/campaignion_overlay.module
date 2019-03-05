@@ -57,7 +57,7 @@ function campaignion_overlay_node_view($entity, $display, $view_mode) {
             ],
           ],
           '#content' => $form,
-          '#introduction' => $intro[0]['safe_value'],
+          '#introduction' => field_view_field('field_collection_item', $overlay_options, 'campaignion_overlay_introduction', ['label' => 'hidden']),
           '#theme' => 'campaignion_overlay_options',
         ];
       }
