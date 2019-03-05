@@ -18,6 +18,10 @@ cache:
   directories:
      - $HOME/.composer/cache
      - $HOME/.drush/cache
+     - $HOME/.npm
+     - campaignion_email_to_target/datasets_app/node_modules
+     - campaignion_email_to_target/messages_app/node_modules
+     - campaignion_wizard/redirects_app/node_modules
 
 install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
