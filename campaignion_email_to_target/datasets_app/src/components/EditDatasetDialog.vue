@@ -19,64 +19,69 @@
         </div>
       </section>
 
-      <section class="dsa-edit-dataset-top-2">
-        <p>{{ text('dataset guidance 1') }}</p>
-        <p>{{ text('dataset guidance 2') }}</p>
-      </section>
+      <div class="dsa-edit-dataset-dialog-table-wrapper">
+        <div class="dsa-target-data ae-legend">{{ text('target data') }}</div>
 
-      <div class="dsa-target-data ae-legend">{{ text('target data') }}</div>
-      <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
+        <div class="dsa-edit-dataset-top-2-wrapper">
+          <section class="dsa-edit-dataset-top-2">
+            <div class="dsa-upload-guidance-wrapper">
+              <p>{{ text('dataset guidance 1') }}</p>
+              <p>{{ text('dataset guidance 2') }}</p>
+            </div>
+            <div class="dsa-upload-button-wrapper">
+              <el-button @click="saveBlob(serializeContacts(), generateFilename(currentDataset.title))" v-tooltip.top="text('download tooltip')">{{ text('download dataset') }}</el-button>
+              <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
+              <label for="dsa-updoad-data" @click="chooseFile" v-tooltip.top="text('upload tooltip')" class="el-button">{{ text('upload dataset') }}</label>
+            </div>
+          </section>
+        </div>
 
-      <v-client-table
-        :data="contacts"
-        :columns="tableColumns"
-        :options="options"
-        name="contactsTable"
-        ref="contactsTable"
-        class="dsa-contacts-table"
-      >
-        <span class="dsa-upload-data-wrapper" slot="beforeFilter">
-          <el-button @click="saveBlob(serializeContacts(), generateFilename(currentDataset.title))" v-tooltip.top="text('download tooltip')">{{ text('download dataset') }}</el-button>
-          <label for="dsa-updoad-data" @click="chooseFile" v-tooltip.top="text('upload tooltip')" class="el-button">{{ text('upload dataset') }}</label>
-        </span>
+        <v-client-table
+          :data="contacts"
+          :columns="tableColumns"
+          :options="options"
+          name="contactsTable"
+          ref="contactsTable"
+          class="dsa-contacts-table"
+        >
+          <a href="#" @click.prevent v-tooltip.top="{
+            content: text('filter tooltip'),
+            classes: 'dsa-filter-tooltip',
+            popperOptions: {modifiers: {offset: {offset: '-60px, 8px'}}}
+          }" class="dsa-filter-tooltip-icon show-help-text" slot="afterFilter"><span>?</span></a>
 
-        <a href="#" @click.prevent v-tooltip.top="{
-          content: text('filter tooltip'),
-          classes: 'dsa-filter-tooltip',
-          popperOptions: {modifiers: {offset: {offset: '-60px, 8px'}}}
-        }" class="dsa-filter-tooltip-icon show-help-text" slot="afterFilter"><span>?</span></a>
+          <div v-if="showContactErrors && !contactsAreValid" class="dsa-invalid-contacts-message messages error" slot="beforeTable">{{ text('invalid contacts message') }}</div>
 
-        <div v-if="showContactErrors && !contactsAreValid" class="dsa-invalid-contacts-message messages error" slot="beforeTable">{{ text('invalid contacts message') }}</div>
+          <template slot="__error" scope="props">
+            <span v-if="showContactErrors && props.row.__error" class="dsa-invalid-contact">✘</span>
+          </template>
 
-        <template slot="__error" scope="props">
-          <span v-if="showContactErrors && props.row.__error" class="dsa-invalid-contact">✘</span>
-        </template>
+          <template slot="__delete" scope="props">
+            <a href="#" class="dsa-delete-contact" @click.prevent.stop="deleteContact(props.row.id)">{{ text('delete') }}</a>
+          </template>
 
-        <template slot="__delete" scope="props">
-          <a href="#" class="dsa-delete-contact" @click.prevent.stop="deleteContact(props.row.id)">{{ text('delete') }}</a>
-        </template>
+          <template v-for="col in contentColumns" :slot="col" scope="props">
+            <div :class="{
+              'dsa-contact-field': true,
+              'dsa-contact-field-invalid': showContactErrors && !isValidValue(col, props.row[col])
+            }">{{ props.row[col] }}</div>
+          </template>
 
-        <template v-for="col in contentColumns" :slot="col" scope="props">
-          <div :class="{
-            'dsa-contact-field': true,
-            'dsa-contact-field-invalid': showContactErrors && !isValidValue(col, props.row[col])
-          }">{{ props.row[col] }}</div>
-        </template>
+          <template :slot="'h__' + column.key" scope="props" v-for="column in columns">
+            <span class="VueTables__heading" v-tooltip.top="{
+              content: columnHeaderTooltipText(column),
+              boundariesElement: $el.children[0]
+            }">{{ column.title }}</span>
+          </template>
 
-        <template :slot="'h__' + column.key" scope="props" v-for="column in columns">
-          <span class="VueTables__heading" v-tooltip.top="{
-            content: columnHeaderTooltipText(column),
-            boundariesElement: $el.children[0]
-          }">{{ column.title }}</span>
-        </template>
+          <template slot="h____error" scope="props"></template>
 
-        <template slot="h____error" scope="props"></template>
-
-        <template slot="h____delete" scope="props">
-          <span class="VueTables__heading"></span>
-        </template>
-      </v-client-table>
-      <el-button type="button" @click="addContact" class="dsa-add-contact">{{ text('add row') }}</el-button>
+          <template slot="h____delete" scope="props">
+            <span class="VueTables__heading"></span>
+          </template>
+        </v-client-table>
+        <el-button type="button" @click="addContact" class="dsa-add-contact">{{ text('add row') }}</el-button>
+      </div>
     </div>
 
     <EditValuePopup />
