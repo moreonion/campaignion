@@ -38,7 +38,13 @@ before_script:
 script:
   - cd $repo
   - UPAL_ROOT=$root UPAL_WEB_URL=http://127.0.0.1 phpunit --bootstrap=$HOME/.composer/vendor/torotil/upal/bootstrap.php --coverage-clover=coverage.xml .
-  - cd campaignion_email_to_target/datasets_app
+  - cd $repo/campaignion_email_to_target/datasets_app
+  - yarn install
+  - yarn unit
+  - cd $repo/campaignion_email_to_target/messages_app
+  - yarn install
+  - yarn unit
+  - cd $repo/campaignion_wizard/redirects_app
   - yarn install
   - yarn unit
 
