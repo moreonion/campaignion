@@ -13,6 +13,8 @@ import {
   MessageBox,
   Loading,
   Option,
+  Radio,
+  RadioGroup,
   Select
 } from 'element-ui';
 import elementLocale from 'element-ui/lib/locale';
@@ -31,6 +33,8 @@ export default {
     MessageBox,
     Loading,
     Option,
+    Radio,
+    RadioGroup,
     Select
   },
   elementLocale,
