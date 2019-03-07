@@ -39,8 +39,13 @@ function campaignion_overlay_node_view($entity, $display, $view_mode) {
         $enabled = field_get_items('field_collection_item', $overlay_options, 'campaignion_overlay_enabled');
         $enabled = $enabled[0]['value'] === '1';
 
-        $node = node_load($content[0]['target_id']);
-        $form = drupal_get_form('webform_client_form_' . $node->nid, $node, []);
+        // Only set form if a node is loaded.
+        if ($node = node_load($content[0]['target_id'])) {
+          $form = drupal_get_form('webform_client_form_' . $node->nid, $node, []);
+        }
+        else {
+          $form = NULL;
+        }
 
         $entity->content['campaignion_overlay_options'] = [
           '#attached' => [
