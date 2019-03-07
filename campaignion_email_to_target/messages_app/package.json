@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "animated-scrollto": "1.1.0",
-    "campaignion_vue": "1.4.1",
+    "campaignion_vue": "1.4.2",
     "lodash.find": "^4.6.0",
     "lodash.isequal": "^4.5.0",
     "lodash.omit": "^4.5.0"
