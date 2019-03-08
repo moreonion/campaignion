@@ -53,7 +53,7 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
       [
         'key' => 'display_name',
         'title' => 'Display name of target',
-        'description' => 'The name/description of the target that the users see',
+        'description' => 'This name will be shown in the target list, so it needs to be clear to supporters.',
       ],
       [
         'key' => 'group',
