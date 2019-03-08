@@ -1,9 +1,9 @@
-import 'es6-promise/dist/es6-promise.auto.js';
+import 'es6-promise/dist/es6-promise.auto.js'
 
 // Add these modules to 'externals' in your app’s webpack.prod.conf.js
-import Vue from 'vue';
-import Vuex from 'vuex';
-import axios from 'axios';
+import Vue from 'vue'
+import Vuex from 'vuex'
+import axios from 'axios'
 import {
   Button,
   Dialog,
@@ -16,9 +16,9 @@ import {
   Radio,
   RadioGroup,
   Select
-} from 'element-ui';
-import elementLocale from 'element-ui/lib/locale';
-import draggable from 'vuedraggable';
+} from 'element-ui'
+import elementLocale from 'element-ui/lib/locale'
+import draggable from 'vuedraggable'
 
 export default {
   Vue,
@@ -39,4 +39,4 @@ export default {
   },
   elementLocale,
   draggable
-};
+}
