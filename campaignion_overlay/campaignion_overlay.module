@@ -39,32 +39,20 @@ function campaignion_overlay_node_view($entity, $display, $view_mode) {
         $enabled = field_get_items('field_collection_item', $overlay_options, 'campaignion_overlay_enabled');
         $enabled = $enabled[0]['value'] === '1';
 
-        // Only set form if a node is loaded.
-        if ($node = node_load($content[0]['target_id'])) {
-          $form = drupal_get_form('webform_client_form_' . $node->nid, $node, []);
-        }
-        else {
-          $form = NULL;
-        }
-
-        $entity->content['campaignion_overlay_options'] = [
-          '#attached' => [
-            'library' => [
-              0 => ['system', 'ui.dialog'],
-            ],
-            'js' => [
-              0 => [
-                'data' => [
-                  'campaignion_overlay' => ['overlay_enabled' => $enabled],
-                ],
-                'type' => 'setting',
-              ],
-            ],
-          ],
-          '#content' => $form,
+        $element = [
           '#introduction' => field_view_field('field_collection_item', $overlay_options, 'campaignion_overlay_introduction', ['label' => 'hidden']),
           '#theme' => 'campaignion_overlay_options',
         ];
+        if ($node = node_load($content[0]['target_id'])) {
+          $element['#content'] = drupal_get_form('webform_client_form_' . $node->nid, $node, []);
+        }
+        $settings['campaignion_overlay']['overlay_enabled'] = $enabled;
+        $element['#attached']['library'][] = ['system', 'ui.dialog'];
+        $element['#attached']['js'][] = [
+          'data' => $settings,
+          'type' => 'setting',
+        ];
+        $entity->content['campaignion_overlay_options'] = $element;
       }
     }
   }
