@@ -21304,7 +21304,7 @@ var _vuedraggable2 = _interopRequireDefault(_vuedraggable);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = {
+var campaignionVue = {
   Vue: _vue2.default,
   Vuex: _vuex2.default,
   axios: _axios2.default,
@@ -21326,7 +21326,7 @@ exports.default = {
 };
 
 // Add these modules to 'externals' in your app’s webpack.prod.conf.js
-
+exports.default = campaignionVue;
 module.exports = exports['default'];
 
 /***/ }),
@@ -23992,7 +23992,7 @@ function getFirstComponentChild(children) {
 /*!
  * Determine if an object is a Buffer
  *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @author   Feross Aboukhadijeh <https://feross.org>
  * @license  MIT
  */
 
@@ -25646,4 +25646,4 @@ module.exports = function ( delay, noTrailing, callback, debounceMode ) {
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=campaignion_vue.js.map
+//# sourceMappingURL=main.js.map

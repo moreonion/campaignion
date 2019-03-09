@@ -1,16 +1,8 @@
-/* global describe, it */
-
 import chai from 'chai'
 
 const expect = chai.expect
-const MockBrowser = require('mock-browser').mocks.MockBrowser
 
-// Mock globals for element-ui.
-global.window = new MockBrowser().getWindow()
-global.document = global.window.document
-global.navigator = global.window.navigator
-
-const campVue = require('../../js/campaignion_vue.js')
+const campVue = require('../../src/index.js')
 
 describe('campaignion_vue', () => {
   it('provides a Vue function', () => {

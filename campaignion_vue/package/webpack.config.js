@@ -2,6 +2,7 @@
 
 const webpack = require('webpack')
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin
+const RenameWebpackPlugin = require('rename-webpack-plugin')
 const path = require('path')
 const env = require('yargs').argv.env // use --env with webpack 2
 
@@ -14,21 +15,22 @@ let plugins = [
     'element-ui/lib/locale/lang/en'
   )
 ]
-let outputFile
 
 if (env === 'build') {
   plugins.push(new UglifyJsPlugin({ minimize: true }))
-  outputFile = libraryName + '.min.js'
-} else {
-  outputFile = libraryName + '.js'
 }
+
+plugins.push(new RenameWebpackPlugin({
+  originNameReg: /^main(\.min)?\.js(\.map)?$/,
+  targetName: libraryName + '$1.js$2'
+}))
 
 const config = {
   entry: path.join(__dirname, '/src/index.js'),
   devtool: 'source-map',
   output: {
     path: path.resolve(__dirname, '../js'),
-    filename: outputFile,
+    filename: '[name]' + (env === 'build' ? '.min.js' : '.js'),
     library: libraryName,
     libraryTarget: 'umd',
     umdNamedDefine: true

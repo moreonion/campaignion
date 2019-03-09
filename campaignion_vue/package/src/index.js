@@ -20,7 +20,7 @@ import {
 import elementLocale from 'element-ui/lib/locale'
 import draggable from 'vuedraggable'
 
-export default {
+const campaignionVue = {
   Vue,
   Vuex,
   axios,
@@ -40,3 +40,5 @@ export default {
   elementLocale,
   draggable
 }
+
+export default campaignionVue
