@@ -1,3 +1,8 @@
+<docs>
+SpecList component.
+Displays all specs and their error messages in a draggable list.
+</docs>
+
 <template lang="html">
   <draggable
     v-model="specs"
@@ -58,12 +63,26 @@ export default {
   },
 
   methods: {
+    /**
+    * Emit an `editSpec` event on the global bus, with the spec’s index as the payload.
+    * @param {integer} index - The index of the spec to edit.
+     */
     editSpec (index) {
       this.$bus.$emit('editSpec', index)
     },
+
+    /**
+    * Emit a `duplicateSpec` event on the global bus, with the spec’s index as the payload.
+    * @param {integer} index - The index of the spec to duplicate.
+     */
     duplicateSpec (index) {
       this.$bus.$emit('duplicateSpec', index)
     },
+
+    /**
+     * Ask for confirmation, then commit a `removeSpec` mutation.
+     * @param {integer} index - The index of the spec to remove.
+     */
     removeSpec (index) {
       const title = this.specs[index].type === 'message-template' ? Drupal.t('Remove message') : Drupal.t('Remove exclusion')
       const question = this.specs[index].label
@@ -77,9 +96,19 @@ export default {
         this.$store.commit({type: 'removeSpec', index})
       }, () => {})
     },
+
+    /**
+     * draggable handler.
+     * Add a `dragging` class to the body.
+     */
     dragStart () {
       document.body.classList.add('dragging')
     },
+
+    /**
+     * draggable handler.
+     * Remove the `dragging` class from the body.
+     */
     dragEnd () {
       document.body.classList.remove('dragging')
     }

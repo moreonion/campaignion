@@ -15,6 +15,10 @@ export const OPERATORS = {
   }
 }
 
+/**
+ * Message object factory.
+ * @return {Object} Object representing an empty message.
+ */
 export function messageObj () {
   return {
     subject: '',
@@ -24,6 +28,11 @@ export function messageObj () {
   }
 }
 
+/**
+ * Specification factory.
+ * @param {string} type - Pass the type of spec you want to create.
+ * @return {Object} A new spec object with an `id` of `null`.
+ */
 export function emptySpec (type) {
   if (VALID_SPECIFICATION_TYPES.indexOf(type) === -1) return
   return {

@@ -4,6 +4,15 @@ import {emptySpec, messageObj} from '@/utils/defaults'
 import find from 'lodash.find'
 
 export default {
+  /**
+   * Initialize the store.
+   * @param {Object} state - vuex state.
+   * @param {Object} payload - The mutation’s payload.
+   * @param {Object[]} payload.messageSelection - Collection of messages and exclusions, including the default message as the last item.
+   * @param {Object[]} payload.targetAttributes - Collection of objects describing the target attributes: {name: 'contact.email', label: 'Email address', description: ''}
+   * @param {Object[]} payload.tokens - Collection of categories with a `title`, a `description` and a collection of `tokens`. The `tokens` each have a `title`, a `description` and a `token`.
+   * @param {boolean} payload.hardValidation - Don’t persist the data if there are validation errors.
+   */
   initializeData (state, {messageSelection, targetAttributes, tokens, hardValidation}) {
     if (messageSelection && messageSelection.length) {
       // The default message is the last message in the messageSelection array and has no filters
@@ -39,12 +48,20 @@ export default {
     state.initialData.defaultMessage = clone(state.defaultMessage)
   },
 
+  /**
+   * Validate the specs and set each spec’s `èrrors` property.
+   * @param {Object} state - vuex state.
+   */
   validateSpecs (state) {
     var errors
     var usedFilterSets = []
 
+    /**
+     * Stringify filters for easier comparison.
+     * @param {Object} filter - A spec’s filter object.
+     * @return {string} The filter’s type, attributeName, operator and value, separated by pipe characters.
+     */
     function stringify (filter) {
-      // Stringify filters for easier comparison.
       return [filter.type, filter.attributeName, filter.operator, filter.value].join('|')
     }
 
@@ -108,22 +125,48 @@ export default {
     }
   },
 
+  /**
+   * Start editing a new spec.
+   * @param {Object} state - vuex state.
+   */
   editNewSpec (state) {
     state.currentSpecIndex = -1
   },
 
+  /**
+   * Start editing an existing spec.
+   * @param {Object} state - vuex state.
+   * @param {Object} payload - The mutation’s payload.
+   * @param {integer} payload.index - The spec’s index in the specs array.
+   */
   editSpec (state, {index}) {
     state.currentSpecIndex = index
   },
 
+  /**
+   * Delete a spec from the specs array.
+   * @param {Object} state - vuex state.
+   * @param {Object} payload - The mutation’s payload.
+   * @param {integer} payload.index - The spec’s index in the specs array.
+   */
   removeSpec (state, {index}) {
     state.specs.splice(index, 1)
   },
 
+  /**
+   * Stop editing a spec and leave it alone.
+   * @param {Object} state - vuex state.
+   */
   leaveSpec (state) {
     state.currentSpecIndex = null
   },
 
+  /**
+   * Save a spec to the store.
+   * @param {Object} state - vuex state.
+   * @param {Object} payload - The mutation’s payload.
+   * @param {Object} payload.spec - The spec to be saved.
+   */
   updateSpec (state, {spec}) {
     if (state.currentSpecIndex === null) return
     if (state.currentSpecIndex === -1) {
@@ -133,10 +176,22 @@ export default {
     }
   },
 
+  /**
+   * Replace all specs in the store.
+   * @param {Object} state - vuex state.
+   * @param {Object} payload - The mutation’s payload.
+   * @param {Object[]} payload.specs - The collection of specs to be saved.
+   */
   updateSpecs (state, {specs}) {
     state.specs = specs
   },
 
+  /**
+   * Save the default message to the store.
+   * @param {Object} state - vuex state.
+   * @param {Object} payload - The mutation’s payload.
+   * @param {Object} payload.message - The deafult message to be saved.
+   */
   updateDefaultMessage (state, {message}) {
     Vue.set(state.defaultMessage, 'message', message)
   }

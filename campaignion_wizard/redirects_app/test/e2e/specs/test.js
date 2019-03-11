@@ -1,6 +1,12 @@
 // For authoring Nightwatch tests, see
 // http://nightwatchjs.org/guide#usage
 
+/**
+ * Generate an array of selectors for targeting sibling elements with `nth-of-type`.
+ * @param {string} selector - A CSS selector.
+ * @param {integer} length - The desired number of selectors.
+ * @return {string[]} An array like `['<selector>:nth-of-type(1)', '<selector>:nth-of-type(2)']`.
+ */
 function listSelectors (selector, length) {
   var arr = []
   for (var i = 1; i <= length; i++) {

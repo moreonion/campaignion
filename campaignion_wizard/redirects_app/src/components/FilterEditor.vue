@@ -1,3 +1,9 @@
+<docs>
+FilterEditor component.
+Provides a UI to edit a redirect’s filters.
+Use this component with the `.sync` modifier on the `filters` prop.
+</docs>
+
 <template lang="html">
   <section class="pra-filter-editor">
 
@@ -57,22 +63,25 @@ import {find} from 'lodash'
 export default {
   data () {
     return {
-      f: this.filters
+      f: this.filters /** {Object[]} The redirect’s filters. Internal property. */
     }
   },
 
   props: {
-    fields: Array,
-    filters: Array,
-    operators: {
+    fields: Array,         /** {Object[]} Collection of the fields that can be filtered, each having an `id` and a `label`. */
+    filters: Array,        /** {Object[]} Collection of the redirect’s filters. */
+    operators: {           /** {Object} Dictionary of filter operators, keyed by identifier, each containing a `label` and a `phrase`. **/
       type: Object,
       required: true
     }
   },
 
   computed: {
+    /**
+     * Provide the operators in a way that’s understood by the select’s el-option component.
+     * @return {Object[]} Collection of options like `{value: '==', label: 'is'}`
+     */
     operatorOptions () {
-      // provide operators in the format {value: '==', label: 'is'}
       var arr = []
       Object.keys(this.operators).map(key => {
         arr.push({
@@ -82,15 +91,22 @@ export default {
       })
       return arr
     },
+
+    /**
+     * Searches the filters for a filter with the `opt-in` type.
+     * @return {boolean} Has an opt-in filter already been used?
+     */
     optInUsed () {
       return !!find(this.f, {type: 'opt-in'})
     }
   },
 
   watch: {
+    // Emit an `update` event for the parent component.
     f (val) {
       this.$emit('update:filters', val)
     },
+    // Update the internal filters property.
     filters (val) {
       this.f = this.filters
     }
@@ -114,6 +130,11 @@ export default {
         case 'Delete': return Drupal.t('Delete')
       }
     },
+
+    /**
+     * Add a new filter to the collection.
+     * @param {string} type - The type of the new filter.
+     */
     addFilter (type) {
       var filter = {
         id: null,
@@ -130,6 +151,11 @@ export default {
       }
       this.f.push(filter)
     },
+
+    /**
+     * Remove a filter from the collection.
+     * @param {integer} index - The index of the filter to delete.
+     */
     removeFilter (index) {
       this.f.splice(index, 1)
     }
