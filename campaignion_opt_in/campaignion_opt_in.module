@@ -130,13 +130,6 @@ function campaignion_opt_in_campaignion_action_taken($node, Submission $submissi
     $values = $submission->valuesByCid($cid);
     $factory->recordOptIn($component, $values);
   }
-
-  // Compatibility with the newsletter component.
-  $components = $submission->webform->componentsByType('newsletter');
-  foreach ($components as $cid => $component) {
-    $values = $submission->valuesByCid($cid);
-    $factory->recordNewsletterSubscription($component, $values);
-  }
 }
 
 /**

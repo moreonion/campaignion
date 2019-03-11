@@ -1,3 +1,8 @@
+<docs>
+RedirectList component.
+Displays all redirects in a draggable list.
+</docs>
+
 <template lang="html">
   <Draggable
     v-model="redirects"
@@ -49,12 +54,26 @@ export default {
   },
 
   methods: {
+    /**
+    * Emit an `editRedirect` event on the global bus, with the redirect’s index as the payload.
+    * @param {integer} index - The index of the redirect to edit.
+     */
     editRedirect (index) {
       this.$root.$emit('editRedirect', index)
     },
+
+    /**
+    * Emit a `duplicateRedirect` event on the global bus, with the redirect’s index as the payload.
+    * @param {integer} index - The index of the redirect to duplicate.
+     */
     duplicateRedirect (index) {
       this.$root.$emit('duplicateRedirect', index)
     },
+
+    /**
+     * Ask for confirmation, then commit a `removeRedirect` mutation.
+     * @param {integer} index - The index of the redirect to remove.
+     */
     removeRedirect (index) {
       const title = Drupal.t('Remove redirect?')
       const question = this.redirects[index].label
@@ -68,12 +87,23 @@ export default {
         this.$store.commit({type: 'removeRedirect', index})
       }, () => {})
     },
+
+    /**
+     * draggable handler.
+     * Add a `dragging` class to the body.
+     */
     dragStart () {
       document.body.classList.add('dragging')
     },
+
+    /**
+     * draggable handler.
+     * Remove the `dragging` class from the body.
+     */
     dragEnd () {
       document.body.classList.remove('dragging')
     },
+
     text (text) {
       switch (text) {
         case 'Redirect to': return Drupal.t('Redirect to')
