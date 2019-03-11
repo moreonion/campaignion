@@ -6,7 +6,7 @@
 
 use Drupal\campaignion_wizard\EmailProtestEmailStep;
 use Drupal\campaignion_action\Loader;
-use Drupal\little_helpers\Webform\Webform;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Helper function to check whether a node is a email protest node.
@@ -16,44 +16,14 @@ function _campaignion_email_protest_node_is_instance($node) {
 }
 
 /**
- * Implements hook_form_(form_id)_alter().
+ * Implements hook_webform_submission_confirmed().
  *
- * We're setting a form submit handler that is called before webform_client_form.
+ * Send the protest email.
  */
-function campaignion_email_protest_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
-  if (_campaignion_email_protest_node_is_instance($form['#node'])) {
-    // Add our own submit-handler right before webform_client_form_submit.
-    $submit = array();
-    foreach ($form['#submit'] as $handler) {
-      if ($handler == 'webform_client_form_submit') {
-        $submit[] = 'campaignion_email_protest_pre_webform_client_form_submit';
-      }
-      $submit[] = $handler;
-    }
-    $form['#submit'] = $submit;
+function campaignion_email_protest_webform_submission_confirmed(Submission $submission) {
+  if (_campaignion_email_protest_node_is_instance($submission->node)) {
+    Loader::instance()->actionFromNode($submission->node)->sendEmail($submission);
   }
-}
-
-/**
- * Helper function that changes webform email data that we can't set anywhere else
- *
- * 1) webform doesn't support loading the target email address from a redhen contact
- * 2) webform doesn't support putting together the email from name from 2 form fields
- *    (first_name, last_name)
- * 3) webform doesn't support loading the body from a form field
- */
-function campaignion_email_protest_pre_webform_client_form_submit(&$form, &$form_state) {
-  if (   ($form_state['webform']['page_count'] != $form_state['webform']['page_num'])
-      || empty($form_state['submitted'])
-      || !empty($form_state['save_draft'])) {
-    return;
-  }
-
-  $node = $form['#node'];
-  $submission = Webform::fromNode($node)->formStateToSubmission($form_state);
-  Loader::instance()->actionFromNode($node)->sendEmail($submission);
-
-
 }
 
 /**
