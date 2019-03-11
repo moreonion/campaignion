@@ -11,13 +11,16 @@
       <section class="dsa-dataset-meta">
         <div>
           <label for="dsa-dataset-title">{{ text('dataset title') }} <small>{{ text('only for internal use') }}</small></label>
-          <input type="text" :value="currentDataset.title" @input="updateTitle" class="field-input" id="dsa-dataset-title" />
+          <input type="text" :value="currentDataset.title" @input="updateTitle" maxlength="255" class="field-input" id="dsa-dataset-title" />
         </div>
         <div>
           <label for="dsa-dataset-description">{{ text('dataset description') }} <small>{{ text('only for internal use') }}</small></label>
-          <input type="text" :value="currentDataset.description" @input="updateDescription" class="field-input" id="dsa-dataset-description">
+          <input type="text" :value="currentDataset.description" @input="updateDescription" maxlength="1000" class="field-input" id="dsa-dataset-description">
         </div>
       </section>
+
+      <div class="dsa-target-data ae-legend">{{ text('target data') }}</div>
+      <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
 
       <v-client-table
         :data="contacts"
@@ -27,12 +30,15 @@
         ref="contactsTable"
         class="dsa-contacts-table"
       >
-        <span slot="beforeFilter" class="dsa-target-data ae-legend">{{ text('target data') }}</span>
-
-        <span class="dsa-upload-data-wrapper" slot="afterFilter">
-          <label for="dsa-updoad-data" @click="chooseFile" class="el-button">{{ text('upload dataset') }}</label>
-          <input ref="fileInput" type="file" tabindex="-1" @change="processFile" id="dsa-updoad-data" accept=".csv, .CSV" />
+        <span class="dsa-upload-data-wrapper" slot="beforeFilter">
+          <label for="dsa-updoad-data" @click="chooseFile" v-tooltip.top="text('upload tooltip')" class="el-button">{{ text('upload dataset') }}</label>
         </span>
+
+        <a href="#" @click.prevent v-tooltip.top="{
+          content: text('filter tooltip'),
+          classes: 'dsa-filter-tooltip',
+          popperOptions: {modifiers: {offset: {offset: '-60px, 8px'}}}
+        }" class="dsa-filter-tooltip-icon show-help-text" slot="afterFilter"><span>?</span></a>
 
         <template slot="__error" scope="props">
           <span v-if="showContactErrors && props.row.__error" class="dsa-invalid-contact">✘</span>
@@ -42,8 +48,18 @@
           <a href="#" class="dsa-delete-contact" @click.prevent.stop="deleteContact(props.row.id)">{{ text('delete') }}</a>
         </template>
 
-        <template :slot="'h__' + attribute.key" scope="props" v-for="attribute in currentDataset.attributes">
-          <span class="VueTables__heading" :title="attribute.description">{{ attribute.title }}</span>
+        <template v-for="col in contentColumns" :slot="col" scope="props">
+          <div :class="{
+            'dsa-contact-field': true,
+            'dsa-contact-field-invalid': showContactErrors && !isValidValue(col, props.row[col])
+          }">{{ props.row[col] }}</div>
+        </template>
+
+        <template :slot="'h__' + column.key" scope="props" v-for="column in columns">
+          <span class="VueTables__heading" v-tooltip.top="{
+            content: column.description,
+            boundariesElement: $el.children[0]
+          }">{{ column.title }}</span>
         </template>
 
         <template slot="h____error" scope="props"></template>
@@ -126,12 +142,20 @@ export default {
       return !find(this.contacts, '__error')
     },
 
+    /** @return {string[]} All columns in the table that don’t start with a double underscore. */
+    contentColumns () {
+      return this.tableColumns.filter(col => col.indexOf('__') !== 0)
+    },
+
     ...mapState([
       'currentDataset',  /** {(Object|null)} The dataset being edited. */
       'contacts',        /** {Object[]} Array of contacts belonging to the current dataset. */
+      'columns',         /** {Object[]} Array of objects describing each column in the current dataset: {key: 'foo', title: 'Foo', description: 'The foo column.'} */
       'tableColumns',    /** {string[]} Array of column identifiers. */
       'standardColumns', /** {Object[]} Array of objects describing the standard columns. */
       'contactsTable',   /** {(Object|undefined)} vue-tables-2 state via vuex. */
+      'validations',     /** {Object} Validations for each column. Dictionary of regex strings, keyed by column name. */
+      'maxFieldLengths', /** {Object} Maximum characters for each column. Dictionary of integers, keyed by column name. */
       'showEditDialog',  /** {boolean} Visibility of the edit dataset dialog. */
       'showSpinner',     /** {boolean} Visibility of the loading spinner. */
       'datasetChanged'   /** {boolean} True if the user has made changes on the current dataset. */
@@ -164,6 +188,21 @@ export default {
   },
 
   methods: {
+    /**
+     * Checks whether a value is valid for a specific column or not.
+     * @param {string} col - The column identifier.
+     * @param {string} val - The value to test.
+     * @return {boolean} Is the value valid for this column?
+     */
+    isValidValue (col, val) {
+      var valid = true
+      if ((typeof this.maxFieldLengths[col] !== 'undefined' && val.length > this.maxFieldLengths[col]) ||
+        (typeof this.validations[col] !== 'undefined' && new RegExp(this.validations[col]).test(val) === false)) {
+        valid = false
+      }
+      return valid
+    },
+
     /**
      * Append a contact to the list, clear the table filter and show the last page.
      */
@@ -351,10 +390,12 @@ export default {
         case 'dataset description': return Drupal.t('Description')
         case 'only for internal use': return Drupal.t('for internal use only')
         case 'upload dataset': return Drupal.t('Upload dataset (CSV)')
+        case 'upload tooltip': return Drupal.t('If you have a large dataset, you might find it quicker to upload the whole set using the ‘Upload dataset’ button.')
         case 'upload warning': return Drupal.t('The existing dataset will be replaced with the CSV data. The existing data will be removed.')
         case 'Data will be lost': return Drupal.t('Data will be lost')
         case 'proceed': return Drupal.t('Yes, proceed')
         case 'target data': return Drupal.t('The target data')
+        case 'filter tooltip': return Drupal.t('The filter functionality can help you find and edit records in a long list, but the filter will not affect the dataset itself.')
         case 'add row': return Drupal.t('Add a new target')
         case 'delete': return Drupal.t('Delete')
         case 'choose dataset': return Drupal.t('Choose a different dataset')

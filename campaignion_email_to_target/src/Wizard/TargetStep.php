@@ -47,7 +47,7 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
       ],
       [
         'key' => 'salutation',
-        'description' => 'Full name and titles',
+        'description' => 'This field is how the target will be addressed in the email opening so should include any appropriate honorifics e.g. ‘Rt Hon John Smith MP’',
         'title' => 'Salutation',
       ],
       [
@@ -58,7 +58,7 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
       [
         'key' => 'group',
         'title' => 'Group',
-        'description' => '',
+        'description' => 'Use this field to segment your list if you want to send different versions of the email to different people, e.g. ‘Chair’ vs ‘Member’. You can set these specific messages up on the next step of the page builder.',
       ],
     ];
     $settings['validations'] = [              // used by the front end, a set of 'key' => 'regex' pairs
@@ -66,6 +66,15 @@ class TargetStep extends \Drupal\campaignion_wizard\WizardStep {
       'first_name' => '\\S+',
       'last_name' => '\\S+',
       'salutation' => '\\S+',
+    ];
+    $settings['maxFieldLengths'] = [  // used by the front end to validate field max length.
+      'email' => 255,
+      'title' => 255,
+      'first_name' => 255,
+      'last_name' => 255,
+      'salutation' => 255,
+      'display_name' => 255,
+      'group' => 255,
     ];
     $settings['endpoints']['e2t-api'] = [
       'url' => $this->api->getEndpoint(),

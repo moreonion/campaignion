@@ -159,6 +159,7 @@ function campaignion_manage_activity_how_many_validate($element, &$form_state) {
  * Implements hook_campaignion_manage_filter_info().
  */
 function campaignion_manage_campaignion_manage_filter_info() {
+  $filters['supporter']['state'] = cm\Filter\SupporterState::class;
   $filters['supporter']['name'] = cm\Filter\SupporterName::class;
   if (module_exists('campaignion_supporter_tags')) {
     $filters['supporter']['tags'] = cm\Filter\SupporterTag::class;

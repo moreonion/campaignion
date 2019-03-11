@@ -40,7 +40,8 @@ class FilterTest extends \DrupalWebTestCase {
     $stub_n['webform']['components'][1] = [
       'cid' => 1,
       'form_key' => 'emailopt',
-      'type' => 'newsletter',
+      'type' => 'opt_in',
+      'extra' => ['channel' => 'email'],
     ];
     $submission = new Submission((object) $stub_n, (object) $stub_s);
 
@@ -89,25 +90,6 @@ class FilterTest extends \DrupalWebTestCase {
   }
 
   /**
-   * Test opt-in filter matching form_key (without campaignion_newsletters).
-   */
-  public function testMatchOptInCheckbox() {
-    $stub_s['data'][1][0] = '1';
-    $stub_n['webform']['components'][1] = [
-      'cid' => 1,
-      'form_key' => 'email_newsletter',
-      'type' => 'select',
-      'extra' => ['multiple' => TRUE, 'items' => "1|Yes\n"],
-    ];
-    $submission = new Submission((object) $stub_n, (object) $stub_s);
-    $fs = Filter::fromArray(['type' => 'opt-in', 'value' => TRUE]);
-    $this->assertTrue($fs->match($submission));
-
-    $fs = Filter::fromArray(['type' => 'opt-in', 'value' => FALSE]);
-    $this->assertFalse($fs->match($submission));
-  }
-
-  /**
    * Test opt-in filter with existing subscriptions, but opt-out.
    */
   public function testMatchOptInWithOptOut() {
@@ -117,12 +99,14 @@ class FilterTest extends \DrupalWebTestCase {
       'cid' => 1,
       'form_key' => 'email',
       'type' => 'email',
+      'extra' => ['channel' => 'email'],
     ];
     $stub_s['data'][2][0] = 'radios:opt-out';
     $stub_n['webform']['components'][2] = [
       'cid' => 2,
       'form_key' => 'emailopt',
-      'type' => 'newsletter',
+      'type' => 'opt_in',
+      'extra' => ['channel' => 'email'],
     ];
     $submission = new Submission((object) $stub_n, (object) $stub_s);
     $subscription = Subscription::fromData(4711, $email);
