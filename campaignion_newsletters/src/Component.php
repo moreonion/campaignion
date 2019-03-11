@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_newsletters;
 
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+use Drupal\campaignion_opt_in\Values;
 use Drupal\little_helpers\ArrayConfig;
 use Drupal\little_helpers\Webform\Submission;
 
@@ -52,7 +53,8 @@ class Component {
    *   Whether to try to unsubscribe even from lists without a subscription.
    */
   public function __construct(array $component, $unsubscribe_unknown) {
-    ArrayConfig::mergeDefaults($component, webform_component_invoke('newsletter', 'defaults'));
+    module_load_include('components.inc', 'webform', 'includes/webform');
+    webform_component_defaults($component);
     $this->component = $component;
     $this->unsubscribeUnknown = $unsubscribe_unknown;
   }
@@ -67,7 +69,7 @@ class Component {
    */
   public function submit($email, WebformSubmission $s) {
     if ($value = $s->valuesByCid($this->component['cid'])) {
-      $value = ValuePrefix::remove($value);
+      $value = Values::removePrefix($value);
       if ($value == 'opt-in') {
         $this->subscribe($email, $s);
       }
@@ -156,6 +158,39 @@ class Component {
       $this->setAllListIds($list_ids);
     }
     return $this->allListIds;
+  }
+
+  /**
+   * Remove list from all components.
+   *
+   * @param int $list_id
+   *   The list_id that is to be removed.
+   */
+  public static function pruneList($list_id) {
+    $node_controller = entity_get_controller('node');
+
+    $result = db_select('webform_component', 'c')
+      ->fields('c', ['nid', 'cid'])
+      ->condition('type', 'opt_in')
+      ->execute();
+    foreach ($result as $row) {
+      $node = node_load($row->nid);
+      $component = $node->webform['components'][$row->cid];
+      if (!empty($component['extra']['lists'][$list_id])) {
+        unset($component['extra']['lists'][$list_id]);
+        webform_component_update($component);
+        $node_controller->resetCache([$row->nid]);
+        $left = array_filter($component['extra']['lists']);
+        if ($node->status) {
+          watchdog('campaignion_newsletters', 'Removed list from published node#%nid(%type) “%title” lists left: %lists', [
+            '%nid' => $node->nid,
+            '%type' => $node->type,
+            '%title' => $node->title,
+            '%lists' => implode(', ', $left),
+          ], $left ? WATCHDOG_NOTICE : WATCHDOG_WARNING);
+        }
+      }
+    }
   }
 
 }

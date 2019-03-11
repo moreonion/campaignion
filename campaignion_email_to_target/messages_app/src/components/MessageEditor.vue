@@ -1,3 +1,9 @@
+<docs>
+MessageEditor component.
+Provides a UI to edit a message object. The appearance depends on the spec type.
+You can use this component with v-model.
+</docs>
+
 <template>
   <fieldset class="message-editor">
     <slot name="legend"></slot>
@@ -40,10 +46,12 @@ export default {
 
   data () {
     return {
+      // Internal component data:
       subject: this.value.subject,
       header: this.value.header,
       body: this.value.body,
       footer: this.value.footer,
+      // Flags indicating whether the respective help text is visible or not:
       helpText: {
         subject: false,
         header: false,
@@ -54,18 +62,20 @@ export default {
   },
 
   props: {
-    value: {
+    value: {     /** The message object to edit. */
       type: Object,
       default: () => messageObj()
     },
-    type: String
+    type: String /** The type of the spec this message is part of. */
   },
 
   watch: {
+    // Inform the parent component about changes:
     subject: 'updateValue',
     header: 'updateValue',
     body: 'updateValue',
     footer: 'updateValue',
+    // Update internal data when changes are caused by the parent component:
     value: {
       handler (val) {
         this.subject = val.subject
@@ -92,9 +102,18 @@ export default {
         case 'exclusion help': return Drupal.t('This message is shown if this exclusion comes into effect and no targets are found for a supporter.')
       }
     },
+
+    /**
+     * Toggle a field’s helptext visibility flag.
+     * @param {string} which - The key of the particular field.
+     */
     toggleHelpText (which) {
       this.helpText[which] = !this.helpText[which]
     },
+
+    /**
+     * Emit an `input` event for the parent comonent.
+     */
     updateValue () {
       this.$emit('input', {
         subject: this.subject,
@@ -106,6 +125,7 @@ export default {
   },
 
   mounted () {
+    // If the dialog is closed, hide all help texts.
     this.$bus.$on('closeSpecDialog', () => {
       for (let which in this.helpText) {
         if (this.helpText.hasOwnProperty(which)) {

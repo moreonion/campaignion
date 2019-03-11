@@ -91,6 +91,21 @@ class Subscription extends Model {
   }
 
   /**
+   * Bulk delete subscriptions based on their list.
+   *
+   * @param int $list_id
+   *   All queue items with this $list_id will be deleted.
+   *
+   * @return int
+   *   Number of affected rows.
+   */
+  public static function bulkDelete($list_id) {
+    return db_delete(static::$table)
+      ->condition('list_id', $list_id)
+      ->execute();
+  }
+
+  /**
    * Get the newsletter list instance.
    *
    * @return \Drupal\campaignion_newsletters\NewsletterList

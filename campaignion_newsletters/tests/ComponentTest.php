@@ -11,6 +11,17 @@ use Drupal\campaignion_newsletters\Subscription;
  */
 class ComponentTest extends \DrupalUnitTestCase {
 
+  protected $component = [
+    'type' => 'opt_in',
+    'cid' => 1,
+    'pid' => 0,
+    'form_key' => 'newsletter',
+    'extra' => [
+      'lists' => [1 => 1],
+      'channel' => 'email',
+    ],
+  ];
+
   /**
    * Create a contact and some lists for testing.
    */
@@ -35,13 +46,11 @@ class ComponentTest extends \DrupalUnitTestCase {
    * Test subscribing to a new list.
    */
   public function testSubscribe() {
-    $component = ['cid' => 1, 'pid' => 0, 'form_key' => 'newsletter'];
-    $component['extra']['lists'][1] = 1;
-    $c = new Component($component, FALSE);
+    $c = new Component($this->component, FALSE);
     $s = $this->createMock(WebformSubmission::class);
     $s->node = (object) [
       'webform' => [
-        'components' => [1 => $component]
+        'components' => [1 => $this->component]
       ],
     ];
     $c->subscribe('test@example.com', $s);
@@ -58,8 +67,7 @@ class ComponentTest extends \DrupalUnitTestCase {
     Subscription::byData(2, $e)->save();
     $this->assertCount(2, Subscription::byEmail($e));
 
-    $component = ['cid' => 1, 'pid' => 0, 'form_key' => 'newsletter'];
-    $component['extra']['lists'][1] = 1;
+    $component = $this->component;
     $component['extra']['optout_all_lists'] = FALSE;
     $c = new Component($component, FALSE);
     $c->unsubscribe($e);
@@ -89,7 +97,7 @@ class ComponentTest extends \DrupalUnitTestCase {
     ]);
     $l->save();
 
-    $c = new Component([], TRUE);
+    $c = new Component(['type' => 'opt_in'], TRUE);
     $this->assertEqual([$l->list_id], $c->getAllListIds());
   }
 

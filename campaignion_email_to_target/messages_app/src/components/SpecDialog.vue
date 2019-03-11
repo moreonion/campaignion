@@ -1,3 +1,8 @@
+<docs>
+SpecDialog component.
+The dialog to edit a spec.
+</docs>
+
 <template lang="html">
   <el-dialog
     :title="dialogTitle"
@@ -61,14 +66,19 @@ export default {
 
   data () {
     return {
-      currentSpec: emptySpec('message-template'),
-      visible: false,
-      modalDirty: false,
-      OPERATORS
+      currentSpec: emptySpec('message-template'), /** {Object} The spec that is currently being edited. This belongs to the component, and must not be a reference to a spec in the store. */
+      visible: false,    /** {boolean} Show the dialog or not. */
+      modalDirty: false, /** {boolean} The user has edited the spec and tried to close the dialog without saving. */
+      OPERATORS          /** {Object} Dictionary of filter operators, keyed by identifier, each containing a `label` and a `phrase`. **/
     }
   },
 
   computed: {
+    /**
+     * Compute a dialog title depending on whether a new or an existing
+     * spec is being edited. If no spec is being edited, return an empty string.
+     * @return {string} Translated dialog title.
+     */
     dialogTitle () {
       if (this.currentSpecIndex === null) {
         return ''
@@ -83,18 +93,29 @@ export default {
         return Drupal.t('Edit @itemName', {'@itemName': this.currentSpec.label})
       }
     },
+
+    /**
+     * Check if the spec being edited is empty.
+     * If no spec is being edited, return `false`.
+     * @return {boolean} Is the current spec empty?
+     */
     currentSpecIsEmpty () {
       return this.currentSpecIndex !== null && isEqual(omit(this.currentSpec, ['id', 'errors', 'filterStr']), omit(emptySpec(this.currentSpec.type), ['id', 'errors', 'filterStr']))
     },
+
     ...mapState([
-      'specs',
-      'currentSpecIndex',
-      'targetAttributes',
-      'tokenCategories'
+      'specs',            /** {Object[]} Specifications for specific targets, these are either of type `message-template` or `exclusion`. */
+      'currentSpecIndex', /** {(integer|null)} The index of the item in the specs array that is currently being edited or `-1` for a new item, or `null`, if no item is being edited. */
+      'targetAttributes', /** {Object[]} Collection of objects describing the target attributes: {name: 'contact.email', label: 'Email address', description: ''} */
+      'tokenCategories'   /** {Object[]} Collection of categories with a `title`, a `description` and a collection of `tokens`. The `tokens` each have a `title`, a `description` and a `token`. */
     ])
   },
 
   watch: {
+    /**
+     * Set dialog visibility depending on the value of currentSpecIndex.
+     * @param {(integer|null)} val - The index of the item in the specs array that is currently being edited or `-1` for a new item, or `null`, if no item is being edited.
+     */
     currentSpecIndex (val) {
       this.visible = val !== null
     }
@@ -112,6 +133,20 @@ export default {
         case 'Done': return Drupal.t('Done')
       }
     },
+
+    /**
+     * Callback to check if the dialog may be closed.
+     * Allow to close it if:
+     * - it’s an existing spec and it hasn’t been changed
+     * - it’s a new spec and it’s empty
+     * - the user has already been warned that changes will be lost and clicks
+     *   the Cancel button.
+     * In other cases, show the 'unsaved changes' warning and prevent the dialog
+     * from  being closed.
+     * @param {(Object|undefined)} options - Details about how the user tried to close the dialog.
+     * @param {string} options.button - `cancel` if the user has clicked the Cancel button.
+     * @return {boolean} May the dialog be closed?
+     */
     tryClose (options) {
       // any changes?
       if (this.currentSpecIndex !== -1 && isEqual(this.currentSpec, this.specs[this.currentSpecIndex]) ||
@@ -130,27 +165,52 @@ export default {
         return false
       }
     },
+
+    /**
+     * Handle dialog closing via the x button or ESC key.
+     * @param {Function} done - el-dialog’s callback function.
+     */
     dialogCancelHandler (done) {
       if (this.tryClose()) {
         this.close()
         done()
       }
     },
+
+    /**
+     * Handle dialog closing via the Cancel button.
+     */
     cancelButtonHandler () {
       if (this.tryClose({button: 'cancel'})) {
         this.close()
       }
     },
+
+    /**
+     * Save the edited spec to the store and trigger spec validation.
+     */
     updateSpec () {
       this.$store.commit({type: 'updateSpec', spec: this.currentSpec})
       this.$store.commit('validateSpecs')
       this.close()
     },
+
+    /**
+     * Stop editing the spec (this will close the dialog via setting
+     * `currentSpecIndex` to `null`), reset component data and emit the
+     * `closeSpecDialog` event.
+     */
     close () {
       this.modalDirty = false
       this.$store.commit('leaveSpec')
       this.$bus.$emit('closeSpecDialog')
     },
+
+    /**
+     * Populate the spec’s message object by copying the corresponding fields
+     * from the default message. Overwrite only empty fields or fields containing
+     * only whitespace.
+     */
     prefillMessage () {
       if (!this.currentSpec.message) return
       for (var field in this.currentSpec.message) {
@@ -164,6 +224,8 @@ export default {
   },
 
   mounted () {
+    // Listen to events on the global bus, set `this.currentSpec` and commit mutations
+    // to set the store’s `currentSpecIndex`, which causes the dialog to open.
     this.$bus.$on('newSpec', type => {
       this.currentSpec = emptySpec(type)
       this.$store.commit('editNewSpec')
@@ -179,6 +241,8 @@ export default {
       this.currentSpec = duplicate
       this.$store.commit('editNewSpec')
     })
+    // If the dialog is visible and it’s not an empty spec, save changes on Enter keyup.
+    // If the cursor is inside a textarea, don’t.
     document.addEventListener('keyup', e => {
       if (this.visible && !this.currentSpecIsEmpty && e.keyCode === 13 && document.activeElement.tagName.toLowerCase() !== 'textarea') {
         e.preventDefault()

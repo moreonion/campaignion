@@ -30,6 +30,7 @@ class CronRunner {
     static::fromConfig()->poll();
   }
 
+
   public function __construct($batch_size, $poll_time) {
     $this->sendBatchSize = $batch_size;
     $this->pollTime = $poll_time;
