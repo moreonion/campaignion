@@ -442,7 +442,7 @@ export default {
         case 'dataset description': return Drupal.t('Description')
         case 'only for internal use': return Drupal.t('for internal use only')
         case 'dataset guidance 1': return Drupal.t('All fields except display name and group are mandatory for each target.')
-        case 'dataset guidance 2': return Drupal.t('Before uploading your own csv, click ‘Download dataset’ to see the required columns and use this file as a template.')
+        case 'dataset guidance 2': return Drupal.t('Before uploading your own CSV, click ‘Download current dataset’ to see the required columns and use this file as a template.')
         case 'download dataset': return Drupal.t('Download current dataset')
         case 'download tooltip': return Drupal.t('Download your current dataset including column headings.')
         case 'upload dataset': return Drupal.t('Upload dataset (CSV)')
