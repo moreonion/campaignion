@@ -1,10 +1,10 @@
 {
   "name": "campaignion_vue",
-  "version": "1.2.10",
+  "version": "1.2.12",
   "description": "A bundle of libraries shared by the Vue apps in Campaignion.",
-  "main": "src/index.js",
+  "main": "dist/campaignion_vue.js",
   "scripts": {
-    "build": "npm run build-js && npm run build-min-js && node extract-locale.js",
+    "build": "npm run build-js && npm run build-min-js && node extract-locale.js && node copy-to-drupal-module.js",
     "build-js": "webpack --env dev",
     "build-min-js": "webpack --env build",
     "dev": "webpack --progress --colors --watch --env dev",
@@ -38,6 +38,7 @@
     "eslint-plugin-standard": "2.3.1",
     "extract-loader": "^2.x",
     "file-loader": "^2.x",
+    "fs-extra": "^6.0.1",
     "karma": "^4.0.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.2",
