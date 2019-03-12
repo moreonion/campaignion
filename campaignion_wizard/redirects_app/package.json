@@ -15,7 +15,7 @@
     "lint": "eslint --ext .js,.vue src test/e2e/specs"
   },
   "dependencies": {
-    "campaignion_vue": "1.2.8"
+    "campaignion_vue": "1.2.15"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",

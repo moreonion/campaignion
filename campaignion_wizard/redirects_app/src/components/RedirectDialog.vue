@@ -33,8 +33,8 @@ The dialog to edit a redirect.
       :show-dropdown-on-focus="true"
       data-key="values"
       label-key="label"
+      :getData="getNodes"
       :url="$root.$options.settings.endpoints.nodes"
-      :headers="{}"
       search-param="s"
       :count="20"
       @input="item => {destination = item}"
@@ -54,9 +54,10 @@ The dialog to edit a redirect.
 <script>
 import {clone, validateDestination} from '@/utils'
 import {OPERATORS, emptyRedirect} from '@/utils/defaults'
+import api from '@/utils/api'
 import {mapState} from 'vuex'
 import {isEqual, omit} from 'lodash'
-import DestinationField from './DestinationField'
+import {DestinationField} from 'campaignion_vue'
 import FilterEditor from './FilterEditor'
 
 export default {
@@ -151,6 +152,8 @@ export default {
         case 'Done': return Drupal.t('Done')
       }
     },
+
+    getNodes: api.getNodes,
 
     /**
      * Callback to check if the dialog may be closed.

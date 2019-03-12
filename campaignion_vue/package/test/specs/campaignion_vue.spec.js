@@ -41,11 +41,19 @@ describe('campaignion_vue', () => {
     expect(campVue.element.Select).to.exist
   })
 
+  it('provides a DestinationField component', () => {
+    expect(typeof campVue.DestinationField).to.be.equal('object')
+  })
+
   it('provides element-ui locale', () => {
     expect(typeof campVue.elementLocale).to.be.equal('object')
   })
 
   it('provides vuedraggable', () => {
     expect(typeof campVue.draggable).to.be.equal('object')
+  })
+
+  it('provides utils', () => {
+    expect(typeof campVue.utils).to.be.equal('object')
   })
 })

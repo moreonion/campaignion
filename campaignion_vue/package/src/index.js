@@ -17,8 +17,10 @@ import {
   RadioGroup,
   Select
 } from 'element-ui'
+import DestinationField from './components/DestinationField.vue'
 import elementLocale from 'element-ui/lib/locale'
 import draggable from 'vuedraggable'
+import utils from './utils'
 
 const campaignionVue = {
   Vue,
@@ -37,8 +39,10 @@ const campaignionVue = {
     RadioGroup,
     Select
   },
+  DestinationField,
   elementLocale,
-  draggable
+  draggable,
+  utils
 }
 
 export default campaignionVue
