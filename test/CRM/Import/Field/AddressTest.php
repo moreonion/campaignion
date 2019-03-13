@@ -20,7 +20,7 @@ class AddressTest extends RedhenEntityTest {
     'country' => 'AT',
   );
 
-  static protected function mapped(&$data) {
+  static protected function mapped($data) {
     $mapped = array();
     foreach (self::$mapping as $field_key => $data_key) {
       if (isset($data[$data_key])) {
@@ -41,6 +41,7 @@ class AddressTest extends RedhenEntityTest {
    * Set up test data.
    */
   public function setUp() {
+    parent::setUp();
     $this->importer = new Address('field_address', self::$mapping);
     $this->contact = $this->newRedhenContact();
     $this->fakeContact = $this->createMock('EntityMetadataWrapper');
@@ -111,6 +112,19 @@ class AddressTest extends RedhenEntityTest {
     // Add rest of the address data.
     $source = new ArraySource(self::$testdata);
     $expected = $this->mapped(self::$testdata);
+    $changed = $this->importer->import($source, $this->fakeContact);
+    $this->assertTrue($changed);
+    $this->assertEqual($expected, $this->contact->field_address->value()[0]);
+  }
+
+  /**
+   * Test importing address with multiple spaces.
+   */
+  public function testImportMultipleSpaces() {
+    $data['street_address'] = 'Multiple  spaces ';
+    $source = new ArraySource($data);
+    $expected = $this->mapped(['street_address' => 'Multiple spaces']);
+
     $changed = $this->importer->import($source, $this->fakeContact);
     $this->assertTrue($changed);
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
