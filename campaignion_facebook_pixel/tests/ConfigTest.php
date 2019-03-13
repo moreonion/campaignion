@@ -33,8 +33,9 @@ class ConfigTest extends \DrupalUnitTestCase {
     $s_node['nid'] = 1;
     $s_node['webform']['components'][1] = [
       'form_key' => 'newsletter',
-      'type' => 'newsletter',
+      'type' => 'opt_in',
       'cid' => 1,
+      'extra' => ['channel' => 'email'],
     ];
     $s_submission['data'][1] = ['radios:opt-in'];
     $submission = new Submission((object) $s_node, (object) $s_submission);

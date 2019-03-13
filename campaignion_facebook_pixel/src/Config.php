@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_facebook_pixel;
 
-use Drupal\campaignion_newsletters\ValuePrefix;
+use Drupal\campaignion_opt_in\Values;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
@@ -73,35 +73,11 @@ class Config {
     if (isset($this->mapping[$node->nid])) {
       $pixel_id = $this->mapping[$node->nid];
       $events = ['CompleteRegistration'];
-      if ($this->isOptIn($submission)) {
+      if (Values::submissionHasOptIn($submission, 'email')) {
         $events[] = 'Lead';
       }
       return static::encodeFragment($pixel_id, $events);
     }
-  }
-
-  /**
-   * Check whether a submission contained a newsletter opt-in.
-   *
-   * @param \Drupal\little_helpers\Webform\Submission $submission
-   *   The submission.
-   *
-   * @return bool
-   *   TRUE if the submission has at least one opt-in, otherwise FALSE.
-   */
-  protected function isOptIn(Submission $submission) {
-    foreach ($submission->webform->componentsByType('newsletter') as $cid => $c) {
-      if ($value = $submission->valueByCid($cid)) {
-        if (ValuePrefix::remove($value) == 'opt-in') {
-          return TRUE;
-        }
-      }
-    }
-    // A checked email_newsletter checkbox counts as opt-in.
-    if ($submission->valueByKey('email_newsletter')) {
-      return TRUE;
-    }
-    return FALSE;
   }
 
   /**
