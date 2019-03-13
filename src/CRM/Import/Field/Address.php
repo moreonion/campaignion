@@ -13,10 +13,19 @@ class Address extends Field {
     parent::__construct($field, $mapping);
   }
 
+  /**
+   * Trim and normalize the source value.
+   */
+  protected static function valueFromSource(SourceInterface $source, $keys) {
+    if ($value = parent::valueFromSource($source, $keys)) {
+      return preg_replace('/\s+/', ' ', trim($value));
+    }
+  }
+
   public function getValue(SourceInterface $source) {
     $address = array();
     foreach ($this->source as $target => $keys) {
-      $value = self::valueFromSource($source, $keys);
+      $value = static::valueFromSource($source, $keys);
       if ($value) {
         $address[$target] = $value;
       }
@@ -52,9 +61,6 @@ class Address extends Field {
   }
 
   public function setValue(\EntityMetadataWrapper $entity, $new_address) {
-    // Trim all whitespace from start and end of input strings.
-    $new_address = array_map('trim', $new_address);
-
     $field = $entity->{$this->field};
     if ($field instanceof \EntityListWrapper) {
       return $this->setValueMultiple($field, $new_address);
