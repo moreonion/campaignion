@@ -15,7 +15,7 @@
 ?>
 <div class="campaignion-overlay-options">
   <div class="campaignion-overlay-introduction">
-    <em><?php echo $introduction; ?></em>
+    <?php echo render($introduction); ?>
   </div>
   <div class="campaignion-overlay-content">
     <?php echo render($content); ?>

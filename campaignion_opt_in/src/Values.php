@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_opt_in;
 
+use Drupal\little_helpers\Webform\Submission;
+
 /**
  * Namespace for form-value constants.
  */
@@ -176,6 +178,28 @@ class Values {
       $values = array_reverse($values);
     }
     return $values;
+  }
+
+  /**
+   * Check whether a submission has a opt-in for a channel.
+   *
+   * @param \Drupal\little_helpers\Webform\Submission $submission
+   *   The submission to check.
+   * @param string $channel
+   *   The channel we are looking for.
+   *
+   * @return bool
+   *   TRUE if the submitted values contain at least one opt-in for the channel.
+   */
+  public static function submissionHasOptIn(Submission $submission, $channel) {
+    foreach ($submission->webform->componentsByType('opt_in') as $cid => $component) {
+      if ($component['extra']['channel'] == $channel) {
+        if (($value = $submission->valueByCid($cid)) && static::removePrefix($value) == static::OPT_IN) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
   }
 
 }

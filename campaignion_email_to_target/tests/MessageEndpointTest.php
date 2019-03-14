@@ -24,6 +24,7 @@ class MessageEndpointTest extends \DrupalWebTestCase {
         ['type' => 'test', 'something' => 'something else'],
       ],
       'url' => NULL,
+      'urlLabel' => NULL,
     ];
     $fakenode = (object) ['nid' => 30551];
     $endpoint = new MessageEndpoint($fakenode);

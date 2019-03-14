@@ -255,6 +255,60 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-thank_you_page-campaignion_overlay_options'.
+  $field_instances['node-thank_you_page-campaignion_overlay_options'] = array(
+    'bundle' => 'thank_you_page',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'cck_blocks' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'field_collection',
+        'settings' => array(
+          'add' => 'Add',
+          'delete' => 'Delete',
+          'description' => TRUE,
+          'edit' => 'Edit',
+          'translate' => 'Translate',
+          'view_mode' => 'full',
+        ),
+        'type' => 'field_collection_view',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'campaignion_overlay_options',
+    'label' => 'Overlay options',
+    'required' => 0,
+    'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'field_collection',
+      'settings' => array(),
+      'type' => 'field_collection_embed',
+      'weight' => 13,
+    ),
+  );
+
   // Exported field_instance: 'redhen_contact-contact-field_address'.
   $field_instances['redhen_contact-contact-field_address'] = array(
     'bundle' => 'contact',
