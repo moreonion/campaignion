@@ -19,6 +19,19 @@ export function isEmptyMessage (message) {
 }
 
 /**
+ * Validate the url property’s value.
+ * Valid values are absolute or relative urls or expressions starting with `node/`.
+ * @param {string} destination - The expression to validate.
+ * @return {boolean} Is it valid?
+ */
+export function validateDestination (destination) {
+  return !!(destination.length &&
+    (destination.match(/^(www\.|http:\/\/|https:\/\/|\/)/) ||
+    destination.match(/^node\//)) &&
+    destination.indexOf(' ') === -1)
+}
+
+/**
  * Dispatch a custom JavaScript event.
  * @param {HTMLElement} el DOM element to dispatch the event on.
  * @param {string} type Event name.
@@ -32,5 +45,6 @@ export function dispatch (el, type) {
 export default {
   clone,
   isEmptyMessage,
+  validateDestination,
   defaults
 }

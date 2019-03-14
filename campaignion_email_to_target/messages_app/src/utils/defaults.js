@@ -41,6 +41,8 @@ export function emptySpec (type) {
     label: '',
     filters: [],
     message: messageObj(),
+    url: '',
+    urlLabel: '',
     errors: []
   }
 }

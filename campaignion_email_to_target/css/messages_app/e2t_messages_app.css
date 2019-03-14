@@ -87,7 +87,11 @@ body.dragging * {
   display: block;
 }.e2tmw th {
   text-align: left;
-}.e2tmw section {
+}.e2tmw .typeahead.field-has-error input {
+  border-color: red;
+}
+
+.e2tmw section {
   margin-bottom: 1rem;
 }
 
