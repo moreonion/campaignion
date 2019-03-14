@@ -1,6 +1,7 @@
 name = campaignion_overlay
 core = 7.x
 package = Features
+dependencies[] = entity
 dependencies[] = entityreference
 dependencies[] = features
 dependencies[] = field_collection
