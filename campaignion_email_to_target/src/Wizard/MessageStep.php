@@ -59,6 +59,7 @@ class MessageStep extends \Drupal\campaignion_wizard\WizardStep {
     }
     $settings['hardValidation'] = !$node->status;
     $settings['endpoints']['messages'] = url("node/{$node->nid}/email-to-target-messages");
+    $settings['endpoints']['nodes'] = url('wizard/nodes');
 
     $client = Client::fromConfig();
     $token = $client->getAccessToken();
