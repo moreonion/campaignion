@@ -79,5 +79,22 @@ describe('EditDatasetDialog', function () {
         assert.equal(generateFilename(''), 'dataset.csv')
       })
     })
+
+    describe('columnHeaderTooltipText', function () {
+      const columnHeaderTooltipText = EditDatasetDialog.methods.columnHeaderTooltipText
+      const column = {key: 'b', title: 'bbb', description: 'old description belonging to the dataset'}
+      const customColumn = {key: 'custom', title: 'Custom', description: 'My custom column'}
+      const standardColumns = [
+        {key: 'a', title: 'aaa', description: 'bar'},
+        {key: 'b', title: 'bbb', description: 'updated description set by the server'},
+        {key: 'c', title: 'ccc', description: 'foo'}
+      ]
+      it('returns the description from `this.standardColumns`.', function () {
+        assert(columnHeaderTooltipText.call({standardColumns}, column) === 'updated description set by the server')
+      })
+      it('returns the column’s description if this column is not found in `this.standardColumns`.', function () {
+        assert(columnHeaderTooltipText.call({standardColumns}, customColumn) === 'My custom column')
+      })
+    })
   })
 })
