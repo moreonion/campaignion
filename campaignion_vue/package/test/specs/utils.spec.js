@@ -21,6 +21,25 @@ describe('fixedEncodeURIComponent', function () {
   })
 })
 
+describe('paramReadyUrl', function () {
+  it('appends a ? if there is no parameter', function () {
+    assert.equal(utils.paramReadyUrl('/foo/bar'), '/foo/bar?')
+  })
+  it('deals with trailing slashes', function () {
+    assert.equal(utils.paramReadyUrl('/foo/bar/'), '/foo/bar?')
+  })
+  it('prevents double question marks', function () {
+    assert.equal(utils.paramReadyUrl('/foo/bar?'), '/foo/bar?')
+    assert.equal(utils.paramReadyUrl('/foo/bar/?'), '/foo/bar?')
+  })
+  it('appends a & if there is one', function () {
+    assert.equal(utils.paramReadyUrl('/foo/bar?color=red'), '/foo/bar?color=red&')
+  })
+  it('appends a & if there are two', function () {
+    assert.equal(utils.paramReadyUrl('/foo/bar?color=red&x=y'), '/foo/bar?color=red&x=y&')
+  })
+})
+
 describe('escapeRegExp', function () {
   it('escapes characters that mean something in regular expressions.', function () {
     const str = utils.escapeRegExp('-[]/{}()*+?.\\^$|')

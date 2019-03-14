@@ -15,6 +15,7 @@ You can use this component with `v-model` to get/set its value.
     <input type="text" class="field-input typeahead-input"
       ref="input"
       :placeholder="placeholder"
+      :maxlength="maxlength"
       autocomplete="off"
       v-model="val"
       @input="update"
@@ -71,6 +72,10 @@ export default {
       default: 'value'
     },
     placeholder: String, /** The input’s placeholder text. */
+    maxlength: {
+      type: Number,
+      default: -1
+    },
     delay: {             /** Request data from the server after the user stopped typing for this amount of time (milliseconds). */
       type: Number,
       default: _DELAY_
