@@ -194,7 +194,7 @@ class Values {
   public static function submissionHasOptIn(Submission $submission, $channel) {
     foreach ($submission->webform->componentsByType('opt_in') as $cid => $component) {
       if ($component['extra']['channel'] == $channel) {
-        if (($value = $submission->valueByCid($cid)) && static::removePrefix($value) == 'opt-in') {
+        if (($value = $submission->valueByCid($cid)) && static::removePrefix($value) == static::OPT_IN) {
           return TRUE;
         }
       }
