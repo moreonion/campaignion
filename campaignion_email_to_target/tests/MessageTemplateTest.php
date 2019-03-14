@@ -20,6 +20,7 @@ class MessageTemplateTest extends \DrupalUnitTestCase {
       'message' => '',
       'footer' => '',
       'url' => NULL,
+      'urlLabel' => NULL,
     ], $t->toArray());
   }
 
@@ -32,6 +33,7 @@ class MessageTemplateTest extends \DrupalUnitTestCase {
       'header' => '',
       'message' => '',
       'footer' => '',
+      'urlLabel' => NULL,
     ];
     $t = new MessageTemplate($data);
     $this->assertEqual('Test Subject', $t->subject);
