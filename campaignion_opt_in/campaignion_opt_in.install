@@ -62,6 +62,24 @@ function campaignion_opt_in_schema() {
 }
 
 /**
+ * Implements hook_update_dependencies().
+ */
+function campaignion_opt_in_update_dependencies() {
+  $dependencies['campaignion_opt_in'][2]['campaignion_newsletters'] = 20;
+}
+
+/**
+ * Explicitly set NOT_SELECTED as default value.
+ */
+function campaignion_opt_in_update_2() {
+  db_update('webform_component')
+    ->fields(['value' => 'not-selected'])
+    ->condition('type', 'opt_in')
+    ->condition('value', '0')
+    ->execute();
+}
+
+/**
  * Migrate inverted checkboxes to their own display option.
  */
 function campaignion_opt_in_update_1() {
