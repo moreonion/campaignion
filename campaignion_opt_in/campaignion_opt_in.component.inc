@@ -71,7 +71,7 @@ function _webform_edit_opt_in($component) {
     '#type' => 'select',
     '#title' => t('Default value'),
     '#options' => [
-      0 => t('Not selected'),
+      Values::NOT_SELECTED => t('Not selected'),
       Values::OPT_IN => t('Opt-in'),
       Values::NO_CHANGE => t('No change'),
       Values::OPT_OUT => t('Opt-out'),
@@ -197,7 +197,7 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
       $options = [Values::OPT_IN => $l[1], $no_value => $l[0]];
       $element += [
         '#type' => 'radios',
-        '#default_value' => $value,
+        '#default_value' => isset($options[$value]) ? $value : FALSE,
         '#options' => $options,
       ];
   }

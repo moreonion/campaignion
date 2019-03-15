@@ -90,11 +90,13 @@ class Values {
         Values::OPT_IN => t('Checkbox opt-in'),
         Values::NO_CHANGE => t('Checkbox no change'),
         Values::OPT_OUT => t('Checkbox opt-out'),
+        Values::NOT_SELECTED => t('Checkbox hidden (no change)'),
       ],
       'checkbox-inverted' => [
         Values::OPT_IN => t('Inverted checkbox opt-in'),
         Values::NO_CHANGE => t('Inverted checkbox no change'),
         Values::OPT_OUT => t('Inverted checkbox opt-out'),
+        Values::NOT_SELECTED => t('Inverted checkbox hidden (no change)'),
       ],
       'radios' => [
         Values::OPT_IN => t('Radio opt-in'),
