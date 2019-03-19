@@ -102,6 +102,15 @@ function _campaignion_manage_deactivate_clientside_validation() {
 }
 
 /**
+ * Enable select2 for the bulk tag functionality.
+ */
+function campaignion_manage_update_7201() {
+  if (!module_enable(['select2'], TRUE)) {
+    throw new \DrupalUpdateException('Unable to enable select2. Please verify it (and all it’s dependencies) can be found by Drupal.');
+  }
+}
+
+/**
  * Create tables for storing (intermediate) filter results.
  */
 function campaignion_manage_update_7102() {
