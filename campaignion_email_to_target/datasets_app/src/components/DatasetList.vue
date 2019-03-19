@@ -2,7 +2,7 @@
   <section class="dsa-dataset-list">
     <input type="text" v-model="filter" :placeholder="text('filter placeholder')" class="field-input">
     <ul class="dsa-datasets">
-      <li v-for="dataset in filteredDatasets" :key="dataset.key" @click="select(dataset)">
+      <li v-for="dataset in filteredDatasets" :key="dataset.key" @click="select(dataset)" v-tooltip.top="{content: dataset.description}">
         {{ dataset.title }}
       </li>
     </ul>
