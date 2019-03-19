@@ -1,3 +1,11 @@
+<docs>
+Typeahead component, based on https://github.com/yuche/vue-strap/blob/master/src/Typeahead.vue
+Asks a server for results based on the query string entered by the user, or
+searches an array, if you pass the `data` prop. Displays a dropdown with the
+results for the user to choose from.
+Per default, you can use this component with `v-model` to get/set its value.
+</docs>
+
 <template>
   <div style="position: relative"
     :class="{
@@ -31,6 +39,11 @@
 <script>
 const _DELAY_ = 200
 
+/**
+ * Prepare a url for appending a GET param key-value pair.
+ * @param {string} url - The url to prepare.
+ * @return {string} The url with either a ? or a & at the end.
+ */
 function paramReadyUrl (url) {
   if (!url.match(/\?[^=]+=[^&]*/)) {
     // there’s no parameter. replace trailing ? or / or /? with ?
@@ -41,6 +54,12 @@ function paramReadyUrl (url) {
   }
 }
 
+/**
+ * Comply to RFC 3986 when encoding URI components.
+ * Encode also !, ', (, ) and *.
+ * @param {string} str - The URI component to encode.
+ * @return {string} The encoded URI component.
+ */
 function fixedEncodeURIComponent (str) {
   return encodeURIComponent(str).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16))
 }
@@ -52,34 +71,34 @@ export default {
   },
 
   props: {
-    value: {
+    value: {             /** The component’s value. */
       type: String,
       default: ''
     },
-    data: Array,
-    count: {
+    data: Array,         /** An array of strings to search. Pass this if you want to use the component client-side. */
+    count: {             /** Number of items that should be loaded at once. */
       type: Number,
       default: 8
     },
-    async: String,
-    headers: {
+    async: String,       /** An HTTP URL for asynchronous suggestions. Expected to return a JSON object. */
+    headers: {           /** HTTP headers to send with the request. */
       type: Object,
       default: {}
     },
-    template: String,
-    dataKey: {
+    template: String,    /** Used to render suggestion. */
+    dataKey: {           /** The key of the suggestions array in the response JSON. If not set, the response itself is expected to by an array of suggestions. */
       type: String,
       default: null
     },
-    matchCase: {
+    matchCase: {         /** Match the case when filtering? Client-side only. */
       type: Boolean,
       default: false
     },
-    matchStart: {
+    matchStart: {        /** Only suggest items starting with the query string? Client-side only. */
       type: Boolean,
       default: false
     },
-    onHit: {
+    onHit: {             /** Function executed when the user selects a suggestion from the dropdown. */
       type: Function,
       default (item) {
         if (item) {
@@ -88,36 +107,36 @@ export default {
         }
       }
     },
-    placeholder: String,
-    delay: {
+    placeholder: String, /** The input’s placeholder text. */
+    delay: {             /** Request data from the server after the user stopped typing for this amount of time (milliseconds). */
       type: Number,
       default: _DELAY_
     },
-    showDropdownOnFocus: { // display the dropdown immediately when focusing the input
+    showDropdownOnFocus: { /** Display the dropdown immediately after the user focused the input or only after typing. */
       type: Boolean,
       default: false
     },
-    lazyLoad: { // allow the user to request more items from the server
+    lazyLoad: {          /** Don’t load huge amounts of data at once. */
       type: Boolean,
       default: false
     },
-    pageMode: { // whether the API uses paging or offset. allowed: 'page'  or 'offset'
+    pageMode: {          /** Define whether the API uses paging or offset. Allowed values: `page`  or `offset`. */
       type: String,
       default: 'page'
     },
-    pageParam: { // query parameter for page or offset
+    pageParam: {         /** Query parameter for page or offset. */
       type: String,
       default: 'p'
     },
-    firstPage: { // the page that pagination starts with. allowed: 0 or 1
+    firstPage: {         /** The page that pagination starts with. Allowed values: `0` or `1`. */
       type: Number,
       default: 1
     },
-    searchParam: { // query parameter for the search term
+    searchParam: {       /** Query parameter for the search term. */
       type: String,
       default: 's'
     },
-    countParam: { // query parameter for the number of items or page size
+    countParam: {        /** Query parameter for the number of items or page size. */
       type: String,
       default: 'n'
     }
@@ -125,18 +144,23 @@ export default {
 
   data () {
     return {
-      val: this.value,
-      cachedQuery: null,
-      showDropdown: false,
-      current: 0,
-      items: [],
-      lastLoadedPage: 0,
-      moreItemsLoadable: true,
-      queryOnTheWay: false
+      val: this.value,         /** {string} Internal value variable bound to the input element. */
+      cachedQuery: null,       /** {(string|null)} The string that has been queried in the last request. */
+      showDropdown: false,     /** {boolean} The dropdown’s visibility. */
+      current: 0,              /** {integer} The index of the currently highlighted item (suggestion). */
+      items: [],               /** {string[]} The suggestions. */
+      lastLoadedPage: 0,       /** {integer} The number of the page that has been loaded last (in lazyLoad mode). */
+      moreItemsLoadable: true, /** {boolean} Is there another page to request? (in lazyLoad mode) */
+      queryOnTheWay: false     /** {boolean} Flag indicating that a request has been made and we’re still waiting for a response. */
     }
   },
 
   computed: {
+    /**
+     * A vue component that uses the `template` prop and offers a `highlight` method
+     * for the template to use.
+     * @return {Object} The templateComp component.
+     */
     templateComp () {
       return {
         template: typeof this.template === 'string' ? '<span v-html="this.template"></span>' : '<span v-html="highlight(item, value)"></span>',
@@ -151,6 +175,12 @@ export default {
         }
       }
     },
+
+    /**
+     * Client-side mode: return a filtered array of items.
+     * HTTP mode: return an empty array.
+     * @return {string[]} An array of items matching the query value.
+     */
     primitiveData () {
       if (this.data) {
         return this.data.filter(value => {
@@ -162,45 +192,75 @@ export default {
         return []
       }
     },
+
+    /**
+     * Prepare the url for appending GET params.
+     * @return {string} The API’s url, ending with a ? or &.
+     */
     url () {
       return paramReadyUrl(this.async)
     },
+
+    /**
+     * Return only allowed values for pageMode. `page` is the default.
+     * @return {string} `page` or `offset`, depending on the `pageMode` prop.
+     */
     coercedPageMode () {
       return (this.pageMode === 'page' || this.pageMode === 'offset') ? this.pageMode : 'page'
     },
+
+    /**
+     * Return only allowed values for firstPage. `1` is the default.
+     * @return {integer} `0` or `1`, depending on the `firstPage` prop.
+     */
     coercedFirstPage () {
       return (this.firstPage === 0 || this.firstPage === '0') ? 0 : 1
     }
   },
 
   watch: {
+    // Inform the parent component about changes:
     val (val, old) {
       this.$emit('input', val)
     },
+    // Update internal data when changes are caused by the parent component:
     value (val) {
       if (this.val !== val) { this.val = val }
     }
   },
 
   methods: {
+    /**
+     * Update the list of suggestions.
+     * In HTTP mode, trigger a request after the delay.
+     * @return {(undefined|false)} TODO: probably returning undefined is enough.
+     */
     update () {
+      // showDropdownOnFocus means: show the dropdown even if the input is empty.
+      // If this option isn’t checked and the input is empty, clear the suggestions list.
       if (!this.showDropdownOnFocus && !this.val) {
         this.reset()
-        return false
+        return false // TODO: probably returning undefined is enough.
       }
+      // Client-side mode:
       if (this.data) {
         this.items = this.primitiveData
         this.showDropdown = this.items.length > 0
       }
-      if (this.async) {
+      // HTTP mode:
+      if (this.async) { // TODO: elseif (this.async) would let the data prop determine the mode.
         this.reset()
         var lastVal = this.val
         setTimeout(() => {
-          // only query if the value didn’t change during the delay period
+          // Only query if the value didn’t change during the delay period.
           if (this.val === lastVal) this.query()
         }, this.delay)
       }
     },
+
+    /**
+     * Request data from the server and process the response.
+     */
     query () {
       var url = this.url + this.searchParam + '=' + fixedEncodeURIComponent(this.val) + '&' + this.countParam + '=' + this.count
       if (this.lazyLoad) url += '&' + this.pageParam + '=' + (this.coercedPageMode === 'page' ? this.lastLoadedPage + this.coercedFirstPage : this.lastLoadedPage * this.count)
@@ -229,6 +289,12 @@ export default {
         this.showDropdown = this.items.length > 0
       })
     },
+
+    /**
+     * If the dropdown should be shown on focus, show it – either with the items
+     * that are still there or with new ones, depending on whether the list is
+     * still appropriate for the current query value.
+     */
     showCachedOrUpdate () {
       if (!this.showDropdownOnFocus) {
         return
@@ -239,6 +305,11 @@ export default {
         this.update()
       }
     },
+
+    /**
+     * Close the dropdown and clear the list of suggestions.
+     * Reset variables for a new request.
+     */
     reset () {
       this.items = []
       this.cachedQuery = null
@@ -247,21 +318,45 @@ export default {
       this.showDropdown = false
       this.moreItemsLoadable = true
     },
+
+    /**
+     * Set `this.current` to the index of item that is being hovered or selected
+     * with the cursor keys.
+     * @param {integer} index - The active item’s index.
+     */
     setActive (index) {
       this.current = index
     },
+
+    /**
+     * Check whether the item with a given index is active.
+     * @param {integer} index - The index of the item to check.
+     * @return {boolean} Is this the item that is currently active?
+     */
     isActive (index) {
       return this.current === index
     },
+
+    /**
+     * Handle Enter keyups and mousedowns on a suggestion.
+     * @param {Event} e - The original event.
+     */
     hit (e) {
       if (this.showDropdown) {
-        e.preventDefault()
+        e.preventDefault() // TODO: use Vue event modifiers?
         e.stopPropagation()
         this.onHit(this.items[this.current], this)
       }
     },
+
+    /**
+     * Handle keydowns of the 'up' arrow key.
+     * Show the dropdown if it’s closed.
+     * Move the active item up and scroll it into view, if necessary.
+     * @param {Event} e - The original event.
+     */
     up (e) {
-      e.preventDefault()
+      e.preventDefault() // TODO: use the .prevent modifier?
       if (!this.showDropdown) {
         this.showCachedOrUpdate()
         return
@@ -275,8 +370,15 @@ export default {
         }
       }
     },
+
+    /**
+     * Handle keydowns of the 'down' arrow key.
+     * Show the dropdown if it’s closed.
+     * Move the active item down and scroll it into view, if necessary.
+     * @param {Event} e - The original event.
+     */
     down (e) {
-      e.preventDefault()
+      e.preventDefault() // TODO: use the .prevent modifier?
       if (!this.showDropdown) {
         this.showCachedOrUpdate()
         return
@@ -290,14 +392,22 @@ export default {
         }
       }
     },
+
+    /**
+     * Handle esc key keydown events.
+     * @param {Event} e - The original event.
+     */
     esc (e) {
       if (this.showDropdown) {
-        e.stopPropagation()
+        e.stopPropagation() // TODO: use the .stop modifier?
         this.showDropdown = false
       }
     },
+
+    /**
+     * Lazy-load more items on scroll.
+     */
     scroll () {
-      // lazy-load more items
       if (!this.lazyLoad || !this.moreItemsLoadable) return
       if (this.$refs.dropdown.scrollHeight - this.$refs.dropdown.scrollTop - 30 < this.$refs.dropdown.clientHeight) {
         if (!this.queryOnTheWay && this.items.length) this.query()

@@ -7,5 +7,10 @@
         "styleLibraryName": "theme-default"
       }]
     ]
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": ["istanbul"]
+    }
+  }
 }

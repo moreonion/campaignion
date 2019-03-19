@@ -3,11 +3,12 @@
 namespace Drupal\campaignion_form_builder;
 
 use Drupal\little_helpers\ArrayConfig;
+use Drupal\form_builder_webform\Element;
 
 /**
  * Form builder integration for the phone_number webform component.
  */
-class PhoneElement extends \FormBuilderWebformElement {
+class PhoneElement extends Element {
 
   /**
    * {@inheritdoc}

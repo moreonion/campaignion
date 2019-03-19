@@ -2,10 +2,11 @@
 
 namespace Drupal\campaignion_email_to_target;
 
-use \Drupal\little_helpers\Webform\Webform;
-use \Drupal\campaignion_action\Loader;
+use Drupal\little_helpers\Webform\Webform;
+use Drupal\little_helpers\Webform\Submission;
+use Drupal\campaignion_action\Loader;
 
-use \Drupal\campaignion_email_to_target\Api\Client;
+use Drupal\campaignion_email_to_target\Loader as ModeLoader;
 
 /**
  * Implement behavior for the email to target message webform component.
@@ -27,6 +28,16 @@ class Component {
     return new static($component, $webform, $action);
   }
 
+  /**
+   * Create a new component instance.
+   *
+   * @param array $component
+   *   The webform component configuration.
+   * @param \Drupal\little_helpers\Webform\Webform $webform
+   *   A webform wrapper for the form’s node.
+   * @param \Drupal\campaignion_email_to_target\Action $action
+   *   An email_to_target action instance.
+   */
   public function __construct(array $component, Webform $webform, Action $action) {
     $this->component = $component;
     $this->webform = $webform;
@@ -54,6 +65,32 @@ class Component {
    */
   protected function disableSubmits(&$form) {
     $form['actions']['#access'] = FALSE;
+  }
+
+  /**
+   * Save submission before redirecting.
+   */
+  protected function saveSubmission($form, &$original_form_state) {
+    $form_state = $original_form_state;
+    $form_state['save_draft'] = TRUE;
+    webform_client_form_submit($form, $form_state);
+    $sid = $form_state['values']['details']['sid'];
+    $original_form_state['values']['details']['sid'] = $sid;
+    return Submission::load($this->component['nid'], $sid);
+  }
+
+  /**
+   * Execute the redirect.
+   */
+  protected function redirect($redirect, $form, &$form_state) {
+    $form_state['redirect'] = $redirect->toFormStateRedirect();
+    if (module_exists('webform_ajax') && $form['#node']->webform['webform_ajax'] != WEBFORM_AJAX_NO_AJAX) {
+      $form_state['webform_completed'] = TRUE;
+      unset($form_state['save_draft']);
+    }
+    else {
+      call_user_func_array('drupal_goto', $form_state['redirect']);
+    }
   }
 
   /**
@@ -91,7 +128,7 @@ class Component {
     $element['#attributes']['class'][] = 'webform-prefill-exclude';
 
     try {
-      list($pairs, $no_target_element) = $this->action->targetMessagePairs($submission_o, $test_mode);
+      $pairs_or_exclusion = $this->action->targetMessagePairs($submission_o, $test_mode);
     }
     catch (\Exception $e) {
       watchdog_exception('campaignion_email_to_target', $e);
@@ -104,66 +141,27 @@ class Component {
       return;
     }
 
-    if (empty($pairs)) {
-      $element['no_target'] = $no_target_element;
+    if ($pairs_or_exclusion instanceof Exclusion) {
+      $exclusion = $pairs_or_exclusion;
+      $element['no_target'] = $exclusion->renderable();
       $element['#attributes']['class'][] = 'email-to-target-no-targets';
       $this->disableSubmits($form);
+      if ($redirect = $exclusion->redirect()) {
+        $submission = $this->saveSubmission($form, $form_state);
+        drupal_alter('webform_redirect', $redirect, $submission);
+        $this->redirect($redirect, $form, $form_state);
+      }
       return;
     }
 
-    $last_id = NULL;
-    foreach ($pairs as $p) {
-      list($target, $message) = $p;
-      $t = [
-        '#type' => 'container',
-        '#attributes' => ['class' => ['email-to-target-target']],
-        '#target' => $target,
-        '#message' => $message->toArray(),
-      ];
-      $t['send'] = [
-        '#type' => 'checkbox',
-        '#title' => $message->display,
-        '#default_value' => TRUE,
-      ];
-      $t['subject'] = [
-        '#type' => 'textfield',
-        '#title' => t('Subject'),
-        '#default_value' => $message->subject,
-        '#disabled' => empty($options['users_may_edit']),
-      ];
-      $t['header'] = [
-        '#prefix' => '<pre class="email-to-target-header">',
-        '#markup' => check_plain($message->header),
-        '#suffix' => '</pre>',
-      ];
-      $t['message'] = [
-        '#type' => 'textarea',
-        '#title' => t('Message'),
-        '#default_value' => $message->message,
-        '#disabled' => empty($options['users_may_edit']),
-      ];
-      $t['footer'] = [
-        '#prefix' => '<pre class="email-to-target-footer">',
-        '#markup' => check_plain($message->footer),
-        '#suffix' => '</pre>',
-      ];
-      $element[$target['id']] = $t;
-      $last_id = $target['id'];
+    $pairs = $pairs_or_exclusion;
+    $class = ModeLoader::instance()->getMode($options['selection_mode']);
+    $mode = new $class(!empty($options['users_may_edit']));
+    if (count($pairs) == 1) {
+      $mode = $mode->singleMode();
     }
-
-    $form_state['send_all'] = FALSE;
-    if (count($pairs) == 1 || $options['selection_mode'] == 'all') {
-      $form_state['send_all'] = TRUE;
-      foreach (element_children($element) as $k) {
-        $c = &$element[$k];
-        $c['#attributes']['class'][] = 'email-to-target-single';
-        $c['send']['#type'] = 'markup';
-        $c['send']['#markup'] = "<p class=\"target\">{$c['send']['#title']} </p>";
-      }
-    }
-    if (count($pairs) > 1) {
-      $element['#attached']['js'] = [drupal_get_path('module', 'campaignion_email_to_target') . '/js/target_selector.js'];
-    }
+    $form_state['selection_mode'] = $mode;
+    $element += $mode->formElement($pairs);
   }
 
   /**
@@ -171,27 +169,13 @@ class Component {
    */
   public function validate(array $element, array &$form_state) {
     $values = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
-
-    $original_values = $values;
-    $values = [];
-    foreach ($original_values as $id => $edited_message) {
-      if (!empty($edited_message['send']) || $form_state['send_all']) {
-        $e = &$element[$id];
-        $values[] = serialize([
-          'message' => $edited_message + $e['#message'],
-          'target' => $e['#target'],
-        ]);
-      }
-    }
-    if (empty($values)) {
-      form_error($element, t('Please select at least one target'));
-    }
+    $values = $form_state['selection_mode']->getValues($element, $values);
   }
 
   /**
    * Send emails to all selected targets.
    */
-  public function sendEmails($data, $submission) {
+  public function sendEmails($data, Submission $submission) {
     $nid = $submission->nid;
     $node = $submission->webform->node;
     $root_node = $node->tnid ? node_load($node->tnid) : $node;
@@ -200,7 +184,7 @@ class Component {
     foreach ($data as $serialized) {
       $m = unserialize($serialized);
       $message = new Message($m['message']);
-      $message->replaceTokens(NULL, $submission->unwrap());
+      $message->replaceTokens(NULL, $submission);
       unset($m);
 
       // Set the HTML property based on availablity of MIME Mail.
@@ -236,11 +220,18 @@ class Component {
       );
 
       // Mail the submission.
-      $m = drupal_mail('campaignion_email_to_target', 'email_to_target', $message->to, $language, $mail_params, $email['from']);
+      $m = $this->mail($message->to, $language, $mail_params, $email['from']);
       if ($m['result']) {
         $send_count += 1;
       }
     }
+  }
+
+  /**
+   * Wrapper for drupal_mail().
+   */
+  protected function mail($to, $language, $mail_params, $from) {
+    return drupal_mail('campaignion_email_to_target', 'email_to_target', $to, $language, $mail_params, $from);
   }
 
 }

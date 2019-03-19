@@ -49,6 +49,8 @@ export default {
       'type': 'message',
       'label': '',
       'filters': [],
+      'url': '',
+      'urlLabel': '',
       'message': {
         'subject': '',
         'header': 'Dear [email-to-target:salutation],\n',
@@ -107,6 +109,7 @@ export default {
   'hardValidation': true,
   'endpoints': {
     'messages': '/node/8/email-to-target-messages',
+    'nodes': '/wizard/nodes',
     'e2t-api': {
       'url': 'https://e2t-api.more-onion.com/v2',
       'token': process.env.E2T_API_TOKEN || 'xxxx', // token injected by webpack.DefinePlugin

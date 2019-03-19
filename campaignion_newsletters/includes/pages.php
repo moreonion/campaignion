@@ -10,7 +10,7 @@ function campaignion_newsletters_admin_settings() {
 
   $form['poll'] = array(
     '#type' => 'button',
-    '#value' => t('Update Lists and Subscribers from all external sources now!'),
+    '#value' => t('Update Lists from all external sources now!'),
     '#description' => t('Updates run automatically around every hour in the background'),
     '#weight' => 20,
     '#executes_submit_callback' => TRUE,
