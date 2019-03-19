@@ -58,7 +58,7 @@ class FormBuilderElementOptIn extends Element {
     $form['no_is_optout'] = $edit['behavior']['no_is_optout'];
     $form['disable_optin'] = $edit['behavior']['disable_optin'];
 
-    if (module_exists('campaignion_newsletters')) {
+    if (module_exists('campaignion_newsletters') && isset($edit['list_management'])) {
       $form['#property_groups']['lists'] = [
         'title' => t('Lists'),
         'weight' => 2,
