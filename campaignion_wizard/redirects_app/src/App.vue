@@ -13,8 +13,8 @@
       :show-dropdown-on-focus="true"
       data-key="values"
       label-key="label"
+      :getData="getNodes"
       :url="$root.$options.settings.endpoints.nodes"
-      :headers="{}"
       search-param="s"
       :count="20"
       @input="item => {destination = item}"
@@ -33,7 +33,7 @@ import {clone, dispatch, validateDestination} from '@/utils'
 import api from '@/utils/api'
 import RedirectList from './components/RedirectList'
 import RedirectDialog from './components/RedirectDialog'
-import DestinationField from './components/DestinationField'
+import {DestinationField} from 'campaignion_vue'
 
 export default {
   name: 'app',
@@ -214,6 +214,8 @@ export default {
         })
       })
     },
+
+    getNodes: api.getNodes,
 
     text (text) {
       switch (text) {
