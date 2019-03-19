@@ -29,6 +29,9 @@ class FormBuilderElementOptIn extends Element {
     $node = !isset($nid) ? (object) array('nid' => NULL, 'webform' => webform_node_defaults()) : node_load($nid);
     $form = $form_id([], $form_state, $node, $component);
     $form_state['build_info']['args'] = [$node, $component];
+    // We want to avoid a full drupal_get_form() for now but some alter hooks
+    // need defaults normally set in drupal_prepare_form().
+    $form += ['#submit' => []];
     drupal_alter(['form', 'form_webform_component_edit_form'], $form, $form_state, $form_id);
     return $form;
   }
