@@ -13,7 +13,7 @@ class SupporterExport implements BatchInterface {
   }
 
   private function getFields() {
-    $exporter = ContactTypeManager::instance()->exporter('campaignion_manage');
+    $exporter = ContactTypeManager::instance()->exporter('csv');
     return $exporter->columnOptions();
   }
 
@@ -50,7 +50,7 @@ class SupporterExport implements BatchInterface {
    * Create the temporary file and add the header lines.
    */
   protected function initBatch(&$data) {
-    $exporter = ContactTypeManager::instance()->exporter('campaignion_manage');
+    $exporter = ContactTypeManager::instance()->exporter('csv');
     $exporter->filterColumns($data['fields']);
     $handle = fopen($data['csv_name'], 'w');
     fputcsv($handle, $exporter->header(0));

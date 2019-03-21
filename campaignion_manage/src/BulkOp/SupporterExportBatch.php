@@ -13,8 +13,7 @@ class SupporterExportBatch extends BatchBase {
   public function __construct(&$data) {
     $this->fields = $data['fields'];
     $this->filename = $data['csv_name'];
-    $this->exporter = ContactTypeManager::instance()
-      ->exporter('campaignion_manage');
+    $this->exporter = ContactTypeManager::instance()->exporter('csv');
     $this->exporter->filterColumns($data['fields']);
   }
 
