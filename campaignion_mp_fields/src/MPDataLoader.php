@@ -137,7 +137,7 @@ class MPDataLoader {
    *   one.
    */
   protected function extractPostcode(array $item) {
-    if ($item['postal_code'] && $item['country'] == 'GB') {
+    if (!empty($item['postal_code']) && !empty($item['country']) && $item['country'] == 'GB') {
       $r = postal_code_validation_validate($item['postal_code'], 'GB');
       if (empty($r['error'])) {
         // Strip spaces and dashes allowed by postal_code_validation_validate().
