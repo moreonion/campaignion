@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import {emptyDataset} from '@/utils/defaults'
-import {INVALID_CONTACT_STRING, clone, elementIndex, validateContacts} from '@/utils'
+import {clone, elementIndex, validateContacts} from '@/utils'
 import {findIndex} from 'lodash'
 
 var idCounter = 0
@@ -41,11 +41,13 @@ export default {
    * @param {string} payload.settings.contactPrefix - A prefix used to identify a contact attribute in a dataset’s attributes list. Defaults to `contact.`.
    * @param {Object[]} payload.settings.standardColumns - An array of objects describing the columns that have to be present in every dataset.
    * @param {Object} payload.settings.validations - Validations for each column: strings containing regular expressions, keyed by columns key.
+   * @param {Object} payload.settings.maxFieldLengths - Maximum characters for each column. Dictionary of integers, keyed by column name.
    */
   init (state, {settings}) {
     state.contactPrefix = settings.contactPrefix || 'contact.'
     state.standardColumns = settings.standardColumns || []
     state.validations = settings.validations || {}
+    state.maxFieldLengths = settings.maxFieldLengths || {}
   },
 
   /**
@@ -172,12 +174,17 @@ export default {
   addContact (state) {
     if (!state.currentDataset.is_custom) return
     const newContact = {
-      id: newId(), // We need ids to identify rows when they are clicked. These dummy ids are removed before POSTing.
-      __error: INVALID_CONTACT_STRING // Contacts are invalid at first because they are empty.
+      id: newId() // We need ids to identify rows when they are clicked. These dummy ids are removed before POSTing.
     }
     for (var i = 0, j = state.columns.length; i < j; i++) {
       newContact[state.columns[i].key] = ''
     }
+    // Maybe the contact is invalid in an empty state... Let’s check:
+    validateContacts({
+      contacts: [newContact],
+      validations: state.validations,
+      maxFieldLengths: state.maxFieldLengths
+    })
     state.contacts.push(newContact)
     state.datasetChanged = true
   },
@@ -240,7 +247,12 @@ export default {
     state.editValue = null
     state.datasetChanged = true
     // Check if the row (still) has an error.
-    validateContacts(state.contacts, state.validations, i)
+    validateContacts({
+      contacts: state.contacts,
+      validations: state.validations,
+      maxFieldLengths: state.maxFieldLengths,
+      index: i
+    })
   },
 
   /**
@@ -282,7 +294,11 @@ export default {
    * @param {Object} state - vuex state.
    */
   validateContacts (state) {
-    validateContacts(state.contacts, state.validations)
+    validateContacts({
+      contacts: state.contacts,
+      validations: state.validations,
+      maxFieldLengths: state.maxFieldLengths
+    })
   },
 
   /**

@@ -24,16 +24,16 @@
 }
 
 /* Remove field collection styling if inside group */
-.group-overlay .fieldset-content .fieldset-title {
+.group-overlay .field-name-campaignion-overlay-options > div > .fieldset > legend .fieldset-title {
   display: none;
 }
 
-.group-overlay .fieldset-content .field-name-campaignion-overlay-options .fieldset-content {
+.group-overlay .field-name-campaignion-overlay-options > div > .fieldset > .fieldset-content {
   padding-top: 1em;
   padding-bottom: 1em;
 }
 
-.group-overlay fieldset.fieldset {
+.group-overlay .field-name-campaignion-overlay-options > div > .fieldset {
   border: 0px;
   margin-bottom: -2em;
 }

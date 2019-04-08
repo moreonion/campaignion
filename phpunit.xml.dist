@@ -19,6 +19,7 @@
       <directory suffix=".features.filter.inc">.</directory>
       <directory suffix=".features.taxonomy.inc">.</directory>
       <directory suffix=".features.uuid_term.inc">.</directory>
+      <directory suffix=".field_group.inc">.</directory>
       <directory suffix=".strongarm.inc">.</directory>
     </exclude>
   </whitelist>

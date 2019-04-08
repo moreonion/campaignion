@@ -160,10 +160,26 @@ class MessageTemplate extends Model {
       $filters[] = $f->toArray();
     }
     $data['filters'] = $filters;
+    $data['urlLabel'] = $this->urlLabel($data['url']);
     // Weights are only represented by order.
     unset($data['weight']);
     unset($data['nid']);
     return $data;
+  }
+
+  /**
+   * Calculate a display version for a node URL.
+   *
+   * @param string $url
+   *   The URL.
+   * @return string
+   *   A pretty label for the URL if available otherwise the URL itself.
+   */
+  protected function urlLabel($url) {
+    if ((substr($url, 0, 5) == 'node/') && ($node = menu_get_object('node', 1, $url))) {
+      return "{$node->title} [{$node->nid}]";
+    }
+    return $url;
   }
 
   /**

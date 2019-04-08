@@ -28,6 +28,11 @@
         });
         overlay.find('.campaignion-overlay-content').prepend(close);
 
+        // generic class to use with e.g. custom buttons
+        $('.campaignion-overlay-close', context).click(function(event) {
+          overlay.dialog("close");
+        });
+
         // Center dialog on window resize.
         $(window).resize(function() {
           overlay.dialog("option", "position", {

@@ -25,6 +25,8 @@ data = {
           'value': 'Green Party'
         }
       ],
+      'url': '',
+      'urlLabel': '',
       'message': {
         'subject': 'Subject of first message',
         'header': 'Header of first message',
@@ -68,6 +70,8 @@ data = {
           'value': 'Green Party'
         }
       ],
+      'url': '',
+      'urlLabel': '',
       'message': {
         'subject': 'Subject of 3rd message',
         'header': 'Header of 3rd message',
@@ -111,6 +115,8 @@ data = {
           'value': 'jane'
         }
       ],
+      'url': '',
+      'urlLabel': '',
       'message': {
         'subject': '',
         'header': '   ',
@@ -146,6 +152,8 @@ data = {
           'value': ''
         }
       ],
+      'url': '',
+      'urlLabel': '',
       'message': {
         'subject': 'foo',
         'header': 'bar',
@@ -159,6 +167,8 @@ data = {
       'type': 'message-template',
       'label': '',
       'filters': [],
+      'url': '',
+      'urlLabel': '',
       'message': {
         'subject': 'default message subject',
         'header': 'default message header',

@@ -16,9 +16,11 @@
   },
   "dependencies": {
     "animated-scrollto": "1.1.0",
-    "campaignion_vue": "1.4.2",
+    "campaignion_vue": "1.4.3",
+    "file-saver": "2.0.1",
     "papaparse": "4.3.6",
     "popper.js": "1.12.9",
+    "v-tooltip": "2.0.0-rc.33",
     "vue-tables-2": "1.0.10"
   },
   "devDependencies": {

@@ -31,6 +31,7 @@ var webpackConfig = merge(baseWebpackConfig, {
   },
   externals: {
     'axios': 'campaignion_vue.axios',
+    'campaignion_vue': 'campaignion_vue',
     'element-ui': 'campaignion_vue.element',
     'element-ui/lib/locale': 'campaignion_vue.elementLocale',
     'vue': 'campaignion_vue.Vue',

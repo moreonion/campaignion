@@ -131,11 +131,23 @@ li.VuePagination__pagination-item {
 }
 
 td {
-    padding: 0 0.7rem;
-    white-space: nowrap;
+  height: 1rem; /* Needed for the contained div with height: 100% */
+  white-space: nowrap;
+  padding: 0;
 }
 td.dsa-edited {
   background-color: yellow;
+}
+td .dsa-contact-field {
+  height: 100%; /* Don’t collapse if empty! */
+  pointer-events: none; /* So you can click 'through' the div and reach the td... */
+  padding: 0 0.7rem;
+}
+td .dsa-contact-field-invalid {
+  background-color: rgba(255, 0, 0, 0.3);
+}
+td.dsa-edited .dsa-contact-field-invalid {
+  background-color: transparent;
 }
 
 .dsa-flash {
@@ -155,5 +167,13 @@ td.dsa-edited {
   0% { background: transparent; }
   10% { background: #d66540; }
   100% { background: transparent; }
+}
+
+.v-tooltip {
+  display: block !important;
+  z-index: 10000;
+}
+.v-tooltip .tooltip-inner {
+  background-color: #ddd;
 }
 </style>

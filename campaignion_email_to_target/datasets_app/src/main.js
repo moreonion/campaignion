@@ -4,6 +4,8 @@ import Vue from 'vue'
 import App from './App'
 import store from './store'
 import {ClientTable} from 'vue-tables-2'
+import {VTooltip} from 'v-tooltip'
+import {TOOLTIP_CLASS} from '@/utils'
 
 import {
   Button,
@@ -28,6 +30,9 @@ const bus = new Vue()
 Vue.prototype.$bus = bus
 
 Vue.use(ClientTable, {}, true)
+VTooltip.options.defaultTemplate = `<div class="${TOOLTIP_CLASS}" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>`
+VTooltip.options.delay = {show: 200, hide: 300}
+Vue.directive('tooltip', VTooltip)
 
 // Register element-ui components.
 Vue.use(Button)

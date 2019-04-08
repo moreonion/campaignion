@@ -34,6 +34,14 @@ function campaignion_test_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'thank_you_page' => array(
+      'name' => t('Thank You page'),
+      'base' => 'node_content',
+      'description' => t('Your supporters will land on thank you pages after taking action or making a donation.'),
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
   );
   drupal_alter('node_info', $items);
   return $items;

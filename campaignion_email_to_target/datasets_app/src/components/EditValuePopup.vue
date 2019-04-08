@@ -4,7 +4,7 @@
     'dsa-has-error': showError && !valid
   }">
     <div v-if="showError && !valid" class="dsa-edit-value-error">
-      {{ text('Please enter a valid value.') }}
+      {{ errorMessage }}
     </div>
     <div v-else class="dsa-edit-value-label">
       {{ label }}
@@ -40,7 +40,22 @@ export default {
 
     /** @return {boolean} Does the editing field’s value pass the validation for the edited column? */
     valid () {
-      return this.validator.test(this.value)
+      if (typeof this.maxFieldLengths[this.editValue.col] !== 'undefined') {
+        const maxlength = this.maxFieldLengths[this.editValue.col]
+        return this.validator.test(this.value) && this.value.length <= maxlength
+      } else {
+        return this.validator.test(this.value)
+      }
+    },
+
+    /** @return {string} A specific error message if maxlength is exceeded, or else a generic one. */
+    errorMessage () {
+      const maxlength = this.maxFieldLengths[this.editValue.col]
+      if (typeof maxlength !== 'undefined' && this.value.length > maxlength) {
+        return Drupal.t('Make sure that this field is not longer than @maxlength characters.', {'@maxlength': maxlength})
+      } else {
+        return Drupal.t('Please enter a valid @fieldName', {'@fieldName': this.label.toLowerCase()})
+      }
     },
 
     /** @return {string} The title of the edited column (or if falsey, the column key). */
@@ -49,9 +64,10 @@ export default {
     },
 
     ...mapState([
-      'editValue',  /** {(Object|null)} Object describing the table cell being edited. */
-      'columns',    /** {Object[]} Array of objects describing each column: {key: 'foo', title: 'Foo', description: 'The foo column.'} */
-      'validations' /** {Object} Validations for each column: strings containing regular expressions, keyed by columns key. */
+      'editValue',      /** {(Object|null)} Object describing the table cell being edited. */
+      'columns',        /** {Object[]} Array of objects describing each column: {key: 'foo', title: 'Foo', description: 'The foo column.'} */
+      'validations',    /** {Object} Validations for each column: strings containing regular expressions, keyed by columns key. */
+      'maxFieldLengths' /** {Object} Maximum characters for each column. Dictionary of integers, keyed by column name. */
     ])
   },
 
@@ -177,7 +193,6 @@ export default {
 
     text (text) {
       switch (text) {
-        case 'Please enter a valid value.': return Drupal.t('Please enter a valid @fieldName', {'@fieldName': this.label.toLowerCase()})
         case 'save': return Drupal.t('Save')
         case 'cancel': return Drupal.t('Cancel')
       }

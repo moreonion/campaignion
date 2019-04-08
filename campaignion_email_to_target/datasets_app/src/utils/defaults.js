@@ -11,8 +11,7 @@ import {clone} from '@/utils'
 function uuid (a) { return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, uuid) }
 
 /**
- * Generate a fresh dataset with the standard contact columns as attributes and a new uuid.
- * The uuid is used for generating the key in the `saveDatasetAndContacts` action, and then deleted.
+ * Generate a fresh dataset with the standard contact columns as attributes and a new uuid as a key.
  * @param {Object} state - vuex state.
  * @return {Object} The new dataset.
  */
@@ -25,10 +24,10 @@ export function emptyDataset (state) {
 
   return {
     attributes,
+    title: '',
     description: '',
     is_custom: true,
-    key: null,
-    title: '',
-    _uuid: uuid() // New datasets only. Will be deleted before persisting to server.
+    _new: true, // Vue app internal use only. Not passed to the server.
+    key: uuid()
   }
 }

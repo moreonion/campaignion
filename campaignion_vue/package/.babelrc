@@ -7,5 +7,10 @@
         "styleLibraryName": "theme-chalk"
       }]
     ]
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": ["istanbul"]
+    }
+  }
 }
