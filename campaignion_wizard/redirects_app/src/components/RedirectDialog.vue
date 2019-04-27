@@ -8,7 +8,6 @@ The dialog to edit a redirect.
     :title="dialogTitle"
     :visible="visible"
     :close-on-click-modal="false"
-    size="large"
     :before-close="dialogCancelHandler"
     >
 

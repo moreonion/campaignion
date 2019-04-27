@@ -3,7 +3,6 @@
     :title="dialogTitle"
     :visible="showEditDialog"
     :close-on-click-modal="false"
-    size="large"
     :before-close="dialogCancelHandler"
     class="dsa-edit-dataset-dialog"
     >
