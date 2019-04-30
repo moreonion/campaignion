@@ -47,7 +47,7 @@ class ClientFactory {
    */
   public function getClient($name, $wrap = TRUE) {
     if (!isset($this->clients[$name])) {
-      $wsdl = "https://api.broadmail.de/soap11/Rpc{$name}?wsdl";
+      $wsdl = "https://api.campaign.episerver.net/soap11/Rpc{$name}?wsdl";
       $class = isset(static::$class[$name]) ? static::$class[$name] : Client::class;
       $service = new $class($wsdl);
       if ($wrap) {
