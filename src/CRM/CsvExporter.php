@@ -8,6 +8,31 @@ namespace Drupal\campaignion\CRM;
 class CsvExporter extends ExporterBase {
 
   /**
+   * Get an options array for choosing which columns of the CSV to display.
+   *
+   * @return string[]
+   *   Array of column labels keyed by column keys.
+   */
+  public function columnOptions() {
+    $options = [];
+    foreach ($this->map as $k => $l) {
+      list($h0, $h1) = [$l->header(0), $l->header(1)];
+      $options[$k] = $h1 ? "$h0 ($h1)" : $h0;
+    }
+    return $options;
+  }
+
+  /**
+   * Remove all columns from the map that are not in $fields.
+   *
+   * @param array $fields
+   *   Associative array with keys matching a selection of column keys.
+   */
+  public function filterColumns(array $fields) {
+    $this->map = isset($fields) ? array_intersect_key($this->map, $fields) : $this->map;
+  }
+
+  /**
    * Get header row.
    *
    * @param int $row_num

@@ -13,8 +13,8 @@ class SupporterExportBatch extends BatchBase {
   public function __construct(&$data) {
     $this->fields = $data['fields'];
     $this->filename = $data['csv_name'];
-    $this->exporter = ContactTypeManager::instance()
-      ->exporter('campaignion_manage');
+    $this->exporter = ContactTypeManager::instance()->exporter('csv');
+    $this->exporter->filterColumns($data['fields']);
   }
 
   public function start(&$context) {
@@ -26,20 +26,7 @@ class SupporterExportBatch extends BatchBase {
 
   public function apply($contact, &$result) {
     $this->exporter->setContact($contact);
-    $csv_line = array();
-    foreach ($this->fields as $field_name => $field_label) {
-      $value = $this->exporter->value($field_name);
-      if (is_array($value)) {
-        if (empty($value)) {
-          $value = array($field_name => '');
-        }
-      }
-      else {
-        $value = array($field_name => $value);
-      }
-      $csv_line += $value;
-    }
-    fputcsv($this->file, $csv_line);
+    fputcsv($this->file, $this->exporter->row());
   }
 
   public function commit() {
