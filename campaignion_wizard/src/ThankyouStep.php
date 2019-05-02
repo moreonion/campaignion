@@ -65,10 +65,11 @@ class ThankyouStep extends WizardStep {
     $field = &$this->referenceField['und'][$index];
 
     $type = $field['type'];
+    $node = NULL;
     if (isset($field['node_reference_nid'])) {
       $node = node_load($field['node_reference_nid']);
     }
-    else {
+    if (!$node) {
       $node = $this->wizard->prepareNode($this->contentType);
     }
 
