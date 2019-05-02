@@ -2,7 +2,6 @@ name = Campaignion Activity
 description = Activity logging for CRM contacts
 core = 7.x
 package = Campaignion
-project = campaignion
 
 dependencies[] = campaignion
 dependencies[] = little_helpers

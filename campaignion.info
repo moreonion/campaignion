@@ -3,6 +3,5 @@ description = Base module for all campaignion features.
 core = 7.x
 php = 5.5
 package = Campaignion
-project = campaignion
 
 dependencies[] = psr0

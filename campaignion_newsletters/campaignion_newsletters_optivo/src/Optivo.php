@@ -188,7 +188,7 @@ class Optivo extends ProviderBase {
    * Get a list of all optin processes for this account.
    */
   public function getOptinProcessOptions() {
-    $service = $this->factory->getClient('Optin');
+    $service = $this->factory->getClient('OptinProcess');
     $ids = $service->getIds();
     $options = [];
     foreach ($ids as $id) {
