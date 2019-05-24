@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function campaignion_tracking_preprocess_html(&$vars) {
+  $module_path = drupal_get_path('module', 'campaignion_tracking');
+
+  // Add javascript.
+  drupal_add_js($module_path . '/js/campaignion_tracking.js', [
+    'scope' => 'header',
+    'group' => JS_LIBRARY,
+    'preprocess' => FALSE,
+  ]);
+}
