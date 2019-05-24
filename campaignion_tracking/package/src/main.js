@@ -1,1 +1,1 @@
-console.log('campaignion_tracking')
+export { TrackerManager } from './tracker-manager'
