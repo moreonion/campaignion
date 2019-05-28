@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * @file
+ * Hook implementations for the Campaignion Tracking module.
+ */
+
+use Drupal\campaignion_action\Loader;
+use Drupal\little_helpers\Webform\Webform;
+
+/**
  * Implements hook_preprocess_html().
  */
 function campaignion_tracking_preprocess_html(&$vars) {
@@ -12,4 +20,153 @@ function campaignion_tracking_preprocess_html(&$vars) {
     'group' => JS_LIBRARY,
     'preprocess' => FALSE,
   ]);
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function campaignion_tracking_node_view($node, $view_mode, $langcode) {
+  $type = Loader::instance()->type($node->type);
+  $is_donation = $type && $type->isDonation();
+
+  // General information about the node.
+  drupal_add_js([
+    'campaignion_tracking' => [
+      'context' => [
+        'node' => [
+          'nid' => $node->nid,
+          'type' => $node->type,
+          'language' => $node->language,
+          'title' => $node->title,
+          'view_mode' => $view_mode,
+          'is_donation' => $is_donation,
+        ],
+      ],
+    ],
+  ], 'setting');
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for webform_client_form().
+ *
+ * We augment the Drupal.campaignion_tracking.context object with information
+ * as we get it submitted.
+ * Drupal will managed the JS object for us, i.e. paging back and forth in the
+ * webform will not delete information once submitted, only update it when
+ * changed. Thus we "track" the current form_state in our context.
+ *
+ * A submit handler is added to deal with redirects.
+ */
+function campaignion_tracking_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
+  $node = $form['#node'];
+  $type = Loader::instance()->type($node->type);
+  $is_donation = $type && $type->isDonation();
+  $webform = Webform::fromNode($form['#node']);
+
+  // Information about the current webform.
+  drupal_add_js([
+    'campaignion_tracking' => [
+      'context' => [
+        'webform' => [
+          'total_steps' => $form_state['webform']['page_count'],
+          'current_step' => $form_state['webform']['page_num'],
+          'last_completed_step' => isset($form_state['webform']['page_visited']) ? $form_state['webform']['page_visited'] : 0,
+        ],
+      ],
+    ],
+  ], 'setting');
+
+  // Information about a donation (in case the node is one).
+  if ($is_donation) {
+    $paymethod = $webform->componentByKey('paymethod_select');
+    $currency_code = isset($paymethod['extra']['currency_code']) ? $paymethod['extra']['currency_code'] : 'EUR';
+    $submission = $webform->formStateToSubmission($form_state);
+
+    // NB: Only after the first step submit we get values.
+    // Thus `interval` and `amount` might be "null" in JS (in case no values
+    // have been submitted so far)
+    drupal_add_js([
+      'campaignion_tracking' => [
+        'context' => [
+          'donation' => [
+            'currency_code' => $currency_code,
+            'interval' => $submission->valueByKey('donation_interval'),
+            'amount' => $submission->valueByKey('donation_amount'),
+          ],
+        ],
+      ],
+    ], 'setting');
+  }
+
+  $form['#submit'][] = 'campaignion_tracking_add_webform_fragment';
+  if ($is_donation) {
+    $form['#submit'][] = 'campaignion_tracking_add_donation_fragment';
+  }
+}
+
+/**
+ * Submit-callback for webform_client_form().
+ *
+ * Add webform tracking data to the URL-fragment of the redirect.
+ */
+function campaignion_tracking_add_webform_fragment($form, &$form_state) {
+  if (empty($form_state['webform_completed'])) {
+    return;
+  }
+  $sid = $form_state['values']['details']['sid'];
+  $fragment = 'w:sid=' . $sid;
+  if (!empty($form_state['redirect'][1]['fragment'])) {
+    $form_state['redirect'][1]['fragment'] .= ';' . $fragment;
+  }
+  else {
+    $form_state['redirect'][1]['fragment'] = $fragment;
+  }
+}
+
+/**
+ * Submit-callback for webform_client_form().
+ *
+ * Add donation success tracking data to the URL-fragment of the redirect.
+ */
+function campaignion_tracking_add_donation_fragment($form, &$form_state) {
+  if (empty($form_state['webform_completed'])) {
+    return;
+  }
+  // Prefix `t` for tracking, `ds` for donationSuccess event code.
+  $fragment = 't=ds';
+  $nid = $form_state['values']['details']['nid'];
+  $sid = $form_state['values']['details']['sid'];
+  if ($payment = _campaignion_tracking_load_payment($nid, $sid)) {
+    // Prefix `dm` for donation method.
+    $fragment .= ";d:m=" . $payment->method->name;
+  }
+  if (!empty($form_state['redirect'][1]['fragment'])) {
+    $form_state['redirect'][1]['fragment'] .= ';' . $fragment;
+  }
+  else {
+    $form_state['redirect'][1]['fragment'] = $fragment;
+  }
+}
+
+/**
+ * Load a payment.
+ *
+ * TODO: is there a little_helper for that?
+ */
+function _campaignion_tracking_load_payment($nid, $sid) {
+  $subquery = db_select('campaignion_activity_webform', 'w')
+    ->fields('w', ['activity_id'])
+    ->condition('nid', $nid)
+    ->condition('sid', $sid);
+  $pid = db_select('campaignion_activity_payment', 'p')
+    ->fields('p', ['pid'])
+    ->condition('p.activity_id', $subquery, 'in')
+    ->execute()
+    ->fetchColumn();
+  if ($pid) {
+    $payments = entity_load('payment', [$pid]);
+    return array_shift($payments);
+  } else {
+    return FALSE;
+  }
 }
