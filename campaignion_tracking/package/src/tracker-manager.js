@@ -5,13 +5,25 @@ export class TrackerManager {
   /**
    * Constructor.
    *
-   * @param {boolean} debug Display `console.debug()` messages
+   * @param {Boolean} debug set to true for debugging
    */
   constructor (debug = false) {
-    this._debug = debug
-    this._topics = {}
-    if (this._debug) {
-      console.debug('campaignion_tracking')
+    this.debug = debug
+    this.topics = {}
+
+    this.printDebug('init')
+  }
+
+  /**
+   * Utility function to print to `console.debug`.
+   *
+   * Print only if debug is set to a truthy value.
+   *
+   * @param  {...any} args arguments to print
+   */
+  printDebug (...args) {
+    if (this.debug) {
+      console.debug('[campaignion_tracking]', ...args)
     }
   }
 
@@ -25,14 +37,12 @@ export class TrackerManager {
    * @returns {object} A Subscription object allowing to `remove()` the subscription
    */
   subscribe (topic, handler) {
-    if (this._debug) {
-      console.debug('subscribe')
-    }
+    this.printDebug('subscribe', handler)
 
-    if (!this._topics[topic]) {
-      this._topics[topic] = []
+    if (!this.topics[topic]) {
+      this.topics[topic] = []
     }
-    let subscribers = this._topics[topic]
+    let subscribers = this.topics[topic]
     let subscriberCount = subscribers.push(handler)
     let subscriberIndex = subscriberCount - 1
 
@@ -44,7 +54,7 @@ export class TrackerManager {
      */
     let subscription = {
       remove: () => {
-        delete this._topics[subscriberIndex]
+        delete this.topics[subscriberIndex]
       }
     }
 
@@ -58,24 +68,15 @@ export class TrackerManager {
    * @param {object} data Any data to be provided to the subscribers
    */
   publish (topic, data = {}) {
-    if (this._debug) {
-      console.debug('publish', data)
-    }
+    this.printDebug('publish', data)
 
-    if (!this._topics[topic]) {
+    if (!this.topics[topic]) {
       return
     }
 
-    for (let subscriber of this._topics[topic]) {
+    for (let subscriber of this.topics[topic]) {
       subscriber(data)
     }
-  }
-
-  /**
-   * Getter for the registered topics.
-   */
-  get topics () {
-    return this._topics
   }
 
   /**
