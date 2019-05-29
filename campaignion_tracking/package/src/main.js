@@ -14,9 +14,12 @@ var debug = parseInt(sessionStorage.getItem('campaignion_debug')) ? true : false
 // some out-of-the-box prefixes
 export const codePrefixes = ['t', 'd', 'w']
 
+// ensure window.dataLayer
+window.dataLayer = window['dataLayer'] || []
+
 // common tracker manager, listener, gtm
 export const tracker = new tm.TrackerManager(debug)
-export const gtmTracker = new gtm.GTMTracker(tracker, debug)
+export const gtmTracker = new gtm.GTMTracker(tracker, window.dataLayer, debug)
 export const fragmentListener = new listener.FragmentListener(tracker, codePrefixes, debug)
 fragmentListener.setup()
 
