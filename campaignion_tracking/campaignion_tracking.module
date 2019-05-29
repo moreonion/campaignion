@@ -14,12 +14,14 @@ use Drupal\little_helpers\Webform\Webform;
 function campaignion_tracking_preprocess_html(&$vars) {
   $module_path = drupal_get_path('module', 'campaignion_tracking');
 
-  // Add javascript.
+  // Add javascript for common tracking structure.
   drupal_add_js($module_path . '/js/campaignion_tracking_common.min.js', [
     'scope' => 'header',
     'group' => JS_LIBRARY,
     'preprocess' => FALSE,
   ]);
+  // Add javascript which triggers messages to the tracker.
+  drupal_add_js($module_path . '/js/campaignion_tracking.js');
 }
 
 /**
