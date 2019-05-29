@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "description": "Common tracking functions",
   "scripts": {
-    "dist:common": "parcel build --no-source-maps --global campaignion_tracking -d dist -o campaignion_tracking_common src/main.js",
-    "dist:gtm": "parcel build --no-source-maps --global campaignion_tracking_gtm -d dist -o campaignion_tracking_gtm src/gtm.js",
+    "dist:common": "parcel build --no-source-maps --global campaignion_tracking -d dist -o campaignion_tracking_common src/drupal-common.js",
+    "dist:gtm": "parcel build --no-source-maps --global campaignion_tracking_gtm -d dist -o campaignion_tracking_gtm src/drupal-gtm.js",
     "dev": "parcel --global campaignion_tracking -d build src/index.html",
     "drupal:common": "yarn run dist:common && cp dist/campaignion_tracking_common.js ../js/campaignion_tracking_common.min.js",
     "drupal:gtm": "yarn run dist:gtm && cp dist/campaignion_tracking_gtm.js ../campaignion_tracking_gtm/js/campaignion_tracking_gtm.min.js",
