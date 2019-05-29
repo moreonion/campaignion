@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "description": "Common tracking functions",
   "scripts": {
-    "dist": "parcel build --no-source-maps --global campaignion_tracking -d dist -o campaignion_tracking src/main.js",
+    "dist": "parcel build --no-source-maps --global campaignion_tracking -d dist -o campaignion_tracking_common src/main.js",
     "dev": "parcel --global campaignion_tracking -d build src/index.html",
-    "drupal": "yarn run dist && cp dist/* ../js/",
+    "drupal": "yarn run dist && cp dist/campaignion_tracking_common.js ../js/campaignion_tracking_common.min.js",
     "test": "mocha --require babel-core/register --ui tdd --reporter dot test",
     "lint": "eslint src test"
   },
