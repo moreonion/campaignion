@@ -1,6 +1,7 @@
 import * as tm from './tracker-manager'
 import * as listener from './listener'
 import * as gtm from './gtm'
+import * as dp from './debug'
 
 /**
  * Check if we want debugging output.
@@ -22,7 +23,8 @@ export const tracker = new tm.TrackerManager(debug)
 export const gtmTracker = new gtm.GTMTracker(tracker, window.dataLayer, debug)
 export const fragmentListener = new listener.FragmentListener(tracker, codePrefixes, debug)
 fragmentListener.setup()
+dp.setupDebugProxy('dataLayer')
 
 // re-exports
-export { tm, listener, debug, gtm }
+export { tm, listener, debug, gtm, dp }
 export { fragment } from './fragment'
