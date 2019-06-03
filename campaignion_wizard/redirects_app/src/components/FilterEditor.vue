@@ -58,7 +58,7 @@ Use this component with the `.sync` modifier on the `filters` prop.
 </template>
 
 <script>
-import {find} from 'lodash'
+import find from 'lodash/find'
 
 export default {
   data () {
