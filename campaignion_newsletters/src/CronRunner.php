@@ -40,9 +40,8 @@ class CronRunner {
    * Select a batch of queue items then send them.
    */
   public function sendQueue() {
-    $lists = NewsletterList::listAll();
     $items = QueueItem::claimOldest($this->sendBatchSize);
-    $this->sendQueueItems($items, $lists);
+    $this->sendQueueItems($items);
   }
 
   /**
@@ -50,12 +49,10 @@ class CronRunner {
    *
    * @param \Drupal\campaignion_newsletters\QueueItem[] $items
    *   The list of queue items to be sent.
-   * @param \Drupal\campaignion_newsletters\NewsletterList[] $lists
-   *   All newsletter lists needed to send the passed queue items.
    */
-  public function sendQueueItems(array $items, array $lists) {
+  public function sendQueueItems(array $items) {
     foreach ($items as $item) {
-      $list = $lists[$item->list_id];
+      $list = NewsletterList::load($item->list_id);
       $provider = $list->provider();
       $method = $item->action;
 
