@@ -52,12 +52,8 @@ class CronRunner {
    */
   public function sendQueueItems(array $items) {
     foreach ($items as $item) {
-      $list = NewsletterList::load($item->list_id);
-      $provider = $list->provider();
-      $method = $item->action;
-
       try {
-        $provider->{$method}($list, $item);
+        $item->send();
         $item->delete();
       }
       catch (ApiError $e) {

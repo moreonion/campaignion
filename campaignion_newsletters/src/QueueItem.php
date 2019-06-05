@@ -174,4 +174,14 @@ class QueueItem extends Model {
     return !empty($this->args['send_welcome']);
   }
 
+  /**
+   * Trigger the queued action on the list’s provider.
+   *
+   * @throws \Drupal\campaignion_newsletters\ApiError
+   */
+  public function send() {
+    $list = NewsletterList::load($this->list_id);
+    $list->provider()->{$this->action}($list, $this);
+  }
+
 }
