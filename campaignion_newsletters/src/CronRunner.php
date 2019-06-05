@@ -51,7 +51,14 @@ class CronRunner {
    *   The list of queue items to be sent.
    */
   public function sendQueueItems(array $items) {
+    $failures = [];
     foreach ($items as $item) {
+      if (isset($failures[$item->email][$item->list_id])) {
+        // An earlier item for the same email/list combo. In order to preserve
+        // the order of queue items for a single subsrciption we have to skip
+        // this item.
+        continue;
+      }
       try {
         $item->send();
         $item->delete();
@@ -61,6 +68,9 @@ class CronRunner {
         if ($e->isPersistent()) {
           // There is no point to items with persistent errors in the queue.
           $item->delete();
+        }
+        else {
+          $failures[$item->email][$item->list_id] = TRUE;
         }
       }
     }
