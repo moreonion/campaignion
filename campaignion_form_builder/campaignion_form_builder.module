@@ -18,6 +18,17 @@ function campaignion_form_builder_webform_component_info() {
 }
 
 /**
+ * Implements hook_webform_validator_alter().
+ */
+function campaignion_form_builder_webform_validator_alter(&$validators) {
+  foreach ($validators as &$info) {
+    if (!empty($info['component_types']) && in_array('textfield', $info['component_types'], TRUE)) {
+      $info['component_types'][] = 'phone_number';
+    }
+  }
+}
+
+/**
  * Implements hook_campaignion_action_taken().
  */
 function campaignion_form_builder_campaignion_action_taken($node, Submission $submission) {

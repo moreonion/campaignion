@@ -38,6 +38,7 @@ dependencies[] = strongarm
 dependencies[] = taxonomy
 dependencies[] = uuid
 dependencies[] = webform_ajax
+dependencies[] = webform_validation
 features[ctools][] = strongarm:strongarm:1
 features[features_api][] = api:2
 features[field_base][] = field_thank_you_pages

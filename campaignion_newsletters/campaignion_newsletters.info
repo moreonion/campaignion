@@ -2,7 +2,6 @@ name = Campaignion Newsletters
 description = Allow to manage newsletters from external sources (CleverReach, etc.) and their subscriptions
 core = 7.x
 package = Campaignion
-project = campaignion
 
 dependencies[] = little_helpers
 dependencies[] = psr0
