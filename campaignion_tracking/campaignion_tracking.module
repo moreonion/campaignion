@@ -85,76 +85,35 @@ function campaignion_tracking_form_webform_client_form_alter(&$form, &$form_stat
     ];
     $form['#attached']['js'][] = ['data' => $donation_settings, 'type' => 'setting'];
   }
-
-  $form['#submit'][] = 'campaignion_tracking_add_webform_fragment';
-  if ($is_donation) {
-    $form['#submit'][] = 'campaignion_tracking_add_donation_fragment';
-  }
 }
 
 /**
- * Submit-callback for webform_client_form().
+ * Implements hook_webform_redirect_alter().
  *
  * Add webform tracking data to the URL-fragment of the redirect.
- */
-function campaignion_tracking_add_webform_fragment($form, &$form_state) {
-  if (empty($form_state['webform_completed'])) {
-    return;
-  }
-  $sid = $form_state['values']['details']['sid'];
-  $fragment = 'w:sid=' . $sid;
-  if (!empty($form_state['redirect'][1]['fragment'])) {
-    $form_state['redirect'][1]['fragment'] .= ';' . $fragment;
-  }
-  else {
-    $form_state['redirect'][1]['fragment'] = $fragment;
-  }
-}
-
-/**
- * Submit-callback for webform_client_form().
  *
- * Add donation success tracking data to the URL-fragment of the redirect.
+ * We want the SID and optionally donation specific information appended to the
+ * URL so that trackers can pick it up.
  */
-function campaignion_tracking_add_donation_fragment($form, &$form_state) {
-  if (empty($form_state['webform_completed'])) {
-    return;
-  }
-  // Prefix `t` for tracking, `ds` for donationSuccess event code.
-  $fragment = 't=ds';
-  $nid = $form_state['values']['details']['nid'];
-  $sid = $form_state['values']['details']['sid'];
-  if ($payment = _campaignion_tracking_load_payment($nid, $sid)) {
-    // Prefix `dm` for donation method.
-    $fragment .= ";d:m=" . $payment->method->name;
-  }
-  if (!empty($form_state['redirect'][1]['fragment'])) {
-    $form_state['redirect'][1]['fragment'] .= ';' . $fragment;
-  }
-  else {
-    $form_state['redirect'][1]['fragment'] = $fragment;
-  }
-}
+function campaignion_tracking_webform_redirect_alter($redirect, $submission) {
+  $type = Loader::instance()->type($submission->node->type);
+  $is_donation = $type && $type->isDonation();
 
-/**
- * Load a payment.
- *
- * TODO: is there a little_helper for that?
- */
-function _campaignion_tracking_load_payment($nid, $sid) {
-  $subquery = db_select('campaignion_activity_webform', 'w')
-    ->fields('w', ['activity_id'])
-    ->condition('nid', $nid)
-    ->condition('sid', $sid);
-  $pid = db_select('campaignion_activity_payment', 'p')
-    ->fields('p', ['pid'])
-    ->condition('p.activity_id', $subquery, 'in')
-    ->execute()
-    ->fetchColumn();
-  if ($pid) {
-    $payments = entity_load('payment', [$pid]);
-    return array_shift($payments);
-  } else {
-    return FALSE;
+  $fragment = 'w:sid=' . $submission->sid;
+
+  if ($is_donation) {
+    // Load the payments into submission objects.
+    // We want the used paymethods name and maybe the pid.
+    $submission->payments = [];
+    $submissions[$submission->sid] = $submission->unwrap();
+    webform_paymethod_select_webform_submission_load($submissions);
+
+    $fragment = 't=ds';
+    foreach ($submissions[$submission->sid]->payments as $payment) {
+      // Prefix `dm` for donation method.
+      $fragment .= ";d:m=" . $payment->method->name;
+    }
   }
+
+  $redirect->fragment = empty($redirect->fragment) ? $fragment : $redirect->fragment . ';' . $fragment;
 }
