@@ -9,19 +9,20 @@ use Drupal\campaignion_action\Loader;
 use Drupal\little_helpers\Webform\Webform;
 
 /**
- * Implements hook_preprocess_html().
+ * Implements hook_page_build().
  */
-function campaignion_tracking_preprocess_html(&$vars) {
-  $module_path = drupal_get_path('module', 'campaignion_tracking');
-
-  // Add javascript for common tracking structure.
-  drupal_add_js($module_path . '/js/campaignion_tracking_common.min.js', [
-    'scope' => 'header',
-    'group' => JS_LIBRARY,
-    'preprocess' => FALSE,
-  ]);
+function campaignion_tracking_page_build(&$page) {
   // Add javascript which triggers messages to the tracker.
-  drupal_add_js($module_path . '/js/campaignion_tracking.js');
+  $module_path = drupal_get_path('module', 'campaignion_tracking');
+  // This should be loaded really early.
+  // NB: needs to be loaded before specific tracker JS, so this has -101 on the
+  // weight.
+  $page['content']['#attached']['js'][$module_path . '/js/campaignion_tracking_common.min.js'] = [
+    'scope' => 'header',
+    'group' => JS_LIBRARY - 101,
+    'preprocess' => FALSE,
+  ];
+  $page['content']['#attached']['js'][] = $module_path . '/js/campaignion_tracking.js';
 }
 
 /**
@@ -32,20 +33,15 @@ function campaignion_tracking_node_view($node, $view_mode, $langcode) {
   $is_donation = $type && $type->isDonation();
 
   // General information about the node.
-  drupal_add_js([
-    'campaignion_tracking' => [
-      'context' => [
-        'node' => [
-          'nid' => $node->nid,
-          'type' => $node->type,
-          'language' => $node->language,
-          'title' => $node->title,
-          'view_mode' => $view_mode,
-          'is_donation' => $is_donation,
-        ],
-      ],
-    ],
-  ], 'setting');
+  $settings['campaignion_tracking']['context']['node'] = [
+    'nid' => $node->nid,
+    'type' => $node->type,
+    'language' => $node->language,
+    'title' => $node->title,
+    'view_mode' => $view_mode,
+    'is_donation' => $is_donation,
+  ];
+  $node->content['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
 }
 
 /**
@@ -66,17 +62,12 @@ function campaignion_tracking_form_webform_client_form_alter(&$form, &$form_stat
   $webform = Webform::fromNode($form['#node']);
 
   // Information about the current webform.
-  drupal_add_js([
-    'campaignion_tracking' => [
-      'context' => [
-        'webform' => [
-          'total_steps' => $form_state['webform']['page_count'],
-          'current_step' => $form_state['webform']['page_num'],
-          'last_completed_step' => isset($form_state['webform']['page_visited']) ? $form_state['webform']['page_visited'] : 0,
-        ],
-      ],
-    ],
-  ], 'setting');
+  $webform_settings['campaignion_tracking']['context']['webform'] = [
+    'total_steps' => $form_state['webform']['page_count'],
+    'current_step' => $form_state['webform']['page_num'],
+    'last_completed_step' => isset($form_state['webform']['page_visited']) ? $form_state['webform']['page_visited'] : 0,
+  ];
+  $form['#attached']['js'][] = ['data' => $webform_settings, 'type' => 'setting'];
 
   // Information about a donation (in case the node is one).
   if ($is_donation) {
@@ -87,17 +78,12 @@ function campaignion_tracking_form_webform_client_form_alter(&$form, &$form_stat
     // NB: Only after the first step submit we get values.
     // Thus `interval` and `amount` might be "null" in JS (in case no values
     // have been submitted so far)
-    drupal_add_js([
-      'campaignion_tracking' => [
-        'context' => [
-          'donation' => [
-            'currency_code' => $currency_code,
-            'interval' => $submission->valueByKey('donation_interval'),
-            'amount' => $submission->valueByKey('donation_amount'),
-          ],
-        ],
-      ],
-    ], 'setting');
+    $donation_settings['campaignion_tracking']['context']['donation'] = [
+      'currency_code' => $currency_code,
+      'interval' => $submission->valueByKey('donation_interval'),
+      'amount' => $submission->valueByKey('donation_amount'),
+    ];
+    $form['#attached']['js'][] = ['data' => $donation_settings, 'type' => 'setting'];
   }
 
   $form['#submit'][] = 'campaignion_tracking_add_webform_fragment';
