@@ -32,6 +32,10 @@ function campaignion_tracking_node_view($node, $view_mode, $langcode) {
   $type = Loader::instance()->type($node->type);
   $is_donation = $type && $type->isDonation();
 
+  if ($view_mode !== 'full') {
+    return;
+  }
+
   // General information about the node.
   $settings['campaignion_tracking']['context']['node'] = [
     'nid' => $node->nid,
