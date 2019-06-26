@@ -58,21 +58,24 @@ class Component {
   }
 
   /**
-   * Take appropriate actions when a webform submission is completed.
+   * Create subscriptions from the data in a webform submission.
    *
    * @param string $email
    *   The email address found in this submission.
    * @param \Drupal\campaignion\CRM\Import\Source\WebformSubmission $s
    *   The webform submission that is being submitted.
+   *
+   * @return \Drupal\campaignion_newsletters\Subscription[]
+   *   A list of subscriptions.
    */
-  public function submit($email, WebformSubmission $s) {
+  public function getSubscriptions($email, WebformSubmission $s) {
     if ($value = $s->valuesByCid($this->component['cid'])) {
       $value = Values::removePrefix($value);
       if ($value == 'opt-in') {
-        $this->subscribe($email, $s);
+        return $this->subscribe($email, $s);
       }
       elseif ($value == 'opt-out') {
-        $this->unsubscribe($email);
+        return $this->unsubscribe($email);
       }
     }
   }
@@ -82,19 +85,25 @@ class Component {
    *
    * @param string $email
    *   The email address to unsubscribe.
+   *
+   * @return \Drupal\campaignion_newsletters\Subscription[]
+   *   A list of (un)subscriptions.
    */
   public function unsubscribe($email) {
+    $subscriptions = [];
     $all_lists = !empty($this->component['extra']['optout_all_lists']);
     if ($all_lists) {
       if ($this->unsubscribeUnknown) {
         foreach ($this->getAllListIds() as $list_id) {
           $subscription = Subscription::byData($list_id, $email);
-          $subscription->delete();
+          $subscription->delete = TRUE;
+          $subscriptions[] = $subscription;
         }
       }
       else {
         foreach (Subscription::byEmail($email) as $subscription) {
-          $subscription->delete();
+          $subscription->delete = TRUE;
+          $subscriptions[] = $subscription;
         }
       }
     }
@@ -102,10 +111,12 @@ class Component {
       $lists = $this->component['extra']['lists'];
       foreach (Subscription::byEmail($email) as $subscription) {
         if (!empty($lists[$subscription->list_id])) {
-          $subscription->delete();
+          $subscription->delete = TRUE;
+          $subscriptions[] = $subscription;
         }
       }
     }
+    return $subscriptions;
   }
 
   /**
@@ -115,8 +126,12 @@ class Component {
    *   The email address to subscribe.
    * @param \Drupal\campaignion\CRM\Import\Source\WebformSubmission $source
    *   The importer source for further CRM action.
+   *
+   * @return \Drupal\campaignion_newsletters\Subscription[]
+   *   A list of subscriptions.
    */
   public function subscribe($email, WebformSubmission $source) {
+    $subscriptions = [];
     $extra = $this->component['extra'];
     $lists = array_keys(array_filter($extra['lists']));
     foreach ($lists as $list_id) {
@@ -127,8 +142,9 @@ class Component {
         'optin_statement' => $extra['optin_statement'],
         'optin_info' => FormSubmission::fromWebformSubmission($source),
       ]);
-      $subscription->save();
+      $subscriptions[] = $subscription;
     }
+    return $subscriptions;
   }
 
   /**

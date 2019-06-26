@@ -53,9 +53,9 @@ class ComponentTest extends \DrupalUnitTestCase {
         'components' => [1 => $this->component]
       ],
     ];
-    $c->subscribe('test@example.com', $s);
-    $subscriptions = Subscription::byEmail('test@example.com');
+    $subscriptions = $c->subscribe('test@example.com', $s);
     $this->assertCount(1, $subscriptions);
+    $this->assertFalse($subscriptions[0]->delete);
   }
 
   /**
@@ -70,20 +70,26 @@ class ComponentTest extends \DrupalUnitTestCase {
     $component = $this->component;
     $component['extra']['optout_all_lists'] = FALSE;
     $c = new Component($component, FALSE);
-    $c->unsubscribe($e);
-    $this->assertCount(1, Subscription::byEmail($e));
-    $this->assertNotEmpty(QueueItem::load(1, $e));
+    $subscriptions = $c->unsubscribe($e);
+    $this->assertCount(1, $subscriptions);
+    $this->assertTrue($subscriptions[0]->delete);
 
     $component['extra']['optout_all_lists'] = TRUE;
     $c = new Component($component, FALSE);
-    $c->unsubscribe($e);
-    $this->assertCount(0, Subscription::byEmail($e));
-    $this->assertNotEmpty(QueueItem::load(2, $e));
+    $c->setAllListIds([1, 2, 3]);
+    $subscriptions = $c->unsubscribe($e);
+    $this->assertCount(2, $subscriptions);
+    foreach ($subscriptions as $s) {
+      $this->assertTrue($s->delete);
+    }
 
     $c = new Component($component, TRUE);
     $c->setAllListIds([1, 2, 3]);
-    $c->unsubscribe($e);
-    $this->assertNotEmpty(QueueItem::load(3, $e));
+    $subscriptions = $c->unsubscribe($e);
+    $this->assertCount(3, $subscriptions);
+    foreach ($subscriptions as $s) {
+      $this->assertTrue($s->delete);
+    }
   }
 
   /**

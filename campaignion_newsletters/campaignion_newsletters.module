@@ -7,7 +7,6 @@
 
 use Drupal\campaignion_newsletters\Component;
 use Drupal\campaignion_newsletters\CronRunner;
-use Drupal\campaignion_newsletters\FormBuilderElementNewsletter;
 use Drupal\campaignion_newsletters\NewsletterList;
 use Drupal\campaignion_newsletters\ProviderFactory;
 use Drupal\campaignion_newsletters\QueueItem;
@@ -83,10 +82,14 @@ function campaignion_newsletters_webform_submission_confirmed(Submission $submis
   if (!($email = $s->value('email'))) {
     return;
   }
+  $subscriptions = [];
   foreach ($s->webform->componentsByType('opt_in') as $component) {
     if ($component['extra']['channel'] == 'email') {
-      Component::fromComponent($component)->submit($email, $s);
+      $subscriptions += Component::fromComponent($component)->getSubscriptions($email, $s);
     }
+  }
+  foreach ($subscriptions as $subscription) {
+    $subscription->save();
   }
 }
 
