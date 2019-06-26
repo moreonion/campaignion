@@ -137,25 +137,9 @@ class Subscription extends Model {
       return $this->delete($from_provider);
     }
     if (!$from_provider && ($provider = $this->provider())) {
-      $item = QueueItem::byData(array(
-        'list_id' => $this->list_id,
-        'email' => $this->email,
-      ));
-      list($data, $fingerprint) = $provider->data($this, $item->data);
-      if ($fingerprint != $this->fingerprint) {
-        $this->fingerprint = $fingerprint;
-        $item->data = $data;
-
-        if ($this->new) {
-          $item->action = QueueItem::SUBSCRIBE;
-          $item->args['send_welcome'] = $this->send_welcome;
-          $item->args['send_optin'] = $this->needs_opt_in;
-          $item->optin_info = $this->optin_info;
-        }
-        else {
-          $item->action = QueueItem::UPDATE;
-        }
-
+      $item = QueueItem::fromSubscription($this, $provider);
+      if ($item->fingerprint != $this->fingerprint) {
+        $this->fingerprint = $item->fingerprint;
         $item->save();
       }
     }
@@ -188,27 +172,13 @@ class Subscription extends Model {
    *   forwarded to provider again.
    */
   public function delete($from_provider = FALSE) {
-    if ($this->isNew()) {
-      return;
-    }
+    $this->delete = TRUE;
     if (!$from_provider) {
-      $this->queueUnsubscribe();
+      QueueItem::fromSubscription($this)->save();
     }
     parent::delete();
     module_invoke_all('campaignion_newsletters_subscription_deleted', $this, $from_provider);
     $this->fingerprint = '';
-  }
-
-  /**
-   * Queue an unsubscribe request for this subscription.
-   */
-  public function queueUnsubscribe() {
-    QueueItem::byData(array(
-      'list_id' => $this->list_id,
-      'email' => $this->email,
-      'action' => QueueItem::UNSUBSCRIBE,
-      'data' => NULL,
-    ))->save();
   }
 
 }

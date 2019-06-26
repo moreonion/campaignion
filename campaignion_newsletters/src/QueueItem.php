@@ -82,6 +82,43 @@ class QueueItem extends Model {
   }
 
   /**
+   * Load or create a queue item with additional data from a subscription.
+   *
+   * @param \Drupal\campaignion_newsletters\Subscription $subscription
+   *   Subscription providing the data for the QueueItem.
+   * @param \Drupal\campaignion_newsletters\ProviderInterface $provider
+   *   Provider matching the subscription.
+   *
+   * @return \Drupal\campaignion_newsletters\QueueItem
+   *   A queue item.
+   */
+  public static function fromSubscription(Subscription $subscription, ProviderInterface $provider = NULL) {
+    $item = static::byData(array(
+      'list_id' => $subscription->list_id,
+      'email' => $subscription->email,
+    ));
+    if ($provider) {
+      list($data, $fingerprint) = $provider->data($subscription, $item->data);
+      $item->fingerprint = $fingerprint;
+      $item->data = $data;
+    }
+    if ($subscription->delete) {
+      $item->action = static::UNSUBSCRIBE;
+      $item->data = NULL;
+    }
+    elseif ($subscription->new) {
+      $item->action = static::SUBSCRIBE;
+      $item->args['send_welcome'] = $subscription->send_welcome;
+      $item->args['send_optin'] = $subscription->needs_opt_in;
+      $item->optin_info = $subscription->optin_info;
+    }
+    else {
+      $item->action = static::UPDATE;
+    }
+    return $item;
+  }
+
+  /**
    * Load and lock queue items in order to process them.
    *
    * @param int $limit

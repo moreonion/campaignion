@@ -4,8 +4,6 @@ namespace Drupal\campaignion_newsletters;
 
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
 use Drupal\campaignion_opt_in\Values;
-use Drupal\little_helpers\ArrayConfig;
-use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Special functionality for the newsletter webform component.
@@ -64,7 +62,7 @@ class Component {
    *
    * @param string $email
    *   The email address found in this submission.
-   * @param \Drupal\campaignion\CRM\Import\Source\WebformSubmission $source
+   * @param \Drupal\campaignion\CRM\Import\Source\WebformSubmission $s
    *   The webform submission that is being submitted.
    */
   public function submit($email, WebformSubmission $s) {
@@ -91,13 +89,13 @@ class Component {
       if ($this->unsubscribeUnknown) {
         foreach ($this->getAllListIds() as $list_id) {
           $subscription = Subscription::byData($list_id, $email);
-          if ($subscription->isNew()) {
-            $subscription->queueUnsubscribe();
-          }
+          $subscription->delete();
         }
       }
-      foreach (Subscription::byEmail($email) as $subscription) {
-        $subscription->delete();
+      else {
+        foreach (Subscription::byEmail($email) as $subscription) {
+          $subscription->delete();
+        }
       }
     }
     else {
@@ -136,7 +134,7 @@ class Component {
   /**
    * Set the array of all list IDs. Usually only used for testing.
    *
-   * @param int[]
+   * @param int[] $list_ids
    *   Array of list IDs.
    */
   public function setAllListIds(array $list_ids) {

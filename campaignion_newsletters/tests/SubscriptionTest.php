@@ -54,6 +54,7 @@ class SubscriptionTest extends \DrupalWebTestCase {
     $this->assertNull($item->data);
 
     // Opt-in again.
+    $s->delete = FALSE;
     $s->save();
 
     // QueueItem was changed into a subscription again.
