@@ -3,11 +3,15 @@
 namespace Drupal\campaignion_newsletters;
 
 class SubscriptionTest extends \DrupalWebTestCase {
+
   public function tearDown() {
     db_delete('campaignion_newsletters_subscriptions')->execute();
     db_delete('campaignion_newsletters_queue')->execute();
   }
 
+  /**
+   * Test `byData()` doesn’t duplicate Subscriptions.
+   */
   public function test_byData_doesntDuplicate() {
     $email = 'bydataduplicate@test.com';
     $list_id = 4711;
@@ -22,12 +26,15 @@ class SubscriptionTest extends \DrupalWebTestCase {
     $this->assertEqual(0, count(Subscription::byEmail($email)));
   }
 
+  /**
+   * Test deleting a non-existing Subscription.
+   */
   public function test_delete_worksForNonExisting() {
     Subscription::fromData(4711, 'this@doesnot.exist')->delete();
   }
 
   /**
-   * Test that a proper QueueItem exists a user does first opt-out then opt-in.
+   * Test that a proper QueueItem exists if a user does first opt-out then -in.
    */
   public function testOptOutThenOptIn() {
     $email = 'bydataduplicate@test.com';
@@ -63,4 +70,28 @@ class SubscriptionTest extends \DrupalWebTestCase {
     $this->assertEqual(['data'], $item->data);
   }
 
+  /**
+   * Test merging subscriptions.
+   */
+  public function testMerge() {
+    $email = 'merge@test.com';
+    $s1 = Subscription::byData(1, $email, [
+      'send_welcome' => TRUE,
+      'optin_statement' => 'I agree.',
+      'fingerprint' => 'fingerprint1',
+    ]);
+    $s2 = Subscription::byData(1, $email, [
+      'send_welcome' => FALSE,
+      'optin_statement' => 'I agree again.',
+      'fingerprint' => 'fingerprint2',
+    ]);
+    $s1->merge($s2);
+
+    // TRUE boolean stays TRUE.
+    $this->assertTrue($s1->send_welcome);
+    // Other values are overwritten.
+    $this->assertEqual($s1->optin_statement, $s2->optin_statement);
+    // Fingerprint is reset.
+    $this->assertEqual($s1->fingerprint, '');
+  }
 }

@@ -165,6 +165,25 @@ class Subscription extends Model {
   }
 
   /**
+   * Merge data from another subscription into this subscription.
+   *
+   * @param Subscription $subscription
+   *   Another subscription to merge into this subscription.
+   *
+   * @return Subscription
+   *   The updated subscription object.
+   */
+  public function merge(Subscription $subscription) {
+    foreach ($subscription as $prop => $value) {
+      if (!empty($value)) {
+        $this->$prop = $value;
+      }
+    }
+    $this->fingerprint = '';
+    return $this;
+  }
+
+  /**
    * Delete the subscription from the database.
    *
    * @param bool $from_provider

@@ -112,7 +112,7 @@ class Subscriptions {
           $existing = $subscription;
         }
         elseif (!$subscription->delete) {
-          // TODO: merge opt-ins
+          $existing->merge($subscription);
         }
       }
       else {
