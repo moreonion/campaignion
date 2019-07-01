@@ -77,20 +77,22 @@ class SubscriptionTest extends \DrupalWebTestCase {
     $email = 'merge@test.com';
     $s1 = Subscription::byData(1, $email, [
       'send_welcome' => TRUE,
-      'optin_statement' => 'I agree.',
+      'needs_opt_in' => FALSE,
       'fingerprint' => 'fingerprint1',
+      'components' => [['cid' => 1]],
     ]);
     $s2 = Subscription::byData(1, $email, [
       'send_welcome' => FALSE,
-      'optin_statement' => 'I agree again.',
+      'needs_opt_in' => TRUE,
       'fingerprint' => 'fingerprint2',
+      'components' => [['cid' => 2]],
     ]);
     $s1->merge($s2);
 
-    // TRUE boolean stays TRUE.
+    $this->assertEqual($s1->components, [['cid' => 1], ['cid' => 2]]);
+    // TRUE wins.
     $this->assertTrue($s1->send_welcome);
-    // Other values are overwritten.
-    $this->assertEqual($s1->optin_statement, $s2->optin_statement);
+    $this->assertTrue($s1->needs_opt_in);
     // Fingerprint is reset.
     $this->assertEqual($s1->fingerprint, '');
   }

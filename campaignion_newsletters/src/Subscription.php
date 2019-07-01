@@ -20,6 +20,7 @@ class Subscription extends Model {
   public $send_welcome = FALSE;
   public $optin_statement = '';
   public $optin_info = NULL;
+  public $components = [];
 
   public static $lists = array();
 
@@ -168,19 +169,13 @@ class Subscription extends Model {
    * Merge data from another subscription into this subscription.
    *
    * @param Subscription $subscription
-   *   Another subscription to merge into this subscription.
-   *
-   * @return Subscription
-   *   The updated subscription object.
+   *   Another subscription for the same email address and list.
    */
   public function merge(Subscription $subscription) {
-    foreach ($subscription as $prop => $value) {
-      if (!empty($value)) {
-        $this->$prop = $value;
-      }
-    }
+    $this->components = array_merge($this->components, $subscription->components);
+    $this->send_welcome = $this->send_welcome || $subscription->send_welcome;
+    $this->needs_opt_in = $this->needs_opt_in || $subscription->needs_opt_in;
     $this->fingerprint = '';
-    return $this;
   }
 
   /**
