@@ -139,7 +139,6 @@ class Component {
         'source' => $source,
         'needs_opt_in' => !$extra['opt_in_implied'],
         'send_welcome' => (bool) $extra['send_welcome'],
-        'optin_statement' => $extra['optin_statement'],
         'optin_info' => FormSubmission::fromWebformSubmission($source),
         'components' => [$this->component],
       ]);
