@@ -74,26 +74,25 @@ class SubscriptionTest extends \DrupalWebTestCase {
    * Test merging subscriptions.
    */
   public function testMerge() {
+    $c1 = ['cid' => 1, 'extra' => ['opt_in_implied' => 1, 'send_welcome' => 1]];
+    $c2 = ['cid' => 2, 'extra' => ['opt_in_implied' => 0, 'send_welcome' => 0]];
     $email = 'merge@test.com';
     $s1 = Subscription::byData(1, $email, [
-      'send_welcome' => TRUE,
-      'needs_opt_in' => FALSE,
       'fingerprint' => 'fingerprint1',
-      'components' => [['cid' => 1]],
+      'components' => [$c1],
     ]);
     $s2 = Subscription::byData(1, $email, [
-      'send_welcome' => FALSE,
-      'needs_opt_in' => TRUE,
       'fingerprint' => 'fingerprint2',
-      'components' => [['cid' => 2]],
+      'components' => [$c2],
     ]);
     $s1->merge($s2);
 
-    $this->assertEqual($s1->components, [['cid' => 1], ['cid' => 2]]);
-    // TRUE wins.
-    $this->assertTrue($s1->send_welcome);
-    $this->assertTrue($s1->needs_opt_in);
+    $this->assertEqual($s1->components, [$c1, $c2]);
     // Fingerprint is reset.
     $this->assertEqual($s1->fingerprint, '');
+    // TRUE wins.
+    $args = $s1->queueItemArgs();
+    $this->assertTrue($args['send_welcome']);
+    $this->assertTrue($args['send_optin']);
   }
 }

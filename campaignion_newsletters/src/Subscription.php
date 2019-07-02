@@ -16,9 +16,6 @@ class Subscription extends Model {
 
   public $delete = FALSE;
   public $source = NULL;
-  public $needs_opt_in = FALSE;
-  public $send_welcome = FALSE;
-  public $optin_info = NULL;
   public $components = [];
 
   public static $lists = array();
@@ -167,13 +164,15 @@ class Subscription extends Model {
   /**
    * Merge data from another subscription into this subscription.
    *
+   * Assumes list_id, email and source are the same.
+   * Ignores last_sync and updated timestamps.
+   *
    * @param Subscription $subscription
    *   Another subscription for the same email address and list.
    */
   public function merge(Subscription $subscription) {
     $this->components = array_merge($this->components, $subscription->components);
-    $this->send_welcome = $this->send_welcome || $subscription->send_welcome;
-    $this->needs_opt_in = $this->needs_opt_in || $subscription->needs_opt_in;
+    $this->delete = $this->delete && $subscription->delete;
     $this->fingerprint = '';
   }
 
@@ -192,6 +191,19 @@ class Subscription extends Model {
     parent::delete();
     module_invoke_all('campaignion_newsletters_subscription_deleted', $this, $from_provider);
     $this->fingerprint = '';
+  }
+
+  /**
+   * Calculate the arguments for a queue item.
+   */
+  public function queueItemArgs() {
+    $args['send_welcome'] = FALSE;
+    $args['send_optin'] = FALSE;
+    foreach ($this->components as $component) {
+      $args['send_welcome'] = $args['send_welcome'] || !empty($component['extra']['send_welcome']);
+      $args['send_optin'] = $args['send_optin'] || empty($component['extra']['opt_in_implied']);
+    }
+    return $args;
   }
 
 }

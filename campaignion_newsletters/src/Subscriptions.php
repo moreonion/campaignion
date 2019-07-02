@@ -108,12 +108,7 @@ class Subscriptions {
   public function merge(array $subscriptions) {
     foreach ($subscriptions as $subscription) {
       if ($existing = &$this->subscriptions[$subscription->email][$subscription->list_id]) {
-        if ($existing->delete) {
-          $existing = $subscription;
-        }
-        elseif (!$subscription->delete) {
-          $existing->merge($subscription);
-        }
+        $existing->merge($subscription);
       }
       else {
         $this->subscriptions[$subscription->email][$subscription->list_id] = $subscription;

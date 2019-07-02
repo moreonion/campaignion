@@ -132,14 +132,10 @@ class Component {
    */
   public function subscribe($email, WebformSubmission $source) {
     $subscriptions = [];
-    $extra = $this->component['extra'];
-    $lists = array_keys(array_filter($extra['lists']));
+    $lists = array_keys(array_filter($this->component['extra']['lists']));
     foreach ($lists as $list_id) {
       $subscription = Subscription::byData($list_id, $email, [
         'source' => $source,
-        'needs_opt_in' => !$extra['opt_in_implied'],
-        'send_welcome' => (bool) $extra['send_welcome'],
-        'optin_info' => FormSubmission::fromWebformSubmission($source),
         'components' => [$this->component],
       ]);
       $subscriptions[] = $subscription;

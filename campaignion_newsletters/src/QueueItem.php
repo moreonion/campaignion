@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_newsletters;
 
 use Drupal\little_helpers\DB\Model;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Model class for newsletter queue items.
@@ -108,9 +109,10 @@ class QueueItem extends Model {
     }
     elseif ($subscription->new) {
       $item->action = static::SUBSCRIBE;
-      $item->args['send_welcome'] = $subscription->send_welcome;
-      $item->args['send_optin'] = $subscription->needs_opt_in;
-      $item->optin_info = $subscription->optin_info;
+      $item->args = $subscription->queueItemArgs();
+      if (!empty($subscription->source) && $subscription->source instanceof Submission) {
+        $item->optin_info = FormSubmission::fromWebformSubmission($subscription->source);
+      }
     }
     else {
       $item->action = static::UPDATE;
