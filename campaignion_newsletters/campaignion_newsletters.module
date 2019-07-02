@@ -183,8 +183,7 @@ function campaignion_newsletters_form_webform_component_edit_form_alter(&$elemen
   ];
 
   if (empty($component['extra']['fixed_channel'])) {
-    $channel_id = drupal_html_id('opt-in-channel');
-    $element['extra']['channel']['#id'] = $channel_id;
+    $channel_id = $element['extra']['channel']['#id'];
     $element['list_management']['#states']['visible']["#$channel_id"]['value'] = 'email';
     $element['behavior']['optout_all_lists']['#states']['visible']["#$channel_id"]['value'] = 'email';
   }
