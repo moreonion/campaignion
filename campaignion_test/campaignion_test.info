@@ -14,6 +14,7 @@ dependencies[] = campaignion_manage
 dependencies[] = campaignion_mp_fields
 dependencies[] = campaignion_newsletters
 dependencies[] = campaignion_newsletters_mailchimp
+dependencies[] = campaignion_newsletters_mailchimp_interests
 dependencies[] = campaignion_opt_in
 dependencies[] = campaignion_overlay
 dependencies[] = campaignion_source_tags
