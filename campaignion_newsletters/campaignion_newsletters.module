@@ -129,6 +129,7 @@ function campaignion_newsletters_form_webform_component_edit_form_alter(&$elemen
   ];
 
   natcasesort($newsletters);
+  $lists_id = drupal_html_id('newsletter-lists');
   $element['list_management']['lists'] = [
     '#type' => module_exists('select2') && count($newsletters) > 5 ? 'select' : 'checkboxes',
     '#title' => t('Newsletter'),
@@ -140,6 +141,7 @@ function campaignion_newsletters_form_webform_component_edit_form_alter(&$elemen
     '#multiple' => 1,
     '#select2' => [],
     '#parents' => ['extra', 'lists'],
+    '#id' => $lists_id,
   ];
 
   $element['list_management']['opt_in_implied'] = [
