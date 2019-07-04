@@ -197,7 +197,7 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
       $options = [Values::OPT_IN => $l[1], $no_value => $l[0]];
       $element += [
         '#type' => 'radios',
-        '#default_value' => isset($options[$value]) ? $value : FALSE,
+        '#default_value' => isset($options[$value]) ? $value : '',
         '#options' => $options,
       ];
   }
