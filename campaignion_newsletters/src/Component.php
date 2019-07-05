@@ -78,6 +78,7 @@ class Component {
         return $this->unsubscribe($email);
       }
     }
+    return [];
   }
 
   /**
