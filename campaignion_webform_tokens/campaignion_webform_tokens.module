@@ -10,14 +10,6 @@ function campaignion_webform_tokens_token_info() {
   $types = [];
   $submission = [];
 
-  // Only webform3.
-  if (!function_exists('webform_token_info')) {
-    $types['submission'] = [
-      'name' => t('Webform submission data'),
-      'description' => t('Tokens related to data submitted by webforms.'),
-    ];
-  }
-
   // Also don't advertise our own token syntax in webform4.
   $submission['{component}'] = [
     'name' => t('Component value'),
