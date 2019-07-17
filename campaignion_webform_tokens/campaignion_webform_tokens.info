@@ -3,5 +3,5 @@ description = "Enable use of webform tokens on thank you pages."
 core = 7.x
 package = Campaignion
 
-dependencies[] = little_helpers
+dependencies[] = little_helpers (>=2.0-alpha1)
 dependencies[] = webform
