@@ -74,16 +74,16 @@ function campaignion_bar_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_page_build()
+ * Implements hook_page_alter()
  */
-function campaignion_bar_page_build(&$page) {
+function campaignion_bar_page_alter(&$page) {
   global $user;
 
   if(user_access('access campaignion bar')) {
     $build_aebar = TRUE;
     if(function_exists('context_active_contexts')) {
       $loaded_contexts = array_keys(context_active_contexts());
-      foreach (array('no_aebar', 'current_webform_embedded', 'colorbox_embedded') as $context) {
+      foreach (array('no_aebar', 'embedded', 'current_webform_embedded', 'colorbox_embedded') as $context) {
         if (in_array($context, $loaded_contexts)) {
           $build_aebar = FALSE;
           break;
