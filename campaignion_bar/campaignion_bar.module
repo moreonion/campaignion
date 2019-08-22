@@ -74,9 +74,9 @@ function campaignion_bar_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_page_alter()
+ * Implements hook_page_build()
  */
-function campaignion_bar_page_alter(&$page) {
+function campaignion_bar_page_build(&$page) {
   global $user;
 
   if(user_access('access campaignion bar')) {
