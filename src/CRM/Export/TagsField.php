@@ -9,7 +9,7 @@ class TagsField extends WrapperField {
     $this->filterable = $filterable;
   }
 
-  public function value() {
+  public function value($delta = 0) {
     $w = $this->exporter->getWrappedContact();
     $tags = $w->{$this->key}->value();
     $names = array();

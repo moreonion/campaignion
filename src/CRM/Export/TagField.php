@@ -13,7 +13,7 @@ class TagField extends WrapperField {
    * @return string|null
    *   The name of the tag if one is set otherwise NULL.
    */
-  public function value() {
+  public function value($delta = 0) {
     $w = $this->exporter->getWrappedContact();
     $tag = $w->{$this->key}->value();
     if ($tag) {

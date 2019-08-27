@@ -8,7 +8,7 @@ class DateField extends WrapperField {
     parent::__construct($key);
     $this->format = $format;
   }
-  public function value() {
+  public function value($delta = 0) {
     if ($timestamp = parent::value()) {
       return strftime($this->format, $timestamp);
     }

@@ -10,8 +10,8 @@ class AddressField extends WrapperField {
     $this->mappedSubkeys = (isset($subkeys_map) && is_array($subkeys_map)) ? $subkeys_map : NULL;
   }
 
-  public function value() {
-    $all_values = parent::value();
+  public function value($delta = 0) {
+    $all_values = parent::value($delta);
     unset($all_values['data']);
     unset($all_values['first_name']);
     unset($all_values['last_name']);
