@@ -9,7 +9,7 @@ class DateField extends WrapperField {
     $this->format = $format;
   }
   public function value($delta = 0) {
-    if ($timestamp = parent::value()) {
+    if ($timestamp = parent::value($delta)) {
       return strftime($this->format, $timestamp);
     }
   }

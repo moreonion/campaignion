@@ -9,8 +9,8 @@ class KeyedField extends WrapperField {
     $this->subkey = $subkey;
   }
 
-  public function value($delta = NULL) {
-    if (($values = parent::value($delta))) {
+  public function value($delta = 0) {
+    if (($values = parent::value(NULL))) {
       foreach ($values as $value) {
         if (!empty($value[$this->subkey])) {
           return $value[$this->subkey];
