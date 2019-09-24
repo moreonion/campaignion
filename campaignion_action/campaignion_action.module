@@ -183,6 +183,14 @@ function campaignion_action_form_webform_client_form_alter(&$form, &$form_state)
   if ($link->checkHash() && !empty($link->query['test-mode'])) {
     $form_state['test_mode'] = TRUE;
   }
+  if ($form_state['webform']['page_num'] == 1) {
+    $form['submitted']['test_mode'] = [
+      '#prefix' => '<p class="test-mode-info">',
+      '#markup' => t('Test-mode is active!'),
+      '#suffix' => '</p>',
+      '#weight' => -1,
+    ];
+  }
 }
 
 /**
