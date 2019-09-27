@@ -56,7 +56,7 @@ class Phone extends Field {
   public function setValue(\EntityMetadataWrapper $entity, $value) {
     $field = $entity->{$this->field};
     $values = $field->value();
-    $values[] = $value;
+    array_unshift($values, $value);
     $field->set($values);
     return TRUE;
   }
