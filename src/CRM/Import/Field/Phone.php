@@ -2,8 +2,14 @@
 
 namespace Drupal\campaignion\CRM\Import\Field;
 
+/**
+ * Importer for phone numbers.
+ */
 class Phone extends Field {
 
+  /**
+   * Remove extra characters from a phone number for comparison.
+   */
   protected function normalizePhoneNumber($number) {
     $number = trim($number);
     if (strpos($number, '+') === 0) {
@@ -13,33 +19,40 @@ class Phone extends Field {
     return ltrim($number, '0');
   }
 
+  /**
+   * Determine whether two strings mean the same phone number.
+   */
   protected function phoneNumbersEqual($short, $long) {
     $short = $this->normalizePhoneNumber($short);
     $long = $this->normalizePhoneNumber($long);
     if (strlen($short) > strlen($long)) {
       list($short, $long) = array($long, $short);
     }
-    return substr($long, strlen($long)-strlen($short)) == $short;
+    return substr($long, strlen($long) - strlen($short)) == $short;
   }
 
-  // returns the array offset when it finds the number
-  // or NULL otherwise
-  public function storeValue($entity, $newNumber) {
+  /**
+   * Determine whether a new value should be stored.
+   */
+  public function storeValue($entity, $new_number) {
     try {
-      foreach ($entity->{$this->field}->value() as $delta => $storedNumber) {
-        if ($this->phoneNumbersEqual($storedNumber, $newNumber)) {
+      foreach ($entity->{$this->field}->value() as $delta => $stored_number) {
+        if ($this->phoneNumbersEqual($stored_number, $new_number)) {
           return FALSE;
         }
       }
-    } catch (\EntityMetadataWrapperException $e) {
+    }
+    catch (\EntityMetadataWrapperException $e) {
       watchdog('campaignion', 'Searched data in a non-existing field "!field".', array('!field' => $this->field), WATCHDOG_WARNING);
       return TRUE;
     }
-
-    // the number wasn't found
+    // The number wasn't found.
     return TRUE;
   }
 
+  /**
+   * Update the field value.
+   */
   public function setValue(\EntityMetadataWrapper $entity, $value) {
     $field = $entity->{$this->field};
     $values = $field->value();
@@ -47,4 +60,5 @@ class Phone extends Field {
     $field->set($values);
     return TRUE;
   }
+
 }
