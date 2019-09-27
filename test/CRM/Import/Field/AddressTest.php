@@ -3,9 +3,10 @@
 namespace Drupal\campaignion\CRM\Import\Field;
 
 require_once dirname(__FILE__) . '/RedhenEntityTest.php';
-use \Drupal\campaignion\CRM\Import\Source\ArraySource;
+use Drupal\campaignion\CRM\Import\Source\ArraySource;
 
 class AddressTest extends RedhenEntityTest {
+
   static protected $mapping = array(
     'thoroughfare' => 'street_address',
     'postal_code' => 'zip_code',
@@ -13,14 +14,23 @@ class AddressTest extends RedhenEntityTest {
     'country' => 'country',
   );
 
-  static protected $testdata = array(
+  static protected $testdata_at = array(
     'street_address' => 'Hütteldorferstraße 253',
     'zip_code' => '1140',
     'state' => 'Wien',
     'country' => 'AT',
   );
 
-  static protected function mapped($data) {
+  /**
+   * Map an array of data from form keys to address fields format.
+   *
+   * @param string[] $data
+   *   Address with form keys.
+   *
+   * @return string[]
+   *   Address field item.
+   */
+  protected static function mapped(array $data) {
     $mapped = array();
     foreach (self::$mapping as $field_key => $data_key) {
       if (isset($data[$data_key])) {
@@ -33,8 +43,19 @@ class AddressTest extends RedhenEntityTest {
     return $mapped;
   }
 
-  static protected function filteredData($keys) {
-    return array_intersect_key(self::$testdata, array_flip($keys));
+  /**
+   * Extract some keys from an array.
+   *
+   * @param array $data
+   *   An associative array.
+   * @param array $keys
+   *   Keys that should be extracted.
+   *
+   * @return array
+   *   An array with all keys from $data that are also in $keys.
+   */
+  protected static function filtered(array $data, array $keys) {
+    return array_intersect_key($data, array_flip($keys));
   }
 
   /**
@@ -47,54 +68,62 @@ class AddressTest extends RedhenEntityTest {
     $this->fakeContact = $this->createMock('EntityMetadataWrapper');
     $this->fakeContact->field_address = $this->contact->field_address[0];
   }
+
+  /**
+   * Shortcut for importing data into the test contact.
+   */
+  protected function import($data) {
+    return $this->importer->import(new ArraySource($data), $this->fakeContact);
+  }
   
-  function testWithAllFields() {
-    $importer = new Address('field_address', self::$mapping);
-    $entity = $this->newRedhenContact();
-    $importer->import(new ArraySource(self::$testdata), $entity);
-    $this->assertEqual(array($this->mapped(self::$testdata)), $entity->field_address->value());
+  /**
+   * Test importing a full address.
+   */
+  public function testWithAllFields() {
+    $data = self::$testdata_at;
+    $this->import($data);
+    $this->assertEqual([$this->mapped($data)], $this->contact->field_address->value());
   }
 
-  function testWithOnlyCountry() {
-    $importer = new Address('field_address',  self::$mapping);
-    $entity = $this->newRedhenContact();
-    $data = self::filteredData(array('country'));
-    $importer->import(new ArraySource($data), $entity);
-    $this->assertEqual(array($this->mapped($data)), $entity->field_address->value());
+  /**
+   * Test importing only the country field.
+   */
+  public function testWithOnlyCountry() {
+    $data = self::filtered(self::$testdata_at, ['country']);
+    $this->import($data);
+    $this->assertEqual([$this->mapped($data)], $this->contact->field_address->value());
   }
 
-  function testWithOnlyLocality() {
-    $importer = new Address('field_address', self::$mapping);
-    $entity = $this->newRedhenContact();
-    $data = self::filteredData(array('street_address'));
-    $importer->import(new ArraySource($data), $entity);
-    $this->assertEqual(array($this->mapped($data)), $entity->field_address->value());
+  /**
+   * Test importing only the locality.
+   */
+  public function testWithOnlyLocality() {
+    $data = self::filtered(self::$testdata_at, ['street_address']);
+    $this->import($data);
+    $this->assertEqual([$this->mapped($data)], $this->contact->field_address->value());
   }
 
+  /**
+   * Test return value for identical imports.
+   */
   function testTwoIndenticalImports_returnValueFalse() {
-    $importer = new Address('field_address', self::$mapping);
-    $entity = $this->newRedhenContact();
-    $this->assertTrue($importer->import(new ArraySource(self::$testdata), $entity), 'Import into new contact returned FALSE intead of TRUE.');
-    $this->assertFalse($importer->import(new ArraySource(self::$testdata), $entity), 'Import of identical datat returned TRUE twice.');
-    $data = self::filteredData(array('street_address'));
-    $this->assertFalse($importer->import(new ArraySource($data), $entity), 'Import of identical street_address/throughfare returned TRUE instead of FALSE.');
+    $this->assertTrue($this->import(self::$testdata_at), 'Import into new contact returned FALSE intead of TRUE.');
+    $this->assertFalse($this->import(self::$testdata_at), 'Import of identical datat returned TRUE twice.');
+    $data = self::filtered(self::$testdata_at, ['street_address']);
+    $this->assertFalse($this->import($data), 'Import of identical street_address/throughfare returned TRUE instead of FALSE.');
   }
 
   /**
    * Test single-value field with full address.
    */
   public function testSingleFullAddress() {
-    $source = new ArraySource(self::$testdata);
-
     // Import full address.
-    $changed = $this->importer->import($source, $this->fakeContact);
-    $this->assertTrue($changed);
-    $expected = $this->mapped(self::$testdata);
+    $this->assertTrue($this->import(self::$testdata_at));
+    $expected = $this->mapped(self::$testdata_at);
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
 
     // Setting again should not change anything.
-    $changed = $this->importer->import($source, $this->fakeContact);
-    $this->assertFalse($changed);
+    $this->assertFalse($this->import(self::$testdata_at));
   }
 
   /**
@@ -102,18 +131,14 @@ class AddressTest extends RedhenEntityTest {
    */
   public function testSingleChangeAddress() {
     // Import only country.
-    $data = self::filteredData(['country']);
-    $source = new ArraySource($data);
+    $data = self::filtered(self::$testdata_at, ['country']);
     $expected = $this->mapped($data);
-    $changed = $this->importer->import($source, $this->fakeContact);
-    $this->assertTrue($changed);
+    $this->assertTrue($this->import($data));
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
 
     // Add rest of the address data.
-    $source = new ArraySource(self::$testdata);
-    $expected = $this->mapped(self::$testdata);
-    $changed = $this->importer->import($source, $this->fakeContact);
-    $this->assertTrue($changed);
+    $expected = $this->mapped(self::$testdata_at);
+    $this->assertTrue($this->import(self::$testdata_at));
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
   }
 
@@ -122,11 +147,8 @@ class AddressTest extends RedhenEntityTest {
    */
   public function testImportMultipleSpaces() {
     $data['street_address'] = 'Multiple  spaces ';
-    $source = new ArraySource($data);
     $expected = $this->mapped(['street_address' => 'Multiple spaces']);
-
-    $changed = $this->importer->import($source, $this->fakeContact);
-    $this->assertTrue($changed);
+    $this->assertTrue($this->import($data));
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
   }
 
