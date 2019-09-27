@@ -94,7 +94,7 @@ class Address extends Field {
   /**
    * Merges a new address into a multi-address field.
    *
-   * @param \EntityListWrapper $items
+   * @param \EntityListWrapper $list
    *   The metadata wrapper for the multi-value address field.
    * @param array $address
    *   Associative array representing the address to be merged.
@@ -102,14 +102,26 @@ class Address extends Field {
    * @param bool
    *   TRUE if any field value has been changed, FALSE if no changes were made.
    */
-  protected function setValueMultiple(\EntityListWrapper $items, array $address) {
-    foreach($items as $item) {
+  protected function setValueMultiple(\EntityListWrapper $list, array $address) {
+    $items = $list->value();
+    $first = TRUE;
+    foreach($items as $delta => $item) {
       if ($this->addressIsMergeable($item->value(), $address)) {
-        return $this->mergeAddress($item, $address);
+        if ($this->mergeAddress($item, $address) || !$first) {
+          // Modified or confirmed addresses bubble to the top of the list.
+          unset($items[$delta]);
+          array_unshift($items, $item);
+          $list->set(array_values($items));
+          return TRUE;
+        }
+        // No new data and the matching address was already at the top.
+        return FALSE;
       }
+      $first = FALSE;
     }
     // We found no matching address so we add it as a new one.
-    $items[] = $address;
+    array_unshift($items, $address);
+    $list->set(array_values($items));
     return TRUE;
   }
 

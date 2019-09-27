@@ -21,6 +21,13 @@ class AddressTest extends RedhenEntityTest {
     'country' => 'AT',
   );
 
+  static protected $testdata_uk = [
+    'street_address' => '34b York Way, King’s Cross',
+    'zip_code' => 'N1 9AB',
+    'city' => 'London',
+    'country' => 'GB',
+  ];
+
   /**
    * Map an array of data from form keys to address fields format.
    *
@@ -150,6 +157,39 @@ class AddressTest extends RedhenEntityTest {
     $expected = $this->mapped(['street_address' => 'Multiple spaces']);
     $this->assertTrue($this->import($data));
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
+  }
+
+  /**
+   * Test importing multiple addresses in turn.
+   */
+  public function testImportMultipleAdresses() {
+    $full_at = self::$testdata_at;
+    $partial_at = self::filtered(self::$testdata_at, ['country']);
+    $full_uk = self::$testdata_uk;
+    $partial_uk = self::filtered(self::$testdata_uk, ['country']);
+
+    // New address should be at the top.
+    $this->assertTrue($this->import($partial_at));
+    $this->assertEqual('AT', $this->contact->field_address->value()[0]['country']);
+
+    // New address should be at the top.
+    $this->assertTrue($this->import($partial_uk));
+    $this->assertEqual('GB', $this->contact->field_address->value()[0]['country']);
+
+    // Updated address should be at the top.
+    $this->assertTrue($this->import($full_at));
+    $this->assertEqual('AT', $this->contact->field_address->value()[0]['country']);
+
+    // Updated address should be at the top.
+    $this->assertTrue($this->import($full_uk));
+    $this->assertEqual('GB', $this->contact->field_address->value()[0]['country']);
+
+    // Re-confirmed address should be at the top even if nothing changed for it.
+    $this->assertTrue($this->import($partial_at));
+    $this->assertEqual('AT', $this->contact->field_address->value()[0]['country']);
+
+    // Re-confirming the top address shouldn’t change anything.
+    $this->assertFalse($this->import($partial_at));
   }
 
 }
