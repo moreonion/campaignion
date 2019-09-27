@@ -74,16 +74,22 @@ class AddressTest extends RedhenEntityTest {
   public function setUp() {
     parent::setUp();
     $this->importer = new Address('field_address', self::$mapping);
-    $this->contact = $this->newRedhenContact();
     $this->fakeContact = $this->createMock('EntityMetadataWrapper');
     $this->fakeContact->field_address = $this->contact->field_address[0];
   }
 
   /**
-   * Shortcut for importing data into the test contact.
+   * Shortcut for importing data into a single address field.
    */
-  protected function import($data) {
-    return $this->importer->import(new ArraySource($data), $this->fakeContact);
+  protected function importSingle($data) {
+    return $this->import($data, $this->fakeContact);
+  }
+
+  /**
+   * Shortcut for importing data into a contact.
+   */
+  protected function import($data, \EntityMetadataWrapper $contact = NULL) {
+    return $this->importer->import(new ArraySource($data), $contact ?? $this->contact);
   }
 
   /**
@@ -92,7 +98,7 @@ class AddressTest extends RedhenEntityTest {
   public function testWithAllFields() {
     $data = self::$testdataAT;
     $this->import($data);
-    $this->assertEqual([$this->mapped($data)], $this->contact->field_address->value());
+    $this->assertEqual($this->mapped($data), $this->contact->field_address->value()[0]);
   }
 
   /**
@@ -101,7 +107,7 @@ class AddressTest extends RedhenEntityTest {
   public function testWithOnlyCountry() {
     $data = self::filtered(self::$testdataAT, ['country']);
     $this->import($data);
-    $this->assertEqual([$this->mapped($data)], $this->contact->field_address->value());
+    $this->assertEqual($this->mapped($data), $this->contact->field_address->value()[0]);
   }
 
   /**
@@ -110,13 +116,13 @@ class AddressTest extends RedhenEntityTest {
   public function testWithOnlyLocality() {
     $data = self::filtered(self::$testdataAT, ['street_address']);
     $this->import($data);
-    $this->assertEqual([$this->mapped($data)], $this->contact->field_address->value());
+    $this->assertEqual($this->mapped($data), $this->contact->field_address->value()[0]);
   }
 
   /**
    * Test return value for identical imports.
    */
-  public function testIndenticalImportsReturnFalse() {
+  public function testIdenticalImportsReturnFalse() {
     $this->assertTrue($this->import(self::$testdataAT), 'Import into new contact returned FALSE intead of TRUE.');
     $this->assertFalse($this->import(self::$testdataAT), 'Import of identical datat returned TRUE twice.');
     $data = self::filtered(self::$testdataAT, ['street_address']);
@@ -128,12 +134,12 @@ class AddressTest extends RedhenEntityTest {
    */
   public function testSingleFullAddress() {
     // Import full address.
-    $this->assertTrue($this->import(self::$testdataAT));
+    $this->assertTrue($this->importSingle(self::$testdataAT));
     $expected = $this->mapped(self::$testdataAT);
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
 
     // Setting again should not change anything.
-    $this->assertFalse($this->import(self::$testdataAT));
+    $this->assertFalse($this->importSingle(self::$testdataAT));
   }
 
   /**
@@ -143,12 +149,12 @@ class AddressTest extends RedhenEntityTest {
     // Import only country.
     $data = self::filtered(self::$testdataAT, ['country']);
     $expected = $this->mapped($data);
-    $this->assertTrue($this->import($data));
+    $this->assertTrue($this->importSingle($data));
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
 
     // Add rest of the address data.
     $expected = $this->mapped(self::$testdataAT);
-    $this->assertTrue($this->import(self::$testdataAT));
+    $this->assertTrue($this->importSingle(self::$testdataAT));
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
   }
 
@@ -178,6 +184,7 @@ class AddressTest extends RedhenEntityTest {
     // New address should be at the top.
     $this->assertTrue($this->import($partial_uk));
     $this->assertEqual('GB', $this->contact->field_address->value()[0]['country']);
+    $this->assertEqual('AT', $this->contact->field_address->value()[1]['country']);
 
     // Updated address should be at the top.
     $this->assertTrue($this->import($full_at));

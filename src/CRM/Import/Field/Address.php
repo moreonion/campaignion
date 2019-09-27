@@ -87,7 +87,10 @@ class Address extends Field {
   protected function setValueSingle(\EntityStructureWrapper $item, array $address) {
     $stored = $item->value();
     if ($stored && $this->addressIsMergeable($stored, $address)) {
-      return $this->mergeAddress($item, $address);
+      if ($changed = $this->mergeAddress($stored, $address)) {
+        $item->set($stored);
+      }
+      return $changed;
     }
     // Existing address contradicts the new one. So just set the new one.
     $item->set($address);
@@ -109,11 +112,12 @@ class Address extends Field {
     $items = $list->value();
     $first = TRUE;
     foreach ($items as $delta => $item) {
-      if ($this->addressIsMergeable($item->value(), $address)) {
-        if ($this->mergeAddress($item, $address) || !$first) {
+      $item_array = $item instanceof \EntityStructureWrapper ? $item->value : $item;
+      if ($this->addressIsMergeable($item_array, $address)) {
+        if ($this->mergeAddress($item_array, $address) || !$first) {
           // Modified or confirmed addresses bubble to the top of the list.
           unset($items[$delta]);
-          array_unshift($items, $item);
+          array_unshift($items, $item_array);
           $list->set(array_values($items));
           return TRUE;
         }
@@ -152,21 +156,20 @@ class Address extends Field {
   /**
    * Merges a new address into an existing address field item.
    *
-   * @param \EntityStructureWrapper $item
-   *   The metadata wrapper for the address field item.
+   * @param array $item
+   *   An address field item.
    * @param array $address
    *   Associative array representing the address to be merged.
    *
    * @return bool
    *   TRUE if any field value has been changed, FALSE if no changes were made.
    */
-  protected function mergeAddress(\EntityStructureWrapper $item, array $address) {
-    $stored = $item->value();
-    if (!array_diff($address, $stored)) {
+  protected function mergeAddress(array &$item, array $address) {
+    if (!array_diff($address, $item)) {
       // New address doesn’t add new information. Nothing to do.
       return FALSE;
     }
-    $item->set(array_merge($stored, $address));
+    $item = array_merge($item, $address);
     return TRUE;
   }
 
