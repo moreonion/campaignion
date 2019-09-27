@@ -5,6 +5,9 @@ namespace Drupal\campaignion\CRM\Import\Field;
 require_once dirname(__FILE__) . '/RedhenEntityTest.php';
 use Drupal\campaignion\CRM\Import\Source\ArraySource;
 
+/**
+ * Tests for the address field importer.
+ */
 class AddressTest extends RedhenEntityTest {
 
   static protected $mapping = array(
@@ -14,14 +17,14 @@ class AddressTest extends RedhenEntityTest {
     'country' => 'country',
   );
 
-  static protected $testdata_at = array(
+  static protected $testdataAT = array(
     'street_address' => 'Hütteldorferstraße 253',
     'zip_code' => '1140',
     'state' => 'Wien',
     'country' => 'AT',
   );
 
-  static protected $testdata_uk = [
+  static protected $testdataUK = [
     'street_address' => '34b York Way, King’s Cross',
     'zip_code' => 'N1 9AB',
     'city' => 'London',
@@ -82,12 +85,12 @@ class AddressTest extends RedhenEntityTest {
   protected function import($data) {
     return $this->importer->import(new ArraySource($data), $this->fakeContact);
   }
-  
+
   /**
    * Test importing a full address.
    */
   public function testWithAllFields() {
-    $data = self::$testdata_at;
+    $data = self::$testdataAT;
     $this->import($data);
     $this->assertEqual([$this->mapped($data)], $this->contact->field_address->value());
   }
@@ -96,7 +99,7 @@ class AddressTest extends RedhenEntityTest {
    * Test importing only the country field.
    */
   public function testWithOnlyCountry() {
-    $data = self::filtered(self::$testdata_at, ['country']);
+    $data = self::filtered(self::$testdataAT, ['country']);
     $this->import($data);
     $this->assertEqual([$this->mapped($data)], $this->contact->field_address->value());
   }
@@ -105,7 +108,7 @@ class AddressTest extends RedhenEntityTest {
    * Test importing only the locality.
    */
   public function testWithOnlyLocality() {
-    $data = self::filtered(self::$testdata_at, ['street_address']);
+    $data = self::filtered(self::$testdataAT, ['street_address']);
     $this->import($data);
     $this->assertEqual([$this->mapped($data)], $this->contact->field_address->value());
   }
@@ -113,10 +116,10 @@ class AddressTest extends RedhenEntityTest {
   /**
    * Test return value for identical imports.
    */
-  function testTwoIndenticalImports_returnValueFalse() {
-    $this->assertTrue($this->import(self::$testdata_at), 'Import into new contact returned FALSE intead of TRUE.');
-    $this->assertFalse($this->import(self::$testdata_at), 'Import of identical datat returned TRUE twice.');
-    $data = self::filtered(self::$testdata_at, ['street_address']);
+  public function testIndenticalImportsReturnFalse() {
+    $this->assertTrue($this->import(self::$testdataAT), 'Import into new contact returned FALSE intead of TRUE.');
+    $this->assertFalse($this->import(self::$testdataAT), 'Import of identical datat returned TRUE twice.');
+    $data = self::filtered(self::$testdataAT, ['street_address']);
     $this->assertFalse($this->import($data), 'Import of identical street_address/throughfare returned TRUE instead of FALSE.');
   }
 
@@ -125,12 +128,12 @@ class AddressTest extends RedhenEntityTest {
    */
   public function testSingleFullAddress() {
     // Import full address.
-    $this->assertTrue($this->import(self::$testdata_at));
-    $expected = $this->mapped(self::$testdata_at);
+    $this->assertTrue($this->import(self::$testdataAT));
+    $expected = $this->mapped(self::$testdataAT);
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
 
     // Setting again should not change anything.
-    $this->assertFalse($this->import(self::$testdata_at));
+    $this->assertFalse($this->import(self::$testdataAT));
   }
 
   /**
@@ -138,14 +141,14 @@ class AddressTest extends RedhenEntityTest {
    */
   public function testSingleChangeAddress() {
     // Import only country.
-    $data = self::filtered(self::$testdata_at, ['country']);
+    $data = self::filtered(self::$testdataAT, ['country']);
     $expected = $this->mapped($data);
     $this->assertTrue($this->import($data));
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
 
     // Add rest of the address data.
-    $expected = $this->mapped(self::$testdata_at);
-    $this->assertTrue($this->import(self::$testdata_at));
+    $expected = $this->mapped(self::$testdataAT);
+    $this->assertTrue($this->import(self::$testdataAT));
     $this->assertEqual($expected, $this->contact->field_address->value()[0]);
   }
 
@@ -163,10 +166,10 @@ class AddressTest extends RedhenEntityTest {
    * Test importing multiple addresses in turn.
    */
   public function testImportMultipleAdresses() {
-    $full_at = self::$testdata_at;
-    $partial_at = self::filtered(self::$testdata_at, ['country']);
-    $full_uk = self::$testdata_uk;
-    $partial_uk = self::filtered(self::$testdata_uk, ['country']);
+    $full_at = self::$testdataAT;
+    $partial_at = self::filtered(self::$testdataAT, ['country']);
+    $full_uk = self::$testdataUK;
+    $partial_uk = self::filtered(self::$testdataUK, ['country']);
 
     // New address should be at the top.
     $this->assertTrue($this->import($partial_at));
@@ -193,4 +196,3 @@ class AddressTest extends RedhenEntityTest {
   }
 
 }
-
