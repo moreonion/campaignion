@@ -50,4 +50,14 @@ class WrapperFieldTest extends \DrupalUnitTestCase {
     $this->assertEqual('o', $w->value(1));
   }
 
+  /**
+   * Test non-existing field.
+   */
+  public function testNonExistingField() {
+    $w = new WrapperField('field_doesnotexist');
+    $w->setExporter($this->exporter);
+    $this->assertEqual(NULL, $w->value(0));
+    $this->assertEqual([], $w->value(NULL));
+  }
+
 }
