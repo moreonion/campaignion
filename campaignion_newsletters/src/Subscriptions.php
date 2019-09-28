@@ -143,20 +143,6 @@ class Subscriptions {
   }
 
   /**
-   * Generate an options array suitable for the form-API #options parameter.
-   *
-   * @return string[]
-   *   List titles keyed by list_id.
-   */
-  public function optionsArray() {
-    $options = array();
-    foreach (static::lists() as $list_id => $list) {
-      $options[$list_id] = $list->title;
-    }
-    return $options;
-  }
-
-  /**
    * Generate a values array suitable for the form-API #default_value.
    *
    * @param string $email
