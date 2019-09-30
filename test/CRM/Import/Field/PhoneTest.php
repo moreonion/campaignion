@@ -47,6 +47,12 @@ class PhoneTest extends RedhenEntityTest {
       $data[1]['field_phone_number'],
       $data[0]['field_phone_number'],
     ], $this->contact->field_phone_number->value());
+    $data[]['field_phone_number'] = '+43 664 87592345';
+    $this->assertTrue($this->import($data[0]));
+    $this->assertEqual([
+      $data[0]['field_phone_number'],
+      $data[1]['field_phone_number'],
+    ], $this->contact->field_phone_number->value());
   }
 
   /**

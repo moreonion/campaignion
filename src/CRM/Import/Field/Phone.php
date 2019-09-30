@@ -35,27 +35,31 @@ class Phone extends Field {
    * Determine whether a new value should be stored.
    */
   public function storeValue($entity, $new_number) {
-    try {
-      foreach ($entity->{$this->field}->value() as $delta => $stored_number) {
-        if ($this->phoneNumbersEqual($stored_number, $new_number)) {
-          return FALSE;
-        }
-      }
-    }
-    catch (\EntityMetadataWrapperException $e) {
-      watchdog('campaignion', 'Searched data in a non-existing field "!field".', array('!field' => $this->field), WATCHDOG_WARNING);
-      return TRUE;
-    }
-    // The number wasn't found.
     return TRUE;
   }
 
   /**
    * Update the field value.
+   *
+   * New or confirmed values are moved to the top.
    */
   public function setValue(\EntityMetadataWrapper $entity, $value) {
     $field = $entity->{$this->field};
     $values = $field->value();
+    $first = TRUE;
+    foreach ($values as $delta => $stored_value) {
+      if ($this->phoneNumbersEqual($stored_value, $value)) {
+        if ($first) {
+          return FALSE;
+        }
+        unset($values[$delta]);
+        $new_values = array_values($values);
+        array_unshift($new_values, $stored_value);
+        $field->set($new_values);
+        return TRUE;
+      }
+      $first = FALSE;
+    }
     array_unshift($values, $value);
     $field->set($values);
     return TRUE;
