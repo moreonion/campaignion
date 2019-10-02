@@ -9,6 +9,10 @@
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.e2tmw .e2t-col {
+  margin-top: 1rem;
 }.e2tmw ul.specs {
   margin: 1rem 0;
 }
@@ -83,7 +87,11 @@ body.dragging * {
   display: block;
 }.e2tmw th {
   text-align: left;
-}.e2tmw section {
+}.e2tmw .typeahead.field-has-error input {
+  border-color: red;
+}
+
+.e2tmw section {
   margin-bottom: 1rem;
 }
 

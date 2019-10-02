@@ -86,14 +86,23 @@ function campaignion_wizard_redirect_add($type) {
  */
 function campaignion_wizard_search_nodes() {
   $search = isset($_GET['s']) ? $_GET['s'] : '';
-  $result = db_select('node', 'n')
+  $q = db_select('node', 'n')
     ->addTag('node_access')
     ->fields('n', ['nid', 'title'])
-    ->condition('n.title', '%' . db_like($search) . '%', 'LIKE')
-    ->range(0, 100)
-    ->execute();
+    ->range(0, 100);
+  if (is_numeric($search)) {
+    $s = db_or()
+      ->condition('n.nid', $search)
+      ->condition('n.title', '%' . db_like($search) . '%', 'LIKE');
+    $q->condition($s);
+    $q->addExpression('n.nid=:nid', 'nid_match', [':nid' => $search]);
+    $q->orderBy('nid_match', 'DESC');
+  }
+  else {
+    $q->condition('n.title', '%' . db_like($search) . '%', 'LIKE');
+  }
   $data = [];
-  foreach ($result as $row) {
+  foreach ($q->execute() as $row) {
     $data[] = [
       'value' => 'node/' . $row->nid,
       'label' => "{$row->title} [{$row->nid}]",

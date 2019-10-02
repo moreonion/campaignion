@@ -114,10 +114,10 @@ class MPDataLoader {
       }
     }
     if ($postcode) {
-      $data = $this->api->getTargets('mp', $postcode);
+      $data = $this->api->getTargets('mp', ['postcode' => $postcode]);
       if ($data) {
-        $constituency = !empty($data[0]) ? $data[0] : NULL;
-        $target = !empty($constituency['contacts'][0]) ? $constituency['contacts'][0] : NULL;
+        $target = !empty($data[0]) ? $data[0] : NULL;
+        $constituency = !empty($target['constituency']) ? $target['constituency'] : NULL;
         $wrapped = entity_metadata_wrapper($entity_type, $entity);
         foreach ($target_fields as $field_name => $field) {
           $this->setters[$field_name]($wrapped->{$field_name}, $constituency, $target);
@@ -137,7 +137,7 @@ class MPDataLoader {
    *   one.
    */
   protected function extractPostcode(array $item) {
-    if ($item['postal_code'] && $item['country'] == 'GB') {
+    if (!empty($item['postal_code']) && !empty($item['country']) && $item['country'] == 'GB') {
       $r = postal_code_validation_validate($item['postal_code'], 'GB');
       if (empty($r['error'])) {
         // Strip spaces and dashes allowed by postal_code_validation_validate().

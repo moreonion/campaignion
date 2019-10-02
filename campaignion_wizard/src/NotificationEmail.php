@@ -3,8 +3,8 @@
 namespace Drupal\campaignion_wizard;
 
 class NotificationEmail extends Email {
-  protected function &getEmailForm(&$form_state) {
-    $form = &parent::getEmailForm($form_state);
+  protected function getEmailForm(&$form_state) {
+    $form = parent::getEmailForm($form_state);
 
     $form['email_option']['#access'] = TRUE;
     $form['email_option']['#default_value'] = 'custom';

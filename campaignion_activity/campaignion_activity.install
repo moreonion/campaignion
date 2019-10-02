@@ -171,11 +171,11 @@ function campaignion_activity_schema() {
       'from_provider' => [
         'description' => 'Flag for whether the change was initiated by the provider',
       ] + $unsigned_int_not_null,
-      'optin_statement' => [
-        'description' => 'Opt-in statement',
-        'type' => 'text',
-        'not null' => FALSE,
-      ],
+      'remote_addr' => array(
+        'description' => 'The IP address of the user that optted in.',
+        'type' => 'varchar',
+        'length' => 128,
+      ),
     ],
     'primary key' => ['activity_id'],
     'indexes' => [
@@ -202,6 +202,24 @@ function campaignion_activity_schema() {
  */
 function campaignion_activity_uninstall() {
   variable_del('campaignion_activity_log_contact_save');
+}
+
+/**
+ * Remove opt-in statement from newsletter activities.
+ */
+function campaignion_activity_update_8() {
+  db_drop_field('campaignion_activity_newsletter_subscription', 'optin_statement');
+}
+
+/**
+ * Add opt-in remote_addr logging to newsletter subscription activities.
+ */
+function campaignion_activity_update_7() {
+  db_add_field('campaignion_activity_newsletter_subscription', 'remote_addr', array(
+    'description' => 'The IP address of the user that optted in.',
+    'type' => 'varchar',
+    'length' => 128,
+  ));
 }
 
 /**

@@ -1,6 +1,7 @@
 <?php
 
-use \Drupal\campaignion_email_to_target\Api\Client;
+use Drupal\campaignion_email_to_target\Api\Client;
+use Drupal\campaignion_email_to_target\Loader;
 
 /**
  * Implements hook_field_info().
@@ -84,10 +85,13 @@ function _campaignion_email_to_target_options_field_widget_form($item) {
     drupal_set_message(t('We are sorry! The service is temporary unavailable. The administrators have been informed. Please try again in a few minutes …'), 'error');
   }
   $element['dataset_name'] = [
-    '#type' => 'select',
-    '#title' => t('Choose which target dataset you would like to use for this action'),
-    '#options' => $options,
+    '#type' => 'hidden',
+    '#attributes' => ['class' => ['datasets-app-selected-dataset']],
     '#default_value' => $item['dataset_name'],
+  ];
+  $element['datasets_app'] = [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['datasets-app']],
   ];
   $element['users_may_edit'] = [
     '#type' => 'checkbox',
@@ -98,10 +102,7 @@ function _campaignion_email_to_target_options_field_widget_form($item) {
     '#type' => 'radios',
     '#title' => t('Target selection mode'),
     '#default_value' => $item['selection_mode'],
-    '#options' => [
-      'one_or_more' => t('Let users deselect specific targets. (default)'),
-      'all' => t('Send email to all the targets.'),
-    ],
+    '#options' => Loader::instance()->options(),
   ];
   return $element;
 }

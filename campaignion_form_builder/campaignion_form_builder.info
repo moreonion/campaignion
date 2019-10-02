@@ -2,9 +2,9 @@ name = Campaignion Form Builder
 description = Definitions of form builder extensions for Campaignion
 core = 7.x
 package = Campaignion
-project = campaignion
 
 ; modules that we need to set up our data structures (so that hook_install() works)
+dependencies[] = campaignion_opt_in
 dependencies[] = form_builder
 dependencies[] = form_builder_webform
 dependencies[] = webform_country_list

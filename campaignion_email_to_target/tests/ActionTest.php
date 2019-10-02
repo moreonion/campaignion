@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_email_to_target;
 
-use \Drupal\campaignion_action\TypeBase;
+use \Drupal\campaignion_action\Loader;
 use \Drupal\campaignion_email_to_target\Api\Client;
 use \Drupal\little_helpers\Webform\Submission;
 
@@ -16,14 +16,25 @@ class ActionTest extends \DrupalUnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $api->method('getTargets')->will($this->returnValue($targets));
-    $node = (object) ['nid' => 47114711];
-    $type = new TypeBase('test');
+    $api->method('getDataset')->will($this->returnValue((object) [
+      'dataset_name' => 'test_dataset',
+      'selectors' => [['title' => 'test_selector', 'filters' => []]],
+    ]));
+    $node_array['field_no_target_message'][LANGUAGE_NONE][0] = [
+      'value' => '<p>Default exclusion</p>',
+      'format' => 'full_html_with_editor',
+    ];
+    $node = (object) ([
+      'nid' => 47114711,
+      'type' => 'email_to_target'
+    ] + $node_array);
+    $type = Loader::instance()->type('email_to_target');
     $action = $this->getMockBuilder(Action::class)
       ->setConstructorArgs([$type, $node, $api])
       ->setMethods(['getOptions', 'getExclusion', 'getMessage'])
       ->getMock();
     $action->method('getOptions')->will($this->returnValue([
-      'dataset_name' => 'mp',
+      'dataset_name' => 'test_dataset',
     ]));
     $submission_o = $this->getMockBuilder(Submission::class)
       ->disableOriginalConstructor()
@@ -35,7 +46,9 @@ class ActionTest extends \DrupalUnitTestCase {
    * Create a message with the replaceTokens() method mocked.
    */
   protected function createMessage($data) {
-    return $this->getMockBuilder(Message::class)
+    $data += ['type' => 'message'];
+    $class = $data['type'] == 'exclusion' ? Exclusion::class : Message::class;
+    return $this->getMockBuilder($class)
       ->setConstructorArgs([$data])
       ->setMethods(['replaceTokens'])
       ->getMock();
@@ -44,25 +57,15 @@ class ActionTest extends \DrupalUnitTestCase {
   /**
    * Test targetMessagePairs() with messages and all types of exclusions.
    */
-  public function testTargetMessagePairs() {
+  public function testTargetMessagePairsWithExclusions() {
+    $c1 = ['name' => 'Constituency 1'];
     $contacts = [
-      ['first_name' => 'Alice'],
-      ['first_name' => 'Bob'],
-      ['first_name' => 'Claire'],
+      ['first_name' => 'Alice', 'constituency' => $c1],
+      ['first_name' => 'Bob', 'constituency' => $c1],
+      ['first_name' => 'Claire', 'constituency' => $c1],
+      ['first_name' => 'David', 'constituency' => ['name' => 'Excluded']],
     ];
-    $c1 = [
-      'name' => 'Constituency 1',
-      'contacts' => $contacts,
-    ];
-    list($action, $api, $submission_o) = $this->mockAction([
-      $c1,
-      [
-        'name' => 'Excluded',
-        'contacts' => [
-          ['first_name' => 'David'],
-        ]
-      ],
-    ]);
+    list($action, $api, $submission_o) = $this->mockAction($contacts);
     $m = $this->createMessage([
       'type' => 'message',
       'label' => 'Default message',
@@ -71,28 +74,59 @@ class ActionTest extends \DrupalUnitTestCase {
       'message' => 'Default message',
       'footer' => 'Default footer',
     ]);
-    $e = $this->createMessage([
-      'type' => 'exclusion',
-      'message' => 'excluded first!',
-    ]);
-    $action->method('getMessage')->will($this->returnCallback(function ($t, $c) use ($e, $m) {
-      if ($t['first_name'] == 'Bob') {
-        return $e;
-      }
-      return $m;
-    }));
     $self = $this;
-    $action->method('getExclusion')->will($this->returnCallback(function ($c) use ($self) {
-      if ($c['name'] == 'Excluded') {
+    $action->method('getMessage')->will($this->returnCallback(function ($t) use ($m, $self) {
+      if ($t['first_name'] == 'Bob') {
+        return $self->createMessage([
+          'type' => 'exclusion',
+          'message' => 'excluded first!',
+        ]);
+      }
+      if ($t['constituency']['name'] == 'Excluded') {
         return $self->createMessage([
           'type' => 'exclusion',
           'message' => 'excluded!',
         ]);
       }
+      return $m;
     }));
-    list($pairs, $no_target_element) = $action->TargetMessagePairs($submission_o);
-    $this->assertEqual([[$contacts[0], $c1, $m], [$contacts[2], $c1, $m]], $pairs);
-    $this->assertEqual(['#markup' => "<p>excluded first!</p>\n"], $no_target_element);
+    $pairs = $action->targetMessagePairs($submission_o);
+    $this->assertEqual([[$contacts[0], $m], [$contacts[2], $m]], $pairs);
+  }
+
+  /**
+   * Test that the first exclusion is returned if all targets are excluded.
+   */
+  public function testTargetMessagePairsReturnsExclusionIfEmpty() {
+    $contacts = [
+      ['first_name' => 'Bob'],
+      ['first_name' => 'David'],
+    ];
+    list($action, $api, $submission_o) = $this->mockAction($contacts);
+    $self = $this;
+    $action->method('getMessage')->will($this->returnCallback(function ($t) use ($self) {
+      if ($t['first_name'] == 'Bob') {
+        return $self->createMessage([
+          'type' => 'exclusion',
+          'message' => 'excluded first!',
+        ]);
+      }
+      return $self->createMessage([
+        'type' => 'exclusion',
+        'message' => 'excluded!',
+      ]);
+    }));
+    $exclusion = $action->targetMessagePairs($submission_o);
+    $this->assertEqual(['#markup' => "<p>excluded first!</p>\n"], $exclusion->renderable());
+  }
+
+  /**
+   * Test getting the default exclusion.
+   */
+  public function testTargetMessagePairsDefaultExclusion() {
+    list($action, $api, $submission_o) = $this->mockAction([]);
+    $exclusion = $action->targetMessagePairs($submission_o);
+    $this->assertEqual(['#markup' => '<p>Default exclusion</p>'], $exclusion->renderable()[0]);
   }
 
 }

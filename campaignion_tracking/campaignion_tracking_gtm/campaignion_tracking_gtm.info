@@ -1,0 +1,6 @@
+name = Campaignion Tracking (GTM)
+description = Tracking integration with Google Tag Manager.
+core = 7.x
+package = Campaignion
+
+dependencies[] = campaignion_tracking
