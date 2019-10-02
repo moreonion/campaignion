@@ -5,7 +5,7 @@ namespace Drupal\campaignion_action\Redirects;
 use Drupal\little_helpers\DB\Model;
 use Drupal\little_helpers\Webform\Submission;
 use Drupal\campaignion_newsletters\Subscription;
-use Drupal\campaignion_newsletters\ValuePrefix;
+use Drupal\campaignion_opt_in\Values;
 
 /**
  * Model class for redirect filters.
@@ -132,20 +132,17 @@ class Filter extends Model {
    */
   protected function hasOptin(Submission $submission) {
     // Check for opt-ins or opt-outs in this form.
-    $components = $submission->webform->componentsByType('newsletter');
+    $components = $submission->webform->componentsByType('opt_in');
     foreach ($components as $cid => $component) {
-      $value = ValuePrefix::remove($submission->valuesByCid($cid));
-      if ($value == 'opt-in') {
-        return TRUE;
+      if ($component['extra']['channel'] == 'email') {
+        $value = Values::removePrefix($submission->valuesByCid($cid));
+        if ($value == 'opt-in') {
+          return TRUE;
+        }
+        elseif ($value == 'opt-out') {
+          return FALSE;
+        }
       }
-      elseif ($value == 'opt-out') {
-        return FALSE;
-      }
-    }
-
-    // A checked email_newsletter checkbox counts as opt-in.
-    if ($submission->valueByKey('email_newsletter')) {
-      return TRUE;
     }
 
     // If there is at least one subscription then we assume we have an opt-in.

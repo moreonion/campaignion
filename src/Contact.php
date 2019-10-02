@@ -18,8 +18,18 @@ class Contact extends \RedhenContact {
     if (!$this->type) {
       $this->type = static::defaultType();
     }
-    if (!$this->created) {
+    if (!isset($this->created)) {
       $this->created = REQUEST_TIME;
+    }
+    // Make sure all fields are represented as properties on the object.
+    // - Saving an empty contact with an existing contact’s ID should erase all
+    //   previous contact data.
+    // - You can check for a field’s existence simply by checking for its
+    //   property on the object.
+    foreach (field_info_instances('redhen_contact', $this->type) as $instance) {
+      if (!isset($this->{$instance['field_name']})) {
+        $this->{$instance['field_name']} = [];
+      }
     }
   }
 

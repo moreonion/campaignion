@@ -66,4 +66,35 @@ class CsvExporterTest extends \DrupalUnitTestCase {
     ], $exporter->row());
   }
 
+  /**
+   * Test exporting a single contact and the headers.
+   */
+  public function testExportOneContactFiltered() {
+    $labels = new LabelFactory('redhen_contact', 'contact');
+    $address = $labels->fromExporter(new WrapperField('field_address'));
+
+    $map['contact_id']                 = new Label('Contact ID', new SingleValueField('contact_id'));
+    $map['field_address.thoroughfare'] = new SubField($address, 'thoroughfare', 'Address line 1');
+    $exporter = new CsvExporter($map);
+
+    $this->assertEqual([
+      'contact_id' => 'Contact ID',
+      'field_address.thoroughfare' => 'Address (Address line 1)',
+    ], $exporter->columnOptions());
+
+    $filter['contact_id'] = 'contact_id';
+    $exporter->filterColumns($filter);
+
+    $this->assertEqual([
+      'contact_id' => 'Contact ID',
+    ], $exporter->header(0));
+    $this->assertEqual([
+      'contact_id' => '',
+    ], $exporter->header(1));
+    $exporter->setContact($this->contact);
+    $this->assertEqual([
+      'contact_id' => $this->contact->contact_id,
+    ], $exporter->row());
+  }
+
 }

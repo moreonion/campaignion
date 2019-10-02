@@ -56,17 +56,4 @@ class OptInRecordFactory {
     return ip_address();
   }
 
-  /**
-   * Add a new opt-in record based on a newsletter component.
-   *
-   * @param array $component
-   *   The webform component that is being processed.
-   * @param mixed $value
-   *   The submission value for the webform component.
-   */
-  public function recordNewsletterSubscription($component, $values) {
-    $component['extra']['channel'] = 'email';
-    $this->recordOptIn($component, $values);
-  }
-
 }

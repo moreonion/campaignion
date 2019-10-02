@@ -2,6 +2,7 @@
 
 use Drupal\campaignion_activity\WebformSubmission as SubmissionActivity;
 use Drupal\campaignion_opt_in\OptInRecordFactory;
+use Drupal\form_builder\Loader;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
@@ -14,6 +15,17 @@ function campaignion_form_builder_webform_component_info() {
     'file' => 'components/phone_number.inc',
   ] + webform_webform_component_info()['textfield'];
   return $info;
+}
+
+/**
+ * Implements hook_webform_validator_alter().
+ */
+function campaignion_form_builder_webform_validator_alter(&$validators) {
+  foreach ($validators as &$info) {
+    if (!empty($info['component_types']) && in_array('textfield', $info['component_types'], TRUE)) {
+      $info['component_types'][] = 'phone_number';
+    }
+  }
 }
 
 /**
@@ -57,11 +69,6 @@ function campaignion_form_builder_form_builder_element_types_alter(&$types, $for
     $field['default']['#default_value'] = '[current-page:query:p5]';
     $field['default']['#key']           = $field['default']['#webform_component']['form_key'] = 'email';
   }
-  if (isset($types['newsletter'])) {
-    $field                  = &$types['newsletter'];
-    $field['palette_group'] = 'supporter_data';
-  }
-
   if (isset($types['country_list'])) {
     $types['country'] = $types['country_list'];
     unset($types['country_list']);
@@ -90,7 +97,7 @@ function campaignion_form_builder_form_builder_webform_property_map_alter(&$map,
  */
 function campaignion_form_builder_form_builder_palette_fields_alter(&$fields, $form_type, $form_id) {
   if ($form_type == 'webform') {
-    $elements = FormBuilderLoader::instance()
+    $elements = Loader::instance()
       ->fromCache($form_type, $form_id)
       ->getFormArray();
     $active_keys = campaignion_form_builder_get_element_keys($elements);

@@ -22,17 +22,31 @@ class ComponentTest extends \DrupalUnitTestCase {
       'user_may_edit' => TRUE,
       'selection_mode' => 'one_or_more',
     ]);
-    $action->method('targetMessagePairs')->willReturn([$pairs, 'no target']);
+    $action->method('targetMessagePairs')->willReturn($pairs);
+    $node = (object) [
+      'type' => 'email_to_target',
+      'tnid' => NULL,
+      'nid' => NULL,
+      'uuid' => 'stub-uuid',
+      'action' => $this->createMock(Action::class)
+    ];
+    node_object_prepare($node);
     $submission_o = $this->getMockBuilder(Submission::class)
       ->disableOriginalConstructor()
       ->getMock();
     $webform = $this->createMock(Webform::class);
     $webform->method('formStateToSubmission')->willReturn($submission_o);
-    $component = new Component([
-      'name' => 'e2t',
-      'extra' => ['description' => 'e2t'],
-      'cid' => 7,
-    ], $webform, $action);
+    $submission_o->webform = $webform;
+    $submission_o->node = $webform->node = $node;
+    $component = $this->getMockBUilder(Component::class)
+      ->setMethods(['saveSubmission', 'mail'])
+      ->setConstructorArgs([
+        ['name' => 'e2t', 'extra' => ['description' => 'e2t'], 'cid' => 7],
+        $webform,
+        $action,
+      ])
+      ->getMock();
+    $component->method('saveSubmission')->willReturn($submission_o);
     return [$component, $submission_o];
   }
 
@@ -41,7 +55,7 @@ class ComponentTest extends \DrupalUnitTestCase {
    */
   public function testRenderEscaping() {
     list($componentObj, $submission_o) = $this->mockComponent([
-      [['id' => 't1', 'salutation' => 'T1'], ['name' => 'C1'], new Message([
+      [['id' => 't1', 'salutation' => 'T1', 'constituency' => ['name' => 'C1']], new Message([
         'subject' => "Subject's string",
         'header' => "Header's string",
         'message' => "Message's string",
@@ -75,7 +89,7 @@ class ComponentTest extends \DrupalUnitTestCase {
    */
   public function testRenderSelectionAllSingleTarget() {
     list($component, $submission_o) = $this->mockComponent([
-      [['id' => 't1', 'salutation' => 'T1'], ['name' => 'C1'], new Message([
+      [['id' => 't1', 'salutation' => 'T1', 'constituency' => ['name' => 'C1']], new Message([
         'subject' => "Subject's string",
         'header' => "Header's string",
         'message' => "Message's string",
@@ -95,13 +109,13 @@ class ComponentTest extends \DrupalUnitTestCase {
    */
   public function testRenderSelectionAllMultipleTargets() {
     list($component, $submission_o) = $this->mockComponent([
-      [['id' => 't1', 'salutation' => 'T1'], ['name' => 'C1'], new Message([
+      [['id' => 't1', 'salutation' => 'T1', 'constituency' => ['name' => 'C1']], new Message([
         'subject' => "Subject's string",
         'header' => "Header's string",
         'message' => "Message's string",
         'footer' => "Footer's string",
       ])],
-      [['id' => 't2', 'salutation' => 'T2'], ['name' => 'C1'], new Message([
+      [['id' => 't2', 'salutation' => 'T2', 'constituency' => ['name' => 'C1']], new Message([
         'subject' => "Subject's string",
         'header' => "Header's string",
         'message' => "Message's string",
@@ -119,7 +133,34 @@ class ComponentTest extends \DrupalUnitTestCase {
     $element['#parents'] = [];
     $component->validate($element, $form_state);
     $this->assertEqual(count($form_state['values']), 2);
+  }
 
+  /**
+   * Test that display is used as label for the targets.
+   */
+  public function testRenderDisplayName() {
+    list($component, $submission_o) = $this->mockComponent([
+      [['id' => 't1'], new Message(['display' => 'D1'])],
+    ], ['selection_mode' => 'all']);
+    $element = [];
+    $form = [];
+    $form_state = form_state_defaults();
+    $component->render($element, $form, $form_state);
+    $this->assertContains('D1', $element['t1']['send']['#markup']);
+  }
+
+  /**
+   * Test sending emails.
+   */
+  public function testSendEmail() {
+    $serialized_messages = array_map(function ($m) {
+      return serialize(['message' => $m->toArray(), 'target' => []]);
+    }, [
+      new Message(['to' => 'test1@example.com']),
+    ]);
+    list($component, $submission) = $this->mockComponent([]);
+    $component->expects($this->once())->method('mail');
+    $component->sendEmails($serialized_messages, $submission);
   }
 
 }

@@ -31,7 +31,8 @@ class OptInRecrodTest extends \DrupalUnitTestCase {
             'cid' => 2,
             'pid' => 0,
             'form_key' => 'newsletter',
-            'type' => 'newsletter',
+            'type' => 'opt_in',
+            'extra' => ['channel' => 'email'],
           ],
         ]
       ],

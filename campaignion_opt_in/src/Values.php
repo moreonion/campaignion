@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_opt_in;
 
+use Drupal\little_helpers\Webform\Submission;
+
 /**
  * Namespace for form-value constants.
  */
@@ -88,11 +90,13 @@ class Values {
         Values::OPT_IN => t('Checkbox opt-in'),
         Values::NO_CHANGE => t('Checkbox no change'),
         Values::OPT_OUT => t('Checkbox opt-out'),
+        Values::NOT_SELECTED => t('Checkbox hidden (no change)'),
       ],
       'checkbox-inverted' => [
         Values::OPT_IN => t('Inverted checkbox opt-in'),
         Values::NO_CHANGE => t('Inverted checkbox no change'),
         Values::OPT_OUT => t('Inverted checkbox opt-out'),
+        Values::NOT_SELECTED => t('Inverted checkbox hidden (no change)'),
       ],
       'radios' => [
         Values::OPT_IN => t('Radio opt-in'),
@@ -176,6 +180,28 @@ class Values {
       $values = array_reverse($values);
     }
     return $values;
+  }
+
+  /**
+   * Check whether a submission has a opt-in for a channel.
+   *
+   * @param \Drupal\little_helpers\Webform\Submission $submission
+   *   The submission to check.
+   * @param string $channel
+   *   The channel we are looking for.
+   *
+   * @return bool
+   *   TRUE if the submitted values contain at least one opt-in for the channel.
+   */
+  public static function submissionHasOptIn(Submission $submission, $channel) {
+    foreach ($submission->webform->componentsByType('opt_in') as $cid => $component) {
+      if ($component['extra']['channel'] == $channel) {
+        if (($value = $submission->valueByCid($cid)) && static::removePrefix($value) == static::OPT_IN) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
   }
 
 }

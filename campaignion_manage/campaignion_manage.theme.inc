@@ -90,7 +90,7 @@ function theme_campaignion_manage_pager($variables) {
   $element['#theme'] = 'pager';
   $old_q = $_GET['q'];
   if ($old_q == 'system/ajax' && !empty($_SERVER['HTTP_REFERER'])) {
-    $url = drupal_parse_url($_SERVER['HTTP_REFERER']);
+    $url = parse_url($_SERVER['HTTP_REFERER']);
     $_GET['q'] = $url['path'];
   }
   $output = drupal_render($element);

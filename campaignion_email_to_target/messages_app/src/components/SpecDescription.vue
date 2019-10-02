@@ -1,3 +1,8 @@
+<docs>
+SpecDescription component.
+Shows a sentence describing a spec’s functionality.
+</docs>
+
 <template lang="html">
   <span>
     {{ specDescription }}
@@ -15,10 +20,14 @@ import {OPERATORS} from '@/utils/defaults'
 
 export default {
   props: {
-    spec: Object,
-    index: Number
+    spec: Object, /** The spec object. */
+    index: Number /** The spec’s index in the specs array. */
   },
   computed: {
+    /**
+     * Get a description for the spec depending on it’s type and position in the array.
+     * @return {string} The description, ending in a way that the filters’ description can be appended.
+     */
     specDescription () {
       switch (this.spec.type) {
         case 'message-template':
@@ -40,6 +49,12 @@ export default {
         case 'missing value': return Drupal.t('please add a filter')
       }
     },
+
+    /**
+     * Generate a translated phrase describing a filter.
+     * @param {Object} filter - The spec’s filter object.
+     * @return {string} The phrase describing the filter.
+     */
     filterDescription (filter) {
       return Drupal.t(OPERATORS[filter.operator].phrase, {'@attribute': filter.attributeLabel, '@value': filter.value})
     }

@@ -4,8 +4,13 @@
     "babel-plugin-add-module-exports",
     ["component", [{
         "libraryName": "element-ui",
-        "styleLibraryName": "theme-default"
+        "styleLibraryName": "theme-chalk"
       }]
     ]
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": ["istanbul"]
+    }
+  }
 }

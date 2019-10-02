@@ -10,7 +10,7 @@ function campaignion_newsletters_admin_settings() {
 
   $form['poll'] = array(
     '#type' => 'button',
-    '#value' => t('Update Lists and Subscribers from all external sources now!'),
+    '#value' => t('Update Lists from all external sources now!'),
     '#description' => t('Updates run automatically around every hour in the background'),
     '#weight' => 20,
     '#executes_submit_callback' => TRUE,
@@ -45,7 +45,7 @@ function _campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form,
   $subscriptions = Subscriptions::byContact($form_state['redhen_contact']);
   $form_state['redhen_contact']->newsletters = $subscriptions;
 
-  $options = $subscriptions->optionsArray();
+  $options = Subscriptions::lists();
 
   $fieldset = array(
     '#type' => 'fieldset',

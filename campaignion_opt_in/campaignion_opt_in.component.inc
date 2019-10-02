@@ -54,6 +54,7 @@ function _webform_edit_opt_in($component) {
   );
 
   $channels = campaignion_opt_in_channel_info();
+  $channel_id = drupal_html_id('opt-in-channel');
   $form['extra']['channel'] = array(
     '#type' => 'select',
     '#title' => t('Channel'),
@@ -65,13 +66,15 @@ function _webform_edit_opt_in($component) {
     '#default_value' => $component['extra']['channel'],
     '#access' => empty($component['extra']['fixed_channel']) || empty($component['extra']['channel']),
     '#parents' => ['extra', 'channel'],
+    // Set a fixed HTML ID so other modules can easier use #states.
+    '#id' => $channel_id,
   );
 
   $form['behavior']['value'] = array(
     '#type' => 'select',
     '#title' => t('Default value'),
     '#options' => [
-      0 => t('Not selected'),
+      Values::NOT_SELECTED => t('Not selected'),
       Values::OPT_IN => t('Opt-in'),
       Values::NO_CHANGE => t('No change'),
       Values::OPT_OUT => t('Opt-out'),
@@ -98,7 +101,7 @@ function _webform_edit_opt_in($component) {
     '#type' => 'textfield',
     '#title' => t('Label for the checkbox'),
     '#default_value' => $component['extra']['checkbox_label'],
-    '#states' => ['visible' => ["#$display_id" => ['value' => 'checkbox']]],
+    '#states' => ['invisible' => ["#$display_id" => ['value' => 'radios']]],
     '#parents' => ['extra', 'checkbox_label'],
   ];
 
@@ -130,21 +133,32 @@ function _webform_edit_opt_in($component) {
   ];
 
   $no_is_opt_out_id = drupal_html_id('no-is-opt-out');
+  $js_file = drupal_get_path('module', 'campaignion_opt_in') . '/campaignion_opt_in.admin.js';
+  $labels = [
+    'radios' => t('Interpret ‘no’ option as opt-out.'),
+    'checkbox' => t('Interpret an unchecked checkbox as opt-out.'),
+    'checkbox-inverted' => t('Interpret a checked inverted checkbox as opt-out.'),
+  ];
+  $settings['campaignionOptIn']['labels']["#$no_is_opt_out_id"] = [
+    'display_id' => "#$display_id",
+    'labels' => $labels,
+  ];
+  $attached['js'][$js_file] = [];
+  $attached['js'][] = ['data' => $settings, 'type' => 'setting'];
   $form['behavior']['no_is_optout'] = [
     '#type' => 'checkbox',
-    '#title' => t('No (radio) is taken as opt-out'),
+    '#title' => $labels[$component['extra']['display']],
     '#default_value' => !empty($component['extra']['no_is_optout']),
     '#parents' => ['extra', 'no_is_optout'],
     '#id' => $no_is_opt_out_id,
+    '#attached' => $attached,
   ];
-  $visible["#$display_id"]['value'] = 'checkbox';
-  $visible["#$no_is_opt_out_id"]['checked'] = TRUE;
   $form['behavior']['disable_optin'] = [
     '#type' => 'checkbox',
     '#title' => t('Only allow opt-out.'),
     '#default_value' => !empty($component['extra']['disable_optin']),
     '#parents' => ['extra', 'disable_optin'],
-    '#states' => ['visible' => $visible],
+    // Visibility of this element is handled in campaignion_opt_in.admin.js .
   ];
 
   return $form;
@@ -186,7 +200,7 @@ function _webform_render_opt_in($component, $value = NULL, $filter = TRUE) {
       $options = [Values::OPT_IN => $l[1], $no_value => $l[0]];
       $element += [
         '#type' => 'radios',
-        '#default_value' => $value,
+        '#default_value' => isset($options[$value]) ? $value : '',
         '#options' => $options,
       ];
   }

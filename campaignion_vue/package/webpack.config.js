@@ -1,34 +1,36 @@
-/* global __dirname, require, module*/
+/* global __dirname, require, module */
 
-const webpack = require('webpack');
-const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
-const path = require('path');
-const env = require('yargs').argv.env; // use --env with webpack 2
+const webpack = require('webpack')
+const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin
+const RenameWebpackPlugin = require('rename-webpack-plugin')
+const path = require('path')
+const env = require('yargs').argv.env // use --env with webpack 2
 
-let libraryName = 'campaignion_vue';
+let libraryName = 'campaignion_vue'
 
 let plugins = [
   // element-ui: replace default Chinese strings with English strings.
   new webpack.NormalModuleReplacementPlugin(
-    /element-ui[\/\\]lib[\/\\]locale[\/\\]lang[\/\\]zh-CN/,
+    /element-ui[\/\\]lib[\/\\]locale[\/\\]lang[\/\\]zh-CN/, // eslint-disable-line no-useless-escape
     'element-ui/lib/locale/lang/en'
   )
-];
-let outputFile;
+]
 
 if (env === 'build') {
-  plugins.push(new UglifyJsPlugin({ minimize: true }));
-  outputFile = libraryName + '.min.js';
-} else {
-  outputFile = libraryName + '.js';
+  plugins.push(new UglifyJsPlugin({ minimize: true }))
 }
 
+plugins.push(new RenameWebpackPlugin({
+  originNameReg: /^main(\.min)?\.js(\.map)?$/,
+  targetName: libraryName + '$1.js$2'
+}))
+
 const config = {
-  entry: __dirname + '/src/index.js',
+  entry: path.join(__dirname, '/src/index.js'),
   devtool: 'source-map',
   output: {
-    path: path.resolve(__dirname, '../js'),
-    filename: outputFile,
+    path: path.join(__dirname, 'dist'),
+    filename: '[name]' + (env === 'build' ? '.min.js' : '.js'),
     library: libraryName,
     libraryTarget: 'umd',
     umdNamedDefine: true
@@ -52,18 +54,18 @@ const config = {
       {
         test: /\.css$/,
         use: [
-          'file-loader?name=element-[name].[ext]&outputPath=../css/',
+          'file-loader?name=element-[name].[ext]&outputPath=./css/',
           'extract-loader',
           'css-loader?-minimize'
         ]
       },
       {
         test: /\.(jpg|jpeg|gif|png)$/,
-        loader: 'file-loader?name=../css/images/[name].[ext]'
+        loader: 'file-loader?name=[name].[ext]&outputPath=./images/'
       },
       {
         test: /\.(woff|woff2|eot|ttf|svg|svgz)$/,
-        loader: 'file-loader?name=../css/fonts/[name].[ext]'
+        loader: 'file-loader?name=[name].[ext]&outputPath=./fonts/'
       }
     ]
   },
@@ -78,6 +80,6 @@ const config = {
     extensions: ['.json', '.js']
   },
   plugins: plugins
-};
+}
 
-module.exports = config;
+module.exports = config

@@ -3,8 +3,9 @@ description = Functionality of email to target actions.
 core = 7.x
 package = Campaignion
 
+dependencies[] = campaignion_action
 dependencies[] = campaignion_vue
 dependencies[] = libraries
-dependencies[] = little_helpers
+dependencies[] = little_helpers:little_helpers (>=2.0-alpha2)
 dependencies[] = variable
 dependencies[] = xautoload

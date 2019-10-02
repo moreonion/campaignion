@@ -2,7 +2,8 @@
 
 namespace Drupal\campaignion_manage\BulkOp;
 
-use \Drupal\campaignion_manage\BatchJob;
+use Drupal\campaignion\ContactTypeManager;
+use Drupal\campaignion_manage\BatchJob;
 
 class SupporterExport implements BatchInterface {
   public function title() { return t('Export contact data'); }
@@ -12,37 +13,22 @@ class SupporterExport implements BatchInterface {
   }
 
   private function getFields() {
-    $fields = array(
-        'first_name' => 'First name',
-        'middle_name' => 'Middle name',
-        'last_name' => 'Last name',
-    );
-
-    foreach (field_info_instances('redhen_contact', 'contact') as $name => $field) {
-      $fields[$name] = $field['label'];
-    }
-    return $fields;
+    $exporter = ContactTypeManager::instance()->exporter('csv');
+    return $exporter->columnOptions();
   }
-
 
   public function formElement(&$element, &$form_state) {
     $options = $this->getFields();
     $element['export'] = array(
-      '#type'     => 'checkboxes',
-      '#title'    => t('Select one or more fields that you want to export.'),
-      '#options'  => $options,
+      '#type' => 'checkboxes',
+      '#title' => t('Select one or more fields that you want to export.'),
+      '#options' => $options,
       '#default_value' => array_keys($options),
     );
   }
 
   public function apply($resultset, $values) {
-    $fields = array();
-    foreach ($this->getFields() as $field_name => $label) {
-      if (isset($values['export'][$field_name]) && $values['export'][$field_name]) {
-        $fields[$field_name] = $label;
-      }
-    }
-    $data['fields'] = $fields;
+    $data['fields'] = array_filter($values['export']);
     $data['csv_name'] = tempnam(file_directory_temp(), 'CampaignionSupporterExport_' );
     $this->initBatch($data);
     $messages = array(
@@ -60,28 +46,15 @@ class SupporterExport implements BatchInterface {
     return new SupporterExportBatch($data);
   }
 
+  /**
+   * Create the temporary file and add the header lines.
+   */
   protected function initBatch(&$data) {
-    // create the CSV column header line
-    $address_mapping = array(
-      'street'  => 'thoroughfare',
-      'country' => 'country',
-      'zip'     => 'postal_code',
-      'city'    => 'locality',
-      'region'  => 'administrative_area',
-    );
-    $csv_header = array();
-    foreach ($data['fields'] as $key => $value) {
-      if ($key === 'field_address') {
-        foreach ($address_mapping as $mapped_key => $key) {
-          $csv_header[$mapped_key] = $mapped_key;
-        }
-      }
-      else {
-        $csv_header[$key] = $value;
-      }
-    }
+    $exporter = ContactTypeManager::instance()->exporter('csv');
+    $exporter->filterColumns($data['fields']);
     $handle = fopen($data['csv_name'], 'w');
-    fputcsv($handle, $csv_header);
+    fputcsv($handle, $exporter->header(0));
+    fputcsv($handle, $exporter->header(1));
     fclose($handle);
   }
 

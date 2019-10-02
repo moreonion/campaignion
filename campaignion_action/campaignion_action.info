@@ -2,8 +2,8 @@ name = Campaignion actions
 description = This is the base for all campaignion actions
 core = 7.x
 package = Campaignion
-project = campaignion
 
 dependencies[] = campaignion
+dependencies[] = little_helpers (>=2.0-alpha1)
 dependencies[] = psr0
 dependencies[] = webform_template
