@@ -37,6 +37,7 @@ dependencies[] = paypal_payment_ec
 dependencies[] = paypal_payment_pps
 dependencies[] = redhen_contact
 dependencies[] = redhen_fields
+dependencies[] = save_draft:save_draft (>=1.4)
 dependencies[] = strongarm
 dependencies[] = taxonomy
 dependencies[] = uuid
