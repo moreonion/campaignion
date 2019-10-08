@@ -183,7 +183,7 @@ function campaignion_action_form_webform_client_form_alter(&$form, &$form_state)
   if ($link->checkHash() && !empty($link->query['test-mode'])) {
     $form_state['test_mode'] = TRUE;
   }
-  if ($form_state['webform']['page_num'] == 1) {
+  if ($form_state['webform']['page_num'] == 1 && $form_state['test_mode'] == TRUE) {
     $form['submitted']['test_mode'] = [
       '#prefix' => '<p class="test-mode-info">',
       '#markup' => t('You are viewing this action in test-mode. The target email will be sent to the address you enter in the form below, not to the target.'),
