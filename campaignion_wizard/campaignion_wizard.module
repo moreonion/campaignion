@@ -184,3 +184,12 @@ function campaignion_wizard_theme() {
 
   return $items;
 }
+
+/**
+ * Implements hook_node_delete().
+ */
+function campaignion_wizard_node_delete($node) {
+  db_delete('campaignion_wizard_status')
+    ->condition('nid', $node->nid)
+    ->execute();
+}
