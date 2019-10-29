@@ -11,6 +11,16 @@ use Upal\DrupalUnitTestCase;
 class NodeFormTest extends DrupalUnitTestCase {
 
   /**
+   * Test that the node form for content can be initialized.
+   */
+  public function testNodeContent() {
+    $form = campaignion_wizard_new('petition');
+    $this->assertNotEmpty($form[0]['title']);
+    $this->assertNotEmpty($form[0]['webform']);
+    $this->assertNotEmpty($form[0]['wizard_secondary']);
+  }
+
+  /**
    * Test that the node form for an action type is not modified by save_draft.
    */
   public function testSaveDraftDisabledOnActionTypes() {
