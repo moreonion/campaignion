@@ -2,12 +2,13 @@
 
 namespace Drupal\campaignion_wizard;
 
-use \Drupal\little_helpers\Webform\Webform;
+use Drupal\little_helpers\Webform\Webform;
 
 /**
  * Extend the webform step to include validations for the email field.
  */
 class WebformStepUnique extends WebformStep {
+
   /**
    * Check for a unique email field.
    */
