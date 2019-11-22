@@ -148,7 +148,7 @@ class Component {
       $this->disableSubmits($form);
       if ($redirect = $exclusion->redirect()) {
         $submission = $this->saveSubmission($form, $form_state);
-        drupal_alter('webform_redirect', $redirect, $submission);
+        drupal_alter('campaignion_email_to_target_redirect', $redirect, $submission);
         $this->redirect($redirect, $form, $form_state);
       }
       return;
