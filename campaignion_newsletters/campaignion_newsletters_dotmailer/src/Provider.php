@@ -2,12 +2,12 @@
 
 namespace Drupal\campaignion_newsletters_dotmailer;
 
-use Drupal\campaignion_newsletters\Api\Client;
 use Drupal\campaignion_newsletters\ApiError;
 use Drupal\campaignion_newsletters\NewsletterList;
 use Drupal\campaignion_newsletters\ProviderBase;
 use Drupal\campaignion_newsletters\QueueItem;
 use Drupal\campaignion_newsletters\Subscription;
+use Drupal\campaignion_newsletters_dotmailer\Api\Client;
 
 /**
  * Newsletter provider plugin for dotmailer.
