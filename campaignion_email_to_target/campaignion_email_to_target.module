@@ -276,10 +276,12 @@ function campaignion_email_to_target_form_webform_client_form_alter(&$form, &$fo
  * Send emails for newly confirmed webform submissions.
  */
 function campaignion_email_to_target_webform_submission_confirmed(Submission $submission) {
+  $action = Loader::instance()->actionFromNode($submission->node);
+  $channel = $action->channel();
   $components = $submission->webform->componentsByType('e2t_selector');
   foreach ($components as $cid => $component) {
     $component_o = Component::fromComponent($component);
-    $component_o->sendEmails($submission->valuesByCid($cid), $submission);
+    $component_o->sendEmails($submission->valuesByCid($cid), $submission, $channel);
   }
 }
 

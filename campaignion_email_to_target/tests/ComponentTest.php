@@ -4,6 +4,7 @@ namespace Drupal\campaignion_email_to_target;
 
 use \Drupal\campaignion_action\TypeBase;
 use \Drupal\campaignion_email_to_target\Api\Client;
+use \Drupal\campaignion_email_to_target\Channel\Email;
 use \Drupal\little_helpers\Webform\Submission;
 use \Drupal\little_helpers\Webform\Webform;
 
@@ -15,7 +16,7 @@ class ComponentTest extends \DrupalUnitTestCase {
   protected function mockComponent($pairs, $options = []) {
     $action = $this->getMockBuilder(Action::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getOptions', 'targetMessagePairs'])
+      ->setMethods(['channel', 'getOptions', 'targetMessagePairs'])
       ->getMock();
     $action->method('getOptions')->willReturn($options + [
       'dataset_name' => 'mp',
@@ -23,12 +24,13 @@ class ComponentTest extends \DrupalUnitTestCase {
       'selection_mode' => 'one_or_more',
     ]);
     $action->method('targetMessagePairs')->willReturn($pairs);
+    $action->method('channel')->willReturn($this->createMock(Email::class));
     $node = (object) [
       'type' => 'email_to_target',
       'tnid' => NULL,
       'nid' => NULL,
       'uuid' => 'stub-uuid',
-      'action' => $this->createMock(Action::class)
+      'action' => $action,
     ];
     node_object_prepare($node);
     $submission_o = $this->getMockBuilder(Submission::class)
@@ -39,7 +41,7 @@ class ComponentTest extends \DrupalUnitTestCase {
     $submission_o->webform = $webform;
     $submission_o->node = $webform->node = $node;
     $component = $this->getMockBUilder(Component::class)
-      ->setMethods(['saveSubmission', 'mail'])
+      ->setMethods(['saveSubmission'])
       ->setConstructorArgs([
         ['name' => 'e2t', 'extra' => ['description' => 'e2t'], 'cid' => 7],
         $webform,
@@ -153,14 +155,19 @@ class ComponentTest extends \DrupalUnitTestCase {
    * Test sending emails.
    */
   public function testSendEmail() {
+
     $serialized_messages = array_map(function ($m) {
       return serialize(['message' => $m->toArray(), 'target' => []]);
     }, [
       new Message(['to' => 'test1@example.com']),
     ]);
     list($component, $submission) = $this->mockComponent([]);
-    $component->expects($this->once())->method('mail');
-    $component->sendEmails($serialized_messages, $submission);
+    $channel = $this->getMockBuilder(Email::class)
+      ->setMethods(['mail'])
+      ->disableOriginalConstructor()
+      ->getMock();
+    $channel->expects($this->once())->method('mail');
+    $component->sendEmails($serialized_messages, $submission, $channel);
   }
 
 }
