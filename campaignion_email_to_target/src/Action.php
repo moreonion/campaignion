@@ -5,7 +5,6 @@ namespace Drupal\campaignion_email_to_target;
 use Drupal\campaignion_action\ActionBase;
 use Drupal\campaignion_action\TypeInterface;
 use Drupal\campaignion_email_to_target\Api\Client;
-use Drupal\campaignion_email_to_target\Channel\Email;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
@@ -181,7 +180,7 @@ class Action extends ActionBase {
    * Get the configured channel.
    */
   public function channel() {
-    return new Email();
+    return $this->type->channel();
   }
 
 }
