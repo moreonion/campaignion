@@ -18,6 +18,7 @@ class ActionType extends TypeBase {
     $parameters += [
       'channel' => Email::class,
     ];
+    parent::__construct($type, $parameters);
   }
 
   /**
