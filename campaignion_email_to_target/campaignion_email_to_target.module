@@ -17,7 +17,7 @@ use \Drupal\little_helpers\Webform\Submission;
 use \Drupal\little_helpers\Webform\Webform;
 
 use \Drupal\campaignion_action\Loader;
-use \Drupal\campaignion_email_to_target\ActionType;
+use \Drupal\campaignion_email_to_target\Action;
 use \Drupal\campaignion_email_to_target\Component;
 use \Drupal\campaignion_email_to_target\MessageEndpoint;
 use \Drupal\campaignion_email_to_target\Api\Client;
@@ -346,7 +346,7 @@ function campaignion_email_to_target_form_builder_palette_groups($form_type, $fo
  *   TRUE if email to target is enabled for this node, otherwise FALSE,
  */
 function campaignion_email_to_target_enabled($node) {
-  return Loader::instance()->type($node->type) instanceof ActionType;
+  return Loader::instance()->actionFromNode($node) instanceof Action;
 }
 
 /**
