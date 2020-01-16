@@ -181,11 +181,7 @@ class Component {
     $send_count = 0;
     foreach ($data as $serialized) {
       $m = unserialize($serialized);
-      $message = new Message($m['message']);
-      $message->replaceTokens(NULL, $submission);
-      unset($m);
-
-      if ($channel->send($message, $submission)) {
+      if ($channel->send($m, $submission)) {
         $send_count += 1;
       }
     }

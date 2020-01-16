@@ -29,7 +29,10 @@ class Email {
    * @return bool
    *   TRUE if the message was accepted by the PHP mail function.
    */
-  public function send(Message $message, Submission $submission) {
+  public function send($data, Submission $submission) {
+    $message = new Message($data['message']);
+    $message->replaceTokens(NULL, $submission);
+
     $node = $submission->webform->node;
     $root_node = $node->tnid ? node_load($node->tnid) : $node;
 
