@@ -33,4 +33,24 @@ class NoOp {
     return TRUE;
   }
 
+  /**
+   * Render form elements for a single target/message pair.
+   */
+  public function messageForm($target, $message) {
+    return [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['email-to-target-target']],
+      '#target' => $target,
+    ];
+  }
+
+  /**
+   * Get values that should be serialized for a form element.
+   */
+  public function value($edited_message, $element) {
+    return [
+      'target' => $element['#target'],
+    ];
+  }
+
 }

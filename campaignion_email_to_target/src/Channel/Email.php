@@ -77,4 +77,49 @@ class Email {
     return drupal_mail('campaignion_email_to_target', 'email_to_target', $to, $language, $mail_params, $from);
   }
 
+  /**
+   * Render form elements for a single target/message pair.
+   */
+  public function messageForm($target, $message, $editable) {
+    $t = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['email-to-target-target']],
+      '#message' => $message->toArray(),
+      '#target' => $target,
+    ];
+    $t['subject'] = [
+      '#type' => 'textfield',
+      '#title' => t('Subject'),
+      '#default_value' => $message->subject,
+      '#disabled' => !$editable,
+    ];
+    $t['header'] = [
+      '#prefix' => '<pre class="email-to-target-header">',
+      '#markup' => check_plain($message->header),
+      '#suffix' => '</pre>',
+    ];
+    $t['message'] = [
+      '#type' => 'textarea',
+      '#title' => t('Message'),
+      '#default_value' => $message->message,
+      '#disabled' => !$editable,
+    ];
+    $t['footer'] = [
+      '#prefix' => '<pre class="email-to-target-footer">',
+      '#markup' => check_plain($message->footer),
+      '#suffix' => '</pre>',
+    ];
+    return $t;
+  }
+
+  /**
+   * Get values that should be serialized for a form element.
+   */
+  public function value($edited_message, $element) {
+    return [
+      'message' => $edited_message + $element['#message'],
+      'target' => $element['#target'],
+    ];
+  }
+
 }

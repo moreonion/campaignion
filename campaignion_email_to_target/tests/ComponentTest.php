@@ -53,40 +53,6 @@ class ComponentTest extends \DrupalUnitTestCase {
   }
 
   /**
-   * Test that escaping is only done for #markup attributes.
-   */
-  public function testRenderEscaping() {
-    list($componentObj, $submission_o) = $this->mockComponent([
-      [['id' => 't1', 'salutation' => 'T1', 'constituency' => ['name' => 'C1']], new Message([
-        'subject' => "Subject's string",
-        'header' => "Header's string",
-        'message' => "Message's string",
-        'footer' => "Footer's string",
-      ])]
-    ]);
-    $component = webform_component_invoke('e2t_selector', 'defaults') + [
-      'type' => 'e2t_selector',
-    ];
-    $element = webform_component_invoke('e2t_selector', 'render', $component);
-    $form = [];
-    $form_state = form_state_defaults();
-    $componentObj->render($element, $form, $form_state);
-
-    $this->assertEqual("Subject's string", $element['t1']['subject']["#default_value"]);
-    $this->assertEqual("Header&#039;s string", $element['t1']['header']["#markup"]);
-    $this->assertEqual("Message's string", $element['t1']['message']["#default_value"]);
-    $this->assertEqual("Footer&#039;s string", $element['t1']['footer']["#markup"]);
-
-    drupal_prepare_form('e2t_component_element', $element, $form_state);
-    drupal_process_form('e2t_component_element', $element, $form_state);
-    // Workaround to accommodate template_preprocess_webform_element().
-    $element['#parents'] = ['workaround'];
-    $rendered = drupal_render($element);
-    $this->assertTrue(strpos($rendered, "'") === FALSE, 'Unescaped output strings leaked to HTML output.');
-    $this->assertTrue(strpos($rendered, '&amp;') === FALSE, 'Some strings were double-escaped.');
-  }
-
-  /**
    * Test whether render with selection_mode 'all' works for single targets.
    */
   public function testRenderSelectionAllSingleTarget() {

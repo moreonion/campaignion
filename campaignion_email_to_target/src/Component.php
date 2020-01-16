@@ -101,6 +101,7 @@ class Component {
     // Get list of targets for this node.
     $submission_o = $this->webform->formStateToSubmission($form_state);
     $options = $this->action->getOptions();
+    $channel = $this->action->channel();
 
     $test_mode = !empty($form_state['test_mode']);
     $email = $submission_o->valueByKey('email');
@@ -157,12 +158,12 @@ class Component {
 
     $pairs = $pairs_or_exclusion;
     $class = ModeLoader::instance()->getMode($options['selection_mode']);
-    $mode = new $class(!empty($options['users_may_edit']));
+    $mode = new $class(!empty($options['users_may_edit']), $channel);
     if (count($pairs) == 1) {
       $mode = $mode->singleMode();
     }
     $form_state['selection_mode'] = $mode;
-    $element += $mode->formElement($pairs);
+    $element += $mode->formElement($pairs, $channel);
   }
 
   /**
