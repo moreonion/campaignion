@@ -17,6 +17,7 @@ use \Drupal\little_helpers\Webform\Submission;
 use \Drupal\little_helpers\Webform\Webform;
 
 use \Drupal\campaignion_action\Loader;
+use \Drupal\campaignion_email_to_target\Action;
 use \Drupal\campaignion_email_to_target\Component;
 use \Drupal\campaignion_email_to_target\MessageEndpoint;
 use \Drupal\campaignion_email_to_target\Api\Client;
@@ -118,7 +119,7 @@ function campaignion_email_to_target_tokens_dataset_hint($set_ds = NULL, $reset 
   }
   // Try to tget a default from the menu system, but only if it has been
   // initialized. Otherwise we might end up in a recursion loop.
-  if (!$ds && drupal_static('menu_get_item') && ($node = menu_get_object()) && ($node->type == 'email_to_target')) {
+  if (!$ds && drupal_static('menu_get_item') && ($node = menu_get_object()) && campaignion_email_to_target_enabled($node)) {
     $action = Loader::instance()->actionFromNode($node);
     $options = $action->getOptions() + ['dataset_name' => 'mp'];
     $ds = $options['dataset_name'];
@@ -276,10 +277,15 @@ function campaignion_email_to_target_form_webform_client_form_alter(&$form, &$fo
  * Send emails for newly confirmed webform submissions.
  */
 function campaignion_email_to_target_webform_submission_confirmed(Submission $submission) {
+  if (!campaignion_email_to_target_enabled($submission->node)) {
+    return;
+  }
+  $action = Loader::instance()->actionFromNode($submission->node);
+  $channel = $action->channel();
   $components = $submission->webform->componentsByType('e2t_selector');
   foreach ($components as $cid => $component) {
     $component_o = Component::fromComponent($component);
-    $component_o->sendEmails($submission->valuesByCid($cid), $submission);
+    $component_o->sendEmails($submission->valuesByCid($cid), $submission, $channel);
   }
 }
 
@@ -319,7 +325,7 @@ function campaignion_email_to_target_theme() {
  * Implements hook_form_builder_palette_groups().
  */
 function campaignion_email_to_target_form_builder_palette_groups($form_type, $form_id) {
-  if ($form_type != 'webform' || !($node = node_load($form_id)) || $node->type != 'email_to_target') {
+  if ($form_type != 'webform' || !($node = node_load($form_id)) || !campaignion_email_to_target_enabled($node)) {
     return;
   }
   $palette = array();
@@ -331,10 +337,23 @@ function campaignion_email_to_target_form_builder_palette_groups($form_type, $fo
 }
 
 /**
+ * Helper function to determine whether a node is e2t enabled.
+ *
+ * @param object $node
+ *   The node to check.
+ *
+ * @return bool
+ *   TRUE if email to target is enabled for this node, otherwise FALSE,
+ */
+function campaignion_email_to_target_enabled($node) {
+  return Loader::instance()->actionFromNode($node) instanceof Action;
+}
+
+/**
  * Implements hook_form_builder_element_types().
  */
 function campaignion_email_to_target_form_builder_element_types($form_type, $form_id) {
-  if ($form_type != 'webform' || !($node = node_load($form_id)) || $node->type != 'email_to_target') {
+  if ($form_type != 'webform' || !($node = node_load($form_id)) || !campaignion_email_to_target_enabled($node)) {
     return;
   }
   module_load_include('components.inc', 'form_builder_webform');
@@ -368,7 +387,7 @@ function campaignion_email_to_target_form_builder_element_types_alter(&$types, $
   unset($types['zip_code']);
   $types['postcode']['palette_group'] = 'supporter_data';
 
-  if (!($node = node_load($form_id)) || $node->type != 'email_to_target') {
+  if (!($node = node_load($form_id)) || !campaignion_email_to_target_enabled($node)) {
     return;
   }
   $types['postcode']['palette_group'] = 'email_to_target';
