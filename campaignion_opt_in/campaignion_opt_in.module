@@ -15,6 +15,7 @@ function campaignion_opt_in_webform_component_info() {
     'description' => t('Offers a user to opt-in to future communication.'),
     'features' => [
       'conditional' => TRUE,
+      'opt_in' => TRUE,
     ],
     'file' => 'campaignion_opt_in.component.inc',
     'conditional_type' => 'opt_in',
@@ -125,10 +126,14 @@ function campaignion_opt_in_campaignion_action_taken($node, Submission $submissi
   }
   $factory = new OptInRecordFactory($activity);
 
-  $components = $submission->webform->componentsByType('opt_in');
-  foreach ($components as $cid => $component) {
-    $values = $submission->valuesByCid($cid);
-    $factory->recordOptIn($component, $values);
+  module_load_include('components.inc', 'webform', 'includes/webform');
+  foreach ($node->webform['components'] as $cid => $component) {
+    if (webform_component_feature($component['type'], 'opt_in')) {
+      $values = $submission->valuesByCid($cid);
+      if ($opt_in = webform_component_invoke($component['type'], 'opt_in', $component, $values)) {
+        $factory->recordOptIn($opt_in);
+      }
+    }
   }
 }
 
