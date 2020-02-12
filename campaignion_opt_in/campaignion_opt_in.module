@@ -152,7 +152,7 @@ function campaignion_opt_in_webform_submission_load(&$submissions) {
     $node = node_load($submission->nid);
     foreach ($node->webform['components'] as $cid => $component) {
       if (webform_component_feature($component['type'], 'opt_in')) {
-        $values = $submission->valuesByCid($cid);
+        $values = $submission->data[$cid];
         if ($opt_in = webform_component_invoke($component['type'], 'opt_in', $component, $values)) {
           $submission->opt_in[$opt_in['channel']] = $opt_in;
         }
