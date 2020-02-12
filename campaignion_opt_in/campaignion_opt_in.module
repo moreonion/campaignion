@@ -138,6 +138,35 @@ function campaignion_opt_in_campaignion_action_taken($node, Submission $submissi
 }
 
 /**
+ * Implements hook_webform_submission_load().
+ *
+ * Add opt-ins to their submissions. The opt-ins will be accessible
+ * under $submission->optins[$cid].
+ */
+function campaignion_opt_in_webform_submission_load(&$submissions) {
+  foreach ($submissions as $sid => $submission) {
+    $submission->optins = [];
+  }
+  $query = <<<SQL
+SELECT sid, channel, operation, value
+  FROM campaignion_opt_in
+  INNER JOIN campaignion_activity_webform
+    USING(activity_id)
+  WHERE sid in (:sids)
+SQL;
+  $result = db_query($query, [':sids' => array_keys($submissions)]);
+  foreach ($result as $optin_data) {
+    // Don’t continue if we already have an opt-in for this channel.
+    if (empty($submissions[$optin_data->sid]->optins[$optin_data->channel]['operation'])) {
+      $submissions[$optin_data->sid]->optins[$optin_data->channel] = [
+        'operation' => $optin_data->operation,
+        'value' => $optin_data->value,
+      ];
+    }
+  }
+}
+
+/**
  * Implements hook_campaignion_opt_in_channel_info().
  */
 function campaignion_opt_in_campaignion_opt_in_channel_info() {
