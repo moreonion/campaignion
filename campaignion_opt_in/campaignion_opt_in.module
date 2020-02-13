@@ -124,16 +124,10 @@ function campaignion_opt_in_campaignion_action_taken($node, Submission $submissi
     watchdog('campaignion_opt_in', 'Can’t record opt-in without activity for submission [nid: %nid, sid: %sid].', ['%nid' => $node->nid, '%sid' => $submission->sid], WATCHDOG_ERROR);
     return;
   }
-  $factory = new OptInRecordFactory($activity);
 
-  module_load_include('components.inc', 'webform', 'includes/webform');
-  foreach ($node->webform['components'] as $cid => $component) {
-    if (webform_component_feature($component['type'], 'opt_in')) {
-      $values = $submission->valuesByCid($cid);
-      if ($opt_in = webform_component_invoke($component['type'], 'opt_in', $component, $values)) {
-        $factory->recordOptIn($opt_in);
-      }
-    }
+  $factory = new OptInRecordFactory($activity);
+  foreach ($submission->opt_in->values() as $value) {
+    $factory->recordOptIn($value);
   }
 }
 
@@ -158,4 +152,16 @@ function campaignion_opt_in_channel_info() {
   $channels = module_invoke_all('campaignion_opt_in_channel_info');
   drupal_alter('campaignion_opt_in_channel_info', $channels);
   return $channels;
+}
+
+/**
+ * Implements hook_webform_submission_load().
+ *
+ * Add a opt-in values object to each submission.
+ */
+function campaignion_opt_in_webform_submission_load(&$submissions) {
+  foreach ($submissions as $sid => $submission) {
+    $node = node_load($submission->nid);
+    $submission->opt_in = new Values(new Submission($node, $submission));
+  }
 }
