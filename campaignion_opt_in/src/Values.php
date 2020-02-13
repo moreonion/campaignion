@@ -293,4 +293,25 @@ class Values {
     }, $this->valuesPerChannel($channel));
   }
 
+  /**
+   * Calculate the overall submission result for a channel.
+   */
+  public function canonicalValue($channel, $simple = FALSE) {
+    $value = NULL;
+
+    $priority = [
+      static::NOT_SELECTED => 0,
+      static::NO_CHANGE => 1,
+      static::OPT_OUT => 2,
+      static::OPT_IN => 3,
+    ];
+
+    foreach ($this->valuesPerChannel($channel) as $v) {
+      if (!$value || ($priority[$value['value']] ?? -1) < ($priority[$v['value']] ?? -1)) {
+        $value = $v;
+      }
+    }
+    return $simple && $value ? $value['value'] : $value;
+  }
+
 }
