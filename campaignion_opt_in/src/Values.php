@@ -285,15 +285,6 @@ class Values {
   }
 
   /**
-   * Get all unprefixed values for a channel.
-   */
-  public function simpleValues($channel) {
-    return array_map(function($v) {
-      return $v['value'];
-    }, $this->valuesPerChannel($channel));
-  }
-
-  /**
    * Calculate the overall submission result for a channel.
    */
   public function canonicalValue($channel, $simple = FALSE) {

@@ -132,13 +132,12 @@ class Filter extends Model {
    *   otherwise FALSE.
    */
   protected function hasOptin(Submission $submission) {
-    foreach ($submission->opt_in->simpleValues('email') as $value) {
-      if ($value == Values::OPT_IN) {
-        return TRUE;
-      }
-      elseif ($value == Values::OPT_OUT) {
-        return FALSE;
-      }
+    $value = $submission->opt_in->canonicalValue('email', TRUE);
+    if ($value == Values::OPT_IN) {
+      return TRUE;
+    }
+    elseif ($value == Values::OPT_OUT) {
+      return FALSE;
     }
 
     // If there is at least one subscription then we assume we have an opt-in.
