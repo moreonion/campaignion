@@ -272,19 +272,6 @@ class Values {
   }
 
   /**
-   * Check whether a submission has any opt-out for a channel.
-   *
-   * @param string $channel
-   *   The channel we are looking for.
-   *
-   * @return bool
-   *   TRUE if the submitted values contain at least one opt-out for the channel.
-   */
-  public function hasOptOut($channel) {
-    return $this->hasValue($channel, static::OPT_OUT);
-  }
-
-  /**
    * Calculate the overall submission result for a channel.
    */
   public function canonicalValue($channel, $simple = FALSE) {
