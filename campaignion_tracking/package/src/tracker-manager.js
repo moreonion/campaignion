@@ -74,9 +74,7 @@ export class TrackerManager {
       return
     }
 
-    for (let subscriber of this.topics[topic]) {
-      subscriber(data)
-    }
+    this.topics[topic].forEach(subscriber => subscriber(data))
   }
 
   /**
