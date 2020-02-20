@@ -10,6 +10,7 @@ dependencies[] = campaignion:campaignion_email_to_target
 dependencies[] = campaignion:campaignion_email_to_target_counter
 dependencies[] = campaignion:campaignion_facebook_pixel
 dependencies[] = campaignion:campaignion_form_builder
+dependencies[] = campaignion:campaignion_giftaid
 dependencies[] = campaignion:campaignion_manage
 dependencies[] = campaignion:campaignion_mp_fields
 dependencies[] = campaignion:campaignion_newsletters
