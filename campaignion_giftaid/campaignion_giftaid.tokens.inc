@@ -14,8 +14,8 @@ use Drupal\little_helpers\Webform\Submission;
  */
 function campaignion_giftaid_token_info() {
   $info['tokens']['submission']['amount-including-giftaid'] = [
-    'name' => t('donation amount increased by giftaid'),
-    'description' => t('Returns donation amount increased by giftaid'),
+    'name' => t('Donation amount including Gift Aid'),
+    'description' => t('The donation amount increased by 25%. Note that this does not account for whether there was an actual opt-in for Gift Aid.'),
   ];
   return $info;
 }
