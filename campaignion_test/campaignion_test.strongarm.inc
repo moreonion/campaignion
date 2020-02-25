@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * campaignion_test.strongarm.inc
