@@ -117,7 +117,7 @@ function _webform_show_single_target_e2t_selector($nid) {
  * Implements _webform_csv_headers_component().
  */
 function _webform_csv_headers_e2t_selector($component, $export_options) {
-  $multi_column = user_access('view email_to_target messages') && _webform_show_single_target_e2t_selector($component['nid']);
+  $multi_column = _webform_show_single_target_e2t_selector($component['nid']);
   if ($multi_column) {
     $header = [
       ['', '', '', '', '', '', ''],
@@ -146,9 +146,6 @@ function _webform_csv_headers_e2t_selector($component, $export_options) {
  * Implements _webform_csv_data_component().
  */
 function _webform_csv_data_e2t_selector($component, $export_options, $value) {
-  if (!user_access('view email_to_target messages')) {
-    return t('No permission to view email to target messages.');
-  }
   if (_webform_show_single_target_e2t_selector($component['nid'])) {
     // Three columns: To, Subject, Message
     if (!empty($value[0])) {
