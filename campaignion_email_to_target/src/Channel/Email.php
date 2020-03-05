@@ -54,19 +54,19 @@ class Email {
     // Verify that this submission is not attempting to send any spam hacks.
     if (_webform_submission_spam_check($message->to, $email['subject'], $email['from'], $email['headers'])) {
       watchdog('campaignion_email_to_target', 'Possible spam attempt from @remote !message',
-              array('@remote' => ip_address(), '!message' => "<br />\n" . nl2br(htmlentities($email['message']))));
+              ['@remote' => ip_address(), '!message' => "<br />\n" . nl2br(htmlentities($email['message']))]);
       drupal_set_message(t('Illegal information. Data not submitted.'), 'error');
       return FALSE;
     }
 
     $language = $GLOBALS['language'];
-    $mail_params = array(
+    $mail_params = [
       'message' => $email['message'],
       'subject' => $email['subject'],
       'headers' => $email['headers'],
       'submission' => $submission,
       'email' => $email,
-    );
+    ];
 
     // Mail the submission.
     $m = $this->mail($message->to, $language, $mail_params, $email['from']);
