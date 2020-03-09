@@ -19,6 +19,7 @@ use Drupal\little_helpers\Webform\Webform;
 use Drupal\campaignion_action\Loader;
 use Drupal\campaignion_email_to_target\Action;
 use Drupal\campaignion_email_to_target\Component;
+use Drupal\campaignion_email_to_target\Message;
 use Drupal\campaignion_email_to_target\MessageEndpoint;
 use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_email_to_target\SelectionMode\All;
@@ -132,6 +133,7 @@ function campaignion_email_to_target_tokens_dataset_hint($set_ds = NULL, $reset 
  */
 function campaignion_email_to_target_token_info() {
   $info = [];
+
   if ($ds_name = campaignion_email_to_target_tokens_dataset_hint()) {
     try {
       $api = Client::fromConfig();
@@ -153,6 +155,12 @@ function campaignion_email_to_target_token_info() {
       drupal_set_message(t('We are sorry! The service is temporary unavailable. The administrators have been informed. Please try again in a few minutes …'), 'error');
     }
   }
+
+  $info['tokens']['email-to-target']['messages'] = [
+    'name' => t('The messages sent to targets'),
+    'description' => t('The messages sent to E2T targets.'),
+  ];
+
   return $info;
 }
 
@@ -160,28 +168,57 @@ function campaignion_email_to_target_token_info() {
  * Implements hook_tokens().
  */
 function campaignion_email_to_target_tokens($type, array $tokens, array $data = [], array $options = []) {
-  if ($type != 'email-to-target' || empty($data['email-to-target'])) {
-    return;
-  }
-
-  $my_data['contact'] = $data['email-to-target'];
-  foreach ($my_data['contact'] as $key => $sub_array) {
-    if (is_array($sub_array)) {
-      $my_data[$key] = $sub_array;
-    }
-  }
-
   $replacements = [];
-  foreach ($tokens as $name => $original) {
-    if (strpos($name, '.') === FALSE) {
-      $name = 'contact.' . $name;
+  if ($type != 'email-to-target') {
+    return $replacements;
+  }
+
+  // Token for complete messages sent to target.
+  if (!empty($tokens['messages']) && !empty($data['webform-submission']) && !empty($data['node'])) {
+    $submission = new Submission($data['node'], $data['webform-submission']);
+    $action = Loader::instance()->actionFromNode($submission->node);
+    $channel = $action->channel();
+    $components = $submission->webform->componentsByType('e2t_selector');
+    $messages = [];
+    foreach ($components as $cid => $component) {
+      $component_o = Component::fromComponent($component);
+      $data = $submission->valuesByCid($cid);
+      foreach ($data as $serialized) {
+        $mail = unserialize($serialized);
+        $message = new Message($mail['message']);
+        $email = $channel->prepareEmail($message, $submission);
+        if ($email) {
+          $email['to'] = $message->to;
+          $messages[] = $email;
+        }
+      }
     }
-    $value = drupal_array_get_nested_value($my_data, explode('.', $name));
-    if (!is_null($value)) {
-      $replacements[$original] = (string) $value;
+    $t = 'campaignion_email_to_target_all_messages_mail';
+    $theme_d = ['messages' => $messages, 'submission' => $submission];
+    $text = theme([$t, $t . '_' . $submission->node->nid], $theme_d);
+    $replacements['[email-to-target:messages]'] = $text;
+  }
+
+  // Tokens for use in target messages.
+  if (!empty($data['email-to-target'])) {
+    $my_data['contact'] = $data['email-to-target'];
+    foreach ($my_data['contact'] as $key => $sub_array) {
+      if (is_array($sub_array)) {
+        $my_data[$key] = $sub_array;
+      }
     }
-    else {
-      watchdog('campaignion_email_to_target', 'No data for token "%original" in dataset.', ['%original' => $original], WATCHDOG_ERROR);
+
+    foreach ($tokens as $name => $original) {
+      if (strpos($name, '.') === FALSE) {
+        $name = 'contact.' . $name;
+      }
+      $value = drupal_array_get_nested_value($my_data, explode('.', $name));
+      if (!is_null($value)) {
+        $replacements[$original] = (string) $value;
+      }
+      else {
+        watchdog('campaignion_email_to_target', 'No data for token "%original" in dataset.', ['%original' => $original], WATCHDOG_ERROR);
+      }
     }
   }
   return $replacements;
@@ -314,6 +351,13 @@ function campaignion_email_to_target_theme() {
       'submission' => NULL,
     ],
     'template' => 'campaignion-email-to-target-mail',
+  ];
+  $hooks['campaignion_email_to_target_all_messages_mail'] = [
+    'variables' => [
+      'messages' => NULL,
+      'submission' => NULL,
+    ],
+    'template' => 'campaignion-email-to-target-all-messages-mail',
   ];
   $hooks['campaignion_email_to_target_results_table_entry'] = [
     'template' => 'campaignion-email-to-target-results-table-entry',
