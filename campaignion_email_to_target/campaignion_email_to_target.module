@@ -26,17 +26,6 @@ use \Drupal\campaignion_email_to_target\SelectionMode\One;
 use \Drupal\campaignion_email_to_target\SelectionMode\OneOrMore;
 
 /**
- * Implements hook_permission().
- */
-function campaignion_email_to_target_permission() {
-  $p['view email_to_target messages'] = [
-    'title' => t('View Email-to-target messages'),
-    'description' => t('View and export the contents of messages sent to targets.'),
-  ];
-  return $p;
-}
-
-/**
  * Implements hook_menu().
  */
 function campaignion_email_to_target_menu() {
