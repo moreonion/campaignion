@@ -181,7 +181,6 @@ function campaignion_email_to_target_tokens($type, array $tokens, array $data = 
     $components = $submission->webform->componentsByType('e2t_selector');
     $messages = [];
     foreach ($components as $cid => $component) {
-      $component_o = Component::fromComponent($component);
       $data = $submission->valuesByCid($cid);
       foreach ($data as $serialized) {
         $mail = unserialize($serialized);

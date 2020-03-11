@@ -5,7 +5,6 @@ package = Campaignion
 
 dependencies[] = campaignion_action
 dependencies[] = campaignion_vue
-dependencies[] = campaignion_webform_token
 dependencies[] = libraries
 dependencies[] = little_helpers:little_helpers (>=2.0-alpha2)
 dependencies[] = variable
