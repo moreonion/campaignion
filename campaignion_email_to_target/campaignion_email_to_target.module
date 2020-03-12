@@ -19,8 +19,8 @@ use Drupal\little_helpers\Webform\Webform;
 use Drupal\campaignion_action\Loader;
 use Drupal\campaignion_email_to_target\Action;
 use Drupal\campaignion_email_to_target\Component;
-use Drupal\campaignion_email_to_target\Message;
 use Drupal\campaignion_email_to_target\MessageEndpoint;
+use Drupal\campaignion_email_to_target\Tokens;
 use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_email_to_target\SelectionMode\All;
 use Drupal\campaignion_email_to_target\SelectionMode\One;
@@ -156,7 +156,7 @@ function campaignion_email_to_target_token_info() {
     }
   }
 
-  $info['tokens']['email-to-target']['messages'] = [
+  $info['tokens']['submission']['email-to-target-messages'] = [
     'name' => t('The messages sent to targets'),
     'description' => t('The messages sent to E2T targets.'),
   ];
@@ -169,56 +169,12 @@ function campaignion_email_to_target_token_info() {
  */
 function campaignion_email_to_target_tokens($type, array $tokens, array $data = [], array $options = []) {
   $replacements = [];
-  if ($type != 'email-to-target') {
-    return $replacements;
+  if ($type == 'submission' && ($node = $data['node'] ?? NULL) && ($s = $data['webform-submission'] ?? NULL)) {
+    $submission = new Submission($node, $s);
+    $replacements = Tokens::submissionTokens($tokens, $submission);
   }
-
-  // Token for complete messages sent to target.
-  if (!empty($tokens['messages']) && !empty($data['webform-submission']) && !empty($data['node'])) {
-    $submission = new Submission($data['node'], $data['webform-submission']);
-    $action = Loader::instance()->actionFromNode($submission->node);
-    $channel = $action->channel();
-    $components = $submission->webform->componentsByType('e2t_selector');
-    $messages = [];
-    foreach ($components as $cid => $component) {
-      $data = $submission->valuesByCid($cid);
-      foreach ($data as $serialized) {
-        $mail = unserialize($serialized);
-        $message = new Message($mail['message']);
-        $email = $channel->prepareEmail($message, $submission);
-        if ($email) {
-          $email['to'] = $message->to;
-          $messages[] = $email;
-        }
-      }
-    }
-    $t = 'campaignion_email_to_target_all_messages_mail';
-    $theme_d = ['messages' => $messages, 'submission' => $submission];
-    $text = theme([$t, $t . '_' . $submission->node->nid], $theme_d);
-    $replacements['[email-to-target:messages]'] = $text;
-  }
-
-  // Tokens for use in target messages.
-  if (!empty($data['email-to-target'])) {
-    $my_data['contact'] = $data['email-to-target'];
-    foreach ($my_data['contact'] as $key => $sub_array) {
-      if (is_array($sub_array)) {
-        $my_data[$key] = $sub_array;
-      }
-    }
-
-    foreach ($tokens as $name => $original) {
-      if (strpos($name, '.') === FALSE) {
-        $name = 'contact.' . $name;
-      }
-      $value = drupal_array_get_nested_value($my_data, explode('.', $name));
-      if (!is_null($value)) {
-        $replacements[$original] = (string) $value;
-      }
-      else {
-        watchdog('campaignion_email_to_target', 'No data for token "%original" in dataset.', ['%original' => $original], WATCHDOG_ERROR);
-      }
-    }
+  if ($type == 'email-to-target' && !empty($data['email-to-target'])) {
+    $replacements = Tokens::messageTokens($tokens, $data['email-to-target']);
   }
   return $replacements;
 }
