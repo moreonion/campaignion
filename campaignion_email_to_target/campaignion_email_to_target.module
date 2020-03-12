@@ -33,8 +33,8 @@ function campaignion_email_to_target_menu() {
     'page callback' => 'campaignion_email_to_target_edit_messages',
     'page arguments' => [1],
     'access callback' => 'node_access',
-    'access arguments' => array('update', 1),
-    'delivery callback' => 'campaignion_email_to_target_deliver_json',
+    'access arguments' => ['update', 1],
+    'delivery callback' => 'little_helpers_deliver_json',
   ];
   return $menu;
 }
@@ -56,27 +56,6 @@ function campaignion_email_to_target_campaignion_email_to_target_selection_modes
     'title' => t('Exactly one — Users can choose exactly one target. (select box)')
   ];
   return $plugins;
-}
-
-/**
- * Delivery callback for the JSON API.
- */
-function campaignion_email_to_target_deliver_json($result) {
-  switch ($result) {
-    case MENU_NOT_FOUND:
-      drupal_add_http_header('Status', '404 Not found');
-      return;
-
-    case MENU_ACCESS_DENIED:
-      drupal_add_http_header('Status', '403 Forbidden');
-      return;
-
-    case MENU_SITE_OFFLINE:
-      drupal_add_http_header('Status', '503 Service unavailable');
-      return;
-  }
-  echo drupal_json_output($result);
-  drupal_page_footer();
 }
 
 /**
