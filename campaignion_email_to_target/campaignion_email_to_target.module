@@ -307,12 +307,12 @@ function campaignion_email_to_target_theme() {
     ],
     'template' => 'campaignion-email-to-target-mail',
   ];
-  $hooks['campaignion_email_to_target_all_messages_mail'] = [
+  $hooks['campaignion_email_to_target_messages_token'] = [
     'variables' => [
       'messages' => NULL,
       'submission' => NULL,
     ],
-    'template' => 'campaignion-email-to-target-all-messages-mail',
+    'template' => 'campaignion-email-to-target-messages-token',
   ];
   $hooks['campaignion_email_to_target_results_table_entry'] = [
     'template' => 'campaignion-email-to-target-results-table-entry',

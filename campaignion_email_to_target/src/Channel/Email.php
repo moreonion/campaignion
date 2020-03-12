@@ -19,26 +19,6 @@ class Email {
   }
 
   /**
-   * Prepare the email.
-   */
-  public function prepareEmail(Message $message, Submission $submission) {
-    $message->replaceTokens(NULL, $submission);
-
-    $node = $submission->webform->node;
-
-    $t = 'campaignion_email_to_target_mail';
-    // Set the HTML property based on availablity of MIME Mail.
-    $email['html'] = FALSE;
-    // Pass through the theme layer.
-    $theme_d = ['message' => $message, 'submission' => $submission];
-    $email['message'] = theme([$t, $t . '_' . $node->nid], $theme_d);
-
-    $email['from'] = $message->from;
-    $email['subject'] = $message->subject;
-    return $email;
-  }
-
-  /**
    * Send email to one target.
    *
    * @param \Drupal\campaignion_email_to_target\Message $message
@@ -51,12 +31,21 @@ class Email {
    */
   public function send($data, Submission $submission) {
     $message = new Message($data['message']);
-    $email = $this->prepareEmail($message, $submission);
+    $message->replaceTokens(NULL, $submission);
 
     $node = $submission->webform->node;
     $root_node = $node->tnid ? node_load($node->tnid) : $node;
 
-    // Context for the mail server.
+    // Set the HTML property based on availablity of MIME Mail.
+    $email['html'] = FALSE;
+    // Pass through the theme layer.
+    $t = 'campaignion_email_to_target_mail';
+    $theme_d = ['message' => $message, 'submission' => $submission];
+    $email['message'] = theme([$t, $t . '_' . $node->nid], $theme_d);
+
+    $email['from'] = $message->from;
+    $email['subject'] = $message->subject;
+
     $email['headers'] = [
       'X-Mail-Domain' => variable_get('site_mail_domain', 'supporter.campaignion.org'),
       'X-Action-UUID' => $root_node->uuid,

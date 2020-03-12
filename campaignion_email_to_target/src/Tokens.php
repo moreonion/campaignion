@@ -16,8 +16,6 @@ abstract class Tokens {
   public static function submissionTokens(array $tokens, Submission $submission) {
     $replacements = [];
     if (!empty($tokens['email-to-target-messages'])) {
-      $action = Loader::instance()->actionFromNode($submission->node);
-      $channel = $action->channel();
       $components = $submission->webform->componentsByType('e2t_selector');
       $messages = [];
       foreach ($components as $cid => $component) {
@@ -25,16 +23,14 @@ abstract class Tokens {
         foreach ($data as $serialized) {
           $mail = unserialize($serialized);
           $message = new Message($mail['message']);
-          $email = $channel->prepareEmail($message, $submission);
-          if ($email) {
-            $email['to'] = $message->to;
-            $messages[] = $email;
-          }
+          $messages[] = $message;
         }
       }
-      $t = 'campaignion_email_to_target_all_messages_mail';
-      $theme_d = ['messages' => $messages, 'submission' => $submission];
-      $text = theme([$t, $t . '_' . $submission->node->nid], $theme_d);
+      $t = 'campaignion_email_to_target_messages_token';
+      $text = theme([$t, $t . '_' . $submission->node->nid], [
+        'messages' => $messages,
+        'submission' => $submission,
+      ]);
       $replacements[$tokens['email-to-target-messages']] = $text;
     }
     return $replacements;

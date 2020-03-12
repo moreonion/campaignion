@@ -19,13 +19,6 @@ class NoOp {
   }
 
   /**
-   * Prepare the email.
-   */
-  public function prepareEmail(Message $message, Submission $submission) {
-    return FALSE;
-  }
-
-  /**
    * Send email to one target.
    *
    * @param \Drupal\campaignion_email_to_target\Message $message
