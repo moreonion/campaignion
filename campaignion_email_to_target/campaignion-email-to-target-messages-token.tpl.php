@@ -15,11 +15,12 @@ foreach ($messages as $message): ?>
 <?php if (!$first): ?>
   <hr>
 <?php endif; ?>
-<p>Email to: <?php echo check_plain($message->to); ?> with subject line “<?php echo check_plain($message->subject); ?>”</p>
-
-<?php echo $message->header; ?>
-<?php echo $message->message; ?>
-<?php echo $message->footer; ?>
+<div class="e2t-message">
+<h3>Email to: <?php echo check_plain($message->to); ?> with subject line “<?php echo check_plain($message->subject); ?>”</h3>
+<p><?php echo $message->header; ?></p>
+<?php echo _filter_autop($message->message); ?>
+<p><?php echo $message->footer; ?></p>
+</div>
 <?php
   $first = FALSE;
 endforeach;

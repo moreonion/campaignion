@@ -58,7 +58,7 @@ class MessagesTokenTest extends DrupalUnitTestCase {
       'from' => 'from@example.com',
       'subject' => 'Subject line',
       'header' => 'Header',
-      'message' => 'Content',
+      'message' => "Content\nwith breaks",
       'footer' => 'Footer',
     ]);
     $data[1][] = serialize(['message' => $message->toArray()]);
@@ -67,9 +67,14 @@ class MessagesTokenTest extends DrupalUnitTestCase {
 
     $actual = token_replace('[submission:email-to-target-messages]', $token_data);
     $expected = <<<STR
-<p>Email to: to@example.com with subject line “Subject line”</p>
+<div class="e2t-message">
+<h3>Email to: to@example.com with subject line “Subject line”</h3>
+<p>Header</p>
+<p>Content<br />
+with breaks</p>
+<p>Footer</p>
+</div>
 
-HeaderContentFooter
 STR;
     $this->assertEqual($expected, $actual);
   }
