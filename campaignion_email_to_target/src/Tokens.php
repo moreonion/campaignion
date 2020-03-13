@@ -2,7 +2,6 @@
 
 namespace Drupal\campaignion_email_to_target;
 
-use Drupal\campaignion_action\Loader;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
