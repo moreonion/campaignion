@@ -70,8 +70,6 @@ class MessagesTokenTest extends DrupalUnitTestCase {
 <p>Email to: to@example.com with subject line “Subject line”</p>
 
 HeaderContentFooter
-<hr>
-
 STR;
     $this->assertEqual($expected, $actual);
   }
