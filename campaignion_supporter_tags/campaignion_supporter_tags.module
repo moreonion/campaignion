@@ -23,12 +23,13 @@ use Drupal\campaignion_supporter_tags\Tagger;
 function campaignion_supporter_tags_form_node_form_alter(&$form, &$form_state) {
   $node = $form['#node'];
   if (isset($node) && field_read_instance('node', 'supporter_tags', $node->type)) {
-    $form['segmentation'] = array(
+    $form += ['segmentation' => []];
+    $form['segmentation'] += [
       '#type'  => 'fieldset',
       '#title' => t('Auto segmentation'),
       '#group' => 'additional_settings',
       '#tree'  => FALSE,
-    );
+    ];
     $form['segmentation']['supporter_tags'] = $form['supporter_tags'];
     hide($form['supporter_tags']);
   }
@@ -40,8 +41,7 @@ function campaignion_supporter_tags_form_node_form_alter(&$form, &$form_state) {
  * Add all tags from action to supporter.
  */
 function campaignion_supporter_tags_campaignion_action_contact_alter($contact, $submission, $action_node) {
-  $wrappedContact = $contact->wrap();
-  if (!isset($wrappedContact->supporter_tags)) {
+  if (!isset($contact->supporter_tags)) {
     return FALSE;
   }
   if ($submission->is_draft) {
@@ -55,6 +55,7 @@ function campaignion_supporter_tags_campaignion_action_contact_alter($contact, $
   }
 
   $contact_tids = array();
+  $wrappedContact = $contact->wrap();
   foreach ($wrappedContact->supporter_tags->value() as $term) {
     $contact_tids[$term->tid] = $term->tid;
   }

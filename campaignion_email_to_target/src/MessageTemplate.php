@@ -2,13 +2,31 @@
 
 namespace Drupal\campaignion_email_to_target;
 
-use \Drupal\little_helpers\DB\Model;
+use Drupal\little_helpers\DB\Model;
 
-
+/**
+ * Model class for message/exclusion templates.
+ */
 class MessageTemplate extends Model {
-  protected static $table  = 'campaignion_email_to_target_messages';
+
+  protected static $table = 'campaignion_email_to_target_messages';
   protected static $key = ['id'];
-  protected static $values = ['nid', 'weight', 'type', 'label', 'subject', 'header', 'message', 'footer'];
+  protected static $values = [
+    'nid',
+    'weight',
+    'type',
+    'label',
+    'subject',
+    'header',
+    'message',
+    'footer',
+    'url',
+  ];
+  protected static $types = [
+    'message' => Message::class,
+    'message-template' => Message::class,
+    'exclusion' => Exclusion::class,
+  ];
 
   public $id;
   public $nid;
@@ -20,7 +38,16 @@ class MessageTemplate extends Model {
   public $message = '';
   public $footer = '';
   public $filters = [];
+  public $url = NULL;
 
+  /**
+   * Create new instance by passing the data.
+   *
+   * @param mixed $data
+   *   The data as loaded from the database.
+   * @param bool $new
+   *   TRUE if the data was not yet saved to the database, otherwise FALSE.
+   */
   public function __construct($data = [], $new = TRUE) {
     parent::__construct($data, $new);
     $filters = $this->filters;
@@ -30,8 +57,11 @@ class MessageTemplate extends Model {
 
   /**
    * Reset data based on an array.
+   *
+   * @param array $data
+   *   New data.
    */
-  public function setData($data = []) {
+  public function setData(array $data = []) {
     foreach (static::$values as $k) {
       if ($k == 'nid') {
         continue;
@@ -45,7 +75,14 @@ class MessageTemplate extends Model {
     }
   }
 
-  public function setFilters($new_filters) {
+  /**
+   * Update the filter list to match the new filters.
+   *
+   * @param array $new_filters
+   *   Array of new filters, which can be either associative data arrays or
+   *   Filter instances.
+   */
+  public function setFilters(array $new_filters) {
     $old_filters = [];
     foreach ($this->filters as $f) {
       $old_filters[$f->id] = $f;
@@ -87,6 +124,7 @@ class MessageTemplate extends Model {
    *
    * @param int $nid
    *   Node ID of the action.
+   *
    * @return array
    *   Array of MessageTemplate objects keyed by their id.
    */
@@ -106,6 +144,12 @@ class MessageTemplate extends Model {
     return $messages;
   }
 
+  /**
+   * Get an array representation for this template as used in the API.
+   *
+   * @return array
+   *   An array representation of this template.
+   */
   public function toArray() {
     $data = [];
     foreach (array_merge(static::$key, static::$values) as $k) {
@@ -116,12 +160,31 @@ class MessageTemplate extends Model {
       $filters[] = $f->toArray();
     }
     $data['filters'] = $filters;
+    $data['urlLabel'] = $this->urlLabel($data['url']);
     // Weights are only represented by order.
     unset($data['weight']);
     unset($data['nid']);
     return $data;
   }
 
+  /**
+   * Calculate a display version for a node URL.
+   *
+   * @param string $url
+   *   The URL.
+   * @return string
+   *   A pretty label for the URL if available otherwise the URL itself.
+   */
+  protected function urlLabel($url) {
+    if ((substr($url, 0, 5) == 'node/') && ($node = menu_get_object('node', 1, $url))) {
+      return "{$node->title} [{$node->nid}]";
+    }
+    return $url;
+  }
+
+  /**
+   * Save this template to the database.
+   */
   public function save() {
     parent::save();
     foreach ($this->filters as $f) {
@@ -130,6 +193,9 @@ class MessageTemplate extends Model {
     }
   }
 
+  /**
+   * Delete this template from the database.
+   */
   public function delete() {
     parent::delete();
     foreach ($this->filters as $f) {
@@ -137,13 +203,31 @@ class MessageTemplate extends Model {
     }
   }
 
-  public function checkFilters($target, $constituency) {
+  /**
+   * Check whether all the template’s filters match the given target.
+   *
+   * @param array $target
+   *   Target data as received by the e2t-api.
+   *
+   * @return bool
+   *   TRUE if all filters matched the target, otherwise FALSE.
+   */
+  public function checkFilters(array $target) {
     foreach ($this->filters as $f) {
-      if (!$f->match($target, $constituency)) {
+      if (!$f->match($target)) {
         return FALSE;
       }
     }
     return TRUE;
+  }
+
+  /**
+   * Create a new instance of this template.
+   */
+  public function createInstance() {
+    $class = static::$types[$this->type];
+    $vars = array_intersect_key(get_object_vars($this), get_class_vars($class));
+    return new $class($vars);
   }
 
   /**

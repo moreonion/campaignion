@@ -25,6 +25,10 @@ export const OPERATORS = {
   }
 }
 
+/**
+ * Redirect factory.
+ * @return {Object} A new redirect object with an `id` of `null`.
+ */
 export function emptyRedirect () {
   return {
     id: null,

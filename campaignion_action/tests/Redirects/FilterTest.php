@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_action\Redirects;
 
 use Drupal\little_helpers\Webform\Submission;
+use Drupal\campaignion_opt_in\Values;
 use Drupal\campaignion_newsletters\Subscription;
 
 /**
@@ -36,13 +37,18 @@ class FilterTest extends \DrupalWebTestCase {
    * Test opt-in filter with opt-in in the submission.
    */
   public function testMatchOptInSubmission() {
-    $stub_s['data'][1][0] = 'subscribed';
+    $stub_s['data'][1][0] = 'radios:opt-in';
     $stub_n['webform']['components'][1] = [
       'cid' => 1,
       'form_key' => 'emailopt',
-      'type' => 'newsletter',
+      'type' => 'opt_in',
+      'extra' => [
+        'channel' => 'email',
+        'optin_statement' => 'Opt-in statement',
+      ],
     ];
     $submission = new Submission((object) $stub_n, (object) $stub_s);
+    $submission->opt_in = new Values($submission);
 
     $fs = Filter::fromArray(['type' => 'opt-in', 'value' => TRUE]);
     $this->assertTrue($fs->match($submission));
@@ -58,6 +64,7 @@ class FilterTest extends \DrupalWebTestCase {
     $stub_s['data'] = [];
     $stub_n['webform']['components'] = [];
     $submission = new Submission((object) $stub_n, (object) $stub_s);
+    $submission->opt_in = new Values($submission);
 
     $fs = Filter::fromArray(['type' => 'opt-in', 'value' => TRUE]);
     $this->assertFalse($fs->match($submission));
@@ -78,6 +85,7 @@ class FilterTest extends \DrupalWebTestCase {
       'type' => 'email',
     ];
     $submission = new Submission((object) $stub_n, (object) $stub_s);
+    $submission->opt_in = new Values($submission);
     $subscription = Subscription::fromData(4711, $email);
     $subscription->save(TRUE);
 
@@ -89,21 +97,36 @@ class FilterTest extends \DrupalWebTestCase {
   }
 
   /**
-   * Test opt-in filter matching form_key (without campaignion_newsletters).
+   * Test opt-in filter with existing subscriptions, but opt-out.
    */
-  public function testMatchOptInCheckbox() {
-    $stub_s['data'][1][0] = '1';
+  public function testMatchOptInWithOptOut() {
+    $email = __FUNCTION__ . '@campaignion-action.test';
+    $stub_s['data'][1][0] = $email;
     $stub_n['webform']['components'][1] = [
       'cid' => 1,
-      'form_key' => 'email_newsletter',
-      'type' => 'select',
-      'extra' => ['multiple' => TRUE, 'items' => "1|Yes\n"],
+      'form_key' => 'email',
+      'type' => 'email',
+      'extra' => [
+        'channel' => 'email',
+        'optin_statement' => 'Opt-in statement',
+      ],
+    ];
+    $stub_s['data'][2][0] = 'radios:opt-out';
+    $stub_n['webform']['components'][2] = [
+      'cid' => 2,
+      'form_key' => 'emailopt',
+      'type' => 'opt_in',
+      'extra' => [
+        'channel' => 'email',
+        'optin_statement' => 'Opt-in statement',
+      ],
     ];
     $submission = new Submission((object) $stub_n, (object) $stub_s);
-    $fs = Filter::fromArray(['type' => 'opt-in', 'value' => TRUE]);
-    $this->assertTrue($fs->match($submission));
+    $submission->opt_in = new Values($submission);
+    $subscription = Subscription::fromData(4711, $email);
+    $subscription->save(TRUE);
 
-    $fs = Filter::fromArray(['type' => 'opt-in', 'value' => FALSE]);
+    $fs = Filter::fromArray(['type' => 'opt-in', 'value' => TRUE]);
     $this->assertFalse($fs->match($submission));
   }
 
@@ -118,6 +141,7 @@ class FilterTest extends \DrupalWebTestCase {
       'type' => 'textfield',
     ];
     $submission = new Submission((object) $stub_n, (object) $stub_s);
+    $submission->opt_in = new Values($submission);
 
     $filter = [
       'type' => 'submission-field',
@@ -129,6 +153,19 @@ class FilterTest extends \DrupalWebTestCase {
 
     $fs = Filter::fromArray(['value' => 'bar'] + $filter);
     $this->assertFalse($fs->match($submission));
+  }
+
+  /**
+   * Test changing config with setData.
+   */
+  public function testSetDataChangeConfig() {
+    $c = ['type' => 'test', 'test' => 'unchanged'];
+    $f = Filter::fromArray($c);
+    $this->assertEqual('unchanged', $f->config['test']);
+
+    $c['test'] = 'changed';
+    $f->setData($c);
+    $this->assertEqual('changed', $f->config['test']);
   }
 
 }

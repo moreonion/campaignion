@@ -5,6 +5,7 @@ namespace Drupal\campaignion_action\Redirects;
 use Drupal\little_helpers\DB\Model;
 use Drupal\little_helpers\Webform\Submission;
 use Drupal\campaignion_newsletters\Subscription;
+use Drupal\campaignion_opt_in\Values;
 
 /**
  * Model class for redirect filters.
@@ -28,24 +29,26 @@ class Filter extends Model {
    *   Data representing the filter.
    */
   public static function fromArray(array $data) {
-    $config = $data + ['id' => NULL, 'weight' => 0];
-    unset($config['redirect_id']);
-    $data = [];
-    foreach (['id', 'weight', 'type'] as $k) {
-      $data[$k] = $config[$k];
-      unset($config[$k]);
-    }
-    $data['config'] = $config;
-    return new static($data);
+    $data += ['id' => NULL, 'weight' => 0];
+    $filter = new static();
+    $filter->id = $data['id'];
+    $filter->setData($data);
+    return $filter;
   }
 
   /**
    * Update filter data from array.
    */
-  public function setData($data) {
+  public function setData(array $data) {
     unset($data['id']);
     unset($data['redirect_id']);
-    $this->__construct($data);
+    foreach (['weight', 'type'] as $k) {
+      if (isset($data[$k])) {
+        $this->{$k} = $data[$k];
+        unset($data[$k]);
+      }
+    }
+    $this->config = $data;
   }
 
   /**
@@ -129,27 +132,21 @@ class Filter extends Model {
    *   otherwise FALSE.
    */
   protected function hasOptin(Submission $submission) {
+    $value = $submission->opt_in->canonicalValue('email', TRUE);
+    if ($value == Values::OPT_IN) {
+      return TRUE;
+    }
+    elseif ($value == Values::OPT_OUT) {
+      return FALSE;
+    }
+
     // If there is at least one subscription then we assume we have an opt-in.
     if (module_exists('campaignion_newsletters')) {
       if ($email = $submission->valueByKey('email')) {
-        $subscriptions = Subscription::byEmail($email);
-        if ($subscriptions) {
+        if (Subscription::byEmail($email)) {
           return TRUE;
         }
       }
-    }
-
-    // No opt-in so far. Look for an opt-in this this submission.
-    $components = $submission->webform->componentsByType('newsletter');
-    foreach ($components as $cid => $component) {
-      if ($submission->valueByCid($cid) == 'subscribed') {
-        return TRUE;
-      }
-    }
-
-    // A checked email_newsletter checkbox counts as opt-in.
-    if ($submission->valueByKey('email_newsletter')) {
-      return TRUE;
     }
 
     return FALSE;

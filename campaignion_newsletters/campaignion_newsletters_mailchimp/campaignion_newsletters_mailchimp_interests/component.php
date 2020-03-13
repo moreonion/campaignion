@@ -31,11 +31,13 @@ function _webform_set_options_mc_interests(&$component) {
     // Get groups based on newsletter components in the same form.
     $webform = new Webform(node_load($component['nid']));
     $groups = [];
-    foreach ($webform->componentsByType('newsletter') as $c) {
-      foreach ($c['extra']['lists'] as $list_id => $enabled) {
-        if ($enabled) {
-          $list = NewsletterList::load($list_id);
-          $groups += $list->data->groups;
+    foreach ($webform->componentsByType('opt_in') as $c) {
+      if ($c['extra']['channel'] == 'email') {
+        foreach ($c['extra']['lists'] as $list_id => $enabled) {
+          if ($enabled) {
+            $list = NewsletterList::load($list_id);
+            $groups += $list->data->groups;
+          }
         }
       }
     }

@@ -1,9 +1,13 @@
+<docs>
+RedirectDialog component.
+The dialog to edit a redirect.
+</docs>
+
 <template lang="html">
   <ElDialog
     :title="dialogTitle"
     :visible="visible"
     :close-on-click-modal="false"
-    size="large"
     :before-close="dialogCancelHandler"
     >
 
@@ -28,8 +32,8 @@
       :show-dropdown-on-focus="true"
       data-key="values"
       label-key="label"
+      :getData="getNodes"
       :url="$root.$options.settings.endpoints.nodes"
-      :headers="{}"
       search-param="s"
       :count="20"
       @input="item => {destination = item}"
@@ -49,9 +53,11 @@
 <script>
 import {clone, validateDestination} from '@/utils'
 import {OPERATORS, emptyRedirect} from '@/utils/defaults'
+import api from '@/utils/api'
 import {mapState} from 'vuex'
-import {isEqual, omit} from 'lodash'
-import DestinationField from './DestinationField'
+import isEqual from 'lodash/isEqual'
+import omit from 'lodash/omit'
+import {DestinationField} from 'campaignion_vue'
 import FilterEditor from './FilterEditor'
 
 export default {
@@ -62,14 +68,19 @@ export default {
 
   data () {
     return {
-      currentRedirect: emptyRedirect(),
-      modalDirty: false,
-      showErrors: false,
-      OPERATORS
+      currentRedirect: emptyRedirect(), /** {Object} The redirect that is currently being edited. This belongs to the component, and must not be a reference to a redirect in the store. */
+      modalDirty: false,                /** {boolean} The user has edited the redirect and tried to close the dialog without saving. */
+      showErrors: false,                /** {boolean} Show destination field validation errors (only after the first attemt to save the redirect). */
+      OPERATORS                         /** {Object} Dictionary of filter operators, keyed by identifier, each containing a `label` and a `phrase`. **/
     }
   },
 
   computed: {
+    /**
+     * Compute a dialog title depending on whether a new or an existing redirect is
+     * being edited.
+     * @return {(string|undefined)} Translated dialog title.
+     */
     dialogTitle () {
       if (this.currentRedirectIndex === -1) {
         return Drupal.t('Add personalized redirect')
@@ -81,15 +92,26 @@ export default {
         }
       }
     },
+
+    /**
+     * Check if the redirect being edited is empty.
+     * If no redirect is being edited, return `false`.
+     * @return {boolean} Is the current redirect empty?
+     */
     currentRedirectIsEmpty () {
       return this.currentRedirectIndex !== null && isEqual(omit(this.currentRedirect, ['id', 'prettyDestination']), omit(emptyRedirect(), ['id', 'prettyDestination']))
     },
+
+    /**
+     * Controls the edit dialog visibility.
+     * @return {boolean} Is a redirect being edited?
+     */
     visible () {
       return this.currentRedirectIndex !== null
     },
+
+    /** Map `destination` to `value` and `prettyDestination` to `label` for the DestinationField component. */
     destination: {
-      // destination and prettyDestination translated for the DestinationField
-      // component as value and label
       get () {
         return {
           value: this.currentRedirect.destination,
@@ -101,12 +123,18 @@ export default {
         this.currentRedirect.prettyDestination = val.label
       }
     },
+
+    /**
+     * Validate the current redirect’s destination.
+     * @return {boolean} Is it valid?
+     */
     destinationIsValid () {
       return validateDestination(this.currentRedirect.destination)
     },
+
     ...mapState([
-      'redirects',
-      'currentRedirectIndex'
+      'redirects',           /** {Object[]} All the personalized redirects. */
+      'currentRedirectIndex' /** The index of the item in the redirects array that is currently being edited or `-1` for a new item. `null` means that no item is being edited. */
     ])
   },
 
@@ -124,6 +152,22 @@ export default {
         case 'Done': return Drupal.t('Done')
       }
     },
+
+    getNodes: api.getNodes,
+
+    /**
+     * Callback to check if the dialog may be closed.
+     * Allow to close it if:
+     * - it’s an existing redirect and it hasn’t been changed
+     * - it’s a new redirect and it’s empty
+     * - the user has already been warned that changes will be lost and clicks
+     *   the Cancel button.
+     * In other cases, show the 'unsaved changes' warning and prevent the dialog
+     * from  being closed.
+     * @param {(Object|undefined)} options - Details about how the user tried to close the dialog.
+     * @param {string} options.button - `cancel` if the user has clicked the Cancel button.
+     * @return {boolean} May the dialog be closed?
+     */
     tryClose (options) {
       // Any changes?
       if (this.currentRedirectIndex !== -1 && isEqual(this.currentRedirect, this.redirects[this.currentRedirectIndex]) ||
@@ -137,17 +181,30 @@ export default {
         return false
       }
     },
+
+    /**
+     * Handle dialog closing via the x button or ESC key.
+     * @param {Function} done - el-dialog’s callback function.
+     */
     dialogCancelHandler (done) {
       if (this.tryClose()) {
         this.close()
         done()
       }
     },
+
+    /**
+     * Handle dialog closing via the Cancel button.
+     */
     cancelButtonHandler () {
       if (this.tryClose({button: 'cancel'})) {
         this.close()
       }
     },
+
+    /**
+     * Validate the redirect and save it to the store.
+     */
     updateRedirect () {
       if (!this.destinationIsValid) {
         this.showErrors = true
@@ -156,6 +213,12 @@ export default {
       this.$store.commit({type: 'updateRedirect', redirect: this.currentRedirect})
       this.close()
     },
+
+    /**
+     * Stop editing the redirect (this will close the dialog via setting
+     * `currentRedirectIndex` to `null`), reset component data and emit the
+     * `closeRedirectDialog` event.
+     */
     close () {
       this.modalDirty = false
       this.showErrors = false
@@ -165,6 +228,8 @@ export default {
   },
 
   mounted () {
+    // Listen to events on the global bus, set `this.currentRedirect` and commit mutations
+    // to set the store’s `currentRedirectIndex`, which causes the dialog to open.
     this.$root.$on('newRedirect', () => {
       this.currentRedirect = emptyRedirect()
       this.$store.commit('editNewRedirect')
@@ -180,8 +245,9 @@ export default {
       this.currentRedirect = duplicate
       this.$store.commit('editNewRedirect')
     })
+    // If the dialog is visible and it’s not an empty redirect, save changes on Enter keyup.
+    // If the cursor is inside a textarea, don’t.
     document.addEventListener('keyup', e => {
-      // Catch Enter key and save redirect.
       if (this.visible && !this.currentRedirectIsEmpty && e.keyCode === 13 && document.activeElement.tagName.toLowerCase() !== 'textarea') {
         e.preventDefault()
         this.updateRedirect()

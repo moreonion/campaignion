@@ -1,0 +1,30 @@
+{
+  "name": "campaignion_tracking",
+  "version": "0.0.0",
+  "description": "Common tracking functions",
+  "scripts": {
+    "dist:common": "parcel build --no-source-maps --global campaignion_tracking -d dist -o campaignion_tracking_common src/drupal-common.js",
+    "dist:gtm": "parcel build --no-source-maps --global campaignion_tracking_gtm -d dist -o campaignion_tracking_gtm src/drupal-gtm.js",
+    "dev": "parcel --global campaignion_tracking -d build src/index.html",
+    "drupal:common": "yarn run dist:common && cp dist/campaignion_tracking_common.js ../js/campaignion_tracking_common.min.js",
+    "drupal:gtm": "yarn run dist:gtm && cp dist/campaignion_tracking_gtm.js ../campaignion_tracking_gtm/js/campaignion_tracking_gtm.min.js",
+    "test": "mocha --require @babel/register --ui tdd --reporter dot test",
+    "lint": "eslint src test"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.6",
+    "@babel/preset-env": "^7.8.6",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^6.1.4",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-eslint": "^1.0.8-2",
+    "sinon": "^7.3.2"
+  },
+  "dependencies": {}
+}

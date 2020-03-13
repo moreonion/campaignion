@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * campaignion_test.features.field_base.inc
@@ -85,6 +86,22 @@ function campaignion_test_field_default_field_bases() {
     'type' => 'list_boolean',
   );
 
+  // Exported field_base: 'field_email_to_target_options'.
+  $field_bases['field_email_to_target_options'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_email_to_target_options',
+    'global_block_settings' => 1,
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'campaignion_email_to_target',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'email_to_target_options',
+  );
+
   // Exported field_base: 'field_gender'.
   $field_bases['field_gender'] = array(
     'active' => 1,
@@ -134,6 +151,75 @@ function campaignion_test_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'text',
+  );
+
+  // Exported field_base: 'field_main_image'.
+  $field_bases['field_main_image'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_main_image',
+    'global_block_settings' => 2,
+    'indexes' => array(
+      'fid' => array(
+        0 => 'fid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'image',
+    'settings' => array(
+      'default_image' => 0,
+      'profile2_private' => FALSE,
+      'uri_scheme' => 'public',
+    ),
+    'translatable' => 0,
+    'type' => 'image',
+  );
+
+  // Exported field_base: 'field_no_target_message'.
+  $field_bases['field_no_target_message'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_no_target_message',
+    'global_block_settings' => 1,
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'text_long',
+  );
+
+  // Exported field_base: 'field_opt_in_phone'.
+  $field_bases['field_opt_in_phone'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_opt_in_phone',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => '',
+        1 => '',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_boolean',
   );
 
   // Exported field_base: 'field_phone_number'.
@@ -228,14 +314,13 @@ function campaignion_test_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_thank_you_pages'
+  // Exported field_base: 'field_thank_you_pages'.
   $field_bases['field_thank_you_pages'] = array(
     'active' => 1,
     'cardinality' => 2,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_thank_you_pages',
-    'foreign keys' => array(),
     'global_block_settings' => 1,
     'indexes' => array(),
     'locked' => 0,

@@ -1,6 +1,12 @@
 // For authoring Nightwatch tests, see
 // http://nightwatchjs.org/guide#usage
 
+/**
+ * Generate an array of selectors for targeting sibling elements with `nth-of-type`.
+ * @param {string} selector - A CSS selector.
+ * @param {integer} length - The desired number of selectors.
+ * @return {string[]} An array like `['<selector>:nth-of-type(1)', '<selector>:nth-of-type(2)']`.
+ */
 function listSelectors (selector, length) {
   var arr = []
   for (var i = 1; i <= length; i++) {
@@ -92,12 +98,15 @@ module.exports = {
     var redirectSelectors = listSelectors(redirect.selector, 2)
 
     browser
-      .pause(500)
+      .pause(300)
       .moveToElement(redirectSelectors[1] + ' .pra-redirect-handle', 5, 5)
+      .pause(50)
       .mouseButtonDown(0)
+      .pause(50)
       .moveToElement(redirectSelectors[0] + ' .pra-redirect-handle', 5, 5)
+      .pause(50)
       .mouseButtonUp(0)
-      .pause(500)
+      .pause(300)
 
     browser.expect.element(redirectSelectors[0] + ' .pra-redirect-label').text.to.be.equal('Spam haters go here')
     browser.expect.element(redirectSelectors[1] + ' .pra-redirect-label').text.to.be.equal('My internal label')

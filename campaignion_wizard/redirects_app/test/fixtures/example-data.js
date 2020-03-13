@@ -2,6 +2,7 @@ import initialData from './initial-data.js'
 
 var idCounter = 1
 
+/** @return {integer} A new id. */
 function newId () {
   return idCounter++
 }

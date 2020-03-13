@@ -1,0 +1,4 @@
+name = Campaignion Tracking
+description = Common tracking functionality.
+core = 7.x
+package = Campaignion

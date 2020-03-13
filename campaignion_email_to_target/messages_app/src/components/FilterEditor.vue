@@ -1,8 +1,14 @@
+<docs>
+FilterEditor component.
+Provides a UI to edit a spec’s filters.
+Use this component with the `.sync` modifier on the `filters` prop.
+</docs>
+
 <template lang="html">
   <section class="filter-editor">
 
     <header>
-      <el-dropdown trigger="click" menu-align="start">
+      <el-dropdown trigger="click" placement="bottom-start">
         <el-button>
           {{ text('Add filter') }}<i class="el-icon-caret-bottom el-icon--right"></i>
         </el-button>
@@ -60,24 +66,27 @@ export default {
 
   data () {
     return {
-      f: this.filters,
-      e2tApi: clone(Drupal.settings.campaignion_email_to_target.endpoints['e2t-api']) || {}
+      f: this.filters, /** {Object[]} The spec’s filters. Internal property. */
+      e2tApi: clone(Drupal.settings.campaignion_email_to_target.endpoints['e2t-api']) || {} /** {Object} Data needed to call the e2t API. Key: `url`, `dataset`, `token`. */
     }
   },
 
   props: {
-    fields: Array,
-    filters: Array,
-    filterDefault: Object,
-    operators: {
+    fields: Array,         /** {Object[]} Collection of the fields that can be filtered, each having a `name`, a `title` and a `description`. */
+    filters: Array,        /** {Object[]} Collection of the spec’s filters. */
+    filterDefault: Object, /** {Object} A new filter will be generated from this. */
+    operators: {           /** {Object} Dictionary of filter operators, keyed by identifier, each containing a `label` and a `phrase`. **/
       type: Object,
       required: true
     }
   },
 
   computed: {
+    /**
+     * Provide the operators in a way that’s understood by the select’s el-option component.
+     * @return {Object[]} Collection of options like `{value: '==', label: 'is'}`
+     */
     operatorOptions () {
-      // provide operators in the format {value: '==', label: 'is'}
       var arr = []
       Object.keys(this.operators).map(key => {
         arr.push({
@@ -90,9 +99,11 @@ export default {
   },
 
   watch: {
+    // Emit an `update` event for the parent component.
     f (val) {
       this.$emit('update:filters', val)
     },
+    // Update the internal filters property.
     filters (val) {
       this.f = this.filters
     }
@@ -110,6 +121,11 @@ export default {
         case 'Delete': return Drupal.t('Delete')
       }
     },
+
+    /**
+     * Add a new filter to the collection.
+     * @param {Object} field - The field used by the new filter.
+     */
     addFilter (field) {
       var filter = Object.assign({}, this.filterDefault)
       filter.id = null
@@ -119,6 +135,11 @@ export default {
       filter.value = ''
       this.f.push(filter)
     },
+
+    /**
+     * Remove a filter from the collection.
+     * @param {integer} index - The index of the filter to delete.
+     */
     removeFilter (index) {
       this.f.splice(index, 1)
     }

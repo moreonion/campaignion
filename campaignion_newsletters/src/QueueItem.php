@@ -2,7 +2,16 @@
 
 namespace Drupal\campaignion_newsletters;
 
-class QueueItem extends \Drupal\little_helpers\DB\Model {
+use Drupal\little_helpers\DB\Model;
+use Drupal\little_helpers\Webform\Submission;
+
+/**
+ * Model class for newsletter queue items.
+ *
+ * Queue items represent data that’s to be sent to the newsletter provider.
+ */
+class QueueItem extends Model {
+
   const SUBSCRIBE = 'subscribe';
   const UNSUBSCRIBE = 'unsubscribe';
   const UPDATE = 'update';
@@ -19,10 +28,26 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
 
   protected static $table = 'campaignion_newsletters_queue';
   protected static $key = ['id'];
-  protected static $values = ['list_id', 'email', 'created', 'locked', 'action', 'args', 'data', 'optin_info'];
-  protected static $serialize = ['args' => TRUE, 'data' => TRUE, 'optin_info' => TRUE];
+  protected static $values = [
+    'list_id',
+    'email',
+    'created',
+    'locked',
+    'action',
+    'args',
+    'data',
+    'optin_info',
+  ];
+  protected static $serialize = [
+    'args' => TRUE,
+    'data' => TRUE,
+    'optin_info' => TRUE,
+  ];
   protected static $serial = TRUE;
 
+  /**
+   * Load a queue item by its primary keys.
+   */
   public static function load($list_id, $email) {
     $table = static::$table;
     $keys = [':list_id' => $list_id, ':email' => $email, ':now' => REQUEST_TIME];
@@ -32,6 +57,9 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     }
   }
 
+  /**
+   * Load a queue item by its id.
+   */
   public static function byId($id) {
     $table = static::$table;
     $keys = [':id' => $id];
@@ -41,6 +69,9 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     }
   }
 
+  /**
+   * Load or create queue item.
+   */
   public static function byData($data) {
     if ($item = static::load($data['list_id'], $data['email'])) {
       $item->__construct($data, FALSE);
@@ -51,16 +82,79 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     return $item;
   }
 
+  /**
+   * Load or create a queue item with additional data from a subscription.
+   *
+   * @param \Drupal\campaignion_newsletters\Subscription $subscription
+   *   Subscription providing the data for the QueueItem.
+   * @param \Drupal\campaignion_newsletters\ProviderInterface $provider
+   *   Provider matching the subscription.
+   *
+   * @return \Drupal\campaignion_newsletters\QueueItem
+   *   A queue item.
+   */
+  public static function fromSubscription(Subscription $subscription, ProviderInterface $provider = NULL) {
+    $item = static::byData(array(
+      'list_id' => $subscription->list_id,
+      'email' => $subscription->email,
+    ));
+    if ($provider) {
+      list($data, $fingerprint) = $provider->data($subscription, $item->data);
+      $item->fingerprint = $fingerprint;
+      $item->data = $data;
+    }
+    if ($subscription->delete) {
+      $item->action = static::UNSUBSCRIBE;
+      $item->data = NULL;
+    }
+    elseif ($subscription->new) {
+      $item->action = static::SUBSCRIBE;
+      $item->args = $subscription->queueItemArgs();
+      if (!empty($subscription->source) && $subscription->source instanceof Submission) {
+        $item->optin_info = FormSubmission::fromWebformSubmission($subscription->source);
+      }
+    }
+    else {
+      $item->action = static::UPDATE;
+    }
+    return $item;
+  }
+
+  /**
+   * Load and lock queue items in order to process them.
+   *
+   * The queue should preserve the order of queue items for a single email
+   * address / list combination. That means it should never return a queue item
+   * for such a combination where another item for the same combination is still
+   * locked.
+   *
+   * @param int $limit
+   *   Maximum number of queue items to load.
+   * @param int $time
+   *   Duration of the lock.
+   *
+   * @return \Drupal\campaignion_newsletters\QueueItem[]
+   *   An array of locked queue items.
+   */
   public static function claimOldest($limit, $time = 600) {
     $transaction = db_transaction();
     $t = static::$table;
     $now = time();
     $limit = (int) $limit;
-    // This is MySQL specific and there is no abstraction in Drupal for it.
-    $result = db_query("SELECT * FROM {{$t}} WHERE LOCKED<$now ORDER BY CREATED LIMIT $limit LOCK IN SHARE MODE");
+    // “LOCK IN SHARE MODE” is MySQL specific and there is no abstraction in
+    // Drupal for it.
+    $sql = <<<SQL
+SELECT q.*
+FROM {{$t}} q
+  LEFT OUTER JOIN {{$t}} ql ON ql.email=q.email AND ql.list_id=q.list_id AND ql.locked>=:now
+WHERE q.locked<:now AND ql.id IS NULL
+ORDER BY q.created
+LIMIT $limit
+LOCK IN SHARE MODE
+SQL;
     $items = [];
     $ids = [];
-    foreach ($result as $row) {
+    foreach (db_query($sql, [':now' => $now]) as $row) {
       $row->locked = $now + $time;
       $item = new static($row, FALSE);
       $ids[] = $row->id;
@@ -75,6 +169,24 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
     return $items;
   }
 
+  /**
+   * Bulk delete queue items based on their list.
+   *
+   * @param int $list_id
+   *   All queue items with this $list_id will be deleted.
+   *
+   * @return int
+   *   Number of affected rows.
+   */
+  public static function bulkDelete($list_id) {
+    return db_delete(static::$table)
+      ->condition('list_id', $list_id)
+      ->execute();
+  }
+
+  /**
+   * Prepare a new queue item instance.
+   */
   public function __construct($data = array(), $new = TRUE) {
     parent::__construct($data, $new);
     if (!isset($this->created)) {
@@ -113,6 +225,16 @@ class QueueItem extends \Drupal\little_helpers\DB\Model {
    */
   public function welcome() {
     return !empty($this->args['send_welcome']);
+  }
+
+  /**
+   * Trigger the queued action on the list’s provider.
+   *
+   * @throws \Drupal\campaignion_newsletters\ApiError
+   */
+  public function send() {
+    $list = NewsletterList::load($this->list_id);
+    $list->provider()->{$this->action}($list, $this);
   }
 
 }

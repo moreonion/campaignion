@@ -2,17 +2,24 @@
 
 namespace Drupal\campaignion_email_to_target\Api;
 
-use \Dflydev\Hawk\Credentials\Credentials;
-use \Dflydev\Hawk\Client\ClientBuilder;
+use Dflydev\Hawk\Credentials\Credentials;
+use Dflydev\Hawk\Client\ClientBuilder;
 
-use \Drupal\little_helpers\Rest\Client as _Client;
-use \Drupal\little_helpers\Rest\HttpError;
+use Drupal\little_helpers\Rest\Client as _Client;
+use Drupal\little_helpers\Rest\HttpError;
 
+/**
+ * API client for the e2t-api service.
+ */
 class Client extends _Client {
-  CONST API_VERSION = 'v2';
+  const API_VERSION = 'v2';
   protected $hawk;
   protected $credentials;
+  protected $datasets;
 
+  /**
+   * Create a new instance from global configuration.
+   */
   public static function fromConfig() {
     $c = variable_get('campaignion_email_to_target_credentials', []);
     foreach (['url', 'public_key', 'secret_key'] as $v) {
@@ -26,10 +33,21 @@ class Client extends _Client {
     return new static($c['url'], $c['public_key'], $c['secret_key']);
   }
 
+  /**
+   * Create a new instance.
+   *
+   * @param string $url
+   *   The URL for the API endpoint (withut the version prefix).
+   * @param string $pk
+   *   The public API-key used for HAWK authentication.
+   * @param string $sk
+   *   The secret API-key used for HAWK authentication.
+   */
   public function __construct($url, $pk, $sk) {
     parent::__construct($url . '/' . static::API_VERSION);
     $this->credentials = new Credentials($sk, 'sha256', $pk);
     $this->hawk = ClientBuilder::create()->build();
+    $this->datasets = &drupal_static(__CLASS__ . '.datasets', []);
   }
 
   /**
@@ -58,26 +76,35 @@ class Client extends _Client {
     return parent::sendRequest($url, $options);
   }
 
+  /**
+   * Get all datasets from the API.
+   *
+   * @return \Drupal\campaignion_email_to_target\Api\Dataset[]
+   *   An array of datasets keyed by their machine names.
+   */
   public function getDatasetList() {
-    if ($c = cache_get('campaignion_email_to_target_dataset_list')) {
-      return $c->data;
-    }
-    $datasets = [];
     $dataset_list = $this->get('');
     foreach ($dataset_list as $dataset) {
-      $datasets[] = Dataset::fromArray($dataset);
+      $ds = Dataset::fromArray($dataset);
+      $this->datasets[$ds->key] = $ds;
     }
-    cache_set('campaignion_email_to_target_dataset_list', $datasets, 'cache');
-    return $datasets;
+    return $this->datasets;
   }
 
+  /**
+   * Get a single dataset from the API.
+   *
+   * @param string $key
+   *   Machine name of the dataset to get.
+   *
+   * @return \Drupal\campaignion_email_to_target\Api\Dataset
+   *   The dataset.
+   */
   public function getDataset($key) {
-    foreach ($this->getDatasetList() as $dataset) {
-      if ($dataset->key == $key) {
-        return $dataset;
-      }
+    if (!array_key_exists($key, $this->datasets)) {
+      $this->datasets[$key] = Dataset::fromArray($this->get(urlencode($key)));
     }
-    return NULL;
+    return $this->datasets[$key];
   }
 
   /**
@@ -85,22 +112,17 @@ class Client extends _Client {
    *
    * @param string $dataset_key
    *   The key of the dataset which’s targets we want to query.
-   * @param string|null $selector
-   *   An optional selector to narrow down the number of targets. The meaning
-   *   of this selector depends on the dataset.
+   * @param string[] $selector
+   *   An associate array of URL query parameters used as filters to narrow down
+   *   the number of targets. The meaning of the filters depends on the dataset.
    *
-   * @param array
-   *   A nested array of targets.
+   * @return array
+   *   An array of targets.
    */
-  public function getTargets($dataset_key, $selector) {
-    $ds = $this->getDataset($dataset_key);
+  public function getTargets($dataset_key, array $selector) {
     try {
-      if ($ds->isCustom) {
-        return $this->getAllTargets($dataset_key);
-      }
-      else {
-        return $this->getTargetsByPostcode($dataset_key, $selector);
-      }
+      $key = urlencode($dataset_key);
+      return $this->get("$key/select", $selector);
     }
     catch (HttpError $e) {
       if (in_array($e->getCode(), [400, 404])) {
@@ -111,27 +133,8 @@ class Client extends _Client {
   }
 
   /**
-   * Gets all contacts for a dataset.
-   *
-   * This should only be used for custom datasets.
-   *
-   * @param string $dataset_key
-   *   The key of the dataset.
-   *
-   * @param array
-   *   A nested array of targets.
+   * Get a JWT access token for client-side access.
    */
-  protected function getAllTargets($dataset_key) {
-    $targets = $this->get("$dataset_key/contact");
-    $constituences[]['contacts'] = $targets;
-    return $constituences;
-  }
-
-  public function getTargetsByPostcode($dataset_key, $postcode) {
-    $postcode = urlencode($postcode);
-    return $this->get("$dataset_key/postcode/$postcode");
-  }
-
   public function getAccessToken() {
     $res = $this->post('access-token');
     return $res['access_token'];

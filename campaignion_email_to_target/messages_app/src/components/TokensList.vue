@@ -1,3 +1,8 @@
+<docs>
+TokensList component.
+Displays an expandable table containing the token categories and their corresponding tokens.
+</docs>
+
 <template>
   <section class="tokens-list">
       <table v-for="(cat, index) in tokenCategories" class="table table-sm">
@@ -31,24 +36,37 @@ import {dispatch} from '@/utils'
 
 export default {
   props: {
-    tokenCategories: Array
+    tokenCategories: Array /** {Object[]} Collection of categories with a `title`, a `description` and a collection of `tokens`. The `tokens` each have a `title`, a `description` and a `token`. */
   },
   data () {
     return {
-      expanded: []
+      expanded: [] /** {boolean[]} Array of booleans, being true if the token category with the same index is expanded. */
     }
   },
   methods: {
+    /**
+     * Toggle expanded state of a token category.
+     * @param {integer} idx - The index of the token category to toggle.
+     */
     toggle (idx) {
       Vue.set(this.expanded, idx, !this.expanded[idx])
     },
 
+    /**
+     * Call insertAtCaret for the element with the focus.
+     * @param {string} token - The token to insert in the focused element.
+     */
     insert (token) {
       if (document.activeElement.hasAttribute('data-token-insertable')) {
         this.insertAtCaret(document.activeElement, token)
       }
     },
 
+    /**
+     * Insert a string in a textarea or input at the cursor position.
+     * @param {HTMLElement} txtarea - The input or textarea.
+     * @param {string} text - The string to insert.
+     */
     insertAtCaret (txtarea, text) {
       var strPos = 0
       var range
