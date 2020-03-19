@@ -60,6 +60,7 @@ class MessagesTokenTest extends DrupalUnitTestCase {
       'header' => "Header\nwith breaks",
       'message' => "Content\nwith breaks\n\nand multiple breaks",
       'footer' => "multi line\nFooter",
+      'display' => 'Display name',
     ]);
     $data[1][] = serialize(['message' => $message->toArray()]);
     $token_data['node'] = $this->nodeStub($components);
@@ -68,7 +69,7 @@ class MessagesTokenTest extends DrupalUnitTestCase {
     $actual = token_replace('[submission:email-to-target-messages]', $token_data);
     $expected = <<<STR
 <div class="e2t-message">
-<h3>Email to: to@example.com with subject line “Subject line”</h3>
+<h3>Email to: Display name with subject line “Subject line”</h3>
 <p>Header<br />
 with breaks</p>
 <p>Content<br />
