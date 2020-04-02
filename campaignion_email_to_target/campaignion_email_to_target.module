@@ -27,17 +27,6 @@ use Drupal\campaignion_email_to_target\SelectionMode\One;
 use Drupal\campaignion_email_to_target\SelectionMode\OneOrMore;
 
 /**
- * Implements hook_permission().
- */
-function campaignion_email_to_target_permission() {
-  $p['view email_to_target messages'] = [
-    'title' => t('View Email-to-target messages'),
-    'description' => t('View and export the contents of messages sent to targets.'),
-  ];
-  return $p;
-}
-
-/**
  * Implements hook_menu().
  */
 function campaignion_email_to_target_menu() {
@@ -46,7 +35,7 @@ function campaignion_email_to_target_menu() {
     'page arguments' => [1],
     'access callback' => 'node_access',
     'access arguments' => ['update', 1],
-    'delivery callback' => 'campaignion_email_to_target_deliver_json',
+    'delivery callback' => 'little_helpers_deliver_json',
   ];
   return $menu;
 }
@@ -68,27 +57,6 @@ function campaignion_email_to_target_campaignion_email_to_target_selection_modes
     'title' => t('Exactly one — Users can choose exactly one target. (select box)'),
   ];
   return $plugins;
-}
-
-/**
- * Delivery callback for the JSON API.
- */
-function campaignion_email_to_target_deliver_json($result) {
-  switch ($result) {
-    case MENU_NOT_FOUND:
-      drupal_add_http_header('Status', '404 Not found');
-      return;
-
-    case MENU_ACCESS_DENIED:
-      drupal_add_http_header('Status', '403 Forbidden');
-      return;
-
-    case MENU_SITE_OFFLINE:
-      drupal_add_http_header('Status', '503 Service unavailable');
-      return;
-  }
-  echo drupal_json_output($result);
-  drupal_page_footer();
 }
 
 /**
