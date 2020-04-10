@@ -26,7 +26,7 @@
         close.click(function() {
           overlay.dialog("close");
         });
-        overlay.find('.campaignion-overlay-content').prepend(close);
+        overlay.find('.campaignion-overlay-options').prepend(close);
 
         // generic class to use with e.g. custom buttons
         $('.campaignion-overlay-close', context).click(function(event) {
