@@ -3,5 +3,4 @@ description = Email protest functionality for campaignion
 core = 7.x
 package = Campaignion
 dependencies[] = campaignion_action
-dependencies[] = webform
 
