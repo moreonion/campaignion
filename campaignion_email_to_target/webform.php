@@ -107,7 +107,7 @@ function _webform_show_single_target_e2t_selector($nid) {
   $return = FALSE;
   if (($node = node_load($nid)) && $node->type == 'email_to_target') {
     $action = Loader::instance()->actionFromNode($node);
-    $return = $action->dataset()->key == 'mp';
+    $return = $action->getOptions()['dataset_name'] == 'mp';
   }
   $static_cache[$nid] = $return;
   return $return;
