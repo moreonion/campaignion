@@ -19,6 +19,7 @@ use Drupal\little_helpers\Webform\Webform;
 use Drupal\campaignion_action\Loader;
 use Drupal\campaignion_email_to_target\Action;
 use Drupal\campaignion_email_to_target\Component;
+use Drupal\campaignion_email_to_target\Loader as SelectionModeLoader;
 use Drupal\campaignion_email_to_target\MessageEndpoint;
 use Drupal\campaignion_email_to_target\Tokens;
 use Drupal\campaignion_email_to_target\Api\Client;
@@ -57,6 +58,20 @@ function campaignion_email_to_target_campaignion_email_to_target_selection_modes
     'title' => t('Exactly one — Users can choose exactly one target. (select box)'),
   ];
   return $plugins;
+}
+
+/**
+ * Implements hook_little_helpers_services().
+ */
+function campaignion_email_to_target_little_helpers_services() {
+  $info['campaignion_email_to_target.selection_mode.loader'] = [
+    'class' => SelectionModeLoader::class,
+    'calls' => [
+      ['setDefaults', [['arguments' => ['%editable', '%channel']]]],
+      ['loadSpecsFromHook', ['campaignion_email_to_target_selection_modes']],
+    ],
+  ];
+  return $info;
 }
 
 /**

@@ -2,12 +2,12 @@
 
 namespace Drupal\campaignion_email_to_target;
 
+use Drupal\little_helpers\Services\Container;
 use Drupal\little_helpers\Webform\Webform;
 use Drupal\little_helpers\Webform\Submission;
 use Drupal\campaignion_action\Loader;
 
 use Drupal\campaignion_email_to_target\Channel\Email;
-use Drupal\campaignion_email_to_target\Loader as ModeLoader;
 
 /**
  * Implement behavior for the email to target message webform component.
@@ -157,8 +157,13 @@ class Component {
     }
 
     $pairs = $pairs_or_exclusion;
-    $class = ModeLoader::instance()->getMode($options['selection_mode']);
-    $mode = new $class(!empty($options['users_may_edit']), $channel);
+    $mode = Container::get()
+      ->loadService('campaignion_email_to_target.selection_mode.loader')
+      ->getSpec($options['selection_mode'])
+      ->instantiate([
+        'editable' => !empty($options['users_may_edit']),
+        'channel' => $channel,
+      ]);
     if (count($pairs) == 1) {
       $mode = $mode->singleMode();
     }
