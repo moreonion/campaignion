@@ -27,6 +27,7 @@ use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_email_to_target\SelectionMode\All;
 use Drupal\campaignion_email_to_target\SelectionMode\One;
 use Drupal\campaignion_email_to_target\SelectionMode\OneOrMore;
+use Drupal\campaignion_email_to_target\Wizard\Wizard;
 
 /**
  * Implements hook_menu().
@@ -62,9 +63,36 @@ function campaignion_email_to_target_campaignion_email_to_target_selection_modes
 }
 
 /**
+ * Implements hook_campaignion_action_type_info().
+ */
+function campaignion_email_to_target_campaignion_action_type_info() {
+  $info['email_to_target'] = [
+    'class' => Action::class,
+    'arguments' => [
+      '%parameters',
+      '%node',
+      '@campaignion_email_to_target.api',
+    ]
+  ];
+  return $info;
+}
+
+/**
+ * Implements hook_campaignion_wizard_info().
+ */
+function campaignion_email_to_target_campaignion_wizard_info() {
+  $info['email_to_target'] = Wizard::class;
+  return $info;
+}
+
+/**
  * Implements hook_little_helpers_services().
  */
 function campaignion_email_to_target_little_helpers_services() {
+  $info['campaignion_email_to_target.api'] = [
+    'class' => Client::class,
+    'constructor' => 'fromConfig',
+  ];
   $info['campaignion_email_to_target.selection_mode.loader'] = [
     'class' => SelectionModeLoader::class,
     'calls' => [
