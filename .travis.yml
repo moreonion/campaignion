@@ -1,12 +1,13 @@
-dist: trusty
 language: php
-sudo: false
+services:
+  - mysql
+language: php
 
 addons:
   chrome: stable
 
 php:
-  - 7.0
+  - 7.3
 
 mysql:
   database: drupal
