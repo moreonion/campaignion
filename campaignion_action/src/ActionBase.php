@@ -10,11 +10,11 @@ class ActionBase {
   protected $type;
   protected $node;
 
-  public static function fromTypeAndNode(TypeInterface $type, $node) {
+  public static function fromTypeAndNode(ActionType $type, $node) {
     return new static($type, $node);
   }
 
-  public function __construct(TypeInterface $type, $node) {
+  public function __construct(ActionType $type, $node) {
     $this->type = $type;
     $this->node = $node;
   }

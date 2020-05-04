@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_action;
 
-class TypeBase implements TypeInterface {
+class ActionType {
 
   /**
    * Content-type

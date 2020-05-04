@@ -36,7 +36,6 @@ class Loader {
   public function __construct($types_info) {
     foreach ($types_info as $type => &$info) {
       $info += [
-        'class' => '\\Drupal\\campaignion_action\\TypeBase',
         'action_class' => '\\Drupal\\campaignion_action\\ActionBase',
         'parameters' => [],
       ];
@@ -98,10 +97,8 @@ class Loader {
   public function type($type) {
     if (!isset($this->types[$type])) {
       $this->types[$type] = FALSE;
-      if (!empty($this->info[$type]['class'])) {
-        $info = $this->info[$type];
-        $class = $info['class'];
-        $this->types[$type] = new $class($type, $info + $info['parameters']);
+      if ($info = $this->info[$type] ?? NULL) {
+        $this->types[$type] = new ActionType($type, $info + $info['parameters']);
       }
     }
     return $this->types[$type];

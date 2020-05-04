@@ -3,7 +3,7 @@
 namespace Drupal\campaignion_email_to_target;
 
 use Drupal\campaignion_action\ActionBase;
-use Drupal\campaignion_action\TypeInterface;
+use Drupal\campaignion_action\ActionType;
 use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_email_to_target\Channel\Email;
 use Drupal\little_helpers\Webform\Submission;
@@ -22,21 +22,21 @@ class Action extends ActionBase {
   /**
    * Create a new instance by reading the global Api\Client config.
    */
-  public static function fromTypeAndNode(TypeInterface $type, $node) {
+  public static function fromTypeAndNode(ActionType $type, $node) {
     return new static($type, $node, Client::fromConfig());
   }
 
   /**
    * Create a new action instance.
    *
-   * @param \Drupal\campaignion_action\TypeInterface $type
+   * @param \Drupal\campaignion_action\ActionType $type
    *   The action type of this action.
    * @param object $node
    *   The action’s node.
    * @param \Drupal\campaignion_email_to_target\Api\Client $api
    *   Api client for the e2t_api serivce.
    */
-  public function __construct(TypeInterface $type, $node, Client $api) {
+  public function __construct(ActionType $type, $node, Client $api) {
     parent::__construct($type, $node);
     $this->options = $this->getOptions();
     $this->api = $api;
