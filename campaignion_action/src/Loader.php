@@ -2,6 +2,8 @@
 
 namespace Drupal\campaignion_action;
 
+use Drupal\little_helpers\Services\Container;
+
 /**
  * Class for loading Action-Type plugins and general dependency injection.
  */
@@ -11,22 +13,10 @@ class Loader {
   protected $types = [];
 
   /**
-   * Inject a custom loader instance.
-   *
-   * NOTE: Only for testing purposes.
-   */
-  public static function injectInstance($instance) {
-    static::$instance = $instance;
-  }
-
-  /**
    * Get a singleton instance of this class.
    */
   public static function instance() {
-    if (!static::$instance) {
-      static::$instance = static::fromGlobalInfo();
-    }
-    return static::$instance;
+    return Container::get()->loadService('campaignion_action.loader');
   }
 
   public static function fromGlobalInfo() {

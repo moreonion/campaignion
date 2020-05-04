@@ -16,6 +16,17 @@ use Drupal\little_helpers\System\FormRedirect;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
+ * Implements hook_little_helpers_services().
+ */
+function campaignion_action_little_helpers_services() {
+  $info['campaignion_action.loader'] = [
+    'class' => Loader::class,
+    'constructor' => 'fromGlobalInfo',
+  ];
+  return $info;
+}
+
+/**
  * Implements hook_menu().
  */
 function campaignion_action_menu() {
