@@ -131,8 +131,7 @@ class Loader {
    *  The wizard responsible for changing/adding actions of this type.
    */
   public function wizard($type, $node = NULL) {
-    if ($type_o = $this->type($type)) {
-      $info = $this->info[$type];
+    if ($info = $this->info[$type] ?? NULL) {
       $class = $info['wizard_class'];
       return new $class($info, $node, $type);
     }
