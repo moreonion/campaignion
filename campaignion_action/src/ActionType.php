@@ -16,7 +16,7 @@ class ActionType {
   public function __construct($type, array $parameters = array()) {
     $this->type = $type;
     $this->parameters = $parameters + [
-      'action_class' => '\\Drupal\\campaignion_action\\ActionBase',
+      'email_protest' => FALSE,
       'donation' => FALSE,
     ];
   }
