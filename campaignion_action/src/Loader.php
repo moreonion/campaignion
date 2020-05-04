@@ -110,9 +110,10 @@ class Loader {
   public function actionFromNode($node) {
     if (!isset($node->action)) {
       $node->action = NULL;
-      if ($type = $this->type($node->type)) {
-        $class = $this->info[$node->type]['action_class'];
-        $node->action = $class::fromTypeAndNode($type, $node);
+      if ($info = $this->info[$node->type] ?? NULL) {
+        $class = $info['action_class'];
+        $parameters = $info + $info['parameters'];
+        $node->action = new $class($parameters, $node);
       }
     }
     return $node->action;
