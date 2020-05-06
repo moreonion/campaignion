@@ -37,7 +37,8 @@ function campaignion_giftaid_tokens($type, $tokens, array $data = [], array $opt
   foreach ($tokens as $name => $original) {
     switch ($name) {
       case 'amount-including-giftaid':
-        $replacements[$original] = $donation_amount * 1.25;
+        $giftaid_amount = $donation_amount * 1.25;
+        $replacements[$original] = number_format($giftaid_amount, 2);
         break;
     }
   }
