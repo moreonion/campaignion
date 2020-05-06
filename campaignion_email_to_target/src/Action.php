@@ -27,15 +27,22 @@ class Action extends ActionBase {
    *   Additional action parameters.
    * @param object $node
    *   The action’s node.
-   * @param \Drupal\campaignion_email_to_target\Api\Client $api
-   *   Api client for the e2t_api serivce.
    */
-  public function __construct(array $parameters, $node, Client $api = NULL) {
+  public function __construct(array $parameters, $node) {
     parent::__construct($parameters + [
       'channel' => Email::class,
     ], $node);
     $this->options = $this->getOptions();
-    $this->api = $api ?? Container::get()->loadService('campaignion_email_to_target.api.Client');
+  }
+
+  /**
+   * Set the API-client.
+   *
+   * @param \Drupal\campaignion_email_to_target\Api\Client $api
+   *   Api client for the e2t_api serivce.
+   */
+  public function setApi(Cient $api) {
+    $this->api = $api;
   }
 
   /**
