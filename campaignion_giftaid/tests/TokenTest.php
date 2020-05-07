@@ -44,7 +44,7 @@ class TokenTest extends DrupalUnitTestCase {
     $submission = webform_submission_create($node, $GLOBALS['user'], $form_state);
 
     $replaced = webform_replace_tokens('[submission:amount-including-giftaid]', $node, $submission);
-    $this->assertEqual('12.50', $replaced);
+    $this->assertSame('12.50', $replaced);
   }
 
 }
