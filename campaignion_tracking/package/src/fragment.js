@@ -9,7 +9,13 @@ export function parseLocationHash (locationHash = '') {
   const parts = locationHash.split(';')
   // only consider "truthy" values
   const filtered = parts.filter(Boolean)
-  const items = filtered.map(item => parsePart(item))
+  const items = filtered.reduce((acc, item) => {
+    const _pos1 = item.indexOf(':')
+    const prefix = item.substring(0, _pos1)
+    // TODO sanitize prefix
+    const partsString = item.substring(_pos1 + 1)
+    return acc.concat(parsePartsWithPrefix(partsString, prefix))
+  }, [])
   return items
 }
 
@@ -57,35 +63,40 @@ export function consumeLocationHashForPrefixes (prefixes = [], locationHash = ''
 }
 
 /**
- * Parse a part from the URL fragment.
- *
- * The optional "id" in the match item is the empty string if no id was given.
- *
- * TODO: optional multiple ids
- * TODO: whitespace trimming?
+ * Parse a single key-value part from the URL fragment.
  *
  * @param {String} part A part from the URL fragment.
  *
- * @returns {Object} A match item with the keys "prefix", "id", "codes", "origParts".
+ * @returns {Object} A match item with the keys "id", "codes", "origPart".
  */
 export function parsePart (part) {
   const _pos1 = part.indexOf('=')
   const value1 = part.substring(0, _pos1)
   const value2 = part.substring(_pos1 + 1)
-  let id = ''
-  let prefix = value1
-  // if there is a ':' we extract the id
-  const _pos2 = value1.indexOf(':')
-  if (_pos2 >= 0) {
-    prefix = value1.substring(0, _pos2)
-    id = value1.substring(_pos2 + 1)
-  }
   const codes = value2.split(',')
-
   return {
-    prefix: prefix,
-    id: id,
+    id: value1,
     codes: codes,
     origPart: part
   }
+}
+
+/**
+ * Parse a possible multiple parts from the URL fragment.
+ *
+ * Optionally tag all parts with a commong prefix.
+ *
+ * @param {String} part Parts from the URL fragment, delimited with `&`.
+ * @param {String} prefix A prefix to tag the parts with
+ *
+ * @returns {Array} A list of match objects
+ */
+export function parsePartsWithPrefix (partsString, prefix = '') {
+  const split = partsString.split('&')
+  const parts = split.map(part => {
+    const _p = parsePart(part)
+    _p.prefix = prefix
+    return _p
+  })
+  return parts
 }

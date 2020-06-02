@@ -7,6 +7,7 @@ import {
   parseLocationHash,
   consumeLocationHashForPrefixes,
   parseLocationHashForPrefixes,
+  parsePartsWithPrefix,
   parsePart
 } from '../src/fragment'
 
@@ -18,29 +19,29 @@ suite('parse location hash', () => {
   })
 
   test('delimit parts with semicolon', () => {
-    const locationHash = 'prefix1=a;prefix2=b'
+    const locationHash = 'key1=a;key2=b'
     const parsed = parseLocationHash(locationHash)
     assert(Array.isArray(parsed))
     assert(parsed.length === 2)
   })
 
   test('return list of match objects', () => {
-    const locationHash = 'prefix1=a;prefix2=b,c'
+    const locationHash = 'key1=a;key2=b,c'
     const parsed = parseLocationHash(locationHash)
-    assert(parsed[0].prefix === 'prefix1')
+    assert(parsed[0].id === 'key1')
     sinon.assert.match(parsed[0].codes, ['a'])
-    assert(parsed[1].prefix === 'prefix2')
+    assert(parsed[1].id === 'key2')
     sinon.assert.match(parsed[1].codes, ['b', 'c'])
   })
 
   test('return nothing if no prefix is whitelisted', () => {
-    const locationHash = 'prefix1=a;prefix2=b,c;prefix3:myid=d'
+    const locationHash = 'key1=a;key2=b,c;prefix1:key3=d'
     const parsed = parseLocationHashForPrefixes([], locationHash)
     assert(parsed.length === 0)
   })
 
   test('return matches for whitelisted prefixes', () => {
-    const locationHash = 'prefix1=a;prefix2=b,c;prefix3:myid=d'
+    const locationHash = 'key1=a;prefix1:key2=b,c;prefix3:key3=d'
     const parsed = parseLocationHashForPrefixes(['prefix1', 'prefix3'], locationHash)
     // matches nested objects
     sinon.assert.match(parsed[0], { prefix: 'prefix1' })
@@ -48,7 +49,7 @@ suite('parse location hash', () => {
   })
 
   test('return matches for whitelisted prefixes in order of location hash', () => {
-    const locationHash = 'prefix1=a;prefix2=b,c;prefix3:myid=d'
+    const locationHash = 'key1=a;prefix1:key2=b,c;prefix3:key3=d'
     const parsed = parseLocationHashForPrefixes(['prefix3', 'prefix1'], locationHash)
     // matches nested objects
     sinon.assert.match(parsed[0], { prefix: 'prefix1' })
@@ -56,34 +57,83 @@ suite('parse location hash', () => {
   })
 
   test('consume only prefixed parts of a location hash', () => {
-    const locationHash = 'prefix1=a;prefix2=b,c;prefix3:myid=d'
-    const parsed = consumeLocationHashForPrefixes(['prefix2'], locationHash)
+    const locationHash = 'key1=a;key2=b,c;prefix1:key3=d'
+    const parsed = consumeLocationHashForPrefixes(['prefix1'], locationHash)
     // matches nested objects
-    sinon.assert.match(parsed.items[0], { prefix: 'prefix2' })
+    sinon.assert.match(parsed.items[0], { prefix: 'prefix1' })
   })
 })
 
 suite('parse location parts', () => {
-  test('return a match object without optional id', () => {
-    const part = 'prefix1=a'
+  test('return a match object', () => {
+    const part = 'key1=a'
     const parsed = parsePart(part)
-    sinon.assert.match(parsed, { prefix: 'prefix1', id: '', codes: ['a'] })
+    sinon.assert.match(parsed, { id: 'key1', codes: ['a'] })
   })
 
-  test('return a match object with optional id', () => {
-    const part = 'prefix1:myid=a'
+  test('empty keys', () => {
+    const part = '=a'
     const parsed = parsePart(part)
-    sinon.assert.match(parsed, { prefix: 'prefix1', id: 'myid', codes: ['a'] })
+    sinon.assert.match(parsed, { id: '', codes: ['a'] })
+  })
+
+  test('no key', () => {
+    const part = 'a'
+    const parsed = parsePart(part)
+    sinon.assert.match(parsed, { id: '', codes: ['a'] })
   })
 
   test('a match object includes the original string too', () => {
-    const part = 'prefix1:myid=a'
+    const part = 'key1=a'
     const parsed = parsePart(part)
     sinon.assert.match(parsed, {
-      prefix: 'prefix1',
-      id: 'myid',
+      id: 'key1',
       codes: ['a'],
-      origPart: 'prefix1:myid=a'
+      origPart: 'key1=a'
     })
+  })
+
+  test('multiple parts with ampersand', () => {
+    const parts = 'key1=a&key2=b'
+    const parsed = parsePartsWithPrefix(parts)
+    assert(parsed.length === 2)
+    sinon.assert.match(parsed, [{
+      prefix: '',
+      id: 'key1',
+      codes: ['a'],
+      origPart: 'key1=a'
+    }, {
+      prefix: '',
+      id: 'key2',
+      codes: ['b'],
+      origPart: 'key2=b'
+    }])
+  })
+
+  test('parts with prefix', () => {
+    const parts = 'key1=a'
+    const parsed = parsePartsWithPrefix(parts, 'prefix1')
+    sinon.assert.match(parsed, [{
+      prefix: 'prefix1',
+      id: 'key1',
+      codes: ['a'],
+      origPart: 'key1=a'
+    }])
+  })
+
+  test('same keys parsed as different items', () => {
+    const parts = 'key1=a&key1=b'
+    const parsed = parsePartsWithPrefix(parts)
+    sinon.assert.match(parsed, [{
+      prefix: '',
+      id: 'key1',
+      codes: ['a'],
+      origPart: 'key1=a'
+    }, {
+      prefix: '',
+      id: 'key1',
+      codes: ['b'],
+      origPart: 'key1=b'
+    }])
   })
 })
