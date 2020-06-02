@@ -33,7 +33,7 @@
   "dependencies": {},
   "husky": {
     "hooks": {
-      "pre-commit": "yarn run lint-staged && yarn run dist"
+      "pre-commit": "yarn run lint-staged && yarn run test && yarn run dist"
     }
   },
   "lint-staged": {
