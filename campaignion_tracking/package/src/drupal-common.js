@@ -49,7 +49,7 @@ export const codeSubscription = tracker.subscribe('code', e => {
   const events = e.items.reduce(
     (acc, item) => {
       // Code to tracking events.
-      if (item.prefix === 't') {
+      if (item.prefix === 't' && item.id === 't') {
         item.codes.forEach(code => {
           if (trackingCodes[code]) {
             acc.tracking.events.push(trackingCodes[code])
