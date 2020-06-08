@@ -6,7 +6,7 @@
     "dist:common": "parcel build --no-source-maps --global campaignion_tracking -d dist -o campaignion_tracking_common src/drupal-common.js",
     "dist:gtm": "parcel build --no-source-maps --global campaignion_tracking_gtm -d dist -o campaignion_tracking_gtm src/drupal-gtm.js",
     "dist": "yarn run dist:common && yarn run dist:gtm",
-    "dev": "parcel --global campaignion_tracking -d build src/index.html",
+    "dev": "mkdir -p build && cp src/debug.js build && parcel --global campaignion_tracking -d build src/index.html",
     "drupal:common": "yarn run dist:common && cp dist/campaignion_tracking_common.js ../js/campaignion_tracking_common.min.js",
     "drupal:gtm": "yarn run dist:gtm && cp dist/campaignion_tracking_gtm.js ../campaignion_tracking_gtm/js/campaignion_tracking_gtm.min.js",
     "drupal": "yarn run drupal:common && yarn run drupal:gtm",
