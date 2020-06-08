@@ -14,7 +14,12 @@ class TrackerTest extends \DrupalWebTestCase {
     parent::setUp();
     $this->petition = entity_create('node', ['type' => 'petition']);
     $this->petition->webform = webform_node_defaults();
-    $component = ['type' => 'email', 'form_key' => 'email', 'cid' => 1, 'page_num' => 1];
+    $component = [
+      'type' => 'email',
+      'form_key' => 'email',
+      'cid' => 1,
+      'page_num' => 1,
+    ];
     webform_component_defaults($component);
     $this->petition->webform['webform_ajax'] = WEBFORM_AJAX_NO_CONFIRM;
     $this->petition->webform['components'][1] = $component;
@@ -80,11 +85,13 @@ class TrackerTest extends \DrupalWebTestCase {
     }
     $this->assertTrue($found);
     $this->assertArraySubset(['type' => 'setting'], $form['#attached']['js'][$found_key]);
-    $this->assertArraySubset(['webform' => [
-      'total_steps' => 1,
-      'current_step' => 1,
-      'last_completed_step' => 0,
-    ]], $form['#attached']['js'][$found_key]['data']['campaignion_tracking']['context']);
+    $this->assertArraySubset([
+      'webform' => [
+        'total_steps' => 1,
+        'current_step' => 1,
+        'last_completed_step' => 0,
+      ],
+    ], $form['#attached']['js'][$found_key]['data']['campaignion_tracking']['context']);
   }
 
   /**
