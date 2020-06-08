@@ -112,13 +112,15 @@ class TrackerTest extends \DrupalWebTestCase {
     $redirect->fragment = '';
     $submission = new stdClass();
     $submission->node = $this->petition;
+    $submission->node->title = "Donation test";
     $submission->sid = 1;
+    $nid = $submission->node->nid;
     campaignion_tracking_webform_redirect_alter($redirect, $submission);
-    $this->assertEqual('w:sid=1', $redirect->fragment);
+    $this->assertEqual('t:t=s;w:nid=' . $nid . '&sid=1&title=Donation test', $redirect->fragment);
 
     $redirect->fragment = 'something';
     campaignion_tracking_webform_redirect_alter($redirect, $submission);
-    $this->assertEqual('something;w:sid=1', $redirect->fragment);
+    $this->assertEqual('something;t:t=s;w:nid=' . $nid . '&sid=1&title=Donation test', $redirect->fragment);
   }
 
 }
