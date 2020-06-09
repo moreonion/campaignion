@@ -109,7 +109,7 @@ function campaignion_tracking_webform_redirect_alter($redirect, $submission) {
   // Add webform context.
   $webformFragments[] = 'nid=' . $submission->node->nid;
   $webformFragments[] = 'sid=' . $submission->sid;
-  $webformFragments[] = 'title=' . $submission->node->title;
+  $webformFragments[] = 'title=' . rawurlencode($submission->node->title);
 
   $donationFragments = [];
   if ($is_donation) {

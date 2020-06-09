@@ -72,7 +72,7 @@ export function consumeLocationHashForPrefixes (prefixes = [], locationHash = ''
 export function parsePart (part) {
   const _pos1 = part.indexOf('=')
   const value1 = part.substring(0, _pos1)
-  const value2 = part.substring(_pos1 + 1)
+  const value2 = decodeURIComponent(part.substring(_pos1 + 1))
   const codes = value2.split(',')
   return {
     id: value1,

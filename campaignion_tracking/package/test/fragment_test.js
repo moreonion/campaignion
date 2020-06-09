@@ -71,6 +71,12 @@ suite('parse location parts', () => {
     sinon.assert.match(parsed, { id: 'key1', codes: ['a'] })
   })
 
+  test('urlencoded values are decoded', () => {
+    const part = 'key1=test%20%26%20stuff'
+    const parsed = parsePart(part)
+    sinon.assert.match(parsed, { id: 'key1', codes: ['test & stuff'] })
+  })
+
   test('empty keys', () => {
     const part = '=a'
     const parsed = parsePart(part)
