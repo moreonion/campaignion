@@ -1,6 +1,5 @@
 <?php
 
-use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\little_helpers\Services\Container;
 
 /**
@@ -75,7 +74,7 @@ function _campaignion_email_to_target_options_field_widget_form($item) {
 
   $options = [];
   try {
-    $api = Client::fromConfig();
+    $api = Container::get()->loadService('campaignion_email_to_target.api.Client');
     foreach ($api->getDatasetList() as $ds) {
       $options[$ds->key] = $ds->title;
     }

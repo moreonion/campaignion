@@ -67,4 +67,14 @@ class AuthAppClient extends Client {
     return $token;
   }
 
+  /**
+   * Get editor token.
+   */
+  public function getEditorToken() : string {
+    $token = $this->getToken();
+    $options['headers']['Authorization'] = "Bearer $token";
+    $token = $this->post('session', [], ['roles' => ['editor']], $options)['token'];
+    return $token;
+  }
+
 }

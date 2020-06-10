@@ -4,8 +4,8 @@ namespace Drupal\campaignion_email_to_target\Wizard;
 
 use Drupal\campaignion\Forms\EntityFieldForm;
 use Drupal\campaignion_email_to_target\MessageEndpoint;
-use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_wizard\WizardStep;
+use Drupal\little_helpers\Services\Container;
 
 /**
  * Wizard step for configuring the email to target messages.
@@ -85,11 +85,10 @@ class MessageStep extends WizardStep {
     $settings['endpoints']['messages'] = url("node/{$node->nid}/email-to-target-messages");
     $settings['endpoints']['nodes'] = url('wizard/nodes');
 
-    $client = Client::fromConfig();
-    $token = $client->getAccessToken();
+    $client = Container::get()->loadService('campaignion_email_to_target.api.Client');
     $settings['endpoints']['e2t-api'] = [
       'url' => $client->getEndpoint(),
-      'token' => $token,
+      'token' => $client->getAccessToken(),
       'dataset' => $dataset->key,
     ];
 

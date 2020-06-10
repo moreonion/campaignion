@@ -3,8 +3,8 @@
 namespace Drupal\campaignion_email_to_target\Wizard;
 
 use Drupal\campaignion\Forms\EntityFieldForm;
-use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_wizard\WizardStep;
+use Drupal\little_helpers\Services\Container;
 
 /**
  * Wizard step for choosing the action’s targets.
@@ -31,7 +31,7 @@ class TargetStep extends WizardStep {
    */
   public function __construct($wizard, $api = NULL) {
     parent::__construct($wizard);
-    $this->api = $api ? $api : Client::fromConfig();
+    $this->api = $api ? $api : Container::get()->loadService('campaignion_email_to_target.api.Client');
   }
 
   /**

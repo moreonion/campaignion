@@ -13,6 +13,7 @@
 
 require_once dirname(__FILE__) . '/campaignion_email_to_target.field.inc';
 
+use Drupal\little_helpers\Services\Container;
 use Drupal\little_helpers\Webform\Submission;
 use Drupal\little_helpers\Webform\Webform;
 
@@ -72,6 +73,13 @@ function campaignion_email_to_target_little_helpers_services() {
       ['loadSpecsFromHook', ['campaignion_email_to_target_selection_modes']],
     ],
   ];
+  $info['campaignion_email_to_target.api.Client'] = [
+    'class' => Client::class,
+    'arguments' => [
+      '!campaignion_email_to_target_e2t_api_url',
+      '@campaignion_email_to_target.api.AuthAppClient',
+    ],
+  ];
   $info['campaignion_email_to_target.api.AuthAppClient'] = [
     'class' => AuthAppClient::class,
     'arguments' => [
@@ -127,7 +135,7 @@ function campaignion_email_to_target_token_info() {
 
   if ($ds_name = campaignion_email_to_target_tokens_dataset_hint()) {
     try {
-      $api = Client::fromConfig();
+      $api = Container::get()->loadService('campaignion_email_to_target.api.Client');
       $dataset = $api->getDataset($ds_name);
       $type = 'email-to-target';
       $info['types'][$type] = [
@@ -168,42 +176,6 @@ function campaignion_email_to_target_tokens($type, array $tokens, array $data = 
     $replacements = Tokens::messageTokens($tokens, $data['email-to-target']);
   }
   return $replacements;
-}
-
-/**
- * Implements hook_libraries_info().
- */
-function campaignion_email_to_target_libraries_info() {
-  $libraries['dflydev-hawk'] = [
-    'name' => 'Hawk — A PHP Implementation',
-    'vendor url' => 'https://github.com/dflydev/dflydev-hawk',
-    'download url' => 'https://github.com/dflydev/dflydev-hawk',
-    'version' => '0.0.0',
-    'xautoload' => function ($adapter) {
-      $adapter->composerJson('composer.json');
-    },
-    'dependencies' => ['RandomLib (>=1.0)'],
-  ];
-  $libraries['RandomLib'] = [
-    'name' => 'RandomLib — A library for generating random numbers and strings of various strengths.',
-    'vendor url' => 'https://github.com/paragonie/RandomLib',
-    'download url' => 'https://github.com/paragonie/RandomLib',
-    'version' => '2.0.0',
-    'xautoload' => function ($adapter) {
-      $adapter->composerJson('composer.json');
-    },
-    'dependencies' => ['SecurityLib (>=1.1)'],
-  ];
-  $libraries['SecurityLib'] = [
-    'name' => 'SecurityLib',
-    'vendor url' => 'https://github.com/ircmaxell/SecurityLib',
-    'download url' => 'https://github.com/ircmaxell/SecurityLib',
-    'version' => '1.1.0',
-    'xautoload' => function ($adapter) {
-      $adapter->composerJson('composer.json');
-    },
-  ];
-  return $libraries;
 }
 
 /**
