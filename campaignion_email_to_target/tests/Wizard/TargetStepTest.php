@@ -5,15 +5,18 @@ namespace Drupal\campaignion_email_to_target\Wizard;
 use Drupal\campaignion_action\Loader;
 use Drupal\campaignion_email_to_target\Api\Client;
 
+use Upal\DrupalUnitTestCase;
+
 /**
  * Test whether the wizard target step works.
  */
-class TargetStepTest extends \DrupalUnitTestCase {
+class TargetStepTest extends DrupalUnitTestCase {
 
   /**
    * Set some e2t-api connection data.
    */
   public function setUp() {
+    parent::setUp();
     $GLOBALS['conf']['campaignion_email_to_target_credentials'] = [
       'url' => 'http://mocked',
       'public_key' => 'pk',
@@ -26,6 +29,7 @@ class TargetStepTest extends \DrupalUnitTestCase {
    */
   public function tearDown() {
     unset($GLOBALS['conf']['campaignion_email_to_target_credentials']);
+    parent::tearDown();
   }
 
   /**
