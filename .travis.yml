@@ -37,6 +37,7 @@ before_script:
   - php -d include_path=`pwd` -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes core-quick-drupal --core=drupal-7.69 --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --root=$root
   - ln -s $repo $root/sites/all/modules/campaignion
   - cd $root
+  - curl https://www.drupal.org/files/issues/1891356-drupal_static_reset-on-module-changes-30-D7.patch | patch -p1
   - drush dl --cache-duration-releasexml=0 little_helpers-2.0-alpha12
   - drush --yes pm-enable campaignion_test
 
