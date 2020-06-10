@@ -4,7 +4,7 @@ namespace Drupal\campaignion_email_to_target\Wizard;
 
 use Drupal\campaignion_action\Loader;
 use Drupal\campaignion_email_to_target\Api\Client;
-
+use Drupal\little_helpers\Services\Container;
 use Upal\DrupalUnitTestCase;
 
 /**
@@ -17,18 +17,14 @@ class TargetStepTest extends DrupalUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    $GLOBALS['conf']['campaignion_email_to_target_credentials'] = [
-      'url' => 'http://mocked',
-      'public_key' => 'pk',
-      'secret_key' => 'sk',
-    ];
+    Container::get()->inject('campaignion_email_to_target.api.Client', $this->createMock(Client::class));
   }
 
   /**
    * Remove test API connection.
    */
   public function tearDown() {
-    unset($GLOBALS['conf']['campaignion_email_to_target_credentials']);
+    drupal_static_reset(Container::class);
     parent::tearDown();
   }
 
