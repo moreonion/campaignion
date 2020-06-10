@@ -5,6 +5,7 @@ package = Campaignion
 dependencies[] = campaignion_email_to_target
 dependencies[] = ctools
 dependencies[] = features
+dependencies[] = little_helpers:little_helpers (>=2.0-alpha11)
 dependencies[] = postal_code_validation
 dependencies[] = psr0
 dependencies[] = strongarm
