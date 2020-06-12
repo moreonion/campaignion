@@ -10,7 +10,7 @@ use Drupal\little_helpers\Rest\HttpError;
  */
 class Client extends _Client {
 
-  const API_VERSION = 'v2';
+  const API_VERSION = 'v3';
 
   /**
    * A auth app API client.
