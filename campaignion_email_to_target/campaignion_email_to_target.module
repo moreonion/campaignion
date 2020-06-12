@@ -5,9 +5,9 @@
  * Main module file that implements hooks and some callbacks.
  *
  * - Menu entry, page callback and delivery callback for the message API.
+ * - Declare services and selection-mode plugins.
  * - Permission to view the user edited messages.
  * - Tokens integration.
- * - Libraries needed for the HAWK authentication.
  * - Declare the webform component type and its form_builder integration.
  */
 
