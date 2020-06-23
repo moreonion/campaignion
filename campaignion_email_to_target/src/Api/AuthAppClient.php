@@ -59,7 +59,7 @@ class AuthAppClient extends Client {
    * Get a valid JWT token using the configured API-key.
    */
   public function getToken() : string {
-    if ($cache = cache_get(static::TOKEN_CID)) {
+    if (($cache = cache_get(static::TOKEN_CID)) && $cache->expire > REQUEST_TIME) {
       return $cache->data;
     }
     $token = $this->post('token', [], $this->key)['token'];
