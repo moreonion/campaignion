@@ -32,7 +32,7 @@ export default {
   saveDataset (dataset, createNew) {
     return axios({
       method: createNew ? 'post' : 'put',
-      url: createNew ? url : url + dataset.key + '/',
+      url: createNew ? url : url + dataset.key,
       data: JSON.stringify(dataset),
       headers,
       transformRequest: [function (data, headers) {
