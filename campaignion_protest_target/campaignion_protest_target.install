@@ -1,6 +1,25 @@
 <?php
 
 /**
+ * Delete variable campaignion_protest_target_contact_type.
+ */
+function campaignion_protest_target_update_4() {
+  variable_del('campaignion_protest_target_contact_type');
+}
+
+/**
+ * Remove protest target and protest target options field instances.
+ */
+function campaignion_protest_target_update_3() {
+  foreach (field_read_instances(['field_name' => 'field_protest_target']) as $instance) {
+    field_delete_instance($instance);
+  }
+  foreach (field_read_instances(['field_name' => 'field_protest_target_options']) as $instance) {
+    field_delete_instance($instance);
+  }
+}
+
+/**
  * Helper function: Get target options for a node.
  */
 function _campaignion_protest_target_options($node) {
