@@ -6,6 +6,21 @@
  */
 
 /**
+ * Implements hook_theme().
+ */
+function campaignion_language_switcher_theme() {
+  $theme['campaignion_language_switcher'] = [
+    'variables' => [
+      'links' => [],
+      'provider' => 'default',
+    ],
+    'file' => 'campaignion_language_switcher.theme.inc',
+    'template' => 'campaignion-language-switcher',
+  ];
+  return $theme;
+}
+
+/**
  * Implements hook_block_info().
  */
 function campaignion_language_switcher_block_info() {
@@ -33,15 +48,13 @@ function campaignion_language_switcher_block_view($delta = '') {
         $link['attributes']['class'][] = 'locale-untranslated';
       }
     }
-    $class = "campaignion-language-switcher-{$links->provider}";
     $block['content'] = [
-      '#theme' => 'links__locale_block',
+      '#theme' => 'campaignion_language_switcher',
       '#links' => $links->links,
-      '#attributes' => ['class' => [$class]],
+      '#provider' => $links->provider,
     ];
     $block['content']['#attached']['css'][] = drupal_get_path('module', 'locale') . '/locale.css';
     $block['subject'] = '<none>';
-
     return $block;
   }
 }
