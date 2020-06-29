@@ -25,6 +25,7 @@ function template_preprocess_campaignion_language_switcher(array &$variables) {
     if (isset($link['href']) && ($link['href'] == $_GET['q'] || ($link['href'] == '<front>' && drupal_is_front_page()))
         && (empty($link['language']) || $link['language']->language == $language_url->language)) {
       $link['li_attributes']['class'][] = 'active';
+      $link['attributes']['class'][] = 'active';
     }
 
     $link['renderable'] = [];
