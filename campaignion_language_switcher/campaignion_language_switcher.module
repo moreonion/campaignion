@@ -33,13 +33,13 @@ function campaignion_language_switcher_block_view($delta = '') {
         $link['attributes']['class'][] = 'locale-untranslated';
       }
     }
-    drupal_add_css(drupal_get_path('module', 'locale') . '/locale.css');
     $class = "campaignion-language-switcher-{$links->provider}";
-    $variables = [
-      'links' => $links->links,
-      'attributes' => ['class' => [$class]],
+    $block['content'] = [
+      '#theme' => 'links__locale_block',
+      '#links' => $links->links,
+      '#attributes' => ['class' => [$class]],
     ];
-    $block['content'] = theme('links__locale_block', $variables);
+    $block['content']['#attached']['css'][] = drupal_get_path('module', 'locale') . '/locale.css';
     $block['subject'] = '<none>';
 
     return $block;
