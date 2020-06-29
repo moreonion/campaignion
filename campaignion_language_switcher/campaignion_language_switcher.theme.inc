@@ -10,6 +10,10 @@
  *
  * Default template: campaignion-language-switcher.tpl.php.
  *
+ * The logic is (and should be) mostly identical to theme_links().
+ *
+ * @see theme_links()
+ *
  * @param array $variables
  *   An associative array containing:
  *   - links: An array of links similar to theme_links().
