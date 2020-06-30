@@ -1,5 +1,5 @@
-name = Campaignion giftaid token
-description = Define a webform submission token for giftaid donations.
+name = Campaignion donation amount total token
+description = Define a webform submission token that calculates the sum of two donation amounts.
 core = 7.x
 php = 7.0
 
