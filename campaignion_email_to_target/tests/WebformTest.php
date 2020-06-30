@@ -3,6 +3,7 @@
 namespace Drupal\campaignion_email_to_target;
 
 use Drupal\campaignion_action\Loader;
+use Drupal\little_helpers\Services\Container;
 use Upal\DrupalUnitTestCase;
 
 use Drupal\campaignion_email_to_target\Api\Client;
@@ -17,11 +18,7 @@ class WebformTest extends DrupalUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    $GLOBALS['conf']['campaignion_email_to_target_credentials'] = [
-      'url' => 'http://mocked',
-      'public_key' => 'pk',
-      'secret_key' => 'sk',
-    ];
+    Container::get()->inject('campaignion_email_to_target.api.Client', $this->createMock(Client::class));
     $node = (object) [
       'type' => 'email_to_target',
     ];
@@ -37,7 +34,7 @@ class WebformTest extends DrupalUnitTestCase {
    * Delete test node.
    */
   public function tearDown() {
-    unset($GLOBALS['conf']['campaignion_email_to_target_credentials']);
+    drupal_static_reset(Container::class);
     entity_delete('node', $this->node->nid);
     parent::tearDown();
   }

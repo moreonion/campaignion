@@ -5,22 +5,25 @@
  * Main module file that implements hooks and some callbacks.
  *
  * - Menu entry, page callback and delivery callback for the message API.
+ * - Declare services and selection-mode plugins.
  * - Permission to view the user edited messages.
  * - Tokens integration.
- * - Libraries needed for the HAWK authentication.
  * - Declare the webform component type and its form_builder integration.
  */
 
 require_once dirname(__FILE__) . '/campaignion_email_to_target.field.inc';
 
+use Drupal\little_helpers\Services\Container;
 use Drupal\little_helpers\Webform\Submission;
 use Drupal\little_helpers\Webform\Webform;
 
 use Drupal\campaignion_action\Loader;
 use Drupal\campaignion_email_to_target\Action;
 use Drupal\campaignion_email_to_target\Component;
+use Drupal\campaignion_email_to_target\Loader as SelectionModeLoader;
 use Drupal\campaignion_email_to_target\MessageEndpoint;
 use Drupal\campaignion_email_to_target\Tokens;
+use Drupal\campaignion_email_to_target\Api\AuthAppClient;
 use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_email_to_target\SelectionMode\All;
 use Drupal\campaignion_email_to_target\SelectionMode\One;
@@ -57,6 +60,34 @@ function campaignion_email_to_target_campaignion_email_to_target_selection_modes
     'title' => t('Exactly one — Users can choose exactly one target. (select box)'),
   ];
   return $plugins;
+}
+
+/**
+ * Implements hook_little_helpers_services().
+ */
+function campaignion_email_to_target_little_helpers_services() {
+  $info['campaignion_email_to_target.selection_mode.loader'] = [
+    'class' => SelectionModeLoader::class,
+    'calls' => [
+      ['setDefaults', [['arguments' => ['%editable', '%channel']]]],
+      ['loadSpecsFromHook', ['campaignion_email_to_target_selection_modes']],
+    ],
+  ];
+  $info['campaignion_email_to_target.api.Client'] = [
+    'class' => Client::class,
+    'arguments' => [
+      '!campaignion_email_to_target_e2t_api_url',
+      '@campaignion_email_to_target.api.AuthAppClient',
+    ],
+  ];
+  $info['campaignion_email_to_target.api.AuthAppClient'] = [
+    'class' => AuthAppClient::class,
+    'arguments' => [
+      '!campaignion_email_to_target_auth_app_url',
+      '!campaignion_email_to_target_api_key',
+    ],
+  ];
+  return $info;
 }
 
 /**
@@ -104,7 +135,7 @@ function campaignion_email_to_target_token_info() {
 
   if ($ds_name = campaignion_email_to_target_tokens_dataset_hint()) {
     try {
-      $api = Client::fromConfig();
+      $api = Container::get()->loadService('campaignion_email_to_target.api.Client');
       $dataset = $api->getDataset($ds_name);
       $type = 'email-to-target';
       $info['types'][$type] = [
@@ -145,42 +176,6 @@ function campaignion_email_to_target_tokens($type, array $tokens, array $data = 
     $replacements = Tokens::messageTokens($tokens, $data['email-to-target']);
   }
   return $replacements;
-}
-
-/**
- * Implements hook_libraries_info().
- */
-function campaignion_email_to_target_libraries_info() {
-  $libraries['dflydev-hawk'] = [
-    'name' => 'Hawk — A PHP Implementation',
-    'vendor url' => 'https://github.com/dflydev/dflydev-hawk',
-    'download url' => 'https://github.com/dflydev/dflydev-hawk',
-    'version' => '0.0.0',
-    'xautoload' => function ($adapter) {
-      $adapter->composerJson('composer.json');
-    },
-    'dependencies' => ['RandomLib (>=1.0)'],
-  ];
-  $libraries['RandomLib'] = [
-    'name' => 'RandomLib — A library for generating random numbers and strings of various strengths.',
-    'vendor url' => 'https://github.com/paragonie/RandomLib',
-    'download url' => 'https://github.com/paragonie/RandomLib',
-    'version' => '2.0.0',
-    'xautoload' => function ($adapter) {
-      $adapter->composerJson('composer.json');
-    },
-    'dependencies' => ['SecurityLib (>=1.1)'],
-  ];
-  $libraries['SecurityLib'] = [
-    'name' => 'SecurityLib',
-    'vendor url' => 'https://github.com/ircmaxell/SecurityLib',
-    'download url' => 'https://github.com/ircmaxell/SecurityLib',
-    'version' => '1.1.0',
-    'xautoload' => function ($adapter) {
-      $adapter->composerJson('composer.json');
-    },
-  ];
-  return $libraries;
 }
 
 /**
