@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Token hook implementations for campaignion_giftaid.
+ * Token hook implementations for campaignion_donation_amount_total.
  */
 
 use Drupal\little_helpers\Webform\Submission;
@@ -10,12 +10,12 @@ use Drupal\little_helpers\Webform\Submission;
 /**
  * Implements hook_token_info().
  *
- * Provide a custom token for giftaid.
+ * Provide a custom token for the total donation amount.
  */
-function campaignion_giftaid_token_info() {
-  $info['tokens']['submission']['amount-including-giftaid'] = [
-    'name' => t('Donation amount including Gift Aid'),
-    'description' => t('The donation amount increased by 25%. Note that this does not account for whether there was an actual opt-in for Gift Aid.'),
+function campaignion_donation_amount_total_token_info() {
+  $info['tokens']['submission']['amount-total'] = [
+    'name' => t('Donation amount total'),
+    'description' => t('Calculates the sum of two donation amount fields'),
   ];
   return $info;
 }
@@ -23,7 +23,7 @@ function campaignion_giftaid_token_info() {
 /**
  * Implements hook_tokens().
  */
-function campaignion_giftaid_tokens($type, $tokens, array $data = [], array $options = []) {
+function campaignion_donation_amount_total_tokens($type, $tokens, array $data = [], array $options = []) {
   // Return early unless submission tokens are needed and node and submission
   // are available.
   if ($type != 'submission' || empty($data['webform-submission']) || empty($data['node']) || !webform_variable_get('webform_token_access')) {
@@ -31,14 +31,14 @@ function campaignion_giftaid_tokens($type, $tokens, array $data = [], array $opt
   }
 
   $submission = new Submission($data['node'], $data['webform-submission']);
-  $donation_amount = $submission->valueByKey('donation_amount');
+  $donation_amount_1 = $submission->valueByKey('donation_amount_1');
+  $donation_amount_2 = $submission->valueByKey('donation_amount_2');
 
   $replacements = [];
   foreach ($tokens as $name => $original) {
     switch ($name) {
-      case 'amount-including-giftaid':
-        $giftaid_amount = $donation_amount * 1.25;
-        $replacements[$original] = number_format($giftaid_amount, 2);
+      case 'amount-total':
+        $replacements[$original] = $donation_amount_1 + $donation_amount_2;
         break;
     }
   }
