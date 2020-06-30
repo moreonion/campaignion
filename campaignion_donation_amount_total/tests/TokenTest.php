@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion_giftaid;
+namespace Drupal\campaignion_donation_amount_total;
 
 use Upal\DrupalUnitTestCase;
 
@@ -14,7 +14,7 @@ class TokenTest extends DrupalUnitTestCase {
    */
   public function testTokenInfo() {
     $info = token_info();
-    $this->assertNotEmpty($info['tokens']['submission']['amount-including-giftaid']);
+    $this->assertNotEmpty($info['tokens']['submission']['amount-total']);
   }
 
   /**
@@ -43,7 +43,7 @@ class TokenTest extends DrupalUnitTestCase {
     $form_state['values']['submitted'][1][] = 10;
     $submission = webform_submission_create($node, $GLOBALS['user'], $form_state);
 
-    $replaced = webform_replace_tokens('[submission:amount-including-giftaid]', $node, $submission);
+    $replaced = webform_replace_tokens('[submission:amount-total]', $node, $submission);
     $this->assertSame('12.50', $replaced);
   }
 
