@@ -44,6 +44,7 @@ body.aetoolbar {
 /* ae bar reset css styles */
 
 #ae-bar, #ae-popups, #ae-widepopups {
+  box-sizing: content-box;
   font-family: @fontfamily;
   font-size: @fontsizeabsolute;
   line-height: @lineheightabsolute;
@@ -51,8 +52,8 @@ body.aetoolbar {
     font-family: @fontfamily;
     font-size: @fontsizeabsolute;
     line-height: @lineheightabsolute;
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0;
+    padding: 0;
   }
   a, a:hover, a:focus, a:active {
     font-family: @fontfamily;
@@ -64,9 +65,11 @@ body.aetoolbar {
     font-family: @fontfamily;
     font-size: @fontsizeabsolute;
     line-height: @lineheightabsolute;
+    margin: 0;
+    padding: 0;
   }
 }
-    
+
 /* general ae-bar styling */
 
 #ae-bar {
@@ -219,6 +222,8 @@ body.aetoolbar {
     a {
       padding: 0.5em 1em;
       display: block;
+      width: 100%;
+      box-sizing: border-box;
       background: @bg_link;
       -moz-border-radius: @link_border_radius;
       -webkit-border-radius: @link_border_radius;
@@ -337,8 +342,11 @@ body.aetoolbar {
       }
       a {
         padding: .5em 1.5em .5em 1em;
-        display: block; }
-        list-style: none; }}
+        display: block;
+      }
+      list-style: none;
+    }
+  }
   .element-invisible {
     display: none; }
   /* main popup stlyes */
