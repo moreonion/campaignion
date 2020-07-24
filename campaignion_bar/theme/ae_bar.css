@@ -84,6 +84,9 @@ body.aetoolbar .ui-page {
   padding: 0.5em 1em 0.2em 1em;
   line-height: 0px;
 }
+#ae-bar #ae-logo img {
+  height: 51px;
+}
 /* ae bar menu styling */
 #ae-menu,
 #ae-sidemenu {
