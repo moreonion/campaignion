@@ -1,6 +1,6 @@
 <div id="ae-bar" class="clearfix">
 
-  <a href="#" id="ae-logo" title="Click here to visit the Dashboard"><img src="https://ucarecdn.com/a9569cca-93df-48bd-b5fc-99add06246d3/ae_admin_impacstack_logo.png"></a>
+  <a href="#" id="ae-logo" title="Click here to visit the Dashboard"><img src="https://ucarecdn.com/51febc91-6f3f-4f75-9d03-b5a71d564cf3/ae_admin_impacstack_logocopy.png"></a>
 
   <?php print theme('ae_menu', array('sidebar' => FALSE, 'links' => menu_tree_all_data('ae-menu'))); ?>
 
