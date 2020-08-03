@@ -54,6 +54,9 @@ function template_preprocess_campaignion_language_switcher(array &$variables) {
       ];
     }
   }
+  $variables['links_accessible'] = array_filter($links, function ($link) {
+    return !empty($link['href']);
+  });
 
   reset($links)['li_class'][] = 'first';
   end($links)['li_class'][] = 'last';
