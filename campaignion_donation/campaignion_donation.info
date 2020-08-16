@@ -8,6 +8,7 @@ dependencies[] = features
 dependencies[] = field_collection
 dependencies[] = form_builder_webform
 dependencies[] = number
+dependencies[] = payment_recurrence
 dependencies[] = variable
 dependencies[] = webform_paymethod_select (>= 7.x-1.15)
 features[features_api][] = api:2
