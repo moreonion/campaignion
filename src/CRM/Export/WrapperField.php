@@ -15,11 +15,13 @@ class WrapperField implements ExportMapperInterface {
    * {@inheritdoc}
    */
   public function value($delta = 0) {
-    $w = $this->exporter->getWrappedContact();
-    if (!$w->__isset($this->key)) {
-      return is_null($delta) ? [] : NULL;
+    $field = $this->exporter->getWrappedContact();
+    foreach (explode('.', $this->key) as $part) {
+      if (!$field->__isset($part)) {
+        return is_null($delta) ? [] : NULL;
+      }
+      $field = $field->{$part};
     }
-    $field = $w->{$this->key};
     if ($field instanceof \EntityListWrapper) {
       return is_null($delta) ? $field->value() : $field->get($delta)->value();
     }
