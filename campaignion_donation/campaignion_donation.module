@@ -157,7 +157,7 @@ function campaignion_donation_campaignion_action_contact_alter(\RedhenContact $c
           $changed = TRUE;
         }
         $data = [
-          'donation_value' => $payment->totalAmount(TRUE),
+          'donation_value' => $amount,
           'donation_date' => $payment->getStatus()->created,
         ];
         foreach ($data as $f => $new_value) {
