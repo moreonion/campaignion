@@ -11,54 +11,6 @@
 function campaignion_test_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'redhen_contact-contact-campaign_tag'.
-  $field_instances['redhen_contact-contact-campaign_tag'] = array(
-    'bundle' => 'contact',
-    'custom_add_another' => '',
-    'custom_remove' => '',
-    'default_value' => array(
-      0 => array(
-        'tid' => NULL,
-      ),
-    ),
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'i18n_taxonomy',
-        'settings' => array(),
-        'type' => 'i18n_taxonomy_term_reference_link',
-        'weight' => 17,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'redhen_contact',
-    'field_name' => 'campaign_tag',
-    'label' => 'Campaign tag',
-    'required' => 0,
-    'settings' => array(
-      'custom_add_another' => '',
-      'custom_remove' => '',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'taxonomy',
-      'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
-      ),
-      'type' => 'taxonomy_autocomplete',
-      'weight' => 14,
-    ),
-  );
-
   // Exported field_instance:
   // 'node-email_to_target-field_email_to_target_options'.
   $field_instances['node-email_to_target-field_email_to_target_options'] = array(
@@ -472,6 +424,54 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'redhen_contact-contact-campaign_tag'.
+  $field_instances['redhen_contact-contact-campaign_tag'] = array(
+    'bundle' => 'contact',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(
+      0 => array(
+        'tid' => NULL,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'i18n_taxonomy',
+        'settings' => array(),
+        'type' => 'i18n_taxonomy_term_reference_link',
+        'weight' => 17,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'redhen_contact',
+    'field_name' => 'campaign_tag',
+    'label' => 'Campaign tag',
+    'required' => 0,
+    'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'taxonomy',
+      'settings' => array(
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
+      ),
+      'type' => 'taxonomy_autocomplete',
+      'weight' => 14,
+    ),
+  );
+
   // Exported field_instance: 'redhen_contact-contact-field_address'.
   $field_instances['redhen_contact-contact-field_address'] = array(
     'bundle' => 'contact',
@@ -673,7 +673,9 @@ function campaignion_test_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'use_select2' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 1,
     ),
@@ -849,7 +851,9 @@ function campaignion_test_field_default_field_instances() {
     'widget' => array(
       'active' => 0,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'use_select2' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 9,
     ),
@@ -890,7 +894,9 @@ function campaignion_test_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'use_select2' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 2,
     ),
@@ -1117,6 +1123,7 @@ function campaignion_test_field_default_field_instances() {
   // Included for use with string extractors like potx.
   t('Add a large main image or a video to your petition.');
   t('Address');
+  t('Campaign tag');
   t('Date of birth');
   t('Direct Mail Newsletter');
   t('Email');
