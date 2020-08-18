@@ -1,0 +1,133 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations and callbacks for the campaignion layouts module.
+ */
+
+use Drupal\campaignion_layout\Themes;
+
+// The field.module does not group its hooks so we have to include this here.
+require_once 'campaignion_layout.field.inc';
+
+/**
+ * Implements hook_menu_alter().
+ *
+ * Enable theme-switching on all relevant paths.
+ */
+function campaignion_layout_menu_alter(&$items) {
+  $callback = [
+    'theme callback' => 'campaignion_layout_get_theme_for_entity',
+    'theme arguments' => ['node', 1],
+  ];
+  $no_callback = [
+    'theme callback' => 'campaignion_layout_no_custom_theme',
+    'theme arguments' => [],
+  ];
+  $set_theme = [
+    'view' => TRUE,
+    'share' => TRUE,
+    'continue' => TRUE,
+  ];
+  foreach ($items as $path => &$item) {
+    if (substr($path, 0, 10) == 'node/%node') {
+      $args = explode('/', $path, 4);
+      $third_arg = $args[2] ?? NULL;
+      $more_args = $args[3] ?? NULL;
+      if (!$third_arg || ($set_theme[$third_arg] ?? FALSE)) {
+        $item = $callback + $item;
+      }
+      elseif (!$more_args) {
+        $item = $no_callback + $item;
+      }
+    }
+  }
+}
+
+/**
+ * Menu theme callback: Set no custom theme.
+ *
+ * This is only used as a workaround to be able to add a theme callback for
+ * node/% but not automatically for all local tasks (eg node/%/edit).
+ *
+ * @see campaignion_layout_menu_alter()
+ */
+function campaignion_layout_no_custom_theme() {
+  return NULL;
+}
+
+/**
+ * Menu theme callback: Set the theme based on layout variation fields.
+ *
+ * @see campaignion_layout_menu_alter()
+ */
+function campaignion_layout_get_theme_for_entity($entity_type, $entity) {
+  if ($item = _campaignion_layout_get_field_item($entity_type, $entity)) {
+    return $item['theme'];
+  }
+  return NULL;
+}
+
+/**
+ * Get the first non-empty field-name on any field of type 'layout_selection'.
+ */
+function _campaignion_layout_get_field_item($entity_type, $entity) {
+  list($id, $_, $bundle) = entity_extract_ids($entity_type, $entity);
+  $instances = array_filter(field_info_instances($entity_type, $bundle), function ($instance) {
+    $field = field_info_field($instance['field_name']);
+    return $field['type'] == 'layout_selection';
+  });
+  foreach (array_keys($instances) as $field_name) {
+    foreach (field_get_items($entity_type, $entity, $field_name) as $item) {
+      if ($item['theme']) {
+        return $item;
+      }
+    }
+  }
+}
+
+/**
+ * Prepare variables for page templates.
+ */
+function campaignion_layout_preprocess_page(array &$vars) {
+  $vars['layout'] = NULL;
+  if (!empty($vars['node']) && ($item = _campaignion_layout_get_field_item('node', $vars['node']))) {
+    if ($GLOBALS['theme'] == $item['theme'] && ($layout = $item['layout'])) {
+      $vars['layout'] = $layout;
+      array_unshift($vars['theme_hook_suggestions'], "page__layout__$layout");
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for system_theme_settings().
+ */
+function campaignion_layout_form_system_theme_settings_alter(&$form, $form_state) {
+  if (!($theme_name = $form_state['build_info']['args'][0] ?? NULL)) {
+    return;
+  }
+  $theme = list_themes()[$theme_name];
+  if (!in_array('layout_variations', $theme->info['features'] ?? [])) {
+    return;
+  }
+  $form['layout_variations'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Layout variations'),
+  ];
+  $form['layout_variations']['toggle_layout_variations'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Make this theme and its layout variations available.'),
+    '#default_value' => theme_get_setting('toggle_layout_variations', $theme_name),
+  ];
+  $states['visible'][':input[name="toggle_layout_variations"]']['checked'] = TRUE;
+  $themes = Themes::fromConfig();
+  $options = $themes->layoutOptions($theme_name, TRUE);
+  $enabled = array_keys($themes->layoutOptions($theme_name));
+  $form['layout_variations']['layout_variations'] = [
+    '#type' => 'checkboxes',
+    '#title' => t('Enabled layout variations.'),
+    '#options' => $options,
+    '#default_value' => $enabled,
+    '#states' => $states,
+  ];
+}
