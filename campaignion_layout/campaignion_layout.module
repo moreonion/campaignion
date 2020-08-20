@@ -131,3 +131,29 @@ function campaignion_layout_form_system_theme_settings_alter(&$form, $form_state
     '#states' => $states,
   ];
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter() for node_form().
+ *
+ * Hide other fields on node forms.
+ */
+function campaignion_layout_form_node_form_alter(&$form, &$form_state) {
+  $hidden_fields = module_invoke_all('campaignion_layout_hidden_fields');
+  drupal_alter('campaignion_layout_hidden_fields', $hidden_fields);
+  foreach (array_keys(array_filter($hidden_fields)) as $field_name) {
+    if (!isset($form[$field_name])) {
+      // Skip fields if they don’t appear in the form anyway.
+      continue;
+    }
+    $activating_selectors = $form_state['campaignion_layout_fields'][$field_name] ?? [];
+    foreach ($activating_selectors as $selector => $values) {
+      foreach ($values as $value) {
+        $states['visible'][$selector]['value'] = $value;
+        $form[$field_name]['#states'] = $states;
+      }
+    }
+    if (!$activating_selectors) {
+      $form[$field_name]['#access'] = FALSE;
+    }
+  }
+}

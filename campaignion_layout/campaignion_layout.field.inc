@@ -67,10 +67,15 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     '#value' => $item['layout'],
   ];
   foreach ($theme_options as $theme_name => $title) {
+    $options = ['' => t('Default layout')];
+    $html_id = drupal_html_id("layout_{$theme_name}");
+    foreach ($themes->layouts($theme_name) as $layout => $info) {
+      $options[$layout] = $info['title'];
+      foreach (array_keys(array_filter($info['fields'])) as $field_name) {
+        $fields[$field_name]["#$html_id input"][] = $layout;
+      }
+    }
     $states['visible']["#{$theme_id}"]['value'] = $theme_name;
-    $options = [
-      '' => t('Default layout'),
-    ] + $themes->layoutOptions($theme_name);
     $element["layout_{$theme_name}"] = [
       '#type' => 'radios',
       '#title' => t('Layout'),
@@ -78,8 +83,10 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
       '#options' => $options,
       '#default_value' => $item['layout'],
       '#states' => $states,
+      '#id' => $html_id,
     ];
   }
+  $form_state['campaignion_layout_fields'] = $fields;
   return $element;
 }
 

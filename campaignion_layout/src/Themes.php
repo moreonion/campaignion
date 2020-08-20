@@ -54,13 +54,13 @@ class Themes {
   public function layoutOptions(string $theme_name, bool $disabled = FALSE) {
     return array_map(function (array $info) {
       return $info['title'];
-    }, $this->getLayoutVariations($theme_name, $disabled));
+    }, $this->layouts($theme_name, $disabled));
   }
 
   /**
    * Get info about all enabled layout variations for a theme.
    */
-  protected function getLayoutVariations(string $theme_name, bool $disabled = FALSE) {
+  public function layouts(string $theme_name, bool $disabled = FALSE) {
     $variations = $this->invokeLayoutHook($this->themes[$theme_name]);
     if (!$disabled) {
       $enabled = theme_get_setting('layout_variations', $theme_name);
