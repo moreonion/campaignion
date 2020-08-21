@@ -5,8 +5,8 @@
  * Hook implementations for the our custom field type and field widget.
  */
 
-use Drupal\campaignion_layout\Themes;
 use Drupal\little_helpers\ArrayConfig;
+use Drupal\little_helpers\Services\Container;
 
 /**
  * Implements hook_field_info().
@@ -49,7 +49,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     'layout' => '',
   ]);
 
-  $themes = Themes::fromConfig()->enabledThemes();
+  $themes = Container::get()->loadService('campaignion_layout.themes')->enabledThemes();
   $theme_options = array_map(function ($theme) {
     return $theme->title();
   }, $themes);

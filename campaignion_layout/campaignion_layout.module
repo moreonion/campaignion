@@ -6,6 +6,7 @@
  */
 
 use Drupal\campaignion_layout\Themes;
+use Drupal\little_helpers\Services\Container;
 
 // The field.module does not group its hooks so we have to include this here.
 require_once 'campaignion_layout.field.inc';
@@ -87,12 +88,23 @@ function _campaignion_layout_get_field_item($entity_type, $entity) {
 }
 
 /**
+ * Implements hook_little_helpers_services().
+ */
+function campaignion_layout_little_helpers_services() {
+  $info['campaignion_layout.themes'] = [
+    'class' => Themes::class,
+    'constructor' => 'fromConfig',
+  ];
+  return $info;
+}
+
+/**
  * Prepare variables for page templates.
  */
 function campaignion_layout_preprocess_page(array &$vars) {
   $vars['layout'] = NULL;
   if (($node = $vars['node'] ?? NULL) && ($item = _campaignion_layout_get_field_item('node', $node)) && ($layout = $item['layout'])) {
-    $theme = Themes::fromConfig()->getTheme($item['theme']);
+    $theme = Container::get()->loadService('campaignion_layout.themes')->getTheme($item['theme']);
     if ($theme->isActive() && $theme->layoutIsEnabled($layout)) {
       $vars['layout'] = $layout;
       array_unshift($vars['theme_hook_suggestions'], "page__layout__$layout");
@@ -107,7 +119,7 @@ function campaignion_layout_form_system_theme_settings_alter(&$form, $form_state
   if (!($theme_name = $form_state['build_info']['args'][0] ?? NULL)) {
     return;
   }
-  $theme = Themes::fromConfig()->getTheme($theme_name);
+  $theme = Container::get()->loadService('campaignion_layout.themes')->getTheme($theme_name);
   if (!$theme->hasFeature()) {
     return;
   }
