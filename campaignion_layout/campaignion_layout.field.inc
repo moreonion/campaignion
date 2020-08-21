@@ -49,8 +49,10 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     'layout' => '',
   ]);
 
-  $themes = Themes::fromConfig();
-  $theme_options = $themes->themeOptions();
+  $themes = Themes::fromConfig()->enabledThemes();
+  $theme_options = array_map(function ($theme) {
+    return $theme->title();
+  }, $themes);
   $theme_id = drupal_html_id('campaignion-layout-theme');
   $element['theme'] = [
     '#type' => 'select',
@@ -66,10 +68,10 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     '#type' => 'value',
     '#value' => $item['layout'],
   ];
-  foreach ($theme_options as $theme_name => $title) {
+  foreach ($themes as $theme_name => $theme) {
     $options = ['' => t('Default layout')];
     $html_id = drupal_html_id("layout_{$theme_name}");
-    foreach ($themes->layouts($theme_name) as $layout => $info) {
+    foreach ($theme->layouts() as $layout => $info) {
       $options[$layout] = $info['title'];
       foreach (array_keys(array_filter($info['fields'])) as $field_name) {
         $fields[$field_name]["#$html_id input"][] = $layout;
