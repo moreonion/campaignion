@@ -90,4 +90,20 @@ class FieldTest extends DrupalUnitTestCase {
     $this->assertFalse(campaignion_layout_field_is_empty($item, NULL));
   }
 
+  /**
+   * Test that #states are added to the node form.
+   */
+  public function testNodeFormAlter() {
+    $form['layout_background_image'] = [];
+    $form_state = [];
+    campaignion_layout_form_node_form_alter($form, $form_state);
+    $this->assertFalse($form['layout_background_image']['#access']);
+    unset($form['layout_background_image']['#access']);
+
+    $form_state['campaignion_layout_fields']['layout_background_image']['#layout-a input'] = ['banner'];
+    campaignion_layout_form_node_form_alter($form, $form_state);
+    $expected['visible']['#layout-a input']['value'] = 'banner';
+    $this->assertEqual($expected, $form['layout_background_image']['#states']);
+  }
+
 }
