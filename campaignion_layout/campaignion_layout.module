@@ -157,3 +157,11 @@ function campaignion_layout_form_node_form_alter(&$form, &$form_state) {
     }
   }
 }
+
+/**
+ * Implements hook_campaignion_layout_hidden_fields().
+ */
+function campaignion_layout_campaignion_layout_hidden_fields() {
+  $hidden_fields['layout_background_image'] = TRUE;
+  return $hidden_fields;
+}

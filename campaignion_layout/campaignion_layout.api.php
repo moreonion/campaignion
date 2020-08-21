@@ -13,7 +13,7 @@ function hook_campaignion_layout_info() {
     'title' => t('Two-column layout'),
     'fields' => [
       // Hide the background image unless this layout is selected.
-      'field_background_image' => TRUE,
+      'layout_background_image' => TRUE,
     ],
   ];
   return $info;
@@ -35,7 +35,7 @@ function hook_campaignion_layout_info_alter(&$info) {
  *   has a truthy value then it will be hidden by default.
  */
 function hook_campaignion_layout_dependent_fields() {
-  $hidden_fields['field_background_image'] = TRUE;
+  $hidden_fields['layout_background_image'] = TRUE;
   return $hidden_fields;
 }
 

@@ -3,5 +3,7 @@ description = Layout variations selectable from the content.
 core = 7.x
 package = Campaignion
 dependencies[] = features
+dependencies[] = image
 features[features_api][] = api:2
 features[field_base][] = layout
+features[field_base][] = layout_background_image
