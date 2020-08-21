@@ -68,6 +68,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     '#type' => 'value',
     '#value' => $item['layout'],
   ];
+  $fields = [];
   foreach ($themes as $theme_name => $theme) {
     $options = ['' => t('Default layout')];
     $html_id = drupal_html_id("layout_{$theme_name}");
@@ -89,6 +90,9 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     ];
   }
   $form_state['campaignion_layout_fields'] = $fields;
+  if (!$themes) {
+    $element['#access'] = FALSE;
+  }
   return $element;
 }
 
