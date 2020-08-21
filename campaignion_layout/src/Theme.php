@@ -56,6 +56,14 @@ class Theme {
   }
 
   /**
+   * Check whether the theme is the current active theme.
+   */
+  public function isActive($active = NULL) {
+    $active = $active ?? $GLOBALS['theme'];
+    return $this->theme->name === $active;
+  }
+
+  /**
    * Get the theme’s human-readable title.
    */
   public function title() {
@@ -98,6 +106,14 @@ class Theme {
       }
     }
     return $variations;
+  }
+
+  /**
+   * Check whether a layout is enabled.
+   */
+  public function layoutIsEnabled($layout) {
+    $enabled = $this->setting('layout_variations');
+    return !empty($enabled[$layout]);
   }
 
   /**

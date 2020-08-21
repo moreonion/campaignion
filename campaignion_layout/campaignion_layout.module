@@ -91,8 +91,9 @@ function _campaignion_layout_get_field_item($entity_type, $entity) {
  */
 function campaignion_layout_preprocess_page(array &$vars) {
   $vars['layout'] = NULL;
-  if (!empty($vars['node']) && ($item = _campaignion_layout_get_field_item('node', $vars['node']))) {
-    if ($GLOBALS['theme'] == $item['theme'] && ($layout = $item['layout'])) {
+  if (($node = $vars['node'] ?? NULL) && ($item = _campaignion_layout_get_field_item('node', $node)) && ($layout = $item['layout'])) {
+    $theme = Themes::fromConfig()->getTheme($item['theme']);
+    if ($theme->isActive() && $theme->layoutIsEnabled($layout)) {
       $vars['layout'] = $layout;
       array_unshift($vars['theme_hook_suggestions'], "page__layout__$layout");
     }
