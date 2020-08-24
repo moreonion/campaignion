@@ -168,6 +168,17 @@ function campaignion_layout_form_node_form_alter(&$form, &$form_state) {
       $form[$field_name]['#access'] = FALSE;
     }
   }
+
+  $instances = field_info_instances('node', $form['#node']->type);
+  if (isset($instances['layout'])) {
+    $form['layout'] = [
+      '#type' => 'fieldset',
+      '#title' => $form['layout'][LANGUAGE_NONE][0]['#title'],
+      '#group' => 'additional_settings',
+      '#weight' => -10,
+    ] + $form['layout'];
+    $form['layout'][LANGUAGE_NONE][0]['#type'] = 'container';
+  }
 }
 
 /**

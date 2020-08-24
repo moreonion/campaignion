@@ -94,7 +94,12 @@ class FieldTest extends DrupalUnitTestCase {
    * Test that #states are added to the node form.
    */
   public function testNodeFormAlter() {
+    $form['layout'][LANGUAGE_NONE][0] = [
+      '#type' => 'fieldset',
+      '#title' => 'Theme & layout',
+    ];
     $form['layout_background_image'] = [];
+    $form['#node'] = (object) ['type' => 'petition'];
     $form_state = [];
     campaignion_layout_form_node_form_alter($form, $form_state);
     $this->assertFalse($form['layout_background_image']['#access']);
@@ -104,6 +109,8 @@ class FieldTest extends DrupalUnitTestCase {
     campaignion_layout_form_node_form_alter($form, $form_state);
     $expected['visible']['#layout-a input']['value'] = 'banner';
     $this->assertEqual($expected, $form['layout_background_image']['#states']);
+
+    $this->assertEqual('fieldset', $form['layout']['#type']);
   }
 
 }
