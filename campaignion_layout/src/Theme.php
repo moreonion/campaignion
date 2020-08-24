@@ -100,7 +100,9 @@ class Theme {
    * Get info about all enabled layout variations for a theme.
    */
   public function layouts(bool $disabled = FALSE) {
-    $variations = $this->invokeLayoutHook();
+    $variations = array_map(function ($info) {
+      return $info + ['fields' => []];
+    }, $this->invokeLayoutHook());
     if (!$disabled) {
       $enabled = $this->setting('layout_variations');
       // If not explicitly set (NULL) we assume all variations are enabled.

@@ -80,6 +80,11 @@ class ThemeTest extends DrupalUnitTestCase {
     $this->assertEqual([
       'bar' => 'Bar',
     ], $theme->layoutOptions());
+    $this->assertEqual([
+      'foo' => ['title' => 'Foo', 'fields' => []],
+      'bar' => ['title' => 'Bar', 'fields' => []],
+      'baz' => ['title' => 'Baz', 'fields' => []],
+    ], $theme->layouts(TRUE));
   }
 
 }
