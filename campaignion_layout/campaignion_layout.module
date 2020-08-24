@@ -79,7 +79,7 @@ function _campaignion_layout_get_field_item($entity_type, $entity) {
     return $field['type'] == 'layout_selection';
   });
   foreach (array_keys($instances) as $field_name) {
-    foreach (field_get_items($entity_type, $entity, $field_name) as $item) {
+    foreach (field_get_items($entity_type, $entity, $field_name) ?: [] as $item) {
       if ($item['theme']) {
         return $item;
       }

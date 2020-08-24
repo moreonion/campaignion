@@ -82,6 +82,7 @@ features[field_instance][] = node-email_to_target-field_thank_you_pages
 features[field_instance][] = node-email_to_target-supporter_tags
 features[field_instance][] = node-petition-field_main_image
 features[field_instance][] = node-petition-field_thank_you_pages
+features[field_instance][] = node-petition-layout
 features[field_instance][] = node-petition-supporter_tags
 features[field_instance][] = node-thank_you_page-campaignion_overlay_options
 features[field_instance][] = redhen_contact-contact-campaign_tag
