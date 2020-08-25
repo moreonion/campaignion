@@ -5,6 +5,7 @@
  * Hook implementations and callbacks for the campaignion layouts module.
  */
 
+use Drupal\campaignion_layout\Lookup;
 use Drupal\campaignion_layout\Themes;
 use Drupal\little_helpers\Services\Container;
 
@@ -63,28 +64,7 @@ function campaignion_layout_no_custom_theme() {
  * @see campaignion_layout_menu_alter()
  */
 function campaignion_layout_get_theme_for_entity($entity_type, $entity) {
-  if ($item = _campaignion_layout_get_field_item($entity_type, $entity)) {
-    return $item['theme'];
-  }
-  return NULL;
-}
-
-/**
- * Get the first non-empty field-name on any field of type 'layout_selection'.
- */
-function _campaignion_layout_get_field_item($entity_type, $entity) {
-  list($id, $_, $bundle) = entity_extract_ids($entity_type, $entity);
-  $instances = array_filter(field_info_instances($entity_type, $bundle), function ($instance) {
-    $field = field_info_field($instance['field_name']);
-    return $field['type'] == 'layout_selection';
-  });
-  foreach (array_keys($instances) as $field_name) {
-    foreach (field_get_items($entity_type, $entity, $field_name) ?: [] as $item) {
-      if ($item['theme']) {
-        return $item;
-      }
-    }
-  }
+  return Lookup::fromEntity($entity_type, $entity)->getTheme();
 }
 
 /**
@@ -103,12 +83,9 @@ function campaignion_layout_little_helpers_services() {
  */
 function campaignion_layout_preprocess_page(array &$vars) {
   $vars['layout'] = NULL;
-  if (($node = $vars['node'] ?? NULL) && ($item = _campaignion_layout_get_field_item('node', $node)) && ($layout = $item['layout'])) {
-    $theme = Container::get()->loadService('campaignion_layout.themes')->getTheme($item['theme']);
-    if ($theme->isActive() && $theme->layoutIsEnabled($layout)) {
-      $vars['layout'] = $layout;
-      array_unshift($vars['theme_hook_suggestions'], "page__layout__$layout");
-    }
+  if (($node = $vars['node'] ?? NULL) && ($layout = Lookup::fromEntity('node', $node)->getLayout())) {
+    $vars['layout'] = $layout;
+    array_unshift($vars['theme_hook_suggestions'], "page__layout__$layout");
   }
 }
 
