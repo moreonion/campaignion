@@ -68,18 +68,24 @@ class ThemeTest extends DrupalUnitTestCase {
     $theme = $mock_builder->setConstructorArgs([
       (object) ['status' => 1, 'name' => 'foo'],
     ])->getMock();
-    $theme->method('setting')->willReturn([
-      'bar' => 'bar',
-      'baz' => 0,
-    ]);
     $theme->method('invokeLayoutHook')->willReturn([
       'foo' => ['title' => 'Foo'],
       'bar' => ['title' => 'Bar'],
       'baz' => ['title' => 'Baz'],
     ]);
+    // No setting yet → No layouts activated.
+    $this->assertEqual([], $theme->layoutOptions());
+
+    // Activate the bar-layout.
+    $theme->method('setting')->willReturn([
+      'bar' => 'bar',
+      'baz' => 0,
+    ]);
     $this->assertEqual([
       'bar' => 'Bar',
     ], $theme->layoutOptions());
+
+    // List the entire layout info with defaults added.
     $this->assertEqual([
       'foo' => ['title' => 'Foo', 'fields' => []],
       'bar' => ['title' => 'Bar', 'fields' => []],

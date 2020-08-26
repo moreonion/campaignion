@@ -104,11 +104,8 @@ class Theme {
       return $info + ['fields' => []];
     }, $this->invokeLayoutHook());
     if (!$disabled) {
-      $enabled = $this->setting('layout_variations');
-      // If not explicitly set (NULL) we assume all variations are enabled.
-      if (!is_null($enabled)) {
-        $variations = array_intersect_key($variations, array_filter($enabled));
-      }
+      $enabled = $this->setting('layout_variations') ?? [];
+      $variations = array_intersect_key($variations, array_filter($enabled));
     }
     return $variations;
   }

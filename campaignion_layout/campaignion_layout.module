@@ -110,13 +110,11 @@ function campaignion_layout_form_system_theme_settings_alter(&$form, $form_state
     '#default_value' => $theme->setting('toggle_layout_variations'),
   ];
   $states['visible'][':input[name="toggle_layout_variations"]']['checked'] = TRUE;
-  $options = $theme->layoutOptions(TRUE);
-  $enabled = $theme->setting('layout_variations') ?? array_keys($options);
   $form['layout_variations']['layout_variations'] = [
     '#type' => 'checkboxes',
     '#title' => t('Enabled layout variations.'),
-    '#options' => $options,
-    '#default_value' => $enabled,
+    '#options' => $theme->layoutOptions(TRUE),
+    '#default_value' => $theme->setting('layout_variations') ?? [],
     '#states' => $states,
   ];
 }
