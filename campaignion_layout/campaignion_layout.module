@@ -151,6 +151,7 @@ function campaignion_layout_form_node_form_alter(&$form, &$form_state) {
       '#title' => $form['layout'][LANGUAGE_NONE][0]['#title'],
       '#group' => 'additional_settings',
       '#weight' => -10,
+      '#access' => $form['layout'][LANGUAGE_NONE][0]['#access'] ?? TRUE,
     ] + $form['layout'];
     $form['layout'][LANGUAGE_NONE][0]['#type'] = 'container';
   }
