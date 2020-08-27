@@ -19,12 +19,44 @@ class FieldTest extends DrupalUnitTestCase {
   }
 
   /**
+   * Inject a themes service with specific metadata.
+   */
+  protected function injectThemes($themes = []) {
+    $theme_objects = [];
+    foreach ($themes as $name => $data) {
+      $theme = $this->createMock(Theme::class);
+      $theme->method('title')->willReturn($data['title'] ?? $name);
+      $theme->method('layouts')->willReturn(array_map(function ($info) {
+        return $info + ['fields' => []];
+      }, $data['layouts']));
+      $theme_objects[$name] = $theme;
+    }
+    $themes = $this->createMock(Themes::class);
+    $themes->method('enabledThemes')->willReturn($theme_objects);
+    Container::get()->inject('campaignion_layout.themes', $themes);
+  }
+
+  /**
+   * Generate theme test data.
+   */
+  protected function twoThemes() {
+    $themes['a']['title'] = 'Theme A';
+    $themes['a']['layouts']['2col']['title'] = 'Two columns';
+    $themes['a']['layouts']['banner'] = [
+      'title' => 'Banner',
+      'fields' => ['banner' => TRUE],
+    ];
+    $themes['b']['title'] = 'Theme B';
+    $themes['b']['layouts']['2col']['title'] = 'Two columns';
+    $themes['b']['layouts']['1col']['title'] = 'Single column';
+    return $themes;
+  }
+
+  /**
    * Test rendering the field widget if no themes are available.
    */
   public function testFieldWidgetWithoutThemes() {
-    $themes = $this->createMock(Themes::class);
-    $themes->method('enabledThemes')->willReturn([]);
-    Container::get()->inject('campaignion_layout.themes', $themes);
+    $this->injectThemes([]);
     $form = [];
     $form_state = [];
     $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, [], 0, []);
@@ -36,36 +68,23 @@ class FieldTest extends DrupalUnitTestCase {
    * Test rendering the field widget with themes.
    */
   public function testFieldWidgetWithThemes() {
-    $theme_a = $this->createMock(Theme::class);
-    $theme_a->method('title')->willReturn('Theme A');
-    $theme_a->method('layouts')->willReturn([
-      '2col' => ['title' => 'Two columns', 'fields' => []],
-      'banner' => ['title' => 'Banner', 'fields' => ['banner' => TRUE]],
-    ]);
-    $theme_b = $this->createMock(Theme::class);
-    $theme_b->method('title')->willReturn('Theme B');
-    $theme_b->method('layouts')->willReturn([
-      '1col' => ['title' => 'Single column', 'fields' => []],
-    ]);
-    $themes = $this->createMock(Themes::class);
-    $themes->method('enabledThemes')->willReturn([
-      'a' => $theme_a,
-      'b' => $theme_b,
-    ]);
-    Container::get()->inject('campaignion_layout.themes', $themes);
+    $this->injectThemes($this->twoThemes());
     $form = [];
     $form_state = [];
     $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, [], 0, []);
+    $this->assertFalse($element['enabled']['#default_value']);
     $this->assertEqual([
       'a' => 'Theme A',
       'b' => 'Theme B',
     ], $element['values']['theme']['#options']);
+    $this->assertNull($element['values']['theme']['#default_value']);
     $this->assertNotEmpty($element['values']['layout_a']['#options']);
     $this->assertEqual([
       '' => 'Default layout',
       '2col' => 'Two columns',
       'banner' => 'Banner',
     ], $element['values']['layout_a']['#options']);
+    $this->assertEqual('', $element['values']['layout_a']['#default_value']);
     $this->assertNotEmpty($element['values']['layout_b']['#options']);
     $this->assertEqual([
       'banner' => ['#layout-a input' => ['banner']],
@@ -85,6 +104,51 @@ class FieldTest extends DrupalUnitTestCase {
     _campaignion_layout_field_widget_validate($element, $form_state, $form);
     $this->assertNull($form_state['values']['theme']);
     $this->assertNull($form_state['values']['layout']);
+  }
+
+  /**
+   * Test default values with an unknown theme as default value.
+   */
+  public function testDefaultValuesUnknownTheme() {
+    $this->injectThemes($this->twoThemes());
+    $form = [];
+    $form_state = [];
+    $items[] = ['theme' => 'unknown', 'layout' => '2col'];
+    $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, $items, 0, []);
+    $this->assertFalse($element['enabled']['#default_value']);
+    $this->assertNull($element['values']['theme']['#default_value']);
+    $this->assertEqual('', $element['values']['layout_a']['#default_value']);
+    $this->assertEqual('', $element['values']['layout_b']['#default_value']);
+  }
+
+  /**
+   * Test default values with an unknown layout as default value.
+   */
+  public function testDefaultValuesUnknownLayout() {
+    $this->injectThemes($this->twoThemes());
+    $form = [];
+    $form_state = [];
+    $items[] = ['theme' => 'a', 'layout' => 'unknown'];
+    $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, $items, 0, []);
+    $this->assertTrue($element['enabled']['#default_value']);
+    $this->assertEqual('a', $element['values']['theme']['#default_value']);
+    $this->assertEqual('', $element['values']['layout_a']['#default_value']);
+    $this->assertEqual('', $element['values']['layout_b']['#default_value']);
+  }
+
+  /**
+   * Test default values with a default theme and layout.
+   */
+  public function testDefaultValues() {
+    $this->injectThemes($this->twoThemes());
+    $form = [];
+    $form_state = [];
+    $items[] = ['theme' => 'a', 'layout' => '2col'];
+    $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, $items, 0, []);
+    $this->assertTrue($element['enabled']['#default_value']);
+    $this->assertEqual('a', $element['values']['theme']['#default_value']);
+    $this->assertEqual('2col', $element['values']['layout_a']['#default_value']);
+    $this->assertEqual('', $element['values']['layout_b']['#default_value']);
   }
 
   /**

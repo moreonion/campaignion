@@ -49,12 +49,12 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     'layout' => '',
   ]);
   $themes = Container::get()->loadService('campaignion_layout.themes')->enabledThemes();
-
+  $selected_theme = isset($themes[$item['theme']]) ? $item['theme'] : NULL;
   $toggle_id = drupal_html_id('layout_toggle');
   $element['enabled'] = [
     '#type' => 'checkbox',
     '#title' => t('Custom theme and layout.'),
-    '#default_value' => $themes && $item['theme'],
+    '#default_value' => $themes && $selected_theme,
     '#id' => $toggle_id,
   ];
   $toggle_states['visible']["#$toggle_id"]['checked'] = TRUE;
@@ -74,7 +74,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     '#title' => t('Theme'),
     '#description' => t('This theme is used when displaying the content.'),
     '#options' => $theme_options,
-    '#default_value' => $item['theme'],
+    '#default_value' => $selected_theme,
     '#id' => $theme_id,
     '#states' => $toggle_states,
   ];
@@ -93,12 +93,16 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
       }
     }
     $states['visible']["#{$theme_id}"]['value'] = $theme_name;
+    $selected_layout = '';
+    if ($theme_name == $selected_theme && isset($options[$item['layout']])) {
+      $selected_layout = $item['layout'];
+    }
     $element['values']["layout_{$theme_name}"] = [
       '#type' => 'radios',
       '#title' => t('Layout'),
       '#description' => t('This layout is used for displaying the content.'),
       '#options' => $options,
-      '#default_value' => $item['layout'],
+      '#default_value' => $selected_layout,
       '#states' => $states + $toggle_states,
       '#id' => $html_id,
     ];
