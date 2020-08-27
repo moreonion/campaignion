@@ -28,7 +28,7 @@ class FieldTest extends DrupalUnitTestCase {
     $form = [];
     $form_state = [];
     $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, [], 0, []);
-    $this->assertEqual([], $element['theme']['#options']);
+    $this->assertEqual([], $element['values']['theme']['#options']);
     $this->assertFalse($element['#access']);
   }
 
@@ -59,25 +59,32 @@ class FieldTest extends DrupalUnitTestCase {
     $this->assertEqual([
       'a' => 'Theme A',
       'b' => 'Theme B',
-    ], $element['theme']['#options']);
-    $this->assertNotEmpty($element['layout_a']['#options']);
+    ], $element['values']['theme']['#options']);
+    $this->assertNotEmpty($element['values']['layout_a']['#options']);
     $this->assertEqual([
       '' => 'Default layout',
       '2col' => 'Two columns',
       'banner' => 'Banner',
-    ], $element['layout_a']['#options']);
-    $this->assertNotEmpty($element['layout_b']['#options']);
+    ], $element['values']['layout_a']['#options']);
+    $this->assertNotEmpty($element['values']['layout_b']['#options']);
     $this->assertEqual([
       'banner' => ['#layout-a input' => ['banner']],
     ], $form_state['campaignion_layout_fields']);
 
-    $element['theme']['#value'] = 'a';
-    $element['layout_a']['#value'] = 'banner';
-    $element['layout_b']['#value'] = '1col';
-    $element['layout']['#parents'] = ['layout'];
+    $element['#parents'] = [];
+    $element['enabled']['#value'] = TRUE;
+    $element['values']['theme']['#value'] = 'a';
+    $element['values']['layout_a']['#value'] = 'banner';
+    $element['values']['layout_b']['#value'] = '1col';
     $form_state['values'] = [];
     _campaignion_layout_field_widget_validate($element, $form_state, $form);
     $this->assertEqual('banner', $form_state['values']['layout']);
+
+    $element['enabled']['#value'] = FALSE;
+    $form_state['values'] = [];
+    _campaignion_layout_field_widget_validate($element, $form_state, $form);
+    $this->assertNull($form_state['values']['theme']);
+    $this->assertNull($form_state['values']['layout']);
   }
 
   /**

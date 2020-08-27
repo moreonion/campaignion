@@ -48,23 +48,37 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     'theme' => NULL,
     'layout' => '',
   ]);
-
   $themes = Container::get()->loadService('campaignion_layout.themes')->enabledThemes();
+
+  $toggle_id = drupal_html_id('layout_toggle');
+  $element['enabled'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Custom theme and layout.'),
+    '#default_value' => $themes && $item['theme'],
+    '#id' => $toggle_id,
+  ];
+  $toggle_states['visible']["#$toggle_id"]['checked'] = TRUE;
+
+  // Container for the values so that they can be hidden with #states.
+  $element['values'] = [
+    '#type' => 'container',
+    '#states' => $toggle_states,
+  ];
+
   $theme_options = array_map(function ($theme) {
     return $theme->title();
   }, $themes);
   $theme_id = drupal_html_id('campaignion-layout-theme');
-  $element['theme'] = [
+  $element['values']['theme'] = [
     '#type' => 'select',
     '#title' => t('Theme'),
-    '#empty_value' => NULL,
-    '#empty_option' => t('- Default -'),
     '#description' => t('This theme is used when displaying the content.'),
     '#options' => $theme_options,
     '#default_value' => $item['theme'],
     '#id' => $theme_id,
+    '#states' => $toggle_states,
   ];
-  $element['layout'] = [
+  $element['values']['layout'] = [
     '#type' => 'value',
     '#value' => $item['layout'],
   ];
@@ -79,13 +93,13 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
       }
     }
     $states['visible']["#{$theme_id}"]['value'] = $theme_name;
-    $element["layout_{$theme_name}"] = [
+    $element['values']["layout_{$theme_name}"] = [
       '#type' => 'radios',
       '#title' => t('Layout'),
       '#description' => t('This layout is used for displaying the content.'),
       '#options' => $options,
       '#default_value' => $item['layout'],
-      '#states' => $states,
+      '#states' => $states + $toggle_states,
       '#id' => $html_id,
     ];
   }
@@ -100,9 +114,15 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
  * Validation callback for the field widget.
  */
 function _campaignion_layout_field_widget_validate($element, &$form_state, $form) {
-  $theme_name = $element['theme']['#value'];
-  $layout = $theme_name ? $element["layout_{$theme_name}"]['#value'] : NULL;
-  form_set_value($element['layout'], $layout, $form_state);
+  $values = [
+    'theme' => NULL,
+    'layout' => NULL,
+  ];
+  if ($element['enabled']['#value']) {
+    $values['theme'] = $element['values']['theme']['#value'];
+    $values['layout'] = $element['values']["layout_{$values['theme']}"]['#value'];
+  }
+  form_set_value($element, $values, $form_state);
 }
 
 /**
