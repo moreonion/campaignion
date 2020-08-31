@@ -13,7 +13,7 @@ use Upal\DrupalUnitTestCase;
 class MenuTest extends DrupalUnitTestCase {
 
   const ENTITY_CALLBACK = 'campaignion_layout_get_theme_for_entity';
-  const DUMMY_CALLBACK = 'campaignion_layout_no_custom_theme';
+  const NO_CALLBACK = '';
 
   /**
    * Create a test node.
@@ -51,10 +51,10 @@ class MenuTest extends DrupalUnitTestCase {
     $this->assertEqual(self::ENTITY_CALLBACK, $item['theme_callback']);
 
     $item = menu_get_item("node/{$this->node->nid}/edit");
-    $this->assertEqual(self::DUMMY_CALLBACK, $item['theme_callback']);
+    $this->assertEqual(self::NO_CALLBACK, $item['theme_callback']);
 
     $item = menu_get_item("node/{$this->node->nid}/webform");
-    $this->assertEqual(self::DUMMY_CALLBACK, $item['theme_callback']);
+    $this->assertEqual(self::NO_CALLBACK, $item['theme_callback']);
   }
 
 }

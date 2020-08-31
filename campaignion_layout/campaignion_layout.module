@@ -24,7 +24,7 @@ function campaignion_layout_menu_alter(&$items) {
     'theme arguments' => ['node', 1],
   ];
   $no_callback = [
-    'theme callback' => 'campaignion_layout_no_custom_theme',
+    'theme callback' => '',
     'theme arguments' => [],
   ];
   $set_theme = [
@@ -44,18 +44,6 @@ function campaignion_layout_menu_alter(&$items) {
       }
     }
   }
-}
-
-/**
- * Menu theme callback: Set no custom theme.
- *
- * This is only used as a workaround to be able to add a theme callback for
- * node/% but not automatically for all local tasks (eg node/%/edit).
- *
- * @see campaignion_layout_menu_alter()
- */
-function campaignion_layout_no_custom_theme() {
-  return NULL;
 }
 
 /**
