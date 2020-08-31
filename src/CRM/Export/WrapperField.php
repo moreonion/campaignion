@@ -21,6 +21,13 @@ class WrapperField implements ExportMapperInterface {
         return is_null($delta) ? [] : NULL;
       }
       $field = $field->{$part};
+      // Check for missing values and stop recursion if we encounter one.
+      try {
+        $field->value();
+      }
+      catch (\EntityMetadataWrapperException $e) {
+        return is_null($delta) ? [] : NULL;
+      }
     }
     if ($field instanceof \EntityListWrapper) {
       return is_null($delta) ? $field->value() : $field->get($delta)->value();
