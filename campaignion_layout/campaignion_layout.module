@@ -30,17 +30,16 @@ function campaignion_layout_menu_alter(&$items) {
   $set_theme = [
     'view' => TRUE,
     'share' => TRUE,
-    'continue' => TRUE,
+    'webform-continue' => TRUE,
   ];
   foreach ($items as $path => &$item) {
-    if (substr($path, 0, 10) == 'node/%node') {
+    if (substr($path, 0, 6) == 'node/%') {
       $args = explode('/', $path, 4);
       $third_arg = $args[2] ?? NULL;
-      $more_args = $args[3] ?? NULL;
       if (!$third_arg || ($set_theme[$third_arg] ?? FALSE)) {
         $item = $callback + $item;
       }
-      elseif (!$more_args) {
+      else {
         $item = $no_callback + $item;
       }
     }

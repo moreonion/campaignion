@@ -7,7 +7,7 @@ use Upal\DrupalUnitTestCase;
 /**
  * Test whether menu-entries are manipulated as expected.
  *
- * NOTE: If you change anything in the theme alters you have to clear caches
+ * NOTE: If you change anything in the menu alters you have to clear caches
  *       before the test results will change.
  */
 class MenuTest extends DrupalUnitTestCase {
@@ -51,6 +51,9 @@ class MenuTest extends DrupalUnitTestCase {
     $this->assertEqual(self::ENTITY_CALLBACK, $item['theme_callback']);
 
     $item = menu_get_item("node/{$this->node->nid}/edit");
+    $this->assertEqual(self::DUMMY_CALLBACK, $item['theme_callback']);
+
+    $item = menu_get_item("node/{$this->node->nid}/webform");
     $this->assertEqual(self::DUMMY_CALLBACK, $item['theme_callback']);
   }
 
