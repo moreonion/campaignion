@@ -160,6 +160,10 @@ function campaignion_layout_form_node_form_alter(&$form, &$form_state) {
     ] + $form['layout'];
     $form['layout'][LANGUAGE_NONE][0]['#type'] = 'container';
   }
+
+  if (isset($form['layout_background_image'])) {
+    $form['layout_background_image']['#wizard_secondary'] = TRUE;
+  }
 }
 
 /**
