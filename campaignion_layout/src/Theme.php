@@ -100,9 +100,7 @@ class Theme {
    * Get info about all enabled layout variations for a theme.
    */
   public function layouts(bool $disabled = FALSE) {
-    $variations = array_map(function ($info) {
-      return $info + ['fields' => []];
-    }, $this->invokeLayoutHook());
+    $variations = $this->layoutInfo();
     if (!$disabled) {
       $enabled = $this->setting('layout_variations') ?? [];
       $variations = array_intersect_key($variations, array_filter($enabled));
@@ -113,9 +111,25 @@ class Theme {
   /**
    * Check whether a layout is enabled.
    */
-  public function layoutIsEnabled($layout) {
-    $enabled = $this->setting('layout_variations');
-    return !empty($enabled[$layout]);
+  public function getLayout($layout, $if_enabled = TRUE) {
+    return $this->layouts(!$if_enabled)[$layout] ?? NULL;
+  }
+
+  /**
+   * Get the theme’s declared layout metadata (with defaults).
+   */
+  protected function layoutInfo() {
+    $info = $this->invokeLayoutHook();
+    foreach ($info as $name => &$i) {
+      $i += ['name' => $name, 'fields' => []];
+      foreach ($i['fields'] as $field_name => &$f) {
+        $f += [
+          'display' => [],
+          'variable' => $field_name,
+        ];
+      }
+    }
+    return $info;
   }
 
   /**

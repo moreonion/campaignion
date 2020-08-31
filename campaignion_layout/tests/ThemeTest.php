@@ -87,9 +87,9 @@ class ThemeTest extends DrupalUnitTestCase {
 
     // List the entire layout info with defaults added.
     $this->assertEqual([
-      'foo' => ['title' => 'Foo', 'fields' => []],
-      'bar' => ['title' => 'Bar', 'fields' => []],
-      'baz' => ['title' => 'Baz', 'fields' => []],
+      'foo' => ['name' => 'foo', 'title' => 'Foo', 'fields' => []],
+      'bar' => ['name' => 'bar', 'title' => 'Bar', 'fields' => []],
+      'baz' => ['name' => 'baz', 'title' => 'Baz', 'fields' => []],
     ], $theme->layouts(TRUE));
   }
 

@@ -72,8 +72,8 @@ class Lookup {
    */
   public function getLayout() {
     foreach ($this->iterateItems() as $item) {
-      if (($theme = $this->themes->getTheme($item['theme'])) && $theme->isActive() && $theme->layoutIsEnabled($item['layout'])) {
-        return $item['layout'];
+      if (($theme = $this->themes->getTheme($item['theme'])) && $theme->isActive() && ($layout = $theme->getLayout($item['layout']))) {
+        return $layout;
       }
     }
   }
