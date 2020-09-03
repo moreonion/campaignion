@@ -333,6 +333,58 @@ function campaignion_test_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-petition-layout'.
+  $field_instances['node-petition-layout'] = array(
+    'bundle' => 'petition',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => array(
+      0 => array(
+        'theme' => '',
+        'layout' => NULL,
+        'layout_simplicity' => '',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'cck_blocks' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 14,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'layout',
+    'label' => 'Theme & layout',
+    'required' => 0,
+    'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'campaignion_layout',
+      'settings' => array(),
+      'type' => 'layout_selector',
+      'weight' => 17,
+    ),
+  );
+
   // Exported field_instance: 'node-petition-supporter_tags'.
   $field_instances['node-petition-supporter_tags'] = array(
     'bundle' => 'petition',
