@@ -11,6 +11,7 @@ body.aetoolbar .ui-page {
 #ae-bar,
 #ae-popups,
 #ae-widepopups {
+  box-sizing: content-box;
   font-family: "Helvetica Neue", Helvetica, Verdana, sans-serif !important;
   font-size: 11px !important;
   line-height: 2.272727em !important;
@@ -27,8 +28,8 @@ body.aetoolbar .ui-page {
   font-family: "Helvetica Neue", Helvetica, Verdana, sans-serif !important;
   font-size: 11px !important;
   line-height: 2.272727em !important;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin: 0;
+  padding: 0;
 }
 #ae-bar a,
 #ae-popups a,
@@ -65,6 +66,8 @@ body.aetoolbar .ui-page {
   font-family: "Helvetica Neue", Helvetica, Verdana, sans-serif !important;
   font-size: 11px !important;
   line-height: 2.272727em !important;
+  margin: 0;
+  padding: 0;
 }
 /* general ae-bar styling */
 #ae-bar {
@@ -285,6 +288,8 @@ body.aetoolbar .ui-page {
 #ae-widepopups .sidepopup ul.menu a {
   padding: 0.5em 1em;
   display: block;
+  width: 100%;
+  box-sizing: border-box;
   background: url() repeat #787575;
   -moz-border-radius: 0.5em;
   -webkit-border-radius: 0.5em;
