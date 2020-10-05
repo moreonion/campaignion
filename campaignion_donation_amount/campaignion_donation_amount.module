@@ -8,6 +8,23 @@
 use Drupal\campaignion_donation_amount\Utils;
 
 /**
+ * Implements hook_webform_component_info().
+ */
+function campaignion_donation_amount_webform_component_info() {
+  $info['donation_amount'] = [
+    'label' => t('Donation amount'),
+    'description' => t('Allows a use to specify a donation amount.'),
+    'features' => [
+      'conditional' => TRUE,
+      'conditional_action_set' => TRUE,
+      'opt_in' => TRUE,
+    ],
+    'file' => 'components/donation_amount.php',
+  ];
+  return $info;
+}
+
+/**
  * Implements hook_webform_component_render_alter().
  */
 function campaignion_donation_amount_webform_component_render_alter(array &$element, array &$component) {
