@@ -21,6 +21,7 @@ function campaignion_donation_amount_webform_component_info() {
       'opt_in' => TRUE,
     ],
     'file' => 'components/donation_amount.php',
+    'conditional_type' => 'numeric',
   ];
   return $info;
 }
