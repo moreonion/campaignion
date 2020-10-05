@@ -30,6 +30,8 @@ class ComponentTest extends DrupalUnitTestCase {
    */
   public function tearDown() : void {
     $_GET = $this->backupGet;
+    drupal_static_reset('form_set_error');
+    $_SESSION['messages'] = [];
     parent::tearDown();
   }
 
@@ -74,6 +76,45 @@ class ComponentTest extends DrupalUnitTestCase {
       '2.00' => '2.00',
       '3' => '3',
     ], $form['#options']);
+  }
+
+  /**
+   * Test the number validation pass.
+   */
+  public function testValidate() {
+    $component = webform_component_invoke('donation_amount', 'defaults');
+    $element = webform_component_invoke('donation_amount', 'render', $component);
+    $element['#value'] = "1\n2\n3";
+    $element['#parents'] = ['amount'];
+    $form_state['values']['extra'] = [
+      'max' => '100',
+      'min' => '',
+      'step' => '',
+      'integer' => FALSE,
+      'decimals' => '',
+    ];
+    _webform_edit_donation_amount_validate_amounts($element, $form_state);
+    $this->assertEmpty(drupal_static('form_set_error'));
+    $this->assertEqual(['1', '2', '3'], $form_state['values']['amount']);
+  }
+
+  /**
+   * Test the number validation with error.
+   */
+  public function testValidateError() {
+    $component = webform_component_invoke('donation_amount', 'defaults');
+    $element = webform_component_invoke('donation_amount', 'render', $component);
+    $element['#value'] = "1\n2\n300";
+    $element['#parents'] = ['amount'];
+    $form_state['values']['extra'] = [
+      'max' => '100',
+      'min' => '',
+      'step' => '',
+      'integer' => FALSE,
+      'decimals' => '',
+    ];
+    _webform_edit_donation_amount_validate_amounts($element, $form_state);
+    $this->assertNotEmpty(drupal_static('form_set_error'));
   }
 
 }
