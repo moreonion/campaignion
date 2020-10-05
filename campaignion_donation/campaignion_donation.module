@@ -93,20 +93,6 @@ function campaignion_donation_form_builder_element_types($form_type, $form_id) {
       'title' => t('Donation interval'),
       'weight' => -98,
     ];
-
-    $types['donation_amount'] = [
-      'title'  => t('Donation amount'),
-      'weight' => -99,
-      'palette_group' => 'donation',
-      'unique' => TRUE,
-      'properties' => ['default_value'],
-      'default' => [
-        '#title' => t('Donation amount'),
-        '#default_value' => '[current-page:query:p12]',
-        '#required' => TRUE,
-      ] + _form_builder_webform_default('textfield'),
-    ];
-
     return $types;
   }
 }
@@ -128,6 +114,7 @@ function campaignion_donation_form_builder_element_types_alter(&$types, $form_ty
     $types['currency']['unique'] = TRUE;
   }
   else {
+    $types['donation_amount']['addable'] = FALSE;
     $types['paymethod_select']['addable'] = FALSE;
   }
 }

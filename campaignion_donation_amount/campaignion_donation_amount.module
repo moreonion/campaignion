@@ -5,6 +5,7 @@
  * Hook implementations & callbacks for the campaignion_donation_amount module.
  */
 
+use Drupal\campaignion_donation_amount\FormBuilderElementDonationAmount;
 use Drupal\campaignion_donation_amount\Utils;
 
 /**
@@ -22,6 +23,31 @@ function campaignion_donation_amount_webform_component_info() {
     'file' => 'components/donation_amount.php',
   ];
   return $info;
+}
+
+/**
+ * Implements hook_form_builder_element_types().
+ *
+ * Add donation / payment specific types to the donation palette.
+ */
+function campaignion_donation_form_builder_element_types($form_type, $form_id) {
+  if ($form_type != 'webform') {
+    return;
+  }
+  module_load_include('components.inc', 'form_builder_webform');
+  $map = _form_builder_webform_property_map('donation_amount');
+  // Default value is handled by the form builder element class.
+  unset($map['properties']['default_value']);
+  $default = _form_builder_webform_default('donation_amount');
+  $default['#webform_component']['name'] = t('Donation amount');
+  $types['donation_amount'] = [
+    'palette_group' => 'donation',
+    'title' => t('Donation amount'),
+    'class' => FormBuilderElementDonationAmount::class,
+    'properties' => array_keys($map['properties']),
+    'default' => $default,
+  ];
+  return $types;
 }
 
 /**
