@@ -11,7 +11,9 @@
 function _webform_defaults_donation_amount() {
   $defaults = webform_component_invoke('number', 'defaults');
   unset($defaults['type']);
+  $defaults['name'] = t('Donation amount');
   $defaults['extra'] += [
+    'currency' => 'XXX',
     'options' => [],
     'other_option' => TRUE,
     'other_text' => t('Other'),
