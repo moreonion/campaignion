@@ -117,9 +117,9 @@ function campaignion_layout_form_system_theme_settings_alter(&$form, $form_state
  * Hide other fields on node forms.
  */
 function campaignion_layout_form_node_form_alter(&$form, &$form_state) {
-  $hidden_fields = module_invoke_all('campaignion_layout_dependent_fields');
-  drupal_alter('campaignion_layout_dependent_fields', $hidden_fields);
-  foreach (array_keys(array_filter($hidden_fields)) as $field_name) {
+  $dependent_fields = module_invoke_all('campaignion_layout_dependent_fields');
+  drupal_alter('campaignion_layout_dependent_fields', $dependent_fields);
+  foreach (array_keys(array_filter($dependent_fields)) as $field_name) {
     if (!isset($form[$field_name])) {
       // Skip fields if they don’t appear in the form anyway.
       continue;
@@ -157,8 +157,8 @@ function campaignion_layout_form_node_form_alter(&$form, &$form_state) {
  * Implements hook_campaignion_layout_dependent_fields().
  */
 function campaignion_layout_campaignion_layout_dependent_fields() {
-  $hidden_fields['layout_background_image'] = TRUE;
-  return $hidden_fields;
+  $dependent_fields['layout_background_image'] = TRUE;
+  return $dependent_fields;
 }
 
 /**
