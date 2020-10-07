@@ -146,14 +146,19 @@ function _webform_render_donation_amount($component, $value = NULL, $filter = TR
   $component['extra']['unique'] = FALSE;
   $element = webform_component_invoke('number', 'render', $component, $value, $filter, $submission);
   $element['#attributes']['class'][] = 'donation-amount';
+  $element['#attributes']['class'][] = 'donation-amount-' . $component['extra']['currency'];
+  $element['#attributes']['data-currency'] = $component['extra']['currency'];
   if ($component['extra']['options']) {
+    $currency = currency_load($component['extra']['currency']);
     $element['#type'] = 'select_or_other';
     $element['#select_type'] = 'radios';
-    $element['#options'] = drupal_map_assoc($component['extra']['options']);
+    $element['#options'] = drupal_map_assoc($component['extra']['options'], function ($amount) use ($currency) {
+      return $currency->sign . ' ' . $amount;
+    });
     $element['#other'] = !empty($component['extra']['other_text']) ? check_plain($component['extra']['other_text']) : t('Other...');
     $element['#translatable'][] = 'other';
-    $element['#other_title'] = $element['#title'] . ' ' . $element['#other'];
-    $element['#other_title_display'] = 'invisible';
+    $element['#other_title'] = $currency->sign;
+    $element['#other_title_display'] = 'before';
     $element['#other_unknown_defaults'] = 'other';
     $element['#other_delimiter'] = ', ';
     // Merge in Webform's #process function for Select or other.
