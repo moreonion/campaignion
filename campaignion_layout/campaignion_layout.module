@@ -124,14 +124,16 @@ function campaignion_layout_form_node_form_alter(&$form, &$form_state) {
       // Skip fields if they don’t appear in the form anyway.
       continue;
     }
-    $activating_selectors = $form_state['campaignion_layout_fields'][$field_name] ?? [];
-    foreach ($activating_selectors as $selector => $values) {
+    $states = [];
+    foreach ($form_state['campaignion_layout_fields'][$field_name] ?? [] as $selector => $values) {
       foreach ($values as $value) {
-        $states['visible'][$selector]['value'] = $value;
-        $form[$field_name]['#states'] = $states;
+        $states['visible'][$selector][] = ['value' => $value];
       }
     }
-    if (!$activating_selectors) {
+    if ($states) {
+      $form[$field_name]['#states'] = $states;
+    }
+    else {
       $form[$field_name]['#access'] = FALSE;
     }
   }
