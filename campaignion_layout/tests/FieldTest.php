@@ -178,7 +178,12 @@ class FieldTest extends DrupalUnitTestCase {
 
     $form_state['campaignion_layout_fields']['layout_background_image']['#layout-a input'] = ['banner'];
     campaignion_layout_form_node_form_alter($form, $form_state);
-    $expected['visible']['#layout-a input']['value'] = 'banner';
+    $expected['visible']['#layout-a input'][] = ['value' => 'banner'];
+    $this->assertEqual($expected, $form['layout_background_image']['#states']);
+
+    $form_state['campaignion_layout_fields']['layout_background_image']['#layout-a input'] = ['banner', '2col'];
+    campaignion_layout_form_node_form_alter($form, $form_state);
+    $expected['visible']['#layout-a input'][] = ['value' => '2col'];
     $this->assertEqual($expected, $form['layout_background_image']['#states']);
 
     $this->assertEqual('fieldset', $form['layout']['#type']);
