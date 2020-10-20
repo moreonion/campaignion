@@ -22,6 +22,25 @@ class WebformSubmission extends ActivityBase {
     return $query->execute()->fetchObject(get_called_class());
   }
 
+  /**
+   * Load or create a submission activity based on contact and submission.
+   */
+  public static function fromContactAndSubmission(\RedhenContact $contact, Submission $submission) {
+    $query = static::buildJoins();
+    $query->condition('aw.nid', $submission->nid)
+      ->condition('aw.sid', $submission->sid)
+      ->condition('a.contact_id', $contact->contact_id);
+    if ($activity = $query->execute()->fetchObject(get_called_class())) {
+      return $activity;
+    }
+    return new static([
+      'contact_id' => $contact->contact_id,
+      'nid' => $submission->nid,
+      'sid' => $submission->sid,
+      'confirmed' => $submission->webform->needsConfirmation() ? NULL : $submission->completed,
+    ]);
+  }
+
   public static function byNidSid($nid, $sid) {
     $query = static::buildJoins();
     $query->condition('aw.nid', $nid)

@@ -1,6 +1,8 @@
 <?php
 
-use \Drupal\campaignion_activity\ActivityBase;
+use Drupal\campaignion_activity\ActivityBase;
+use \Drupal\campaignion_activity\WebformSubmission;
+use Drupal\little_helpers\Webform\Submission;
 
 function campaignion_activity_types() {
   $info = module_invoke_all('campaignion_activity_type_info');
@@ -36,6 +38,18 @@ function redhen_contact_campaignion_activity_type_info() {
   $info['redhen_contact_edit'] = '\Drupal\campaignion_activity\ActivityTypeBase';
 
   return $info;
+}
+
+/**
+ * Implements hook_campaignion_action_contact_alter().
+ *
+ * Record a submission activity after the contact has been imported.
+ */
+function campaignion_activity_campaignion_action_contact_alter(\RedhenContact $contact, Submission $submission, $node) {
+  $activity = WebformSubmission::fromContactAndSubmission($contact, $submission);
+  $activity->confirmed = $submission->webform->needsConfirmation() ? NULL : $submission->confirmed;
+  $activity->save();
+  module_invoke_all('campaignion_activity_submission', $activity, $submission, $contact);
 }
 
 /**
