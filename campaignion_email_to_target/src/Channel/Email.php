@@ -89,6 +89,8 @@ class Email {
       '#attributes' => ['class' => ['email-to-target-target']],
       '#message' => $message->toArray(),
       '#target' => $target,
+      '#editable' => $editable,
+      '#theme' => 'campaignion_email_to_target_email_message_form',
     ];
     $t['subject'] = [
       '#type' => 'textfield',
@@ -96,22 +98,14 @@ class Email {
       '#default_value' => $message->subject,
       '#disabled' => !$editable,
     ];
-    $t['header'] = [
-      '#prefix' => '<pre class="email-to-target-header">',
-      '#markup' => check_plain($message->header),
-      '#suffix' => '</pre>',
-    ];
+    $t['header']['#markup'] = check_plain($message->header);
     $t['message'] = [
       '#type' => 'textarea',
       '#title' => t('Message'),
       '#default_value' => $message->message,
       '#disabled' => !$editable,
     ];
-    $t['footer'] = [
-      '#prefix' => '<pre class="email-to-target-footer">',
-      '#markup' => check_plain($message->footer),
-      '#suffix' => '</pre>',
-    ];
+    $t['footer']['#markup'] = check_plain($message->footer);
     return $t;
   }
 
