@@ -71,6 +71,41 @@ class MessageTemplateTest extends \DrupalUnitTestCase {
   }
 
   /**
+   * Test copying a filter from one message template to another.
+   */
+  public function testCopyFilter() {
+    $data = [
+      'id' => 42,
+      'type' => 'message',
+      'label' => 'A',
+      'filters' => [[
+        'type' => 'test',
+        'config' => ['value' => 1],
+      ]],
+    ];
+    $template_a = new MessageTemplate($data);
+    $template_a->filters[0]->id = 42;
+
+    $data = [
+      'id' => 43,
+      'type' => 'message',
+      'label' => 'B',
+      'filters' => [],
+    ];
+    $template_b = new MessageTemplate($data);
+
+    // Copy as array.
+    $template_b->setFilters([$template_a->filters[0]->toArray()]);
+    $this->assertEquals(42, $template_a->filters[0]->id);
+    $this->assertNotEquals(42, $template_b->filters[0]->id);
+
+    // Copy as filter object.
+    $template_b->setFilters([$template_a->filters[0]]);
+    $this->assertEquals(42, $template_a->filters[0]->id);
+    $this->assertNotEquals(42, $template_b->filters[0]->id);
+  }
+
+  /**
    * Test creating a message instance.
    */
   public function testCreateMessageFromInstance() {

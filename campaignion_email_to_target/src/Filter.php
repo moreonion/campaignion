@@ -19,7 +19,9 @@ class Filter extends Model {
   public $config = [];
 
   public static function fromArray($data) {
-    return new static($data);
+    $f = new static();
+    $f->setData($data);
+    return $f;
   }
 
   public function __construct($data = array(), $new = TRUE) {

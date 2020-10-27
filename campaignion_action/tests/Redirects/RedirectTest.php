@@ -70,6 +70,38 @@ class RedirectTest extends \DrupalUnitTestCase {
   }
 
   /**
+   * Test copying a filter from one redirect template to another.
+   */
+  public function testCopyFilter() {
+    $data = [
+      'id' => 42,
+      'label' => 'A',
+      'destination' => 'node/50',
+      'filters' => [['type' => 'test', 'value' => 1]],
+    ];
+    $redirect_a = new Redirect($data);
+    $redirect_a->filters[0]->id = 42;
+
+    $data = [
+      'id' => 43,
+      'label' => 'B',
+      'destination' => 'node/50',
+      'filters' => [],
+    ];
+    $redirect_b = new Redirect($data);
+
+    // Copy as array.
+    $redirect_b->setFilters([$redirect_a->filters[0]->toArray()]);
+    $this->assertEquals(42, $redirect_a->filters[0]->id);
+    $this->assertNotEquals(42, $redirect_b->filters[0]->id);
+
+    // Copy as filter object.
+    $redirect_b->setFilters([$redirect_a->filters[0]]);
+    $this->assertEquals(42, $redirect_a->filters[0]->id);
+    $this->assertNotEquals(42, $redirect_b->filters[0]->id);
+  }
+
+  /**
    * Test checkFilters without any filters configured (ie. default redirect).
    */
   public function testCheckFiltersWithoutFilters() {

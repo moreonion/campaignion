@@ -73,7 +73,7 @@ class Redirect extends Model {
 
     foreach ($new_filters as $nf) {
       if ($nf instanceof Filter) {
-        $f = $nf;
+        $f = $nf->redirect_id == $this->id ? $nf : clone $nf;
       }
       else {
         // Reuse filter objects if 'id' is passed and found.
