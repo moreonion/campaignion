@@ -2,7 +2,7 @@
 
   <a href="#" id="ae-logo" title="Click here to visit the Dashboard"><img src="https://ucarecdn.com/51febc91-6f3f-4f75-9d03-b5a71d564cf3/ae_admin_impacstack_logocopy.png"></a>
 
-  <?php print theme('ae_menu', array('sidebar' => FALSE, 'links' => menu_tree_all_data('ae-menu'))); ?>
+  <?php print theme('campaignion_bar_menu', array('sidebar' => FALSE, 'links' => menu_tree_all_data('ae-menu'))); ?>
 
   <ul id="ae-sidemenu">
 
@@ -19,11 +19,11 @@
 </div>
 
 <div id="ae-popups">
-  <?php print theme('ae_menu', array('sidebar' => TRUE, 'links' => menu_tree_all_data('ae-menu'), 'wide' => array('New'))); ?>
+  <?php print theme('campaignion_bar_menu', array('sidebar' => TRUE, 'links' => menu_tree_all_data('ae-menu'), 'wide' => array('New'))); ?>
 </div>
 
 <div id="ae-widepopups">
-  <?php print theme('ae_menu', array('widebar' => TRUE, 'links' => menu_tree_all_data('ae-menu'), 'wide' => array('New'))); ?>
+  <?php print theme('campaignion_bar_menu', array('widebar' => TRUE, 'links' => menu_tree_all_data('ae-menu'), 'wide' => array('New'))); ?>
 
   <div id="ae-menu-modal-hotkey-menu" title="AE bar modal hotkey menu">
     <ul class="big-icons">
