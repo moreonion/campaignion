@@ -102,7 +102,7 @@ function campaignion_bar_page_build(&$page) {
  */
 function campaignion_bar_menu() {
   $items['admin/not_implemented'] = array(
-    'page callback' => 'not_implemented_view',
+    'page callback' => 'campaignion_bar_not_implemented_page',
     'access callback' => TRUE,
     'title' => 'This feature is not implemented yet. Soon to come!',
     'type' => MENU_CALLBACK,
@@ -110,8 +110,8 @@ function campaignion_bar_menu() {
   return $items;
 }
 
-function not_implemented_view() {
-    $page = array(
+function campaignion_bar_not_implemented_page() {
+  $page = array(
     '#type' => 'page',
   ) + element_info('page');
   return $page;
