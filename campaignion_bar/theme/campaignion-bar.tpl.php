@@ -24,35 +24,4 @@
 
 <div id="ae-widepopups">
   <?php print theme('campaignion_bar_menu', array('widebar' => TRUE, 'links' => menu_tree_all_data('ae-menu'), 'wide' => array('New'))); ?>
-
-  <div id="ae-menu-modal-hotkey-menu" title="AE bar modal hotkey menu">
-    <ul class="big-icons">
-      <li>
-        <a href="">Front Page</a>
-      </li>
-      <!-- li>
-        <a href="">Monitor</a>
-      </li -->
-      <li>
-        <a href="">Manage</a>
-      </li>
-      <li>
-        <a href="">New</a>
-      </li>
-    </ul>
-    <ul class="last">
-      <li>
-        <a class="tooltipped" title="Want to leave?" href="/user/logout">Logout</a>
-      </li>
-      <li>
-        <a class="tooltipped" href="http://advocacyengine.desk.com/" title="Visit our support center!">Help &amp; Support</a>
-      </li>
-      <li>
-        <a href="">Settings</a>
-      </li>
-      <li>
-        <a href="">Your Account</a>
-      </li>
-    </ul>
-  </div>
 </div>
