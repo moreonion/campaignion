@@ -1,8 +1,8 @@
 language: php
+os: linux
+dist: xenial
 services:
   - mysql
-language: php
-
 addons:
   chrome: stable
 
@@ -14,10 +14,13 @@ mysql:
   username: root
   encoding: utf8
 
+env:
+  COMPOSER_HOME=$HOME/.config/composer
+
 cache:
   yarn: true
   directories:
-     - $HOME/.composer/cache
+     - $COMPOSER_HOME/cache
      - $HOME/.drush/cache
      - $HOME/.npm
      - campaignion_email_to_target/datasets_app/node_modules
@@ -25,7 +28,7 @@ cache:
      - campaignion_wizard/redirects_app/node_modules
 
 install:
-  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - export PATH="$COMPOSER_HOME/vendor/bin:$PATH"
   - composer global require drush/drush:8.1.* phpunit/phpunit:6.4.* torotil/upal:1.2.0
   - nvm install 10.0.0
   - npm install -g yarn
@@ -34,7 +37,7 @@ before_script:
   - repo=`pwd`
   - root=$HOME/test-root
   - mysql -e 'create database drupal'
-  - php -d include_path=`pwd` -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes core-quick-drupal --core=drupal-7.69 --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --root=$root
+  - php -d include_path=`pwd` -d sendmail_path=`which true` $COMPOSER_HOME/vendor/bin/drush.php --yes core-quick-drupal --core=drupal-7.69 --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --root=$root
   - ln -s $repo $root/sites/all/modules/campaignion
   - cd $root
   - curl https://www.drupal.org/files/issues/1891356-drupal_static_reset-on-module-changes-30-D7.patch | patch -p1
@@ -43,7 +46,7 @@ before_script:
 
 script:
   - cd $repo
-  - UPAL_ROOT=$root UPAL_WEB_URL=http://127.0.0.1 phpunit --bootstrap=$HOME/.composer/vendor/torotil/upal/bootstrap.php --coverage-clover=coverage.xml .
+  - UPAL_ROOT=$root UPAL_WEB_URL=http://127.0.0.1 phpunit --bootstrap=$COMPOSER_HOME/vendor/torotil/upal/bootstrap.php --coverage-clover=coverage.xml .
   - cd $repo/campaignion_email_to_target/datasets_app
   - yarn install
   - yarn unit
