@@ -58,9 +58,11 @@ function _campaignion_donation_amount_select_or_other_process($element, &$form_s
     return $element;
   }
   if (_campaignion_donation_amount_component_is_amount($component)) {
-    // add a currency symbol as label
-    $element['other']['#title'] = variable_get_value('campaignion_donation_amount_currency_symbol');
-    unset($element['other']['#title_display']);
+    if ($symbol = variable_get_value('campaignion_donation_amount_currency_symbol')) {
+      // Use the currency symbol as label.
+      $element['other']['#title'] = $symbol;
+      unset($element['other']['#title_display']);
+    }
     if ($element['#select_type'] ?? '' == 'radios') {
       // always show other textfield (needs opt-out patch for select_or_other)
       $element['#attributes']['class'][] = 'select-or-other-disabled-js';
