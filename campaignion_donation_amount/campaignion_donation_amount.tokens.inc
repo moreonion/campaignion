@@ -5,6 +5,7 @@
  * Token hook implementations for campaignion_donation_amount.
  */
 
+use Drupal\campaignion_donation_amount\Utils;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
@@ -31,11 +32,7 @@ function campaignion_donation_amount_tokens($type, $tokens, array $data = [], ar
 
   $node = $data['node'] ?? node_load($data['webform-submission']->nid);
   $submission = new Submission($node, $data['webform-submission']);
-  $amount = 0;
-
-  foreach (array_filter($node->webform['components'], '_campaignion_donation_amount_component_is_amount') as $cid => $_) {
-    $amount += $submission->valueByCid($cid) ?: 0;
-  }
+  $amount = Utils::submissionTotal($submission);
 
   $replacements = [];
   foreach ($tokens as $name => $original) {

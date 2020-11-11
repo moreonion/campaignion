@@ -5,19 +5,13 @@
  * Hook implementations & callbacks for the campaignion_donation_amount module.
  */
 
-
-/**
- * Check whether a webform component is a donation amount component.
- */
-function _campaignion_donation_amount_component_is_amount($component) {
-  return $component['form_key'] == 'donation_amount' || in_array('donation-amount', explode(' ', $component['extra']['wrapper_classes'] ?? ''));
-}
+use Drupal\campaignion_donation_amount\Utils;
 
 /**
  * Implements hook_webform_component_render_alter().
  */
 function campaignion_donation_amount_webform_component_render_alter(array &$element, array &$component) {
-  if (_campaignion_donation_amount_component_is_amount($component)) {
+  if (Utils::isAmountComponent($component)) {
     $info = element_info($element['#type']);
     $element += [
       '#element_validate' => $info['#element_validate'] ?? [],
@@ -58,7 +52,7 @@ function _campaignion_donation_amount_select_or_other_process($element, &$form_s
   if (!($component = $element['#webform_component'] ?? NULL)) {
     return $element;
   }
-  if (_campaignion_donation_amount_component_is_amount($component)) {
+  if (Utils::isAmountComponent($component)) {
     if ($symbol = variable_get_value('campaignion_donation_amount_currency_symbol')) {
       // Use the currency symbol as label.
       $element['other']['#title'] = $symbol;
