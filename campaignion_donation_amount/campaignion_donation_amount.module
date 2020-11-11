@@ -23,6 +23,7 @@ function campaignion_donation_amount_webform_component_render_alter(array &$elem
       '#element_validate' => $info['#element_validate'] ?? [],
     ];
     $element['#element_validate'][] = 'campaignion_donation_amount_validate';
+    // Always show the select_or_other textfield.
     $element['#attributes']['data-select-or-other-hide'] = 0;
   }
 }
@@ -62,10 +63,6 @@ function _campaignion_donation_amount_select_or_other_process($element, &$form_s
       // Use the currency symbol as label.
       $element['other']['#title'] = $symbol;
       unset($element['other']['#title_display']);
-    }
-    if ($element['#select_type'] ?? '' == 'radios') {
-      // always show other textfield (needs opt-out patch for select_or_other)
-      $element['#attributes']['class'][] = 'select-or-other-disabled-js';
     }
   }
   return $element;
