@@ -19,6 +19,10 @@ function campaignion_donation_amount_webform_component_render_alter(array &$elem
     $element['#element_validate'][] = 'campaignion_donation_amount_validate';
     // Always show the select_or_other textfield.
     $element['#attributes']['data-select-or-other-hide'] = 0;
+    if ($symbol = variable_get_value('campaignion_donation_amount_currency_symbol')) {
+      $element['#other_title'] = $symbol;
+      $element['#other_title_display'] = 'before';
+    }
   }
 }
 
@@ -36,28 +40,4 @@ function campaignion_donation_amount_validate($element, &$form_state, $form) {
   if ((string) $num != $value || $num < 1) {
     form_error($element, t('Please enter a whole-numbered amount of at least 1.'));
   }
-}
-
-/**
- * Implements hook_element_info_alter().
- */
-function campaignion_donation_amount_element_info_alter(&$type) {
-  $type['select_or_other']['#process'][] = '_campaignion_donation_amount_select_or_other_process';
-}
-
-/**
- * Change how select_or_other is displayed for donation_amount components.
- */
-function _campaignion_donation_amount_select_or_other_process($element, &$form_state) {
-  if (!($component = $element['#webform_component'] ?? NULL)) {
-    return $element;
-  }
-  if (Utils::isAmountComponent($component)) {
-    if ($symbol = variable_get_value('campaignion_donation_amount_currency_symbol')) {
-      // Use the currency symbol as label.
-      $element['other']['#title'] = $symbol;
-      unset($element['other']['#title_display']);
-    }
-  }
-  return $element;
 }
