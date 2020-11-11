@@ -280,6 +280,9 @@ function campaignion_email_to_target_theme() {
   $hooks['campaignion_email_to_target_results_table_entry'] = [
     'template' => 'campaignion-email-to-target-results-table-entry',
   ] + $options;
+  $hooks['campaignion_email_to_target_email_message_form'] = [
+    'template' => 'campaignion-email-to-target-email-message-form',
+  ] + $options;
   return $hooks;
 }
 
