@@ -1,0 +1,10 @@
+name = Campaignion donation amount total token
+description = Define a webform submission token that calculates the sum of two donation amounts.
+core = 7.x
+php = 7.0
+
+dependencies[] = campaignion:campaignion_donation
+dependencies[] = drupal:node
+dependencies[] = little_helpers:little_helpers
+dependencies[] = token:token
+dependencies[] = webform:webform
