@@ -3,7 +3,7 @@ description = Define a webform submission token for giftaid donations.
 core = 7.x
 php = 7.0
 
-dependencies[] = campaignion:campaignion_donation
+dependencies[] = campaignion:campaignion_donation_amount
 dependencies[] = drupal:node
 dependencies[] = little_helpers:little_helpers
 dependencies[] = token:token
