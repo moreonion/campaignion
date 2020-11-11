@@ -7,4 +7,5 @@ dependencies[] = campaignion:campaignion_donation
 dependencies[] = drupal:node
 dependencies[] = little_helpers:little_helpers
 dependencies[] = token:token
+dependencies[] = variable:variable
 dependencies[] = webform:webform
