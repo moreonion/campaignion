@@ -17,11 +17,13 @@ function campaignion_donation_amount_webform_component_render_alter(array &$elem
       '#element_validate' => $info['#element_validate'] ?? [],
     ];
     $element['#element_validate'][] = 'campaignion_donation_amount_validate';
-    // Always show the select_or_other textfield.
-    $element['#attributes']['data-select-or-other-hide'] = 0;
-    if ($symbol = variable_get_value('campaignion_donation_amount_currency_symbol')) {
-      $element['#other_title'] = $symbol;
-      $element['#other_title_display'] = 'before';
+    if ($element['#type'] == 'select_or_other') {
+      // Always show the select_or_other textfield.
+      $element['#attributes']['data-select-or-other-hide'] = 0;
+      if ($symbol = variable_get_value('campaignion_donation_amount_currency_symbol')) {
+        $element['#other_title'] = $symbol;
+        $element['#other_title_display'] = 'before';
+      }
     }
   }
 }
