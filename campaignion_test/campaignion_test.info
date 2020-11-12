@@ -7,6 +7,7 @@ dependencies[] = campaignion:campaignion
 dependencies[] = campaignion:campaignion_action
 dependencies[] = campaignion:campaignion_activity
 dependencies[] = campaignion:campaignion_bar
+dependencies[] = campaignion:campaignion_donation
 dependencies[] = campaignion:campaignion_email_to_target
 dependencies[] = campaignion:campaignion_email_to_target_counter
 dependencies[] = campaignion:campaignion_facebook_pixel
