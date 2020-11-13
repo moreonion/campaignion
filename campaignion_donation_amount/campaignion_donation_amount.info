@@ -1,0 +1,11 @@
+name = Campaignion donation amount
+description = Custom behavior for webform components used as donation amounts.
+core = 7.x
+php = 7.0
+
+dependencies[] = drupal:node
+dependencies[] = little_helpers:little_helpers
+dependencies[] = psr0:psr0
+dependencies[] = token:token
+dependencies[] = variable:variable
+dependencies[] = webform:webform
