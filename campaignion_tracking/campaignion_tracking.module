@@ -6,6 +6,7 @@
  */
 
 use Drupal\campaignion_action\Loader;
+use Drupal\little_helpers\Webform\Submission;
 use Drupal\little_helpers\Webform\Webform;
 
 /**
@@ -113,7 +114,7 @@ function campaignion_tracking_form_webform_client_form_alter(&$form, &$form_stat
  * We want the SID and optionally donation specific information appended to the
  * URL so that trackers can pick it up.
  */
-function campaignion_tracking_webform_redirect_alter($redirect, $submission) {
+function campaignion_tracking_webform_redirect_alter($redirect, Submission $submission) {
   $type = Loader::instance()->type($submission->node->type);
   $is_donation = $type && $type->isDonation();
 
@@ -124,6 +125,11 @@ function campaignion_tracking_webform_redirect_alter($redirect, $submission) {
   $webformFragments[] = 'nid=' . $submission->node->nid;
   $webformFragments[] = 'sid=' . $submission->sid;
   $webformFragments[] = 'title=' . rawurlencode($submission->node->title);
+
+  // Add optin values for all defined optin fields
+  foreach ($submission->opt_in->values() as $optin) {
+    $webformFragments[] = 'optin[' . rawurlencode($optin['channel']) . ']=' . rawurlencode($optin['value']);
+  }
 
   $donationFragments = [];
   if ($is_donation) {
