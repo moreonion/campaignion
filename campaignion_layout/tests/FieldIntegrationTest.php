@@ -13,7 +13,7 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
   /**
    * Delete the test node.
    */
-  public function tearDown() {
+  public function tearDown() : void {
     Container::get()->inject('campaignion_layout.themes', NULL);
     parent::tearDown();
   }

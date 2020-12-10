@@ -13,7 +13,7 @@ class FieldTest extends DrupalUnitTestCase {
   /**
    * Clean up the injected services.
    */
-  public function tearDown() {
+  public function tearDown() : void {
     Container::get()->inject('campaignion_layout.themes', NULL);
     parent::tearDown();
   }

@@ -17,7 +17,7 @@ class FormSteptest extends DrupalUnitTestCase {
   /**
    * Create a test node.
    */
-  public function setUp() {
+  public function setUp() : void {
     parent::setUp();
     $mock_loader = $this->getMockBuilder(Loader::class)
       ->disableOriginalConstructor()
@@ -57,7 +57,7 @@ class FormSteptest extends DrupalUnitTestCase {
   /**
    * Delete the test node.
    */
-  public function tearDown() {
+  public function tearDown() : void {
     $this->form_obj->delete();
     node_delete($this->node->nid);
     drupal_static_reset('form_set_error');

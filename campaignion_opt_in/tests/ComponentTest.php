@@ -17,7 +17,7 @@ class ComponentTest extends \DrupalUnitTestCase {
   /**
    * Backup global $_GET values.
    */
-  public function setUp() {
+  public function setUp() : void {
     parent::setUp();
     $this->backupGet = $_GET;
     $_GET = ['q' => $_GET['q']];
@@ -26,7 +26,7 @@ class ComponentTest extends \DrupalUnitTestCase {
   /**
    * Restore global $_GET values.
    */
-  public function tearDown() {
+  public function tearDown() : void {
     $_GET = $this->backupGet;
     parent::tearDown();
   }

@@ -10,7 +10,7 @@ class AuthAppClientTest extends \DrupalUnitTestCase {
   /**
    * Reset cache.
    */
-  public function tearDown() {
+  public function tearDown() : void {
     cache_clear_all(AuthAppClient::TOKEN_CID, 'cache');
   }
 
