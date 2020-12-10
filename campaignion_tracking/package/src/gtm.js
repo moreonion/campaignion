@@ -226,8 +226,10 @@ export class GTMTracker {
 
     if (eventData.optins.length > 0) {
       let optinData = {
-        event: 'optin',
-        optins: eventData.optins || []
+        event: 'optin'
+      }
+      for (const channel of eventData.optins) {
+        optinData[channel.channel] = channel.value
       }
       // Allow others to modify the data being sent to GTM.
       optinData = this.callChangeHook(eventName, optinData, this._context)
