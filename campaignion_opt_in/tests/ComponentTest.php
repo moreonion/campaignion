@@ -222,7 +222,7 @@ class ComponentTest extends \DrupalUnitTestCase {
     $form_callback = $this->getConditionalFormCallback();
     $forms = $form_callback($fake_node);
     $expected_select = '<select class="form-select"><option value="radios:opt-in">Radio opt-in</option><option value="radios:no-change">Radio no change</option><option value="radios:not-selected">Radio not selected (no change)</option></select>';
-    $this->assertContains($expected_select, $forms[1]);
+    $this->assertStringContainsString($expected_select, $forms[1]);
   }
 
 }

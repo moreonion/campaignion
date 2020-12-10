@@ -58,7 +58,7 @@ class EmailTest extends \DrupalUnitTestcase {
     drupal_prepare_form('e2t_component_element', $element, $form_state);
     drupal_process_form('e2t_component_element', $element, $form_state);
     $rendered = drupal_render($element);
-    $this->assertContains('<p class="email-to-target-subject"><strong>Subject&#039;s string</strong></p>', $rendered);
+    $this->assertStringContainsString('<p class="email-to-target-subject"><strong>Subject&#039;s string</strong></p>', $rendered);
   }
 
 }

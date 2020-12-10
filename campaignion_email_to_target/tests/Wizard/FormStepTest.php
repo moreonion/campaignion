@@ -82,7 +82,7 @@ class FormSteptest extends DrupalUnitTestCase {
     $step->validateStep($form, $form_state);
     $this->assertTrue(isset($_SESSION['messages']['error'][0]));
     $this->assertCount(1, $_SESSION['messages']['error']);
-    $this->assertContains('inaccessible', $_SESSION['messages']['error'][0]);
+    $this->assertStringContainsString('inaccessible', $_SESSION['messages']['error'][0]);
   }
 
 }
