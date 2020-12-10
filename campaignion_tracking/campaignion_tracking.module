@@ -126,9 +126,12 @@ function campaignion_tracking_webform_redirect_alter($redirect, Submission $subm
   $webformFragments[] = 'sid=' . $submission->sid;
   $webformFragments[] = 'title=' . rawurlencode($submission->node->title);
 
+  $channels = array_keys(campaignion_opt_in_channel_info());
   // Add optin values for all defined optin fields
-  foreach ($submission->opt_in->values() as $optin) {
-    $webformFragments[] = 'optin[' . rawurlencode($optin['channel']) . ']=' . rawurlencode($optin['value']);
+  foreach ($channels as $channel) {
+    if ($value = $submission->opt_in->canonicalValue($channel, TRUE)) {
+      $webformFragments[] = 'optin[' . rawurlencode($channel) . ']=' . rawurlencode($value);
+    }
   }
 
   $donationFragments = [];
