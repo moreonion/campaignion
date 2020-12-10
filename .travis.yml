@@ -46,7 +46,7 @@ before_script:
 
 script:
   - cd $repo
-  - UPAL_ROOT=$root UPAL_WEB_URL=http://127.0.0.1 phpunit --bootstrap=$COMPOSER_HOME/vendor/torotil/upal/bootstrap.php --coverage-clover=coverage.xml .
+  - UPAL_ROOT=$root UPAL_WEB_URL=http://127.0.0.1 XDEBUG_MODE=coverage phpunit --bootstrap=$COMPOSER_HOME/vendor/torotil/upal/bootstrap.php --coverage-clover=coverage.xml .
   - cd $repo/campaignion_email_to_target/datasets_app
   - yarn install
   - yarn unit
