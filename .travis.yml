@@ -29,7 +29,7 @@ cache:
 
 install:
   - export PATH="$COMPOSER_HOME/vendor/bin:$PATH"
-  - composer global require drush/drush:8.1.* phpunit/phpunit:6.4.* torotil/upal:1.2.0
+  - composer global require drush/drush:8.1.* phpunit/phpunit:^8 torotil/upal:2.0.0-RC1
   - nvm install 10.0.0
   - npm install -g yarn
 
