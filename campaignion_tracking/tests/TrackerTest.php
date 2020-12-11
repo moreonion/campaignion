@@ -10,7 +10,7 @@ class TrackerTest extends \DrupalWebTestCase {
   /**
    * Create test nodes.
    */
-  public function setUp() {
+  public function setUp() : void {
     parent::setUp();
     $this->petition = entity_create('node', ['type' => 'petition']);
     $this->petition->webform = webform_node_defaults();
@@ -29,7 +29,7 @@ class TrackerTest extends \DrupalWebTestCase {
   /**
    * Delete test nodes.
    */
-  public function tearDown() {
+  public function tearDown() : void {
     node_delete($this->petition->nid);
     parent::tearDown();
   }

@@ -18,7 +18,7 @@ class ClientTest extends \DrupalUnitTestCase {
   /**
    * Reset static cache.
    */
-  public function tearDown() {
+  public function tearDown() : void {
     drupal_static_reset(Client::class . '.datasets');
   }
 

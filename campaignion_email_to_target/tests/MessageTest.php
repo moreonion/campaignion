@@ -37,7 +37,7 @@ class MessageTest extends \DrupalUnitTestCase {
   public function testRenderDisplayNameToken() {
     $target = ['salutation' => 'S'];
     $message = new Message([]);
-    $this->assertContains('contact.display_name', $message->display);
+    $this->assertStringContainsString('contact.display_name', $message->display);
     $message->replaceTokens($target);
     $this->assertEqual('S', $message->display);
 
