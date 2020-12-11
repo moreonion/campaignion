@@ -72,6 +72,7 @@ function campaignion_layout_little_helpers_services() {
 function campaignion_layout_preprocess_page(array &$vars) {
   $vars['layout'] = NULL;
   if (($node = $vars['node'] ?? NULL) && ($layout = Lookup::fromEntity('node', $node)->getLayout())) {
+    campaignion_layout_active_layout($layout);
     $vars['layout'] = $layout['name'];
     array_unshift($vars['theme_hook_suggestions'], "page__layout__{$layout['name']}");
 
@@ -79,6 +80,25 @@ function campaignion_layout_preprocess_page(array &$vars) {
       $vars[$settings['variable']] = field_view_field('node', $node, $field_name, $settings['display']);
     }
   }
+}
+
+/**
+ * Get or set the current active layout.
+ *
+ * This value is available for reading after the page theme hook has been
+ * preprocessed. It is intended for use in nested theme functions (eg. blocks).
+ *
+ * @param array $layout
+ *   Set the current active layout.
+ * @return array|null
+ *   The currently active layout or NULL if none was set yet.
+ */
+function campaignion_layout_active_layout($layout = NULL) {
+  $active_layout = &drupal_static(__FUNCTION__, NULL);
+  if ($layout) {
+    $active_layout = $layout;
+  }
+  return $active_layout;
 }
 
 /**
