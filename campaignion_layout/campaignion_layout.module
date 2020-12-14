@@ -187,20 +187,8 @@ function campaignion_layout_node_prepare($node) {
  * Impelements hook_context_plugins().
  */
 function campaignion_layout_context_plugins() {
-  $plugins = [
-    'campaignion_layout_context_condition_layout' => [
-      'handler' => [
-        'class' => LayoutCondition::class,
-        'parent' => 'context_condition',
-      ],
-    ],
-    'campaignion_layout_context_condition_theme' => [
-      'handler' => [
-        'class' => ThemeCondition::class,
-        'parent' => 'context_condition',
-      ],
-    ],
-  ];
+  $plugins['campaignion_layout_context_condition_layout']['handler']['class'] = LayoutCondition::class;
+  $plugins['campaignion_layout_context_condition_theme']['handler']['class'] = ThemeCondition::class;
   return $plugins;
 }
 
