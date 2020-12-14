@@ -180,3 +180,67 @@ function campaignion_layout_node_prepare($node) {
     }
   }
 }
+
+/**
+ * Impelements hook_context_plugins().
+ */
+function campaignion_layout_context_plugins() {
+  $plugins = [
+    'campaignion_layout_context_condition_layout' => [
+      'handler' => [
+        'path' => drupal_get_path('module', 'campaignion_layout') . '/plugins/context',
+        'file' => 'campaignion_layout_context_condition_layout.inc',
+        'class' => 'campaignion_layout_context_condition_layout',
+        'parent' => 'context_condition',
+      ],
+    ],
+    'campaignion_layout_context_condition_theme' => [
+      'handler' => [
+        'path' => drupal_get_path('module', 'campaignion_layout') . '/plugins/context',
+        'file' => 'campaignion_layout_context_condition_theme.inc',
+        'class' => 'campaignion_layout_context_condition_theme',
+        'parent' => 'context_condition',
+      ],
+    ],
+  ];
+  return $plugins;
+}
+
+/**
+ * Implements hook_context_registry().
+ */
+function campaignion_layout_context_registry() {
+  $registry = [
+    'conditions' => [
+      'campaignion_layout_context_condition_layout' => [
+        'title' => t('Layout'),
+        'description' => t('Set this context based on the selected layout.'),
+        'plugin' => 'campaignion_layout_context_condition_layout',
+      ],
+      'campaignion_layout_context_condition_theme' => [
+        'title' => t('Theme'),
+        'description' => t('Set this context based on the selected theme.'),
+        'plugin' => 'campaignion_layout_context_condition_theme',
+      ],
+    ],
+  ];
+  return $registry;
+}
+
+/**
+ * Implements hook_context_page_condition().
+ */
+function campaignion_layout_context_page_condition() {
+  if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_theme')) {
+    $plugin->execute();
+  }
+}
+
+/**
+ * Implements hook_context_node_condition_alter().
+ */
+function campaignion_layout_context_node_condition_alter($node, $op) {
+  if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_layout')) {
+    $plugin->execute($node, $op);
+  }
+}

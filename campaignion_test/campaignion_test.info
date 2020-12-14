@@ -31,6 +31,7 @@ dependencies[] = campaignion:campaignion_tracking
 dependencies[] = campaignion:campaignion_tracking_gtm
 dependencies[] = campaignion:campaignion_webform_tokens
 dependencies[] = campaignion:campaignion_wizard
+dependencies[] = context:context
 dependencies[] = ctools:ctools
 dependencies[] = date:date
 dependencies[] = drupal:image
