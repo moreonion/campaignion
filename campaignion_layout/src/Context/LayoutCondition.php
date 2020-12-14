@@ -1,12 +1,14 @@
 <?php
 
+namespace Drupal\campaignion_layout\Context;
+
 use Drupal\little_helpers\Services\Container;
 use Drupal\campaignion_layout\Lookup;
 
 /**
  * Expose available layouts as a context condition.
  */
-class campaignion_layout_context_condition_layout extends context_condition {
+class LayoutCondition extends \context_condition {
 
   /**
    * Condition values.

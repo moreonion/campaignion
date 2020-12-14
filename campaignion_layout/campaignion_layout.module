@@ -8,6 +8,8 @@
 use Drupal\campaignion_layout\Entity;
 use Drupal\campaignion_layout\Lookup;
 use Drupal\campaignion_layout\Themes;
+use Drupal\campaignion_layout\Context\LayoutCondition;
+use Drupal\campaignion_layout\Context\ThemeCondition;
 use Drupal\little_helpers\Services\Container;
 
 // The field.module does not group its hooks so we have to include this here.
@@ -188,17 +190,13 @@ function campaignion_layout_context_plugins() {
   $plugins = [
     'campaignion_layout_context_condition_layout' => [
       'handler' => [
-        'path' => drupal_get_path('module', 'campaignion_layout') . '/plugins/context',
-        'file' => 'campaignion_layout_context_condition_layout.inc',
-        'class' => 'campaignion_layout_context_condition_layout',
+        'class' => LayoutCondition::class,
         'parent' => 'context_condition',
       ],
     ],
     'campaignion_layout_context_condition_theme' => [
       'handler' => [
-        'path' => drupal_get_path('module', 'campaignion_layout') . '/plugins/context',
-        'file' => 'campaignion_layout_context_condition_theme.inc',
-        'class' => 'campaignion_layout_context_condition_theme',
+        'class' => ThemeCondition::class,
         'parent' => 'context_condition',
       ],
     ],

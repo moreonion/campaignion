@@ -1,11 +1,13 @@
 <?php
 
+namespace Drupal\campaignion_layout\Context;
+
 use Drupal\little_helpers\Services\Container;
 
 /**
  * Expose available themes as a context condition.
  */
-class campaignion_layout_context_condition_theme extends context_condition {
+class ThemeCondition extends \context_condition {
 
   /**
    * Condition values.
