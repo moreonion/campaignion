@@ -43,4 +43,27 @@ class ThemesTest extends DrupalUnitTestCase {
     $this->assertEqual(['foo', 'baz'], array_keys($enabled_themes));
   }
 
+  /**
+   * Test getting the declared layouts.
+   */
+  public function testDeclaredLayouts() {
+    $foo = $this->createMock(Theme::class);
+    $foo->method('invokeLayoutHook')->willReturn([
+      'foo' => ['title' => 'Foo'],
+    ]);
+    $bar = $this->createMock(Theme::class);
+    $bar->method('invokeLayoutHook')->willReturn([
+      'bar' => ['title' => 'Bar'],
+    ]);
+    $themes = $this->getMockBuilder(Themes::class)
+      ->setConstructorArgs([[]])
+      ->setMethods(['enabledThemes'])
+      ->getMock();
+    $themes->method('enabledThemes')->willReturn([$foo, $bar]);
+    $this->assertEqual([
+      'foo' => ['name' => 'foo', 'title' => 'Foo', 'fields' => []],
+      'bar' => ['name' => 'bar', 'title' => 'Bar', 'fields' => []],
+    ], $themes->declaredLayouts());
+  }
+
 }
