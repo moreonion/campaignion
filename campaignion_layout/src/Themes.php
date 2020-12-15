@@ -90,4 +90,16 @@ class Themes {
     return $info;
   }
 
+  /**
+   * Get declared layouts for as an #options-array.
+   *
+   * @return string[]
+   *   Machine name as key mapped to the translated title for each layouts.
+   */
+  public function layoutOptions() {
+    return array_map(function (array $info) {
+      return $info['title'];
+    }, $this->declaredLayouts());
+  }
+
 }

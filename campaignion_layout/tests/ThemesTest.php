@@ -68,4 +68,25 @@ class ThemesTest extends DrupalUnitTestCase {
     ], $themes->declaredLayouts());
   }
 
+  /**
+   * Test getting all layouts as options.
+   */
+  public function testLayoutOptions() {
+    $mock_themes = $this->getMockBuilder(Themes::class)
+      ->setMethods(['declaredLayouts'])
+      ->disableOriginalConstructor()
+      ->getMock();
+    $mock_themes->method('declaredLayouts')->willReturn([
+      'foo' => ['title' => 'Foo'],
+      'bar' => ['title' => 'Bar', 'fields' => []],
+      'baz' => ['title' => 'Baz'],
+    ]);
+    $mock_themes->layoutOptions();
+    $this->assertEqual([
+      'foo' => 'Foo',
+      'bar' => 'Bar',
+      'baz' => 'Baz',
+    ], $mock_themes->layoutOptions());
+  }
+
 }

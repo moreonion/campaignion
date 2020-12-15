@@ -15,24 +15,31 @@ class FieldTest extends DrupalUnitTestCase {
    */
   public function tearDown() : void {
     Container::get()->inject('campaignion_layout.themes', NULL);
+    drupal_static_reset('drupal_html_id');
     parent::tearDown();
   }
 
   /**
    * Inject a themes service with specific metadata.
    */
-  protected function injectThemes($themes = []) {
+  protected function injectThemes($themes = [], $layouts = []) {
     $theme_objects = [];
+    $layouts = [];
+    $add_layout_defaults = function ($info) {
+      return $info + ['fields' => []];
+    };
     foreach ($themes as $name => $data) {
       $theme = $this->createMock(Theme::class);
       $theme->method('title')->willReturn($data['title'] ?? $name);
-      $theme->method('layouts')->willReturn(array_map(function ($info) {
-        return $info + ['fields' => []];
-      }, $data['layouts']));
+      $theme->method('layouts')
+        ->willReturn(array_map($add_layout_defaults, $data['layouts']));
       $theme_objects[$name] = $theme;
+      $layouts += $data['layouts'];
     }
     $themes = $this->createMock(Themes::class);
     $themes->method('enabledThemes')->willReturn($theme_objects);
+    $themes->method('declaredLayouts')
+      ->willReturn(array_map($add_layout_defaults, $layouts));
     Container::get()->inject('campaignion_layout.themes', $themes);
   }
 
