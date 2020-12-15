@@ -76,7 +76,6 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     '#options' => $theme_options,
     '#default_value' => $selected_theme,
     '#id' => $theme_id,
-    '#states' => $toggle_states,
   ];
   $element['values']['layout'] = [
     '#type' => 'value',
@@ -103,7 +102,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
       '#description' => t('This layout is used for displaying the content.'),
       '#options' => $options,
       '#default_value' => $selected_layout,
-      '#states' => $states + $toggle_states,
+      '#states' => $states,
       '#id' => $html_id,
     ];
   }
