@@ -17,17 +17,25 @@ class Themes {
   protected $themes;
 
   /**
+   * The cache bin to use for caching declared layouts.
+   *
+   * @var \DrupalCacheInterface
+   */
+  protected $cache;
+
+  /**
    * Create a new instance by reading the theme data from list_themes().
    */
   public static function fromConfig() {
-    return new static(list_themes());
+    return new static(list_themes(), _cache_get_object('cache'));
   }
 
   /**
    * Create a new instance by passing the theme data.
    */
-  public function __construct(array $themes) {
+  public function __construct(array $themes, \DrupalCacheInterface $cache) {
     $this->themes = $themes;
+    $this->cache = $cache;
   }
 
   /**
@@ -57,6 +65,14 @@ class Themes {
    * Get all declared layouts.
    */
   public function declaredLayouts() {
+    $cid = self::class . '::' . __FUNCTION__;
+    $info = &drupal_static($cid);
+    if (isset($info)) {
+      return $info;
+    }
+    if ($cache = $this->cache->get($cid)) {
+      return $info = $cache->data;
+    }
     $info = [];
     foreach ($this->enabledThemes() as $theme) {
       $info = drupal_array_merge_deep($info, $theme->invokeLayoutHook());
@@ -70,6 +86,7 @@ class Themes {
         ];
       }
     }
+    $this->cache->set($cid, $info);
     return $info;
   }
 

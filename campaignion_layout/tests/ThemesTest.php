@@ -15,7 +15,7 @@ class ThemesTest extends DrupalUnitTestCase {
   public function testGetTheme() {
     $themes = new Themes([
       'foo' => (object) [],
-    ]);
+    ], $this->createMock(\DrupalCacheInterface::class));
     $this->assertInstanceOf(Theme::class, $themes->getTheme('foo'));
     $this->assertEmpty($themes->getTheme('bar'));
   }
@@ -27,8 +27,9 @@ class ThemesTest extends DrupalUnitTestCase {
     $data['foo'] = (object) ['name' => 'foo'];
     $data['bar'] = (object) ['name' => 'bar'];
     $data['baz'] = (object) ['name' => 'baz'];
+    $cache = $this->createMock(\DrupalCacheInterface::class);
     $themes = $this->getMockBuilder(Themes::class)
-      ->setConstructorArgs([$data])
+      ->setConstructorArgs([$data, $cache])
       ->setMethods(['getTheme'])
       ->getMock();
 
@@ -55,8 +56,9 @@ class ThemesTest extends DrupalUnitTestCase {
     $bar->method('invokeLayoutHook')->willReturn([
       'bar' => ['title' => 'Bar'],
     ]);
+    $cache = $this->createMock(\DrupalCacheInterface::class);
     $themes = $this->getMockBuilder(Themes::class)
-      ->setConstructorArgs([[]])
+      ->setConstructorArgs([[], $cache])
       ->setMethods(['enabledThemes'])
       ->getMock();
     $themes->method('enabledThemes')->willReturn([$foo, $bar]);
