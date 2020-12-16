@@ -33,12 +33,15 @@ class Theme {
    *
    * @param object $theme
    *   The theme object as given by list_themes().
-   * @param \Drupal\campaignion_layout\Theme $base
-   *   The theme’s base-theme if there it has one.
+   * @param \Drupal\campaignion_layout\Themes $themes
+   *   The themes service.
+   * @param \Drupal\campaignion_layout\Theme|null $base
+   *   The theme’s base-theme if there it has one, otherwise NULL.
    */
-  public function __construct($theme, Theme $base = NULL) {
+  public function __construct($theme, Themes $themes, Theme $base = NULL) {
     $this->theme = $theme;
     $this->base = $base;
+    $this->themes = $themes;
   }
 
   /**
@@ -81,6 +84,23 @@ class Theme {
   }
 
   /**
+   * Get layouts that are implemented in this theme or one of its parents.
+   *
+   * @return string[]
+   *   An array of layouts that are declared to be implemented by this theme.
+   *   Entries of the array have the layout machine name as both key and value.
+   */
+  public function implementedLayouts() {
+    $implemented = [];
+    if ($this->base) {
+      $implemented += $this->base->implementedLayouts();
+    }
+    $info = $this->theme->info['layout'] ?? [];
+    $implemented += array_combine($info, $info);
+    return $implemented;
+  }
+
+  /**
    * Get enabled layout variations for a theme as a #options-array.
    *
    * @param bool $disabled
@@ -100,7 +120,8 @@ class Theme {
    * Get info about all enabled layout variations for a theme.
    */
   public function layouts(bool $disabled = FALSE) {
-    $variations = $this->layoutInfo();
+    $variations = $this->themes->declaredLayouts();
+    $variations = array_intersect_key($variations, $this->implementedLayouts());
     if (!$disabled) {
       $enabled = $this->setting('layout_variations') ?? [];
       $variations = array_intersect_key($variations, array_filter($enabled));
@@ -116,26 +137,9 @@ class Theme {
   }
 
   /**
-   * Get the theme’s declared layout metadata (with defaults).
-   */
-  protected function layoutInfo() {
-    $info = $this->invokeLayoutHook();
-    foreach ($info as $name => &$i) {
-      $i += ['name' => $name, 'fields' => []];
-      foreach ($i['fields'] as $field_name => &$f) {
-        $f += [
-          'display' => [],
-          'variable' => $field_name,
-        ];
-      }
-    }
-    return $info;
-  }
-
-  /**
    * Include the theme’s template.php and invoke its hook.
    */
-  protected function invokeLayoutHook() {
+  public function invokeLayoutHook() {
     $this->includeTheme();
     $func = $this->theme->name . '_campaignion_layout_info';
     return function_exists($func) ? $func() : [];

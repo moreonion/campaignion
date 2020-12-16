@@ -14,13 +14,13 @@ class ThemeTest extends DrupalUnitTestCase {
    */
   public function testHasFeature() {
     $data = (object) ['info' => ['features' => ['foo', 'bar']]];
-    $theme = new Theme($data);
+    $theme = new Theme($data, $this->createMock(Themes::class));
     $this->assertFalse($theme->hasFeature());
 
     $data = (object) [
       'info' => ['features' => ['foo', 'layout_variations', 'baz']],
     ];
-    $theme = new Theme($data);
+    $theme = new Theme($data, $this->createMock(Themes::class));
     $this->assertTrue($theme->hasFeature());
   }
 
@@ -33,11 +33,13 @@ class ThemeTest extends DrupalUnitTestCase {
 
     $theme = $mock_builder->setConstructorArgs([
       (object) ['status' => 0],
+      $this->createMock(Themes::class),
     ])->getMock();
     $this->assertFalse($theme->isEnabled());
 
     $theme = $mock_builder->setConstructorArgs([
       (object) ['status' => 1],
+      $this->createMock(Themes::class),
     ])->getMock();
     $this->assertFalse($theme->isEnabled());
 
@@ -52,7 +54,7 @@ class ThemeTest extends DrupalUnitTestCase {
    * Test checking for the active theme.
    */
   public function testIsActive() {
-    $theme = new Theme((object) ['name' => 'foo']);
+    $theme = new Theme((object) ['name' => 'foo'], $this->createMock(Themes::class));
 
     $this->assertTrue($theme->isActive('foo'));
     $this->assertFalse($theme->isActive('bar'));
@@ -63,34 +65,61 @@ class ThemeTest extends DrupalUnitTestCase {
    */
   public function testLayoutOptions() {
     $mock_builder = $this->getMockBuilder(Theme::class)
-      ->setMethods(['setting', 'invokeLayoutHook']);
+      ->setMethods(['setting']);
+    $mock_themes = $this->createMock(Themes::class);
+    $mock_themes->method('declaredLayouts')->willReturn([
+      'foo' => ['name' => 'foo', 'title' => 'Foo', 'fields' => []],
+      'bar' => ['name' => 'bar', 'title' => 'Bar', 'fields' => []],
+      'baz' => ['name' => 'baz', 'title' => 'Baz', 'fields' => []],
+    ]);
 
     $theme = $mock_builder->setConstructorArgs([
-      (object) ['status' => 1, 'name' => 'foo'],
+      (object) [
+        'status' => 1,
+        'name' => 'foo',
+        'info' => [
+          'layout' => ['foo', 'baz'],
+        ],
+      ],
+      $mock_themes,
     ])->getMock();
-    $theme->method('invokeLayoutHook')->willReturn([
-      'foo' => ['title' => 'Foo'],
-      'bar' => ['title' => 'Bar'],
-      'baz' => ['title' => 'Baz'],
-    ]);
     // No setting yet → No layouts activated.
     $this->assertEqual([], $theme->layoutOptions());
 
-    // Activate the bar-layout.
+    // Activate the bar-layout and baz-layout although bar is not implemented.
     $theme->method('setting')->willReturn([
+      'foo' => 0,
       'bar' => 'bar',
-      'baz' => 0,
+      'baz' => 'baz',
     ]);
     $this->assertEqual([
-      'bar' => 'Bar',
+      'baz' => 'Baz',
     ], $theme->layoutOptions());
 
-    // List the entire layout info with defaults added.
+    // List all implemented layouts.
+    $this->assertEqual([
+      'foo' => ['name' => 'foo', 'title' => 'Foo', 'fields' => []],
+      'baz' => ['name' => 'baz', 'title' => 'Baz', 'fields' => []],
+    ], $theme->layouts(TRUE));
+
+    // Test child theme inheritance.
+    $child_theme = $mock_builder->setConstructorArgs([
+      (object) [
+        'status' => 1,
+        'name' => 'foo',
+        'info' => [
+          'layout' => ['bar'],
+        ],
+      ],
+      $mock_themes,
+      $theme,
+    ])->getMock();
+    // List all implemented layouts in the child theme.
     $this->assertEqual([
       'foo' => ['name' => 'foo', 'title' => 'Foo', 'fields' => []],
       'bar' => ['name' => 'bar', 'title' => 'Bar', 'fields' => []],
       'baz' => ['name' => 'baz', 'title' => 'Baz', 'fields' => []],
-    ], $theme->layouts(TRUE));
+    ], $child_theme->layouts(TRUE));
   }
 
 }

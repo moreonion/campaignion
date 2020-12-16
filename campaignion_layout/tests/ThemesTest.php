@@ -11,13 +11,20 @@ class ThemesTest extends DrupalUnitTestCase {
 
   /**
    * Test getting a specific theme class.
+   *
+   * @backupGlobals enabled
    */
   public function testGetTheme() {
     $themes = new Themes([
-      'foo' => (object) [],
-    ]);
+      'foo' => (object) ['info' => ['name' => 'Foo']],
+      'baz' => (object) ['info' => ['name' => 'Baz']],
+    ], $this->createMock(\DrupalCacheInterface::class));
     $this->assertInstanceOf(Theme::class, $themes->getTheme('foo'));
     $this->assertEmpty($themes->getTheme('bar'));
+    // Set 'foo' as the currently active theme.
+    $GLOBALS['theme'] = 'foo';
+    $theme = $themes->getTheme();
+    $this->assertEqual('Foo', $theme->title());
   }
 
   /**
@@ -27,8 +34,9 @@ class ThemesTest extends DrupalUnitTestCase {
     $data['foo'] = (object) ['name' => 'foo'];
     $data['bar'] = (object) ['name' => 'bar'];
     $data['baz'] = (object) ['name' => 'baz'];
+    $cache = $this->createMock(\DrupalCacheInterface::class);
     $themes = $this->getMockBuilder(Themes::class)
-      ->setConstructorArgs([$data])
+      ->setConstructorArgs([$data, $cache])
       ->setMethods(['getTheme'])
       ->getMock();
 
@@ -41,6 +49,51 @@ class ThemesTest extends DrupalUnitTestCase {
     $themes->method('getTheme')->willReturnOnConsecutiveCalls($foo, $bar, $baz);
     $enabled_themes = $themes->enabledThemes();
     $this->assertEqual(['foo', 'baz'], array_keys($enabled_themes));
+  }
+
+  /**
+   * Test getting the declared layouts.
+   */
+  public function testDeclaredLayouts() {
+    $foo = $this->createMock(Theme::class);
+    $foo->method('invokeLayoutHook')->willReturn([
+      'foo' => ['title' => 'Foo'],
+    ]);
+    $bar = $this->createMock(Theme::class);
+    $bar->method('invokeLayoutHook')->willReturn([
+      'bar' => ['title' => 'Bar'],
+    ]);
+    $cache = $this->createMock(\DrupalCacheInterface::class);
+    $themes = $this->getMockBuilder(Themes::class)
+      ->setConstructorArgs([[], $cache])
+      ->setMethods(['enabledThemes'])
+      ->getMock();
+    $themes->method('enabledThemes')->willReturn([$foo, $bar]);
+    $this->assertEqual([
+      'foo' => ['name' => 'foo', 'title' => 'Foo', 'fields' => []],
+      'bar' => ['name' => 'bar', 'title' => 'Bar', 'fields' => []],
+    ], $themes->declaredLayouts());
+  }
+
+  /**
+   * Test getting all layouts as options.
+   */
+  public function testLayoutOptions() {
+    $mock_themes = $this->getMockBuilder(Themes::class)
+      ->setMethods(['declaredLayouts'])
+      ->disableOriginalConstructor()
+      ->getMock();
+    $mock_themes->method('declaredLayouts')->willReturn([
+      'foo' => ['title' => 'Foo'],
+      'bar' => ['title' => 'Bar', 'fields' => []],
+      'baz' => ['title' => 'Baz'],
+    ]);
+    $mock_themes->layoutOptions();
+    $this->assertEqual([
+      'foo' => 'Foo',
+      'bar' => 'Bar',
+      'baz' => 'Baz',
+    ], $mock_themes->layoutOptions());
   }
 
 }
