@@ -93,8 +93,9 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     '#id' => $html_id,
   ];
   $fields = [];
+  $available_layouts = array_intersect_key($themes->declaredLayouts(), $layout_available_in_theme);
   $options = ['' => t('Default layout')];
-  foreach ($themes->declaredLayouts() as $layout => $info) {
+  foreach ($available_layouts as $layout => $info) {
     $options[$layout] = $info['title'];
     foreach (array_keys(array_filter($info['fields'])) as $field_name) {
       $fields[$field_name]["#$html_id input"][] = $layout;

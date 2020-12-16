@@ -24,7 +24,6 @@ class FieldTest extends DrupalUnitTestCase {
    */
   protected function injectThemes($themes = [], $layouts = []) {
     $theme_objects = [];
-    $layouts = [];
     $add_layout_defaults = function ($info) {
       return $info + ['fields' => []];
     };
@@ -75,7 +74,8 @@ class FieldTest extends DrupalUnitTestCase {
    * Test rendering the field widget with themes.
    */
   public function testFieldWidgetWithThemes() {
-    $this->injectThemes($this->twoThemes());
+    $extra_layouts['extra']['title'] = 'Extra layout not available in any theme';
+    $this->injectThemes($this->twoThemes(), $extra_layouts);
     $form = [];
     $form_state = [];
     $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, [], 0, []);
