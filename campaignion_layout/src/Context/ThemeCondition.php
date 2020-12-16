@@ -24,8 +24,7 @@ class ThemeCondition extends \context_condition {
   /**
    * Check whether the condition is met.
    */
-  public function execute() {
-    $theme = $GLOBALS['theme'];
+  public function execute(string $theme) {
     foreach ($this->get_contexts($theme) as $context) {
       $this->condition_met($context, $theme);
     }

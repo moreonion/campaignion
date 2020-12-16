@@ -232,6 +232,6 @@ function campaignion_layout_context_registry() {
  */
 function campaignion_layout_context_page_condition() {
   if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_theme')) {
-    $plugin->execute();
+    $plugin->execute($GLOBALS['theme']);
   }
 }
