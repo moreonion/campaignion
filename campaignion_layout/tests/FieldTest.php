@@ -85,23 +85,22 @@ class FieldTest extends DrupalUnitTestCase {
       'b' => 'Theme B',
     ], $element['values']['theme']['#options']);
     $this->assertNull($element['values']['theme']['#default_value']);
-    $this->assertNotEmpty($element['values']['layout_a']['#options']);
+    $this->assertNotEmpty($element['values']['layout']['#options']);
     $this->assertEqual([
       '' => 'Default layout',
       '2col' => 'Two columns',
       'banner' => 'Banner',
-    ], $element['values']['layout_a']['#options']);
-    $this->assertEqual('', $element['values']['layout_a']['#default_value']);
-    $this->assertNotEmpty($element['values']['layout_b']['#options']);
+      '1col' => 'Single column',
+    ], $element['values']['layout']['#options']);
+    $this->assertEqual('', $element['values']['layout']['#default_value']);
     $this->assertEqual([
-      'banner' => ['#layout-a input' => ['banner']],
+      'banner' => ['#campaignion-layout-layout input' => ['banner']],
     ], $form_state['campaignion_layout_fields']);
 
     $element['#parents'] = [];
     $element['enabled']['#value'] = TRUE;
     $element['values']['theme']['#value'] = 'a';
-    $element['values']['layout_a']['#value'] = 'banner';
-    $element['values']['layout_b']['#value'] = '1col';
+    $element['values']['layout']['#value'] = 'banner';
     $form_state['values'] = [];
     _campaignion_layout_field_widget_validate($element, $form_state, $form);
     $this->assertEqual('banner', $form_state['values']['layout']);
@@ -124,8 +123,7 @@ class FieldTest extends DrupalUnitTestCase {
     $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, $items, 0, []);
     $this->assertFalse($element['enabled']['#default_value']);
     $this->assertNull($element['values']['theme']['#default_value']);
-    $this->assertEqual('', $element['values']['layout_a']['#default_value']);
-    $this->assertEqual('', $element['values']['layout_b']['#default_value']);
+    $this->assertEqual('2col', $element['values']['layout']['#default_value']);
   }
 
   /**
@@ -139,8 +137,7 @@ class FieldTest extends DrupalUnitTestCase {
     $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, $items, 0, []);
     $this->assertTrue($element['enabled']['#default_value']);
     $this->assertEqual('a', $element['values']['theme']['#default_value']);
-    $this->assertEqual('', $element['values']['layout_a']['#default_value']);
-    $this->assertEqual('', $element['values']['layout_b']['#default_value']);
+    $this->assertEqual('', $element['values']['layout']['#default_value']);
   }
 
   /**
@@ -154,8 +151,7 @@ class FieldTest extends DrupalUnitTestCase {
     $element = campaignion_layout_field_widget_form($form, $form_state, NULL, NULL, NULL, $items, 0, []);
     $this->assertTrue($element['enabled']['#default_value']);
     $this->assertEqual('a', $element['values']['theme']['#default_value']);
-    $this->assertEqual('2col', $element['values']['layout_a']['#default_value']);
-    $this->assertEqual('', $element['values']['layout_b']['#default_value']);
+    $this->assertEqual('2col', $element['values']['layout']['#default_value']);
   }
 
   /**
