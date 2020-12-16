@@ -25,16 +25,12 @@ class LayoutCondition extends \context_condition {
   /**
    * Check whether the condition is met.
    *
-   * @param object $node
-   *   The node object.
-   * @param string $op
-   *   The node-related operation: 'view', 'form', 'comment'.
+   * @param string $active_layout_name
+   *   Machine name of the active layout if one was set.
    */
-  public function execute($node, $op) {
-    if ($op === 'view' && $layout = Lookup::fromEntity('node', $node)->getLayout()) {
-      foreach ($this->get_contexts($layout['name']) as $context) {
-        $this->condition_met($context, $layout['name']);
-      }
+  public function execute(string $active_layout_name) {
+    foreach ($this->get_contexts($active_layout_name) as $context) {
+      $this->condition_met($context, $active_layout_name);
     }
   }
 

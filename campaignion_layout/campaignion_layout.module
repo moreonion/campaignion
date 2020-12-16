@@ -75,6 +75,11 @@ function campaignion_layout_page_build(&$page, $node = NULL) {
   $node = $node ?? menu_get_object();
   if ($node && ($layout = Lookup::fromEntity('node', $node)->getLayout())) {
     $page['#layout'] = $layout;
+    if (module_exists('context')) {
+      if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_layout')) {
+        $plugin->execute($layout['name']);
+      }
+    }
   }
 }
 
@@ -228,14 +233,5 @@ function campaignion_layout_context_registry() {
 function campaignion_layout_context_page_condition() {
   if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_theme')) {
     $plugin->execute();
-  }
-}
-
-/**
- * Implements hook_context_node_condition_alter().
- */
-function campaignion_layout_context_node_condition_alter($node, $op) {
-  if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_layout')) {
-    $plugin->execute($node, $op);
   }
 }
