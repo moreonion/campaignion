@@ -11,13 +11,20 @@ class ThemesTest extends DrupalUnitTestCase {
 
   /**
    * Test getting a specific theme class.
+   *
+   * @backupGlobals enabled
    */
   public function testGetTheme() {
     $themes = new Themes([
-      'foo' => (object) [],
+      'foo' => (object) ['info' => ['name' => 'Foo']],
+      'baz' => (object) ['info' => ['name' => 'Baz']],
     ], $this->createMock(\DrupalCacheInterface::class));
     $this->assertInstanceOf(Theme::class, $themes->getTheme('foo'));
     $this->assertEmpty($themes->getTheme('bar'));
+    // Set 'foo' as the currently active theme.
+    $GLOBALS['theme'] = 'foo';
+    $theme = $themes->getTheme();
+    $this->assertEqual('Foo', $theme->title());
   }
 
   /**

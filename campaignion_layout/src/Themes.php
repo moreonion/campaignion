@@ -40,8 +40,16 @@ class Themes {
 
   /**
    * Create instance for a single theme.
+   *
+   * @param string $theme_name
+   *   The machine name of the theme to be loaded. If no value is passed the
+   *   currently active theme is loaded.
+   *
+   * @return \Drupal\campaignion_layout\Theme|null
+   *   The requested theme or NULL if it isn’t found.
    */
-  public function getTheme($theme_name) {
+  public function getTheme(string $theme_name = NULL) {
+    $theme_name = $theme_name ?? $GLOBALS['theme'];
     if ($theme = $this->themes[$theme_name] ?? NULL) {
       $base = isset($theme->base_theme) ? $this->getTheme($theme->base_theme) : NULL;
       return new Theme($theme, $this, $base);
