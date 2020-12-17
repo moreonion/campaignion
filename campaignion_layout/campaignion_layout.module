@@ -202,7 +202,6 @@ function campaignion_layout_node_prepare($node) {
  */
 function campaignion_layout_context_plugins() {
   $plugins['campaignion_layout_context_condition_layout']['handler']['class'] = LayoutCondition::class;
-  $plugins['campaignion_layout_context_condition_theme']['handler']['class'] = ThemeCondition::class;
   return $plugins;
 }
 
@@ -217,21 +216,7 @@ function campaignion_layout_context_registry() {
         'description' => t('Set this context based on the selected layout.'),
         'plugin' => 'campaignion_layout_context_condition_layout',
       ],
-      'campaignion_layout_context_condition_theme' => [
-        'title' => t('Theme'),
-        'description' => t('Set this context based on the selected theme.'),
-        'plugin' => 'campaignion_layout_context_condition_theme',
-      ],
     ],
   ];
   return $registry;
-}
-
-/**
- * Implements hook_context_page_condition().
- */
-function campaignion_layout_context_page_condition() {
-  if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_theme')) {
-    $plugin->execute($GLOBALS['theme']);
-  }
 }
