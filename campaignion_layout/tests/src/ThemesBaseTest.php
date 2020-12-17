@@ -44,7 +44,10 @@ abstract class ThemesBaseTest extends DrupalUnitTestCase {
       $theme_objects[$name] = $theme;
       $layouts += $data['layouts'];
     }
-    $themes = $this->createMock(Themes::class);
+    $themes = $this->getMockBuilder(Themes::class)
+      ->disableOriginalConstructor()
+      ->setMethods(['enabledThemes', 'declaredLayouts'])
+      ->getMock();
     $themes->method('enabledThemes')->willReturn($theme_objects);
     $themes->method('declaredLayouts')
       ->willReturn(array_map($add_layout_defaults, $layouts));

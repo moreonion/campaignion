@@ -14,12 +14,7 @@ class LayoutCondition extends \context_condition {
    * Condition values.
    */
   public function condition_values() {
-    $values = [];
-    $themes = Container::get()->loadService('campaignion_layout.themes')->enabledThemes();
-    foreach ($themes as $theme) {
-      $values += $theme->layoutOptions(TRUE);
-    }
-    return $values;
+    return Container::get()->loadService('campaignion_layout.themes')->layoutOptions();
   }
 
   /**
