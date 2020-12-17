@@ -8,6 +8,8 @@
 use Drupal\campaignion_layout\Entity;
 use Drupal\campaignion_layout\Lookup;
 use Drupal\campaignion_layout\Themes;
+use Drupal\campaignion_layout\Context\LayoutCondition;
+use Drupal\campaignion_layout\Context\ThemeCondition;
 use Drupal\little_helpers\Services\Container;
 
 // The field.module does not group its hooks so we have to include this here.
@@ -67,16 +69,30 @@ function campaignion_layout_little_helpers_services() {
 }
 
 /**
+ * Implements hook_page_build().
+ */
+function campaignion_layout_page_build(&$page, $node = NULL) {
+  $node = $node ?? menu_get_object();
+  if ($node && ($layout = Lookup::fromEntity('node', $node)->getLayout())) {
+    $page['#layout'] = $layout;
+    if (module_exists('context')) {
+      if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_layout')) {
+        $plugin->execute($layout['name']);
+      }
+    }
+  }
+}
+
+/**
  * Prepare variables for page templates.
  */
 function campaignion_layout_preprocess_page(array &$vars) {
   $vars['layout'] = NULL;
-  if (($node = $vars['node'] ?? NULL) && ($layout = Lookup::fromEntity('node', $node)->getLayout())) {
+  if ($layout = $vars['page']['#layout'] ?? NULL) {
     $vars['layout'] = $layout['name'];
     array_unshift($vars['theme_hook_suggestions'], "page__layout__{$layout['name']}");
-
     foreach ($layout['fields'] as $field_name => $settings) {
-      $vars[$settings['variable']] = field_view_field('node', $node, $field_name, $settings['display']);
+      $vars[$settings['variable']] = field_view_field('node', $vars['node'], $field_name, $settings['display']);
     }
   }
 }
@@ -179,4 +195,28 @@ function campaignion_layout_node_prepare($node) {
       }
     }
   }
+}
+
+/**
+ * Impelements hook_context_plugins().
+ */
+function campaignion_layout_context_plugins() {
+  $plugins['campaignion_layout_context_condition_layout']['handler']['class'] = LayoutCondition::class;
+  return $plugins;
+}
+
+/**
+ * Implements hook_context_registry().
+ */
+function campaignion_layout_context_registry() {
+  $registry = [
+    'conditions' => [
+      'campaignion_layout_context_condition_layout' => [
+        'title' => t('Layout'),
+        'description' => t('Set this context based on the selected layout.'),
+        'plugin' => 'campaignion_layout_context_condition_layout',
+      ],
+    ],
+  ];
+  return $registry;
 }
