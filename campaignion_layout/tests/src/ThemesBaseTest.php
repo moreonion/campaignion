@@ -33,7 +33,11 @@ abstract class ThemesBaseTest extends DrupalUnitTestCase {
       return $info + ['fields' => []];
     };
     foreach ($themes as $name => $data) {
-      $theme = $this->createMock(Theme::class);
+      $data += ['layouts' => []];
+      $theme = $this->getMockBuilder(Theme::class)
+        ->disableOriginalConstructor()
+        ->setMethods(['title', 'layouts'])
+        ->getMock();
       $theme->method('title')->willReturn($data['title'] ?? $name);
       $theme->method('layouts')
         ->willReturn(array_map($add_layout_defaults, $data['layouts']));
