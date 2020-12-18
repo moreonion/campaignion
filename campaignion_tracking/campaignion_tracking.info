@@ -2,3 +2,8 @@ name = Campaignion Tracking
 description = Common tracking functionality.
 core = 7.x
 package = Campaignion
+
+dependencies[] = campaignion:campaignion_action
+dependencies[] = campaignion:campaignion_opt_in
+dependencies[] = little_helpers:little_helpers (>=2.0-alpha7)
+dependencies[] = webform_paymethod_select:webform_paymethod_select
