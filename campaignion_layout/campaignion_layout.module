@@ -9,7 +9,6 @@ use Drupal\campaignion_layout\Entity;
 use Drupal\campaignion_layout\Lookup;
 use Drupal\campaignion_layout\Themes;
 use Drupal\campaignion_layout\Context\LayoutCondition;
-use Drupal\campaignion_layout\Context\ThemeCondition;
 use Drupal\little_helpers\Services\Container;
 
 // The field.module does not group its hooks so we have to include this here.
@@ -201,7 +200,13 @@ function campaignion_layout_node_prepare($node) {
  * Impelements hook_context_plugins().
  */
 function campaignion_layout_context_plugins() {
-  $plugins['campaignion_layout_context_condition_layout']['handler']['class'] = LayoutCondition::class;
+  $plugins['campaignion_layout_context_condition_layout']['handler'] = [
+    'class' => LayoutCondition::class,
+    // Ctools throws a not notice if the file doesn’t exist. That’s why a file
+    // needs to be passed although we don’t rely on the Drupal/ctools
+    // auto loading. @see _ctools_registry_alter().
+    'file' => 'src/Context/LayoutCondition.php',
+  ];
   return $plugins;
 }
 
