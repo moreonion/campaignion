@@ -51,16 +51,6 @@ class ThemeTest extends DrupalUnitTestCase {
   }
 
   /**
-   * Test checking for the active theme.
-   */
-  public function testIsActive() {
-    $theme = new Theme((object) ['name' => 'foo'], $this->createMock(Themes::class));
-
-    $this->assertTrue($theme->isActive('foo'));
-    $this->assertFalse($theme->isActive('bar'));
-  }
-
-  /**
    * Test getting all enabled layouts as options.
    */
   public function testLayoutOptions() {

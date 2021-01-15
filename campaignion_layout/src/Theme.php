@@ -59,17 +59,6 @@ class Theme {
   }
 
   /**
-   * Check whether the theme is the current active theme.
-   *
-   * @param string $active
-   *   Machine name of the current active theme used for testing.
-   */
-  public function isActive($active = NULL) {
-    $active = $active ?? $GLOBALS['theme'];
-    return $this->theme->name === $active;
-  }
-
-  /**
    * Get the theme’s human-readable title.
    */
   public function title() {

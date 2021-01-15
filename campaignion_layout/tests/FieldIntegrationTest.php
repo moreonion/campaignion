@@ -58,7 +58,6 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
     $vars['theme_hook_suggestions'] = [];
     $vars['page'] = [];
     $theme = $this->injectTheme(TRUE);
-    $theme->method('isActive')->willReturn(TRUE);
     $theme->method('getLayout')->willReturn([
       'name' => 'foo',
       'fields' => [
@@ -68,7 +67,7 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
         ],
       ],
     ]);
-    campaignion_layout_page_build($vars['page'], $vars['node']);
+    campaignion_layout_page_build($vars['page'], $vars['node'], 'foo');
     campaignion_layout_preprocess_page($vars);
     $this->assertEqual('foo', $vars['layout']);
     $this->assertEqual(['page__layout__foo'], $vars['theme_hook_suggestions']);

@@ -70,10 +70,12 @@ class Lookup {
    * @return string|null
    *   The name of the first enabled layout of the currently active theme.
    */
-  public function getLayout() {
-    foreach ($this->iterateItems() as $item) {
-      if (($theme = $this->themes->getTheme($item['theme'])) && $theme->isActive() && ($layout = $theme->getLayout($item['layout']))) {
-        return $layout;
+  public function getLayout(string $active_theme_name) {
+    if ($theme = $this->themes->getTheme($active_theme_name)) {
+      foreach ($this->iterateItems() as $item) {
+        if ($active_theme_name == $item['theme'] && ($layout = $theme->getLayout($item['layout']))) {
+          return $layout;
+        }
       }
     }
   }
