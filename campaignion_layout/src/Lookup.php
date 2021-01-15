@@ -77,6 +77,7 @@ class Lookup {
           return $layout;
         }
       }
+      return $theme->getLayout($theme->defaultLayout(), FALSE);
     }
   }
 

@@ -76,6 +76,21 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
   }
 
   /**
+   * Test using the default layout.
+   */
+  public function testPageBuildDefaultLayout() {
+    $node = $this->nodeWithItems([]);
+    $page = [];
+    $theme = $this->injectTheme(TRUE);
+    $theme->method('defaultLayout')->willReturn('foo_default');
+    $theme->expects($this->once())->method('getLayout')->with('foo_default', FALSE)->willReturn([
+      'name' => 'foo_default',
+    ]);
+    campaignion_layout_page_build($page, $node, 'foo');
+    $this->assertEqual('foo_default', $page['#layout']['name']);
+  }
+
+  /**
    * Create a test-node with specific items.
    */
   protected function nodeWithItems(array $items) {

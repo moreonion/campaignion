@@ -51,6 +51,31 @@ class ThemeTest extends DrupalUnitTestCase {
   }
 
   /**
+   * Test getting the default layout from the theme or its base theme.
+   */
+  public function testDefaultLayout() {
+    // No declared default layout and no base theme.
+    $data = (object) ['info' => []];
+    $theme_without_default = new Theme($data, $this->createMock(Themes::class));
+    $this->assertEqual('default', $theme_without_default->defaultLayout());
+
+    // Declared default layout.
+    $data = (object) ['info' => ['layout_default' => 'foo']];
+    $theme_foo_layout = new Theme($data, $this->createMock(Themes::class));
+    $this->assertEqual('foo', $theme_foo_layout->defaultLayout());
+
+    // No declared default layout but a base theme with a default layout.
+    $data = (object) ['info' => []];
+    $theme_without_default = new Theme($data, $this->createMock(Themes::class), $theme_foo_layout);
+    $this->assertEqual('foo', $theme_without_default->defaultLayout());
+
+    // Declared default layout wins over default layout of the base theme.
+    $data = (object) ['info' => ['layout_default' => 'bar']];
+    $theme_bar_layout = new Theme($data, $this->createMock(Themes::class), $theme_foo_layout);
+    $this->assertEqual('bar', $theme_bar_layout->defaultLayout());
+  }
+
+  /**
    * Test getting all enabled layouts as options.
    */
   public function testLayoutOptions() {

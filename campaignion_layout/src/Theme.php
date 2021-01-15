@@ -126,6 +126,18 @@ class Theme {
   }
 
   /**
+   * Get the theme’s default layout.
+   *
+   * The default layout of a theme can’t be deactivated.
+   *
+   * @return string
+   *   Machine name of the default layout.
+   */
+  public function defaultLayout() {
+    return $this->theme->info['layout_default'] ?? ($this->base ? $this->base->defaultLayout() : 'default');
+  }
+
+  /**
    * Include the theme’s template.php and invoke its hook.
    */
   public function invokeLayoutHook() {
