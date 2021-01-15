@@ -6,10 +6,8 @@ namespace Drupal\campaignion_email_to_target;
  * Common datastructure for handling protest messages.
  */
 class Message extends MessageTemplateInstance {
-  public $to;
   public $toName;
   public $toAddress;
-  public $from;
   public $fromName;
   public $fromAddress;
   public $subject;
@@ -44,10 +42,6 @@ class Message extends MessageTemplateInstance {
       'display' => '[email-to-target:contact.display_name]',
     ];
     parent::__construct($data);
-
-    // Save as property for compatibility.
-    $this->to = $this->to();
-    $this->from = $this->from();
   }
 
   /**
