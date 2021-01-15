@@ -62,7 +62,6 @@ class FieldTest extends ThemesBaseTest {
     $this->assertNull($element['values']['theme']['#default_value']);
     $this->assertNotEmpty($element['values']['layout']['#options']);
     $this->assertEqual([
-      '' => 'Default layout',
       '2col' => 'Two columns',
       'banner' => 'Banner',
       '1col' => 'Single column',
