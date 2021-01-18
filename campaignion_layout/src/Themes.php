@@ -57,7 +57,7 @@ class Themes {
   }
 
   /**
-   * Get all enabled themes.
+   * Get all themes that are enabled and have the feature enabled as well.
    */
   public function enabledThemes() {
     $self = $this;
@@ -65,7 +65,7 @@ class Themes {
       return $self->getTheme($theme->name);
     }, $this->themes);
     return array_filter($all_themes, function ($theme) {
-      return $theme->isEnabled();
+      return $theme->isEnabled() && $theme->hasFeatureEnabled();
     });
   }
 

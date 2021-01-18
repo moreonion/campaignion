@@ -52,10 +52,17 @@ class Theme {
   }
 
   /**
+   * Check whether the layout variations feature is enabled for this theme.
+   */
+  public function hasFeatureEnabled() {
+    return $this->hasFeature() && $this->setting('toggle_layout_variations');
+  }
+
+  /**
    * Check whether the theme and its layout variations are enabled.
    */
   public function isEnabled() {
-    return $this->theme->status && $this->hasFeature() && $this->setting('toggle_layout_variations');
+    return (bool) $this->theme->status;
   }
 
   /**

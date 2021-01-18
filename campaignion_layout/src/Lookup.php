@@ -58,7 +58,7 @@ class Lookup {
    */
   public function getTheme() {
     foreach ($this->iterateItems() as $item) {
-      if (($theme = $this->themes->getTheme($item['theme'])) && $theme->isEnabled()) {
+      if (($theme = $this->themes->getTheme($item['theme'])) && $theme->hasFeatureEnabled()) {
         return $item['theme'];
       }
     }

@@ -33,7 +33,7 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
   public function testThemeForEntityItemDisabledTheme() {
     $node = $this->nodeWithItems([['theme' => 'foo', 'layout' => 'foo_layout']]);
     // Theme is configured in the field item but not enabled.
-    $this->injectTheme(FALSE);
+    $this->injectTheme(FALSE, TRUE, FALSE);
     $this->assertNull(campaignion_layout_get_theme_for_entity('node', $node));
   }
 
@@ -104,12 +104,14 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
   /**
    * Inject a themes service that always returns a enabled/disabled theme.
    */
-  protected function injectTheme($enabled) {
+  protected function injectTheme($enabled, $has_feature = TRUE, $has_feature_enabled = TRUE) {
     $themes = $this->createMock(Themes::class);
     $theme = $this->createMock(Theme::class);
     $themes->method('getTheme')->willReturn($theme);
     Container::get()->inject('campaignion_layout.themes', $themes);
     $theme->method('isEnabled')->willReturn($enabled);
+    $theme->method('hasFeature')->willReturn($has_feature);
+    $theme->method('hasFeatureEnabled')->willReturn($has_feature_enabled);
     return $theme;
   }
 

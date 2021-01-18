@@ -42,13 +42,16 @@ class ThemesTest extends DrupalUnitTestCase {
 
     $foo = $this->createMock(Theme::class);
     $foo->method('isEnabled')->willReturn(TRUE);
+    $foo->method('hasFeatureEnabled')->willReturn(TRUE);
     $bar = $this->createMock(Theme::class);
     $bar->method('isEnabled')->willReturn(FALSE);
+    $bar->method('hasFeatureEnabled')->willReturn(TRUE);
     $baz = $this->createMock(Theme::class);
     $baz->method('isEnabled')->willReturn(TRUE);
+    $baz->method('hasFeatureEnabled')->willReturn(FALSE);
     $themes->method('getTheme')->willReturnOnConsecutiveCalls($foo, $bar, $baz);
     $enabled_themes = $themes->enabledThemes();
-    $this->assertEqual(['foo', 'baz'], array_keys($enabled_themes));
+    $this->assertEqual(['foo'], array_keys($enabled_themes));
   }
 
   /**

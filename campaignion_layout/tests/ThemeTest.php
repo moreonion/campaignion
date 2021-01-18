@@ -29,7 +29,7 @@ class ThemeTest extends DrupalUnitTestCase {
    */
   public function testIsEnabled() {
     $mock_builder = $this->getMockBuilder(Theme::class)
-      ->setMethods(['hasFeature', 'setting']);
+      ->setMethods(['setting']);
 
     $theme = $mock_builder->setConstructorArgs([
       (object) ['status' => 0],
@@ -41,13 +41,33 @@ class ThemeTest extends DrupalUnitTestCase {
       (object) ['status' => 1],
       $this->createMock(Themes::class),
     ])->getMock();
-    $this->assertFalse($theme->isEnabled());
-
-    $theme->method('hasFeature')->willReturn(TRUE);
-    $this->assertFalse($theme->isEnabled());
-
-    $theme->method('setting')->willReturn(TRUE);
     $this->assertTrue($theme->isEnabled());
+  }
+
+  /**
+   * Test checking whether the layout feature is declared and enabled.
+   */
+  public function testHasFeatureEnabled() {
+    $mock_builder = $this->getMockBuilder(Theme::class)
+      ->setMethods(['setting']);
+
+    $theme = $mock_builder->setConstructorArgs([
+      (object) [],
+      $this->createMock(Themes::class),
+    ])->getMock();
+    $theme->method('setting')->will($this->onConsecutiveCalls(FALSE, TRUE));
+    $this->assertFalse($theme->hasFeature());
+    $this->assertFalse($theme->hasFeatureEnabled());
+    $this->assertFalse($theme->hasFeatureEnabled());
+
+    $theme = $mock_builder->setConstructorArgs([
+      (object) ['info' => ['features' => ['layout_variations']]],
+      $this->createMock(Themes::class),
+    ])->getMock();
+    $theme->method('setting')->will($this->onConsecutiveCalls(FALSE, TRUE));
+    $this->assertTrue($theme->hasFeature());
+    $this->assertFalse($theme->hasFeatureEnabled());
+    $this->assertTrue($theme->hasFeatureEnabled());
   }
 
   /**
