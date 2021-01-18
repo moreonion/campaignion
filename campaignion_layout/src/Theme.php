@@ -145,6 +145,17 @@ class Theme {
   }
 
   /**
+   * Get an array of this theme and all its bases keyed by machine name.
+   */
+  public function baseThemes($include_self = FALSE) {
+    $themes = $this->base ? $this->base->baseThemes(TRUE) : [];
+    if ($include_self) {
+      $themes[$this->theme->name] = $this;
+    }
+    return $themes;
+  }
+
+  /**
    * Include the theme’s template.php and invoke its hook.
    */
   public function invokeLayoutHook() {

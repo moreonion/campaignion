@@ -57,16 +57,42 @@ class Themes {
   }
 
   /**
+   * Get all themes as theme objects.
+   */
+  public function allThemes() {
+    $self = $this;
+    return array_map(function ($theme) use ($self) {
+      return $self->getTheme($theme->name);
+    }, $this->themes);
+  }
+
+  /**
    * Get all themes that are enabled and have the feature enabled as well.
    */
   public function enabledThemes() {
-    $self = $this;
-    $all_themes = array_map(function ($theme) use ($self) {
-      return $self->getTheme($theme->name);
-    }, $this->themes);
-    return array_filter($all_themes, function ($theme) {
+    return array_filter($this->allThemes(), function ($theme) {
       return $theme->isEnabled() && $theme->hasFeatureEnabled();
     });
+  }
+
+  /**
+   * Get all themes which’s hooks should be invoked.
+   *
+   * The hook should be invoked on all enabled themes and all their base themes.
+   * Even disabled base themes should get their hook invoked as this matches how
+   * Drupal core treats themes.
+   */
+  protected function hookThemes() {
+    $enabled_themes = array_filter($this->allThemes(), function ($theme) {
+      return $theme->isEnabled() && $theme->hasFeature();
+    });
+    $hook_themes = $enabled_themes;
+    foreach ($enabled_themes as $name => $theme) {
+      $hook_themes += array_filter($theme->baseThemes(), function($theme) {
+        return $theme->hasFeature();
+      });
+    }
+    return $hook_themes;
   }
 
   /**
@@ -82,7 +108,7 @@ class Themes {
       return $info = $cache->data;
     }
     $info = [];
-    foreach ($this->enabledThemes() as $theme) {
+    foreach ($this->hookThemes() as $theme) {
       $info = drupal_array_merge_deep($info, $theme->invokeLayoutHook());
     }
     foreach ($info as $name => &$i) {
