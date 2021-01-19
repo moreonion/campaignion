@@ -51,7 +51,7 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
    * Test node rendering.
    */
   public function testNodePreprocess() {
-    $vars['node'] = $this->nodeWithItems([['theme' => 'foo', 'layout' => 'foo']]);
+    $vars['node'] = $this->nodeWithItems([['theme' => 'dontcare', 'layout' => 'foo']]);
     $vars['node']->field_main_image[LANGUAGE_NONE][0] = [
       'uri' => '/misc/druplicon.png',
     ];

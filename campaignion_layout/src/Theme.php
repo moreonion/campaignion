@@ -139,7 +139,7 @@ class Theme {
    */
   public function getLayoutFromItems($items) {
     foreach ($items as $item) {
-      if ($item['theme'] == $this->theme->name && ($layout = $this->getLayout($item['layout']))) {
+      if ($layout = $this->getLayout($item['layout'])) {
         return $layout;
       }
     }

@@ -189,14 +189,14 @@ class ThemeTest extends DrupalUnitTestCase {
 
     $items = [];
     $this->assertEqual('standard', $theme->getLayoutFromItems($items)['name']);
-    // Enabled layout but on another theme.
-    $items[] = ['theme' => 'not_foo', 'layout' => 'enabled'];
-    $this->assertEqual('standard', $theme->getLayoutFromItems($items)['name']);
     // Disabled layout.
     $items[] = ['theme' => 'foo', 'layout' => 'disabled'];
     $this->assertEqual('standard', $theme->getLayoutFromItems($items)['name']);
+    // Enabled layout on another theme.
+    $items[] = ['theme' => 'not_foo', 'layout' => 'enabled'];
+    $this->assertEqual('enabled', $theme->getLayoutFromItems($items)['name']);
     // Enabled layout.
-    $items[] = ['theme' => 'foo', 'layout' => 'enabled'];
+    $items[1]['theme'] = 'foo';
     $this->assertEqual('enabled', $theme->getLayoutFromItems($items)['name']);
   }
 
