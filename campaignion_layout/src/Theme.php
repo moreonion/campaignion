@@ -133,6 +133,20 @@ class Theme {
   }
 
   /**
+   * Get the first matchiing layout for a set of field items.
+   *
+   * If no matching item is found the default layout is returned.
+   */
+  public function getLayoutFromItems($items) {
+    foreach ($items as $item) {
+      if ($item['theme'] == $this->theme->name && ($layout = $this->getLayout($item['layout']))) {
+        return $layout;
+      }
+    }
+    return $this->getLayout($this->defaultLayout(), FALSE);
+  }
+
+  /**
    * Get the theme’s default layout.
    *
    * The default layout of a theme can’t be deactivated.

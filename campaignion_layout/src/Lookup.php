@@ -66,19 +66,9 @@ class Lookup {
 
   /**
    * Find the layout configured for the currently active theme.
-   *
-   * @return string|null
-   *   The name of the first enabled layout of the currently active theme.
    */
-  public function getLayout(string $active_theme_name) {
-    if ($theme = $this->themes->getTheme($active_theme_name)) {
-      foreach ($this->iterateItems() as $item) {
-        if ($active_theme_name == $item['theme'] && ($layout = $theme->getLayout($item['layout']))) {
-          return $layout;
-        }
-      }
-      return $theme->getLayout($theme->defaultLayout(), FALSE);
-    }
+  public function getLayout() {
+    return $this->themes->getTheme()->getLayoutFromItems($this->iterateItems());
   }
 
 }

@@ -70,10 +70,9 @@ function campaignion_layout_little_helpers_services() {
 /**
  * Implements hook_page_build().
  */
-function campaignion_layout_page_build(&$page, $node = NULL, $active_theme_name = NULL) {
+function campaignion_layout_page_build(&$page, $node = NULL) {
   $node = $node ?? menu_get_object();
-  $active_theme_name = $active_theme_name ?? $GLOBALS['theme'];
-  if ($node && ($layout = Lookup::fromEntity('node', $node)->getLayout($active_theme_name))) {
+  if ($node && ($layout = Lookup::fromEntity('node', $node)->getLayout())) {
     $page['#layout'] = $layout;
     if (module_exists('context')) {
       if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_layout')) {

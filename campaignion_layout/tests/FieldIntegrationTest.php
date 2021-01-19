@@ -58,7 +58,7 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
     $vars['theme_hook_suggestions'] = [];
     $vars['page'] = [];
     $theme = $this->injectTheme(TRUE);
-    $theme->method('getLayout')->willReturn([
+    $theme->method('getLayoutFromItems')->willReturn([
       'name' => 'foo',
       'fields' => [
         'field_main_image' => [
@@ -82,11 +82,10 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
     $node = $this->nodeWithItems([]);
     $page = [];
     $theme = $this->injectTheme(TRUE);
-    $theme->method('defaultLayout')->willReturn('foo_default');
-    $theme->expects($this->once())->method('getLayout')->with('foo_default', FALSE)->willReturn([
+    $theme->expects($this->once())->method('getLayoutFromItems')->willReturn([
       'name' => 'foo_default',
     ]);
-    campaignion_layout_page_build($page, $node, 'foo');
+    campaignion_layout_page_build($page, $node);
     $this->assertEqual('foo_default', $page['#layout']['name']);
   }
 

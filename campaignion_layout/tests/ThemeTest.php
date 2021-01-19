@@ -157,4 +157,47 @@ class ThemeTest extends DrupalUnitTestCase {
     ], $child_theme->layouts(TRUE));
   }
 
+  /**
+   * Test getting the layout from items.
+   */
+  public function testGetLayoutFromItems() {
+    $mock_builder = $this->getMockBuilder(Theme::class)
+      ->setMethods(['setting']);
+    $mock_themes = $this->createMock(Themes::class);
+    $mock_themes->method('declaredLayouts')->willReturn([
+      'enabled' => ['name' => 'enabled', 'title' => 'Foo', 'fields' => []],
+      'disabled' => ['name' => 'disabled', 'title' => 'Bar', 'fields' => []],
+      'standard' => ['name' => 'standard', 'title' => 'Baz', 'fields' => []],
+    ]);
+
+    $theme = $mock_builder->setConstructorArgs([
+      (object) [
+        'status' => 1,
+        'name' => 'foo',
+        'info' => [
+          'layout' => ['enabled', 'disabled', 'standard'],
+          'layout_default' => 'standard',
+        ],
+      ],
+      $mock_themes,
+    ])->getMock();
+    $theme->method('setting')->willReturn([
+      'enabled' => 'enabled',
+      'disabled' => 0,
+      'default' => 0,
+    ]);
+
+    $items = [];
+    $this->assertEqual('standard', $theme->getLayoutFromItems($items)['name']);
+    // Enabled layout but on another theme.
+    $items[] = ['theme' => 'not_foo', 'layout' => 'enabled'];
+    $this->assertEqual('standard', $theme->getLayoutFromItems($items)['name']);
+    // Disabled layout.
+    $items[] = ['theme' => 'foo', 'layout' => 'disabled'];
+    $this->assertEqual('standard', $theme->getLayoutFromItems($items)['name']);
+    // Enabled layout.
+    $items[] = ['theme' => 'foo', 'layout' => 'enabled'];
+    $this->assertEqual('enabled', $theme->getLayoutFromItems($items)['name']);
+  }
+
 }
