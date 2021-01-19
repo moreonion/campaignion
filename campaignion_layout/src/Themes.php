@@ -86,13 +86,13 @@ class Themes {
     $enabled_themes = array_filter($this->allThemes(), function ($theme) {
       return $theme->isEnabled() && $theme->hasFeature();
     });
-    $hook_themes = $enabled_themes;
+    $hook_themes = [];
     foreach ($enabled_themes as $name => $theme) {
       $hook_themes += array_filter($theme->baseThemes(), function($theme) {
         return $theme->hasFeature();
       });
     }
-    return $hook_themes;
+    return $hook_themes + $enabled_themes;
   }
 
   /**
