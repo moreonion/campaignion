@@ -23,7 +23,7 @@ class FormSubmission implements \Serializable {
   public static function fromWebformSubmission(Submission $submission, $user_agent = NULL) {
     $user_agent = $user_agent ? $user_agent : $_SERVER['HTTP_USER_AGENT'];
     $url = url('node/' . $submission->nid, ['absolute' => TRUE]);
-    $ip = $submission->remote_addr;
+    $ip = $submission->optin_ip_addr ?? NULL;
     $date = $submission->submitted;
 
     // Reconstruct the name of the post-variables.

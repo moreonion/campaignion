@@ -74,6 +74,23 @@ function campaignion_newsletters_form_redhen_contact_contact_form_alter(&$form, 
 }
 
 /**
+ * Implements hook_webform_submission_create_alter().
+ *
+ * By default webform stores the IP-address in $submission->remote_addr, but
+ * this can be deactivated either because the form is marked as confidential or
+ * for privacy reasons.
+ * Some newsletter providers require to record the opt-in IP-address. In these
+ * cases we need it although it might be disabled in webform. This hook adds
+ * the $submission->optin_ip_address for the request in which the submission is
+ * created. It’s not being stored.
+ *
+ * @see \Drupal\campaignion_newsletters\FormSubmission::fromWebformSubmission()
+ */
+function campaignion_newsletters_webform_submission_create_alter($submission, $node, $account, $form_state) {
+  $submission->optin_ip_addr = ip_address();
+}
+
+/**
  * Implements hook_webform_submission_confirmed().
  */
 function campaignion_newsletters_webform_submission_confirmed(Submission $submission) {
