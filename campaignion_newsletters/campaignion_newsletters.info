@@ -6,5 +6,6 @@ package = Campaignion
 dependencies[] = little_helpers
 dependencies[] = psr0
 dependencies[] = ultimate_cron
+dependencies[] = variable:variable
 dependencies[] = webform
 dependencies[] = webform_confirm_email
