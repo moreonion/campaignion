@@ -52,21 +52,17 @@ class Theme {
   }
 
   /**
-   * Check whether the theme and its layout variations are enabled.
+   * Check whether the layout variations feature is enabled for this theme.
    */
-  public function isEnabled() {
-    return $this->theme->status && $this->hasFeature() && $this->setting('toggle_layout_variations');
+  public function hasFeatureEnabled() {
+    return $this->hasFeature() && $this->setting('toggle_layout_variations');
   }
 
   /**
-   * Check whether the theme is the current active theme.
-   *
-   * @param string $active
-   *   Machine name of the current active theme used for testing.
+   * Check whether the theme and its layout variations are enabled.
    */
-  public function isActive($active = NULL) {
-    $active = $active ?? $GLOBALS['theme'];
-    return $this->theme->name === $active;
+  public function isEnabled() {
+    return (bool) $this->theme->status;
   }
 
   /**
@@ -134,6 +130,43 @@ class Theme {
    */
   public function getLayout($layout, $if_enabled = TRUE) {
     return $this->layouts(!$if_enabled)[$layout] ?? NULL;
+  }
+
+  /**
+   * Get the first matchiing layout for a set of field items.
+   *
+   * If no matching item is found the default layout is returned.
+   */
+  public function getLayoutFromItems($items) {
+    foreach ($items as $item) {
+      if ($layout = $this->getLayout($item['layout'])) {
+        return $layout;
+      }
+    }
+    return $this->getLayout($this->defaultLayout(), FALSE);
+  }
+
+  /**
+   * Get the theme’s default layout.
+   *
+   * The default layout of a theme can’t be deactivated.
+   *
+   * @return string
+   *   Machine name of the default layout.
+   */
+  public function defaultLayout() {
+    return $this->theme->info['layout_default'] ?? ($this->base ? $this->base->defaultLayout() : 'default');
+  }
+
+  /**
+   * Get an array of this theme and all its bases keyed by machine name.
+   */
+  public function baseThemes($include_self = FALSE) {
+    $themes = $this->base ? $this->base->baseThemes(TRUE) : [];
+    if ($include_self) {
+      $themes[$this->theme->name] = $this;
+    }
+    return $themes;
   }
 
   /**

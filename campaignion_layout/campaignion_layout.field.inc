@@ -94,7 +94,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
   ];
   $fields = [];
   $available_layouts = array_intersect_key($themes->declaredLayouts(), $layout_available_in_theme);
-  $options = ['' => t('Default layout')];
+  $options = [];
   foreach ($available_layouts as $layout => $info) {
     $options[$layout] = $info['title'];
     foreach (array_keys(array_filter($info['fields'])) as $field_name) {
@@ -107,7 +107,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
   }
   $element['values']['layout'] += [
     '#options' => $options,
-    '#default_value' => isset($options[$item['layout']]) ? $item['layout'] : '',
+    '#default_value' => isset($options[$item['layout']]) ? $item['layout'] : NULL,
   ];
   $form_state['campaignion_layout_fields'] = $fields;
   if (!$enabled_themes) {
