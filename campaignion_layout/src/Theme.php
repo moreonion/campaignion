@@ -120,6 +120,8 @@ class Theme {
     $variations = array_intersect_key($variations, $this->implementedLayouts());
     if (!$disabled) {
       $enabled = $this->setting('layout_variations') ?? [];
+      $default = $this->defaultLayout();
+      $enabled[$default] = $default;
       $variations = array_intersect_key($variations, array_filter($enabled));
     }
     return $variations;
