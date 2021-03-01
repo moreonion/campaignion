@@ -106,6 +106,7 @@ class ThemeTest extends DrupalUnitTestCase {
       'foo' => ['name' => 'foo', 'title' => 'Foo', 'fields' => []],
       'bar' => ['name' => 'bar', 'title' => 'Bar', 'fields' => []],
       'baz' => ['name' => 'baz', 'title' => 'Baz', 'fields' => []],
+      'def' => ['name' => 'def', 'title' => 'Default', 'fields' => []],
     ]);
 
     $theme = $mock_builder->setConstructorArgs([
@@ -113,13 +114,16 @@ class ThemeTest extends DrupalUnitTestCase {
         'status' => 1,
         'name' => 'foo',
         'info' => [
-          'layout' => ['foo', 'baz'],
+          'layout' => ['foo', 'baz', 'def'],
+          'layout_default' => 'def',
         ],
       ],
       $mock_themes,
     ])->getMock();
-    // No setting yet → No layouts activated.
-    $this->assertEqual([], $theme->layoutOptions());
+    // No setting yet → Only the default layout is activated.
+    $this->assertEqual([
+      'def' => 'Default',
+    ], $theme->layoutOptions());
 
     // Activate the bar-layout and baz-layout although bar is not implemented.
     $theme->method('setting')->willReturn([
@@ -129,12 +133,14 @@ class ThemeTest extends DrupalUnitTestCase {
     ]);
     $this->assertEqual([
       'baz' => 'Baz',
+      'def' => 'Default',
     ], $theme->layoutOptions());
 
     // List all implemented layouts.
     $this->assertEqual([
       'foo' => ['name' => 'foo', 'title' => 'Foo', 'fields' => []],
       'baz' => ['name' => 'baz', 'title' => 'Baz', 'fields' => []],
+      'def' => ['name' => 'def', 'title' => 'Default', 'fields' => []],
     ], $theme->layouts(TRUE));
 
     // Test child theme inheritance.
@@ -154,6 +160,7 @@ class ThemeTest extends DrupalUnitTestCase {
       'foo' => ['name' => 'foo', 'title' => 'Foo', 'fields' => []],
       'bar' => ['name' => 'bar', 'title' => 'Bar', 'fields' => []],
       'baz' => ['name' => 'baz', 'title' => 'Baz', 'fields' => []],
+      'def' => ['name' => 'def', 'title' => 'Default', 'fields' => []],
     ], $child_theme->layouts(TRUE));
   }
 
