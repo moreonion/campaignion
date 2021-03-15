@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\campaignion_email_to_target\Api;
+namespace Drupal\impact_stack_auth;
 
 use Drupal\little_helpers\Rest\Client;
 
@@ -10,7 +10,7 @@ use Drupal\little_helpers\Rest\Client;
 class AuthAppClient extends Client {
 
   const API_VERSION = 'v1';
-  const TOKEN_CID = 'campaignion_email_to_target.token';
+  const TOKEN_CID = 'impact_stack_auth:token';
 
   /**
    * The API key for calling backend apps.
@@ -47,6 +47,8 @@ class AuthAppClient extends Client {
    *   The URL for the auth-app API endpoint (withut the version prefix).
    * @param string[] $key
    *   The API key for this site.
+   * @param int $token_lifetime
+   *   The minimum amount of time for which the JWT is expected to be valid.
    */
   public function __construct(string $url, array $key, int $token_lifetime = 3600) {
     static::validateConfig($url, $key);

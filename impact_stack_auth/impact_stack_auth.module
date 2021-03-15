@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Main module file that implements hooks and callbacks.
+ */
+
+use Drupal\impact_stack_auth\AuthAppClient;
+
+/**
+ * Implements hook_little_helpers_services().
+ */
+function impact_stack_auth_little_helpers_services() {
+  $info['impact_stack_auth.AuthAppClient'] = [
+    'class' => AuthAppClient::class,
+    'arguments' => [
+      '!impact_stack_auth_app_url',
+      '!impact_stack_auth_api_key',
+    ],
+  ];
+  return $info;
+}

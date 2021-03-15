@@ -1,0 +1,8 @@
+name = Impact stack auth-app API
+description = Provides an API for accessing the impact stack auth app.
+core = 7.x
+php = 7.3
+package = Campaignion
+
+dependencies[] = little_helpers:little_helpers
+dependencies[] = psr0:psr0

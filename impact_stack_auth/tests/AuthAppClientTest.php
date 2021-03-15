@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\campaignion_email_to_target\Api;
+namespace Drupal\impact_stack_auth;
 
 /**
- * Test the API-client class.
+ * Test the auth app API-client.
  */
 class AuthAppClientTest extends \DrupalUnitTestCase {
 
@@ -15,23 +15,23 @@ class AuthAppClientTest extends \DrupalUnitTestCase {
   }
 
   /**
-   * Create an instrumented Api object that doesn’t actually send requests.
+   * Create an instrumented client object that doesn’t actually send requests.
    */
   protected function instrumentedApi() {
     $api = $this->getMockBuilder(AuthAppClient::class)
-      ->setConstructorArgs(['http://mock', [
-        'public_key' => 'pk_',
-        'secret_key' => 'sk_',
-      ]])
+      ->setConstructorArgs([
+        'http://mock',
+        ['public_key' => 'pk_', 'secret_key' => 'sk_'],
+      ])
       ->setMethods(['send'])
       ->getMock();
     return $api;
   }
 
   /**
-   * Loading the token twice from two Client objects.
+   * Loading the token twice from two client objects.
    */
-  public function testRequestingDatasetTwiceOnTwoObjects() {
+  public function testRequestingTokenTwiceOnTwoObjects() {
     $api = $this->instrumentedApi();
     $api->expects($this->once())
       ->method('send')
