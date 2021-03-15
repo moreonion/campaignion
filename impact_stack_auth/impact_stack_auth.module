@@ -16,6 +16,7 @@ function impact_stack_auth_little_helpers_services() {
     'arguments' => [
       '!impact_stack_auth_app_url',
       '!impact_stack_auth_api_key',
+      '!impact_stack_organization',
     ],
   ];
   return $info;

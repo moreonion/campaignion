@@ -22,6 +22,7 @@ class AuthAppClientTest extends \DrupalUnitTestCase {
       ->setConstructorArgs([
         'http://mock',
         ['public_key' => 'pk_', 'secret_key' => 'sk_'],
+        'org1',
       ])
       ->setMethods(['send'])
       ->getMock();
@@ -35,6 +36,12 @@ class AuthAppClientTest extends \DrupalUnitTestCase {
     $api = $this->instrumentedApi();
     $api->expects($this->once())
       ->method('send')
+      ->with('token/org1', [], [
+        'public_key' => 'pk_',
+        'secret_key' => 'sk_',
+      ], [
+        'method' => 'POST',
+      ])
       ->will($this->returnValue([
         'token' => 'test token',
       ]));

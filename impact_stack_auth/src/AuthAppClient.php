@@ -20,6 +20,13 @@ class AuthAppClient extends Client {
   protected $key;
 
   /**
+   * The current organization.
+   *
+   * @var string
+   */
+  protected $organization;
+
+  /**
    * Number of seconds a token is cached.
    *
    * @var int
@@ -50,10 +57,11 @@ class AuthAppClient extends Client {
    * @param int $token_lifetime
    *   The minimum amount of time for which the JWT is expected to be valid.
    */
-  public function __construct(string $url, array $key, int $token_lifetime = 3600) {
+  public function __construct(string $url, array $key, string $organization, int $token_lifetime = 3600) {
     static::validateConfig($url, $key);
     parent::__construct($url . '/' . static::API_VERSION);
     $this->key = $key;
+    $this->organization = $organization;
     $this->tokenLifetime = $token_lifetime;
   }
 
@@ -64,7 +72,7 @@ class AuthAppClient extends Client {
     if (($cache = cache_get(static::TOKEN_CID)) && $cache->expire > REQUEST_TIME) {
       return $cache->data;
     }
-    $token = $this->post('token', [], $this->key)['token'];
+    $token = $this->post('token/' . urlencode($this->organization), [], $this->key)['token'];
     cache_set(static::TOKEN_CID, $token, 'cache', REQUEST_TIME + $this->tokenLifetime);
     return $token;
   }

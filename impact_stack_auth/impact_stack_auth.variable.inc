@@ -23,5 +23,12 @@ function impact_stack_auth_variable_info($options) {
     'default' => '',
     'localize' => FALSE,
   ];
+  $v['impact_stack_organization'] = [
+    'title' => t('Impact-stack organization'),
+    'description' => t('Machine name of the impact-stack organization owning the data of this installation.'),
+    'type' => 'string',
+    'default' => '',
+    'localize' => FALSE,
+  ];
   return $v;
 }
