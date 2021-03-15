@@ -178,12 +178,12 @@ function campaignion_email_to_target_requirements($phase) {
  * Move auth app implementation to its own module.
  */
 function campaignion_email_to_target_update_10() {
-  if (!module_enable(['impact_stack_auth'])) {
-    throw new \DrupalUpdateException('Could not enable the "impact_stack_auth" module.');
+  if (!module_enable(['campaignion_auth'])) {
+    throw new \DrupalUpdateException('Could not enable the "campaignion_auth" module.');
   }
   $move = [
-    'campaignion_email_to_target_auth_app_url' => 'impact_stack_auth_app_url',
-    'campaignion_email_to_target_auth_api_key' => 'impact_stack_auth_api_key',
+    'campaignion_email_to_target_auth_app_url' => 'campaignion_auth_app_url',
+    'campaignion_email_to_target_auth_api_key' => 'campaignion_auth_api_key',
   ];
   foreach ($move as $from => $to) {
     variable_set($to, variable_get($from));

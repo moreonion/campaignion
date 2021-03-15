@@ -76,7 +76,7 @@ function campaignion_email_to_target_little_helpers_services() {
     'class' => Client::class,
     'arguments' => [
       '!campaignion_email_to_target_e2t_api_url',
-      '@impact_stack_auth.AuthAppClient',
+      '@campaignion_auth.AuthAppClient',
     ],
   ];
   return $info;

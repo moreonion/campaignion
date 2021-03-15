@@ -2,7 +2,7 @@
 
 namespace Drupal\campaignion_email_to_target\Api;
 
-use Drupal\impact_stack_auth\AuthAppClient;
+use Drupal\campaignion_auth\AuthAppClient;
 
 /**
  * Test the API-client class.

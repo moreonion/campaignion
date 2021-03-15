@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\impact_stack_auth;
+namespace Drupal\campaignion_auth;
 
 use Drupal\little_helpers\Rest\Client;
 
@@ -10,7 +10,7 @@ use Drupal\little_helpers\Rest\Client;
 class AuthAppClient extends Client {
 
   const API_VERSION = 'v1';
-  const TOKEN_CID = 'impact_stack_auth:token';
+  const TOKEN_CID = 'campaignion_auth:token';
 
   /**
    * The API key for calling backend apps.

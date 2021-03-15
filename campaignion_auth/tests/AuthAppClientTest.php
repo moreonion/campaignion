@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\impact_stack_auth;
+namespace Drupal\campaignion_auth;
 
 /**
  * Test the auth app API-client.
