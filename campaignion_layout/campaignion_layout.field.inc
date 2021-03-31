@@ -47,6 +47,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
   ArrayConfig::mergeDefaults($item, [
     'theme' => NULL,
     'layout' => '',
+    'order' => 'above-main',
   ]);
   $themes = Container::get()->loadService('campaignion_layout.themes');
   $enabled_themes = $themes->enabledThemes();
@@ -109,6 +110,15 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     '#options' => $options,
     '#default_value' => isset($options[$item['layout']]) ? $item['layout'] : NULL,
   ];
+  $element['values']['order'] = [
+    '#type' => 'radios',
+    '#title' => t('Order on the mobile page'),
+    '#options' => [
+      'above-main' => t('Show form above the main page content'),
+      'below-main' => t('Show form below the main page content'),
+    ],
+    '#default_value' => $item['order'] ?: 'above-main',
+  ];
   $form_state['campaignion_layout_fields'] = $fields;
   if (!$enabled_themes) {
     $element['#access'] = FALSE;
@@ -123,10 +133,12 @@ function _campaignion_layout_field_widget_validate($element, &$form_state, $form
   $values = [
     'theme' => NULL,
     'layout' => NULL,
+    'order' => NULL,
   ];
   if ($element['enabled']['#value']) {
     $values['theme'] = $element['values']['theme']['#value'];
     $values['layout'] = $element['values']['layout']['#value'];
+    $values['order'] = $element['values']['order']['#value'];
   }
   form_set_value($element, $values, $form_state);
 }

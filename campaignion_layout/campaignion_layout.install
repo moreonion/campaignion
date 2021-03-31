@@ -20,10 +20,43 @@ function campaignion_layout_field_schema($field) {
       'length' => 255,
       'not null' => FALSE,
     ],
+    'order' => [
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+    ],
   ];
   $schema['foreign keys']['theme'] = [
     'table' => 'system',
     'columns' => ['theme' => 'name'],
   ];
   return $schema;
+}
+
+/**
+ * Add mobile order to layout field.
+ */
+function campaignion_layout_update_1() {
+  $spec = [
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => FALSE,
+  ];
+
+  foreach (field_info_fields() as $field) {
+    $fields = [];
+    if (in_array($field['type'], ['layout_selection'])) {
+      $fields[] = $field;
+    }
+
+    foreach ($fields as $field) {
+      $field_name = $field['field_name'];
+      $table1 = _field_sql_storage_tablename($field);
+      $table2 = _field_sql_storage_revision_tablename($field);
+      $column = $field_name . '_order';
+
+      db_add_field($table1, $column, $spec);
+      db_add_field($table2, $column, $spec);
+    }
+  }
 }
