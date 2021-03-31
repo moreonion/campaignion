@@ -4,6 +4,10 @@ core = 7.x
 package = Campaignion
 
 dependencies[] = campaignion
+dependencies[] = features
 dependencies[] = little_helpers (>=2.0-alpha10)
 dependencies[] = psr0
+dependencies[] = text
 dependencies[] = webform_template
+features[features_api][] = api:2
+features[field_base][] = action_closed_text

@@ -90,6 +90,40 @@ function campaignion_action_module_implements_alter(&$impl, $hook) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for node_form().
+ */
+function campaignion_action_form_node_form_alter(&$form, &$form_state) {
+  // Add a toggle to the `action_closed_text` to disable the action and show the text field.
+  $node = $form['#node'];
+  if (!empty($form['action_closed_text']) && isset($node->webform)) {
+    $wrapper = &$form['action_closed_text'];
+    $toggle_id = drupal_html_id('action_closed_toggle');
+    $wrapper['toggle'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Deactivate this action'),
+      '#description' => t('Removes the webform and shows a replacement content instead.'),
+      '#default_value' => $node->webform['status'] ? 0 : 1,
+      '#parents' => ['action_closed_toggle'],
+      '#id' => $toggle_id,
+      '#weight' => -1,
+    ];
+    $wrapper[$wrapper['#language']]['#type'] = 'container';
+    $wrapper[$wrapper['#language']]['#states']['visible']["#$toggle_id"]['checked'] = TRUE;
+  }
+}
+
+/**
+ * Implements hook_node_submit().
+ */
+function campaignion_action_node_submit($node, $form, &$form_state) {
+  // Set webform status.
+  $action_closed = &$form_state['values']['action_closed_toggle'] ?? NULL;
+  if ($action_closed !== NULL) {
+    $node->webform['status'] = $action_closed ? 0 : 1;
+  }
+}
+
+/**
  * Implements hook_permission().
  */
 function campaignion_action_permission() {
@@ -120,6 +154,11 @@ function campaignion_action_node_view($node) {
         drupal_set_message($link_text, 'status', FALSE);
       }
     }
+  }
+  // Remove `action_closed_text` when there is a webform.
+  if (!empty($node->webform['status'])) {
+    unset($node->action_closed_text);
+    unset($node->content['action_closed_text']);
   }
 }
 
