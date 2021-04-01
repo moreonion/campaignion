@@ -71,4 +71,19 @@ class Lookup {
     return $this->themes->getTheme()->getLayoutFromItems($this->iterateItems());
   }
 
+  /**
+   * Get the order for the form for the currently active layout.
+   *
+   * @return string|null
+   *   The machine name of the ordering.
+   */
+  public function getOrder() {
+    $layout = $this->getLayout();
+    foreach ($this->iterateItems() as $item) {
+      if (($order = $item['order']) && $layout['name'] === $item['layout'] && $layout['order_enabled']) {
+        return $order;
+      }
+    }
+  }
+
 }
