@@ -96,6 +96,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
   $fields = [];
   $available_layouts = array_intersect_key($themes->declaredLayouts(), $layout_available_in_theme);
   $options = [];
+  $order_layouts = [];
   foreach ($available_layouts as $layout => $info) {
     $options[$layout] = $info['title'];
     foreach (array_keys(array_filter($info['fields'])) as $field_name) {
@@ -104,6 +105,9 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     $element['values']['layout'][$layout]['#disabled'] = TRUE;
     foreach ($layout_available_in_theme[$layout] ?? [] as $theme_name) {
       $element['values']['layout'][$layout]['#states']['enabled']["#$theme_id"][]['value'] = $theme_name;
+    }
+    if (!empty($info['order_enabled'])) {
+      $order_layouts[$layout] = $layout;
     }
   }
   $element['values']['layout'] += [
@@ -119,6 +123,9 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
     ],
     '#default_value' => $item['order'] ?: 'above-main',
   ];
+  foreach ($order_layouts as $layout) {
+    $element['values']['order']['#states']['enabled']["#$html_id input"][]['value'] = $layout;
+  }
   $form_state['campaignion_layout_fields'] = $fields;
   if (!$enabled_themes) {
     $element['#access'] = FALSE;
