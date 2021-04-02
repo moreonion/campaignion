@@ -27,6 +27,16 @@ jobs:
         echo "REPO=`pwd`" >> $GITHUB_ENV
         echo "COMPOSER_HOME=${HOME}/.config/composer" >> $GITHUB_ENV
         echo "ROOT=${HOME}/drupal-root" >> $GITHUB_ENV
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: |
+        echo "::set-output name=dir::$(composer config cache-files-dir)"
+    - uses: actions/cache@v2
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-
+        restore-keys: |
+          ${{ runner.os }}-composer-
     - name: Install composer packages
       run: |
         mkdir -p $COMPOSER_HOME
