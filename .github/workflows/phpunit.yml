@@ -18,10 +18,6 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: "7.3"
-    - name: "Setup node"
-      uses: actions/setup-node@v2
-      with:
-        node-version: 10
     - name: Start MySQL
       run: |
         sudo systemctl start mysql
@@ -31,12 +27,6 @@ jobs:
         echo "REPO=`pwd`" >> $GITHUB_ENV
         echo "COMPOSER_HOME=${HOME}/.config/composer" >> $GITHUB_ENV
         echo "ROOT=${HOME}/drupal-root" >> $GITHUB_ENV
-    - name: php version
-      run: php --version
-    - name: print environment
-      run: |
-        pwd
-        env
     - name: Install composer packages
       run: |
         mkdir -p $COMPOSER_HOME
@@ -52,15 +42,4 @@ jobs:
         drush --yes pm-enable campaignion_test
     - name: Run phpunit tests
       run: UPAL_ROOT=$ROOT UPAL_WEB_URL=http://127.0.0.1 XDEBUG_MODE=coverage phpunit --bootstrap=$COMPOSER_HOME/vendor/torotil/upal/bootstrap.php --coverage-clover=coverage.xml .
-    - name: Run yarn tests
-      run: |
-        cd $REPO/campaignion_email_to_target/datasets_app
-        yarn install
-        yarn unit
-        cd $REPO/campaignion_email_to_target/messages_app
-        yarn install
-        yarn unit
-        cd $REPO/campaignion_wizard/redirects_app
-        yarn install
-        yarn unit
     - uses: codecov/codecov-action@v1
