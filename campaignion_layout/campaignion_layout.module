@@ -79,11 +79,8 @@ function campaignion_layout_page_build(&$page, $node = NULL) {
         $plugin->execute($layout['name']);
       }
     }
-    $page['#order_enabled'] = $layout['order_enabled'] ?? FALSE;
-    $page['#order'] = 'above-main';
-    if ($order = Lookup::fromEntity('node', $node)->getOrder()) {
-      $page['#order'] = $order;
-    }
+    $page['#reversable'] = $layout['reversable'] ?? FALSE;
+    $page['#reversed'] = Lookup::fromEntity('node', $node)->isOrderReversed();
   }
 }
 
@@ -99,8 +96,8 @@ function campaignion_layout_preprocess_page(array &$vars) {
       $vars[$settings['variable']] = field_view_field('node', $vars['node'], $field_name, $settings['display']);
     }
   }
-  $vars['order_enabled'] = $vars['page']['#order_enabled'] ?? NULL;
-  $vars['order'] = $vars['page']['#order'] ?? NULL;
+  $reversable = $vars['page']['#reversable'] ?? FALSE;
+  $vars['reversed'] = $reversable && ($vars['page']['#reversed'] ?? FALSE);
 }
 
 /**

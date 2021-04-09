@@ -20,9 +20,9 @@ function campaignion_layout_field_schema($field) {
       'length' => 255,
       'not null' => FALSE,
     ],
-    'order' => [
-      'type' => 'varchar',
-      'length' => 255,
+    'reversed' => [
+      'type' => 'int',
+      'size' => 'tiny',
       'not null' => FALSE,
     ],
   ];
@@ -34,12 +34,12 @@ function campaignion_layout_field_schema($field) {
 }
 
 /**
- * Add mobile order to layout field.
+ * Add  reversed order indicator to layout field.
  */
 function campaignion_layout_update_1() {
   $spec = [
-    'type' => 'varchar',
-    'length' => 255,
+    'type' => 'int',
+    'size' => 'tiny',
     'not null' => FALSE,
   ];
 
@@ -53,7 +53,7 @@ function campaignion_layout_update_1() {
       $field_name = $field['field_name'];
       $table1 = _field_sql_storage_tablename($field);
       $table2 = _field_sql_storage_revision_tablename($field);
-      $column = $field_name . '_order';
+      $column = $field_name . '_reversed';
 
       db_add_field($table1, $column, $spec);
       db_add_field($table2, $column, $spec);

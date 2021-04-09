@@ -72,18 +72,19 @@ class Lookup {
   }
 
   /**
-   * Get the order for the form for the currently active layout.
+   * Indicate if the form/content order of the layout is reversed.
    *
-   * @return string|null
-   *   The machine name of the ordering.
+   * @return boolean
+   *   Return true if the order is reversed
    */
-  public function getOrder() {
+  public function isOrderReversed() {
     $layout = $this->getLayout();
     foreach ($this->iterateItems() as $item) {
-      if (($order = $item['order']) && $layout['name'] === $item['layout'] && $layout['order_enabled']) {
-        return $order;
+      if ($item['reversed'] && $layout['name'] === $item['layout'] && $layout['reversable']) {
+        return TRUE;
       }
     }
+    return FALSE;
   }
 
 }
