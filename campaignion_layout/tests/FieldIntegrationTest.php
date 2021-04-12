@@ -58,7 +58,7 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
     $vars['theme_hook_suggestions'] = [];
     $vars['page'] = [];
     $theme = $this->injectTheme(TRUE);
-    $theme->method('getLayoutFromItems')->willReturn([
+    $theme->method('getLayoutItem')->willReturn(new Item([
       'name' => 'foo',
       'fields' => [
         'field_main_image' => [
@@ -66,7 +66,7 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
           'variable' => 'main_image',
         ],
       ],
-    ]);
+    ], []));
     campaignion_layout_page_build($vars['page'], $vars['node'], 'foo');
     campaignion_layout_preprocess_page($vars);
     $this->assertEqual('foo', $vars['layout']);
@@ -82,9 +82,9 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
     $node = $this->nodeWithItems([]);
     $page = [];
     $theme = $this->injectTheme(TRUE);
-    $theme->expects($this->once())->method('getLayoutFromItems')->willReturn([
+    $theme->expects($this->once())->method('getLayoutItem')->willReturn(new Item([
       'name' => 'foo_default',
-    ]);
+    ], []));
     campaignion_layout_page_build($page, $node);
     $this->assertEqual('foo_default', $page['#layout']['name']);
   }

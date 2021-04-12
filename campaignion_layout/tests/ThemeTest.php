@@ -167,7 +167,7 @@ class ThemeTest extends DrupalUnitTestCase {
   /**
    * Test getting the layout from items.
    */
-  public function testGetLayoutFromItems() {
+  public function testGetLayoutItem() {
     $mock_builder = $this->getMockBuilder(Theme::class)
       ->setMethods(['setting']);
     $mock_themes = $this->createMock(Themes::class);
@@ -195,16 +195,20 @@ class ThemeTest extends DrupalUnitTestCase {
     ]);
 
     $items = [];
-    $this->assertEqual('standard', $theme->getLayoutFromItems($items)['name']);
+    $item = $theme->getLayoutItem($items);
+    $this->assertEqual('standard', $item->layout['name']);
     // Disabled layout.
     $items[] = ['theme' => 'foo', 'layout' => 'disabled'];
-    $this->assertEqual('standard', $theme->getLayoutFromItems($items)['name']);
+    $item = $theme->getLayoutItem($items);
+    $this->assertEqual('standard', $item->layout['name']);
     // Enabled layout on another theme.
     $items[] = ['theme' => 'not_foo', 'layout' => 'enabled'];
-    $this->assertEqual('enabled', $theme->getLayoutFromItems($items)['name']);
+    $item = $theme->getLayoutItem($items);
+    $this->assertEqual('enabled', $item->layout['name']);
     // Enabled layout.
     $items[1]['theme'] = 'foo';
-    $this->assertEqual('enabled', $theme->getLayoutFromItems($items)['name']);
+    $item = $theme->getLayoutItem($items);
+    $this->assertEqual('enabled', $item->layout['name']);
   }
 
 }

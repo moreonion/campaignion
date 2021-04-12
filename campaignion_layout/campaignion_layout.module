@@ -72,15 +72,10 @@ function campaignion_layout_little_helpers_services() {
  */
 function campaignion_layout_page_build(&$page, $node = NULL) {
   $node = $node ?? menu_get_object();
-  if ($node && ($layout = Lookup::fromEntity('node', $node)->getLayout())) {
-    $page['#layout'] = $layout;
-    if (module_exists('context')) {
-      if ($plugin = context_get_plugin('condition', 'campaignion_layout_context_condition_layout')) {
-        $plugin->execute($layout['name']);
-      }
-    }
-    $page['#reversable'] = $layout['reversable'] ?? FALSE;
-    $page['#reversed'] = Lookup::fromEntity('node', $node)->isOrderReversed();
+  if ($node && ($item = Lookup::fromEntity('node', $node)->getItem())) {
+    $page['#layout'] = $item->layout;
+    $page['#reversed'] = $item->pageOrderIsReversed();
+    $item->executeContextCondition();
   }
 }
 
@@ -96,8 +91,7 @@ function campaignion_layout_preprocess_page(array &$vars) {
       $vars[$settings['variable']] = field_view_field('node', $vars['node'], $field_name, $settings['display']);
     }
   }
-  $reversable = $vars['page']['#reversable'] ?? FALSE;
-  $vars['reversed'] = $reversable && ($vars['page']['#reversed'] ?? FALSE);
+  $vars['reversed'] = $vars['page']['#reversed'];
 }
 
 /**

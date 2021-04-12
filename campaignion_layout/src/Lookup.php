@@ -67,24 +67,8 @@ class Lookup {
   /**
    * Find the layout configured for the currently active theme.
    */
-  public function getLayout() {
-    return $this->themes->getTheme()->getLayoutFromItems($this->iterateItems());
-  }
-
-  /**
-   * Indicate if the form/content order of the layout is reversed.
-   *
-   * @return boolean
-   *   Return true if the order is reversed
-   */
-  public function isOrderReversed() {
-    $layout = $this->getLayout();
-    foreach ($this->iterateItems() as $item) {
-      if ($item['reversed'] && $layout['name'] === $item['layout'] && $layout['reversable']) {
-        return TRUE;
-      }
-    }
-    return FALSE;
+  public function getItem() {
+    return $this->themes->getTheme()->getLayoutItem($this->iterateItems());
   }
 
 }

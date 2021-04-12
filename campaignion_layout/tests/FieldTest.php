@@ -75,6 +75,7 @@ class FieldTest extends ThemesBaseTest {
     $element['enabled']['#value'] = TRUE;
     $element['values']['theme']['#value'] = 'a';
     $element['values']['layout']['#value'] = 'banner';
+    $element['values']['reversed']['#value'] = 1;
     $form_state['values'] = [];
     _campaignion_layout_field_widget_validate($element, $form_state, $form);
     $this->assertEqual('banner', $form_state['values']['layout']);
