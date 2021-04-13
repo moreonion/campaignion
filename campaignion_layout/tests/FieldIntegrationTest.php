@@ -76,6 +76,22 @@ class FieldIntegrationTest extends DrupalUnitTestCase {
   }
 
   /**
+   * Test node rendering without layout.
+   */
+  public function testNodePreprocessWithoutLayout() {
+    $vars['node'] = $this->nodeWithItems([]);
+    $vars['theme_hook_suggestions'] = [];
+    $vars['page'] = [];
+    $theme = $this->injectTheme(TRUE);
+    $theme->method('getLayoutItem')->willReturn(NULL);
+    campaignion_layout_page_build($vars['page'], $vars['node'], 'foo');
+    campaignion_layout_preprocess_page($vars);
+    $this->assertNull($vars['layout']);
+    $this->assertFalse($vars['reversed']);
+    $this->assertEqual([], $vars['theme_hook_suggestions']);
+  }
+
+  /**
    * Test using the default layout.
    */
   public function testPageBuildDefaultLayout() {

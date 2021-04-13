@@ -91,7 +91,7 @@ function campaignion_layout_preprocess_page(array &$vars) {
       $vars[$settings['variable']] = field_view_field('node', $vars['node'], $field_name, $settings['display']);
     }
   }
-  $vars['reversed'] = $vars['page']['#reversed'];
+  $vars['reversed'] = !empty($vars['page']['#reversed']);
 }
 
 /**
