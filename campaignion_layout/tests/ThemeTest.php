@@ -211,4 +211,27 @@ class ThemeTest extends DrupalUnitTestCase {
     $this->assertEqual('enabled', $item->layout['name']);
   }
 
+  /**
+   * Test getting the layout item without a default theme.
+   */
+  public function testGetLayoutItemWithoutDefault() {
+    $mock_builder = $this->getMockBuilder(Theme::class)
+      ->setMethods(['setting']);
+    $mock_themes = $this->createMock(Themes::class);
+    $mock_themes->method('declaredLayouts')->willReturn([]);
+    $theme = $mock_builder->setConstructorArgs([
+      (object) [
+        'status' => 1,
+        'name' => 'foo',
+        'info' => [
+          'layout' => ['enabled'],
+        ],
+      ],
+      $mock_themes,
+    ])->getMock();
+    $items = [];
+    $item = $theme->getLayoutItem($items);
+    $this->assertNull($item);
+  }
+
 }

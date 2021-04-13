@@ -146,14 +146,16 @@ class Theme {
    * @return \Drupal\campaignion_layout\Item
    *   An Item object representing the matching item and layout.
    */
-  public function getLayoutItem(iterable $items) : Item {
+  public function getLayoutItem(iterable $items) : ?Item {
     foreach ($items as $item) {
       if ($layout = $this->getLayout($item['layout'])) {
         return new Item($layout, $item);
       }
     }
-    $layout = $this->getLayout($this->defaultLayout(), FALSE);
-    return new Item($layout, []);
+    if ($layout = $this->getLayout($this->defaultLayout(), FALSE)) {
+      return new Item($layout, []);
+    }
+    return NULL;
   }
 
   /**
