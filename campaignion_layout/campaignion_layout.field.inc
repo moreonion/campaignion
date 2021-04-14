@@ -140,7 +140,7 @@ function _campaignion_layout_field_widget_validate($element, &$form_state, $form
   $values = [
     'theme' => NULL,
     'layout' => NULL,
-    'reversed' => NULL,
+    'reversed' => 0,
   ];
   if ($element['enabled']['#value']) {
     $values['theme'] = $element['values']['theme']['#value'];
