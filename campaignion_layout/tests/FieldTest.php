@@ -70,6 +70,7 @@ class FieldTest extends ThemesBaseTest {
     $this->assertEqual([
       'banner' => ['#campaignion-layout-layout input' => ['banner']],
     ], $form_state['campaignion_layout_fields']);
+    $this->assertSame(0, $element['values']['reversed']['#default_value']);
 
     $element['#parents'] = [];
     $element['enabled']['#value'] = TRUE;

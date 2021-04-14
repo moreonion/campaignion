@@ -47,7 +47,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
   ArrayConfig::mergeDefaults($item, [
     'theme' => NULL,
     'layout' => '',
-    'reversed' => FALSE,
+    'reversed' => 0,
   ]);
   $themes = Container::get()->loadService('campaignion_layout.themes');
   $enabled_themes = $themes->enabledThemes();
@@ -121,7 +121,7 @@ function campaignion_layout_field_widget_form(&$form, &$form_state, $field, $ins
       0 => t('Show form above the main page content'),
       1 => t('Show form below the main page content'),
     ],
-    '#default_value' => $item['reversed'] ?? FALSE,
+    '#default_value' => $item['reversed'],
   ];
   foreach ($reversable_layouts as $layout) {
     $element['values']['reversed']['#states']['enabled']["#$html_id input"][]['value'] = $layout;
