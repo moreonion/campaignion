@@ -15,8 +15,8 @@ function campaignion_test_campaignion_contact_type_info() {
  */
 function campaignion_test_campaignion_action_info() {
   $types['email_to_target'] = array(
-    'wizard_class' => '\\Drupal\\campaignion_email_to_target\\Wizard\\Wizard',
-    'action_class' => '\\Drupal\\campaignion_email_to_target\\Action',
+    'type' => 'email_to_target',
+    'wizard' => 'email_to_target',
     'thank_you_page' => array(
       'type' => 'thank_you_page',
       'reference' => 'field_thank_you_pages',
@@ -31,7 +31,7 @@ function campaignion_test_campaignion_action_info() {
     'template_node_uuid' => 'f5645542-33eb-445e-8e6b-8300cf385069',
   );
   $types['petition'] = array(
-    'wizard_class' => '\\Drupal\\campaignion_wizard\\PetitionWizard',
+    'wizard' => 'petition',
     'thank_you_page' => array(
       'type' => 'thank_you_page',
       'reference' => 'field_thank_you_pages',

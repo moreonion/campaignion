@@ -8,9 +8,27 @@ use Drupal\little_helpers\Services\Container;
  * Class for loading Action-Type plugins and general dependency injection.
  */
 class Loader {
-  protected static $instance  = NULL;
-  protected $info;
-  protected $types = [];
+
+  /**
+   * Action information keyed by node-type machine name.
+   *
+   * @var array
+   */
+  protected $info = [];
+
+  /**
+   * A action plugin loader.
+   *
+   * @var \Drupal\little_helpers\Services\Container
+   */
+  protected $actionLoader;
+
+  /**
+   * A wizard plugin loader.
+   *
+   * @var \Drupal\little_helpers\Services\Container
+   */
+  protected $wizardLoader;
 
   /**
    * Get a singleton instance of this class.
@@ -19,39 +37,50 @@ class Loader {
     return Container::get()->loadService('campaignion_action.loader');
   }
 
-  public static function fromGlobalInfo() {
-    return new static(\module_invoke_all('campaignion_action_info'));
-  }
-
-  public function __construct($types_info) {
-    foreach ($types_info as $type => &$info) {
-      $info += [
-        'action_class' => '\\Drupal\\campaignion_action\\ActionBase',
-        'parameters' => [],
-      ];
-      // Fail early if wizard_class is not defined.
-      if (empty($info['wizard_class'])) {
-        throw new \InvalidArgumentException("wizard_class not defined for action-type '$type'.");
-      }
-      // We explicitly don't check whether the class exists because this would
-      // mean autoloading every class every time the Loader is used.
-    }
-    $this->info = $types_info;
-    $this->types = &drupal_static(__CLASS__ . '::types', []);
+  /**
+   * Create a new instance.
+   *
+   * @param \Drupal\little_helpers\Services\Container $action_loader
+   *   A action plugin loader.
+   * @param \Drupal\little_helpers\Services\Container $wizard_loader
+   *   A wizard plugin loader.
+   */
+  public function __construct(Container $action_loader, Container $wizard_loader) {
+    $this->actionLoader = $action_loader;
+    $this->wizardLoader = $wizard_loader;
   }
 
   /**
-   * Get all action type instances.
+   * Read node type definitions from a hook.
+   *
+   * @param string $hook
+   *   The name of the hook that should be invoked. The corresponding alter-hook
+   *   is invoked as well.
+   */
+  public function loadTypesFromHook(string $hook) : void {
+    $types_info = module_invoke_all($hook);
+    foreach ($types_info as &$info) {
+      $info += [
+        'type' => 'default',
+        'wizard' => 'default',
+      ];
+      if (($p = $info['parameters'] ?? FALSE) && is_array($p)) {
+        unset($info['parameters']);
+        $info += $p;
+      }
+    }
+    drupal_alter($hook, $types_info);
+    $this->info += $types_info;
+  }
+
+  /**
+   * Get all action node types and their info.
    *
    * @return array
-   *   Array of action type classes keyed by their machine-name.
+   *   Array of action definitions keyed by node typemachine-name.
    */
   public function allTypes() {
-    $types = [];
-    foreach (array_keys($this->info) as $type) {
-      $types[$type] = $this->type($type);
-    }
-    return $types;
+    return $this->info;
   }
 
   /**
@@ -69,6 +98,7 @@ class Loader {
    *
    * @param string $type
    *   Machine name of the node-type.
+   *
    * @return boolean
    *   TRUE if the node-type $type is an action-type.
    */
@@ -77,12 +107,13 @@ class Loader {
   }
 
   /**
-   * Get instance of an action type.
+   * Get info for a node-type.
    *
    * @param string $type
-   *   Machine name of the action-type.
-   * @return \Drupal\campaignion_action\TypeBase
-   *   The action-type identified by $type.
+   *   Machine name of the node-type.
+   *
+   * @return array
+   *   The info-array for this node-type or FALSE if it is not defined.
    */
   public function type($type) {
     if (!isset($this->types[$type])) {
@@ -101,9 +132,11 @@ class Loader {
     if (!isset($node->action)) {
       $node->action = NULL;
       if ($info = $this->info[$node->type] ?? NULL) {
-        $class = $info['action_class'];
-        $parameters = $info + $info['parameters'];
-        $node->action = new $class($parameters, $node);
+        $spec = $this->actionLoader->getSpec($info['type']);
+        $node->action = $spec->instantiate([
+          'node' => $node,
+          'parameters' => $info,
+        ]);
       }
     }
     return $node->action;
@@ -122,8 +155,12 @@ class Loader {
    */
   public function wizard($type, $node = NULL) {
     if ($info = $this->info[$type] ?? NULL) {
-      $class = $info['wizard_class'];
-      return new $class($info, $node, $type);
+      $spec = $this->wizardLoader->getSpec($info['wizard']);
+      return $spec->instantiate([
+        'type' => $type,
+        'node' => $node,
+        'parameters' => $info,
+      ]);
     }
   }
 

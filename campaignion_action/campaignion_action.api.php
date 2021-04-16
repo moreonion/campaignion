@@ -10,20 +10,29 @@ use Drupal\campaignion\Contact;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
+ * Get action type specs.
+ *
+ * @return array
+ *   An array of class specs keyed by action type.
+ */
+function hook_campaignion_action_type_info() {
+  $info['donation'] = '\\Drupal\\campaignion_action\\FlexibleForm';
+  return $info;
+}
+
+/**
  * @return array
  *   Config arrays indexed by (machine readable) content-type names:
- *     - action_class: The class representing actions of this type.
- *       Defaults to \Drupal\campiagnion_action\ActionBase
- *     - wizard_class: The class representing the wizard for creating nodes of
- *       this type.
+ *     - type: The action type. (default: 'default'),
+ *     - wizard: The wizard plugin to use for creating nodes of this type. 
  *     - parameters: For backwards compatibility. The values are merged into
  *       The main array.
- *     The whole config is passed as $parameters to the class constructors.
+ *   The whole config array is passed as $parameters to the class constructors.
  */
 function hook_campaignion_action_info() {
   $types['webform'] = array(
-    'action_class' => '\\Drupal\\campaignion_action\\ActionBase',
-    'wizard_class' => '\\Drupal\\campaignion_wizard\\WebformWizard',
+    'type' => 'default',
+    'wizard' => 'default',
     'thank_you_page' => array(
       'type' => 'thank_you_page',
       'reference' => 'field_thank_you_pages',

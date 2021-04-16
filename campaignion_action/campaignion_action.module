@@ -7,11 +7,13 @@
 
 use Drupal\campaignion\ContactTypeManager;
 use Drupal\campaignion\NoEmailException;
+use Drupal\campaignion_action\ActionBase;
 use Drupal\campaignion_action\Loader;
 use Drupal\campaignion_action\Redirects\Endpoint;
 use Drupal\campaignion_action\Redirects\Redirect;
 use Drupal\campaignion_action\SignedLink;
 use Drupal\campaignion\CRM\Import\Source\WebformSubmission;
+use Drupal\little_helpers\Services\Container;
 use Drupal\little_helpers\System\FormRedirect;
 use Drupal\little_helpers\Webform\Submission;
 
@@ -21,7 +23,20 @@ use Drupal\little_helpers\Webform\Submission;
 function campaignion_action_little_helpers_services() {
   $info['campaignion_action.loader'] = [
     'class' => Loader::class,
-    'constructor' => 'fromGlobalInfo',
+    'arguments' => ['@campaignion_action.action.loader', '@campaignion_wizard.loader'],
+    'calls' => [
+      ['loadTypesFromHook', ['campaignion_action_info']],
+    ],
+  ];
+  $info['campaignion_action.action.loader'] = [
+    'class' => Container::class,
+    'calls' => [
+      ['setContainer', ['@container']],
+      ['setDefaults', [
+        ['arguments' => ['%parameters', '%node']],
+      ]],
+      ['loadSpecsFromHook', ['campaignion_action_type_info']],
+    ],
   ];
   return $info;
 }
@@ -39,6 +54,14 @@ function campaignion_action_menu() {
     'type' => MENU_CALLBACK,
     'delivery callback' => 'little_helpers_deliver_json',
   );
+  return $info;
+}
+
+/**
+ * Implements hook_campaignion_action_type_info().
+ */
+function campaignion_action_campaignion_action_type_info() {
+  $info['default'] = ActionBase::class;
   return $info;
 }
 

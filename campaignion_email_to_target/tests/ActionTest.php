@@ -30,9 +30,10 @@ class ActionTest extends \DrupalUnitTestCase {
     ] + $node_array);
     $type = Loader::instance()->type('email_to_target');
     $action = $this->getMockBuilder(Action::class)
-      ->setConstructorArgs([$type->parameters, $node, $api])
+      ->setConstructorArgs([$type->parameters, $node])
       ->setMethods(['getOptions', 'getExclusion', 'getMessage'])
       ->getMock();
+    $action->setApi($api);
     $action->method('getOptions')->will($this->returnValue([
       'dataset_name' => 'test_dataset',
     ]));

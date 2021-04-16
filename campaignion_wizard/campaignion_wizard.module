@@ -6,6 +6,13 @@
  */
 
 use Drupal\campaignion_action\Loader;
+use Drupal\little_helpers\Services\Container;
+
+use Drupal\campaignion_wizard\DonationWizard;
+use Drupal\campaignion_wizard\EmailProtestWizard;
+use Drupal\campaignion_wizard\NodeWizard;
+use Drupal\campaignion_wizard\PetitionWizard;
+use Drupal\campaignion_wizard\WebformWizard;
 
 /**
  * Implements hook_module_implements_alter().
@@ -15,6 +22,23 @@ function campaignion_wizard_module_implements_alter(&$implementations, $hook) {
     // We replace this with our own alter function.
     unset($implementations['save_draft']);
   }
+}
+
+/**
+ * Implements hook_little_helpers_services().
+ */
+function campaignion_wizard_little_helpers_services() {
+  $info['campaignion_wizard.loader'] = [
+    'class' => Container::class,
+    'calls' => [
+      ['setContainer', ['@container']],
+      ['setDefaults', [
+        ['arguments' => ['%parameters', '%node', '%type']],
+      ]],
+      ['loadSpecsFromHook', ['campaignion_wizard_info']],
+    ],
+  ];
+  return $info;
 }
 
 /**
@@ -66,6 +90,17 @@ function campaignion_wizard_menu_alter(&$info) {
   }
   $info['node/%node/edit']['page callback'] = 'campaignion_wizard_redirect_edit';
   $info['node/%webform_menu/webform']['type'] = MENU_LOCAL_TASK;
+}
+
+/**
+ * Implements hook_campaignion_wizard_info().
+ */
+function campaignion_wizard_campaignion_wizard_info() {
+  $info['donation'] = DonationWizard::class;
+  $info['email_protest'] = EmailProtestWizard::class;
+  $info['petition'] = PetitionWizard::class;
+  $info['webform'] = WebformWizard::class;
+  return $info;
 }
 
 /**
