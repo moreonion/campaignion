@@ -5,5 +5,4 @@ package = Campaignion
 dependencies[] = campaignion
 dependencies[] = webform
 dependencies[] = little_helpers
-dependencies[] = googleanalytics
 dependencies[] = psr0
