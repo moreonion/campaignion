@@ -166,36 +166,36 @@ function campaignion_tracking_webform_redirect_alter($redirect, Submission $subm
  * Gather snippets from hooks and add them to the page.
  */
 function _campaignion_tracking_add_snippets() {
-   // Check if we are on an admin page.
-   // This is the same logic as in the google_analytics module.
-   $pages = "admin\nadmin/*\nbatch\nnode/add*\nnode/*/*\nuser/*/*";
-   $path = drupal_strtolower(drupal_get_path_alias($_GET['q']));
-   $match = drupal_match_path($path, $pages);
-   if ($path != $_GET['q']) {
-     $match = $match || drupal_match_path($_GET['q'], $pages);
-   }
+  // Check if we are on an admin page.
+  // This is the same logic as in the google_analytics module.
+  $pages = "admin\nadmin/*\nbatch\nnode/add*\nnode/*/*\nuser/*/*";
+  $path = drupal_strtolower(drupal_get_path_alias($_GET['q']));
+  $match = drupal_match_path($path, $pages);
+  if ($path != $_GET['q']) {
+    $match = $match || drupal_match_path($_GET['q'], $pages);
+  }
 
-   // Check if tracking should be disabled all together e.g. in case we are
-   // working not in a production environment.
-   $tracking_enabled = variable_get('campaignion_tracking_enabled', TRUE);
+  // Check if tracking should be disabled all together e.g. in case we are
+  // working not in a production environment.
+  $tracking_enabled = variable_get('campaignion_tracking_enabled', TRUE);
 
-   // Either tracking was allowed already, or we wait for the appropriate event.
-   $parts = [];
-   $parts[] = <<<HEADER
- function initTracking () {
+  // Either tracking was allowed already, or we wait for the appropriate event.
+  $parts = [];
+  $parts[] = <<<HEADER
+function initTracking () {
 
- HEADER;
+HEADER;
 
-   // Add parts
-   if ($tracking_enabled) {
-     $snippets = module_invoke_all('campaignion_tracking_snippets');
-     drupal_alter('campaignion_tracking_snippets', $snippets);
-     foreach ($snippets as $snippet) {
-       $parts[] = $snippet;
-     }
-   }
+  // Add parts
+  if ($tracking_enabled) {
+    $snippets = module_invoke_all('campaignion_tracking_snippets');
+    drupal_alter('campaignion_tracking_snippets', $snippets);
+    foreach ($snippets as $snippet) {
+      $parts[] = $snippet;
+    }
+  }
 
-   $parts[] = <<<FOOTER
+  $parts[] = <<<FOOTER
 };
 if(document.cookie.indexOf('cookieaccepted')>=0){initTracking();}
 else{document.addEventListener('tracking-allowed',initTracking);}
