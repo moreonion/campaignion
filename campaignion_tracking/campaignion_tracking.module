@@ -166,13 +166,9 @@ function campaignion_tracking_webform_redirect_alter($redirect, Submission $subm
  * Gather snippets from hooks and add them to the page.
  */
 function _campaignion_tracking_add_snippets() {
-  // Check if we are on an admin page.
-  // This is the same logic as in the google_analytics module.
-  $pages = "admin\nadmin/*\nbatch\nnode/add*\nnode/*/*\nuser/*/*";
-  $path = drupal_strtolower(drupal_get_path_alias($_GET['q']));
-  $match = drupal_match_path($path, $pages);
-  if ($path != $_GET['q']) {
-    $match = $match || drupal_match_path($_GET['q'], $pages);
+  // Disable all tracking on admin pages.
+  if (path_is_admin($_GET['q'])) {
+    return;
   }
 
   // Check if tracking should be disabled all together e.g. in case we are
@@ -201,16 +197,13 @@ if(document.cookie.indexOf('cookieaccepted')>=0){initTracking();}
 else{document.addEventListener('tracking-allowed',initTracking);}
 FOOTER;
 
-  // When we are not on an admin page we add the snippet
   // This should be added pretty early in the DOM so that the library JS get
   // the correct allowed state early enough.
-  if (!$match) {
-    $snippet = implode("", $parts);
-    drupal_add_js($snippet, [
-      'type' => 'inline',
-      'group' => JS_LIBRARY,
-      'every_page' => TRUE,
-      'weight' => -40,
-    ]);
-  }
+  $snippet = implode("", $parts);
+  drupal_add_js($snippet, [
+    'type' => 'inline',
+    'group' => JS_LIBRARY,
+    'every_page' => TRUE,
+    'weight' => -40,
+  ]);
 }
