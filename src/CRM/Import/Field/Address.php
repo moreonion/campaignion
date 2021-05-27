@@ -50,10 +50,37 @@ class Address extends Field {
       return FALSE;
     }
     $empty_or_unknown_country = empty($address['country']) || !isset($this->countries[$address['country']]);
-    if ($empty_or_unknown_country && ($c = variable_get('site_default_country', 'AT'))) {
+    if ($empty_or_unknown_country && ($c = $this->defaultCountry($source))) {
       $address['country'] = $c;
     }
     return $address;
+  }
+
+  /**
+   * Get the fallback country from the settings.
+   */
+  protected function defaultCountry(SourceInterface $source): ?string {
+    $language = $source->getLanguageCode();
+    if (module_exists('i18n_variable') && ($country = i18n_variable_get('site_default_country', $language, ''))) {
+      echo "i18n_variable: $country\n";
+      return $country;
+    }
+    if ($country = $this->countryFromLanguage($language)) {
+      return $country;
+    }
+    return NULL;
+  }
+
+  /**
+   * Get the country based on the language.
+   *
+   * We can’t use variable_get_value() here because Drupal sets an empty default
+   * country on new installations. We want to ignore that by invoking the
+   * variable “default callback” directly.
+   */
+  protected function countryFromLanguage($language) {
+    $options['langcode'] = $language;
+    return _campaignion_site_default_country_from_language(NULL, $options);
   }
 
   public function storeValue($entity, $new_address) {

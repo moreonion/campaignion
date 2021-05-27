@@ -45,6 +45,7 @@ dependencies[] = file:file
 dependencies[] = file_entity:file_entity
 dependencies[] = form_builder:form_builder_webform
 dependencies[] = i18n:i18n_taxonomy
+dependencies[] = i18n:i18n_variable
 dependencies[] = media:media
 dependencies[] = paypal_payment:paypal_payment_ec
 dependencies[] = paypal_payment:paypal_payment_pps

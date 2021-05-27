@@ -3,9 +3,19 @@
 namespace Drupal\campaignion\CRM\Import\Source;
 
 class ArraySource implements SourceInterface {
+
   protected $data;
-  public function __construct($data) {
+
+  /**
+   * A pre configured language code.
+   *
+   * @var string|null
+   */
+  protected $language;
+
+  public function __construct($data, string $language = null) {
     $this->data = $data;
+    $this->language = $language;
   }
 
   public function hasKey($key) {
@@ -17,13 +27,13 @@ class ArraySource implements SourceInterface {
   }
 
   /**
-   * Return the language of the array.
+   * Return the configured language.
    *
-   * @return null
-   *   Always return NULL as the array does not have a language.
+   * @return string|null
+   *   The language code of the configured language.
    */
   public function getLanguageCode() {
-    return NULL;
+    return $this->language;
   }
 
 }
