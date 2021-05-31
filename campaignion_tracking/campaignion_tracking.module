@@ -24,6 +24,8 @@ function campaignion_tracking_page_build(&$page) {
     'preprocess' => FALSE,
   ];
   $page['content']['#attached']['js'][] = $module_path . '/js/campaignion_tracking.js';
+
+  _campaignion_tracking_add_snippets();
 }
 
 /**
@@ -158,4 +160,50 @@ function campaignion_tracking_webform_redirect_alter($redirect, Submission $subm
 
   $tracking_fragment = implode(';', $fragments);
   $redirect->fragment = empty($redirect->fragment) ? $tracking_fragment : $redirect->fragment . ';' . $tracking_fragment;
+}
+
+/**
+ * Gather snippets from hooks and add them to the page.
+ */
+function _campaignion_tracking_add_snippets() {
+  // Disable all tracking on admin pages.
+  if (path_is_admin($_GET['q'])) {
+    return;
+  }
+
+  // Check if tracking should be disabled all together e.g. in case we are
+  // working not in a production environment.
+  $tracking_enabled = variable_get('campaignion_tracking_enabled', TRUE);
+
+  // Either tracking was allowed already, or we wait for the appropriate event.
+  $parts = [];
+  $parts[] = <<<HEADER
+function initTracking () {
+
+HEADER;
+
+  // Add parts
+  if ($tracking_enabled) {
+    $snippets = module_invoke_all('campaignion_tracking_snippets');
+    drupal_alter('campaignion_tracking_snippets', $snippets);
+    foreach ($snippets as $snippet) {
+      $parts[] = $snippet;
+    }
+  }
+
+  $parts[] = <<<FOOTER
+};
+if(document.cookie.indexOf('cookieaccepted')>=0){initTracking();}
+else{document.addEventListener('tracking-allowed',initTracking);}
+FOOTER;
+
+  // This should be added pretty early in the DOM so that the library JS get
+  // the correct allowed state early enough.
+  $snippet = implode("", $parts);
+  drupal_add_js($snippet, [
+    'type' => 'inline',
+    'group' => JS_LIBRARY,
+    'every_page' => TRUE,
+    'weight' => -40,
+  ]);
 }
