@@ -9,11 +9,24 @@ use Drupal\campaignion\CRM\Import\Source\SourceInterface;
  */
 class Address extends Field {
 
-  public function __construct($field, $mapping) {
+  /**
+   * Array of known countries keyed by their country codes.
+   *
+   * @var array
+   *
+   * @see country_get_list()
+   */
+  protected $countries;
+
+  /**
+   * Create a new address importer instance.
+   */
+  public function __construct($field, $mapping, $countries = NULL) {
     foreach ($mapping as $target => $keys) {
       $mapping[$target] = is_array($keys) ? $keys : array($keys);
     }
     parent::__construct($field, $mapping);
+    $this->countries = is_null($countries) ? country_get_list() : $countries;
   }
 
   /**
@@ -36,8 +49,7 @@ class Address extends Field {
     if (empty($address)) {
       return FALSE;
     }
-    $countryList = country_get_list();
-    $empty_or_unknown_country = empty($address['country']) || !isset($countryList[$address['country']]);
+    $empty_or_unknown_country = empty($address['country']) || !isset($this->countries[$address['country']]);
     if ($empty_or_unknown_country && ($c = variable_get('site_default_country', 'AT'))) {
       $address['country'] = $c;
     }
