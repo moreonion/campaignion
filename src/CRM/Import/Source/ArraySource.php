@@ -16,4 +16,14 @@ class ArraySource implements SourceInterface {
     return isset($this->data[$key]) ? $this->data[$key] : NULL;
   }
 
+  /**
+   * Return the language of the array.
+   *
+   * @return null
+   *   Always return NULL as the array does not have a language.
+   */
+  public function getLanguageCode() {
+    return NULL;
+  }
+
 }
