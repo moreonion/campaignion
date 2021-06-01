@@ -61,11 +61,21 @@ class Address extends Field {
    */
   protected function defaultCountry(SourceInterface $source): ?string {
     $language = $source->getLanguageCode();
+    // Explicitly set language specific default country.
     if (module_exists('i18n_variable') && ($country = i18n_variable_get('site_default_country', $language, ''))) {
       echo "i18n_variable: $country\n";
       return $country;
     }
+    // Default country for single language sites.
+    if (!drupal_multilingual() && ($country = variable_get('site_default_country'))) {
+      return $country;
+    }
+    // Language based country.
     if ($country = $this->countryFromLanguage($language)) {
+      return $country;
+    }
+    // Non localized setting for multilingual sites.
+    if ($country = variable_get_value('site_default_country')) {
       return $country;
     }
     return NULL;
