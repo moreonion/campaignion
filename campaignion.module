@@ -61,8 +61,5 @@ function _campaignion_site_default_country_from_language($variable, array $optio
     if (count($parts) == 2 && isset($countries[$country = $parts[1]])) {
       return $country;
     }
-    elseif ($language == 'en') {
-      return 'GB';
-    }
   }
 }
