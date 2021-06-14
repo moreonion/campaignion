@@ -36,9 +36,8 @@ function campaignion_overlay_field_collection_item_view_alter(&$build) {
     if ($node = $item->campaignion_overlay_content->value()) {
       $element['#content'] = drupal_get_form('webform_client_form_' . $node->nid, $node, []);
     }
-    $settings['campaignion_overlay']['overlay_enabled'] = (bool) $item->campaignion_overlay_enabled->value();
     $element['#attached']['library'][] = ['system', 'ui.dialog'];
-    $element['#attached']['js'][] = ['data' => $settings, 'type' => 'setting'];
+    $element['#access'] = (bool) $item->campaignion_overlay_enabled->value();
     $build = $element;
   }
 }
