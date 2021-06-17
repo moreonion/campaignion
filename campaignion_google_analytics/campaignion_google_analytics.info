@@ -2,7 +2,8 @@ name = Campaignion Google Analytics Integration
 core = 7.x
 package = Campaignion
 
-dependencies[] = campaignion
-dependencies[] = webform
-dependencies[] = little_helpers
-dependencies[] = psr0
+dependencies[] = campaignion:campaignion
+dependencies[] = little_helpers:little_helpers
+dependencies[] = psr0:psr0
+dependencies[] = variable:variable
+dependencies[] = webform:webform
