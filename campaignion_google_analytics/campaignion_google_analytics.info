@@ -3,6 +3,7 @@ core = 7.x
 package = Campaignion
 
 dependencies[] = campaignion:campaignion
+dependencies[] = campaignion:campaignion_tracking
 dependencies[] = little_helpers:little_helpers
 dependencies[] = psr0:psr0
 dependencies[] = variable:variable
