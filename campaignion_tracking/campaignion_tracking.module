@@ -188,7 +188,7 @@ function _campaignion_tracking_snippets() {
     if (!is_array($snippet)) {
       $snippet = ['js' => $snippet];
     }
-    $snippet += ['event' => 'tracking-allowed'];
+    $snippet += ['event' => variable_get_value('campaignion_tracking_default_event')];
   }
   drupal_alter('campaignion_tracking_snippets', $snippets);
   return $snippets;
