@@ -35,7 +35,8 @@ SNIPPET;
  * Alter the snippets defined in hook_campaignion_tracking_snippets().
  *
  * @param array $snippets
- *   The snippets defined in the earlier hook invocation.
+ *   The snippets defined in the earlier hook invocation normalized into their
+ *   explicit array form.
  */
 function hook_campaignion_tracking_snippets_alter(array &$snippets) {
   unset($snippets['snippet']);

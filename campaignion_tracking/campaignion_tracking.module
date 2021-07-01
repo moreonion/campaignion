@@ -184,13 +184,13 @@ function campaignion_tracking_webform_redirect_alter($redirect, Submission $subm
  */
 function _campaignion_tracking_snippets() {
   $snippets = module_invoke_all('campaignion_tracking_snippets');
-  drupal_alter('campaignion_tracking_snippets', $snippets);
   foreach ($snippets as &$snippet) {
     if (!is_array($snippet)) {
       $snippet = ['js' => $snippet];
     }
     $snippet += ['event' => 'tracking-allowed'];
   }
+  drupal_alter('campaignion_tracking_snippets', $snippets);
   return $snippets;
 }
 
