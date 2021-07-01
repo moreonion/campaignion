@@ -227,11 +227,16 @@ HEADER;
 
   // Add parts
   foreach ($snippets as $snippet) {
-    $parts[] = <<<SNIPPET
+    if ($event = $snippet['event']) {
+      $parts[] = <<<SNIPPET
 Drupal.campaignion_tracking.eventsFired['{$snippet['event']}'].then(function() {
 {$snippet['js']}
 });
 SNIPPET;
+    }
+    else {
+      $parts[] = $snippet['js'];
+    }
   }
 
   $parts[] = <<<FOOTER
