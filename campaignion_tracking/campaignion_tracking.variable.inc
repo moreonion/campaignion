@@ -11,9 +11,9 @@
 function campaignion_tracking_variable_info($options) {
   $v['campaignion_tracking_default_event'] = [
     'title' => t('Tracking default event'),
-    'description' => t('If not specified otherwise in the code tracking scripts wait for this JS event before loading external scripts.'),
+    'description' => t('If not specified otherwise in the code tracking scripts wait for this JS event before loading external scripts. If this is left empty (default) scripts will be loaded immediately.'),
     'type' => 'string',
-    'default' => 'tracking-allowed',
+    'default' => '',
     'localize' => FALSE,
   ];
   return $v;

@@ -13,7 +13,7 @@
  *   snippet can either be a string (containing the JS code) or an associative
  *   array with the following keys:
  *   - js: The JS code.
- *   - event: Event that the snippet waits for (default: 'tracking-allowed').
+ *   - event: Event that the snippet waits for (default: None).
  */
 function hook_campaignion_tracking_snippets() {
   $exports['snippet'] = <<<SNIPPET
