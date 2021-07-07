@@ -14,13 +14,15 @@ class SupporterActivity extends Base {
 
   protected function actionsWithActivity() {
     $query = db_select('node', 'n');
-    $query->fields('n', array('nid', 'type', 'title'))
+    $query->fields('n', array('nid'))
       ->where('n.tnid = 0 OR n.tnid = n.nid')
       ->orderBy('n.created', 'DESC');
+    $nids = $query->execute()->fetchCol();
+    $nodes = entity_load('node', $nids);
 
     $actions = array();
-    foreach ($query->execute()->fetchAllAssoc('nid') as $nid => $action) {
-      $actions[$action->type][$nid] = $action->title;
+    foreach ($nodes as $node) {
+      $actions[$node->type][$node->nid] = $node->title;
     }
 
     return $actions;
