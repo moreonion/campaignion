@@ -35,6 +35,40 @@ function campaignion_node_admin_title_node_presave($node) {
 }
 
 /**
+ * Check if we are on an admin page or a form from an admin page was submitted.
+ */
+function campaignion_node_admin_path_is_admin($value = NULL) {
+  $is_admin = &drupal_static(__FUNCTION__, NULL);
+  if (isset($value)) {
+    return $is_admin = $value;
+  }
+  if (!isset($is_admin)) {
+    return $is_admin = path_is_admin(current_path());
+  }
+  return $is_admin;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function campaignion_node_admin_title_form_alter(&$form, &$form_state) {
+  $form['#process'][] = '_campaignion_node_admin_title_process_form';
+}
+
+/**
+ * Form process callback: Check if this is an admin page form.
+ */
+function _campaignion_node_admin_title_process_form($form, &$form_state) {
+  if ($form_state['path_is_admin'] ?? FALSE) {
+    // Let other parts of the module know that this form was built on an
+    // admin page.
+    campaignion_node_admin_path_is_admin(TRUE);
+  }
+  $form_state['path_is_admin'] = campaignion_node_admin_path_is_admin();
+  return $form;
+}
+
+/**
  * Implements hook_node_load().
  *
  * Add `admin_title` and `public_title` to nodes.
@@ -47,7 +81,7 @@ function campaignion_node_admin_title_node_load($nodes, $types) {
     if ($field = field_get_items('node', $node, 'field_admin_title')) {
       $node->admin_title = $field[0]['safe_value'];
     }
-    if (path_is_admin(current_path()) && $node->admin_title) {
+    if (campaignion_node_admin_path_is_admin() && $node->admin_title) {
       $node->title = $node->admin_title;
     }
   }
