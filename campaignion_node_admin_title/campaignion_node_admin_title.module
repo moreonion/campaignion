@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Hook implementations for the campaignion_node_admin_title module.
+ */
+
+/**
  * Implements hook_form_FORM_ID_alter() for node_form().
  *
  * Make sure the title field is prefilled with the original node title.
@@ -8,6 +13,25 @@
 function campaignion_node_admin_title_form_node_form_alter(&$form, &$form_state) {
   $node = $form['#entity'];
   $form['title']['#default_value'] = $node->public_title ?? $form['title']['#default_value'];
+}
+
+/**
+ * Implements hook_node_submit().
+ *
+ * Update the public title to match the node title in case it was changed.
+ */
+function campaignion_node_admin_title_node_submit($node, $form, &$form_state) {
+  $node->public_title = $node->title;
+}
+
+/**
+ * Implements hook_node_presave().
+ *
+ * Make sure the node title doesn’t get replaced by the admin title
+ * when a node is loaded on an admin path and saved again.
+ */
+function campaignion_node_admin_title_node_presave($node) {
+  $node->title = $node->public_title ?? $node->title;
 }
 
 /**
