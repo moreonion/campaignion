@@ -8,6 +8,13 @@ namespace Drupal\campaignion_content_security_policy;
 class HeaderGenerator {
 
   /**
+   * A Drupal API wrapper.
+   *
+   * @var \Drupal\campaignion_content_security_policy\Drupal
+   */
+  protected $drupal;
+
+  /**
    * Array of trusted frame-ancestors.
    *
    * @var array
@@ -17,21 +24,24 @@ class HeaderGenerator {
   /**
    * Create a new instance based on the textarea value.
    *
+   * @param \Drupal\campaignion_content_security_policy\Drupal $drupal
+   *   A Drupal API wrapper.
    * @param string|null $trusted_sources_str
    *   The string trusted source URLs as stored in the Drupal variable. This
    *   might be NULL when the module is enabled initally and before the caches
    *   are cleared.
    */
-  public static function fromConfig($trusted_sources_str) {
+  public static function fromConfig(Drupal $drupal, $trusted_sources_str) {
     $trusted_sources_str = $trusted_sources_str ?? "'self'\n";
     $trusted_sources = array_filter(array_map('trim', explode("\n", $trusted_sources_str)));
-    return new static($trusted_sources);
+    return new static($drupal, $trusted_sources);
   }
 
   /**
    * Create a new instance.
    */
-  public function __construct(array $trusted_sources) {
+  public function __construct(Drupal $drupal, array $trusted_sources) {
+    $this->drupal = $drupal;
     $this->sources = $trusted_sources;
   }
 
@@ -40,7 +50,7 @@ class HeaderGenerator {
    */
   public function addHeaders() {
     $header_urls = implode(' ', $this->sources);
-    drupal_add_http_header('Content-Security-Policy', "frame-ancestors $header_urls");
+    $this->drupal->addHeader('Content-Security-Policy', "frame-ancestors $header_urls");
   }
 
 }

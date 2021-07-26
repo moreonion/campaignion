@@ -5,6 +5,7 @@
  * Hook implementations for the campaignion_content_security_policy module.
  */
 
+use Drupal\campaignion_content_security_policy\Drupal;
 use Drupal\campaignion_content_security_policy\HeaderGenerator;
 use Drupal\little_helpers\Services\Container;
 
@@ -18,11 +19,15 @@ function campaignion_content_security_policy_init() {
 /**
  * Implements hook_little_helpers_services().
  */
-function mo_hosting_little_helpers_services() {
+function campaignion_content_security_policy_little_helpers_services() {
+  $info['campaignion_content_security_policy.Drupal']['class'] = Drupal::class;
   $info['campaignion_content_security_policy.HeaderGenerator'] = [
     'class' => HeaderGenerator::class,
     'constructor' => 'fromConfig',
-    'arguments' => ['!campaignion_content_security_policy_trusted_frame_ancestors'],
+    'arguments' => [
+      '@campaignion_content_security_policy.Drupal',
+      '!campaignion_content_security_policy_trusted_frame_ancestors',
+    ],
   ];
   return $info;
 }
