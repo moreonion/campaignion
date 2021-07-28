@@ -12,9 +12,11 @@ abstract class SubmissionCron {
    */
   public static function expireSubmissions() {
     $now = REQUEST_TIME;
-    $time_limit = time() + 20;
+    $time_limit = time() + variable_get_value('campaignion_expiry_cron_time_limit');
     $expire_from = variable_get('campaignion_expiry_last_run', 0);
-    $expire_up_to = (new \DateTime("@$now"))->modify('-12 months')->getTimestamp();
+    $expire_up_to = (new \DateTime("@$now"))
+      ->modify(variable_get_value('campaignion_expiry_submission_time_frame'))
+      ->getTimestamp();
     $last_sid = 0;
     while ((time() < $time_limit) && ($last_sid = static::expireSubmissionBatch($expire_from, $expire_up_to, $last_sid))) {
       watchdog('campaignion_expiry', 'Expired webform submissions up to sid=@last_sid', ['@last_sid' => $last_sid], WATCHDOG_DEBUG);

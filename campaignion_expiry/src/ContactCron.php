@@ -13,7 +13,7 @@ class ContactCron {
    * Entry-point for the cron configuration.
    */
   public static function run() {
-    $inactive_since = strtotime('-12 months');
+    $inactive_since = strtotime(variable_get_value('campaignion_expiry_contact_time_frame'));
     $job = new static($inactive_since);
     $job->execute();
   }
@@ -120,12 +120,9 @@ SQL;
 
   /**
    * Execute the cron-job.
-   *
-   * @param int $max_runtime_seconds
-   *   Maximum runtime in seconds.
    */
-  public function execute($max_runtime_seconds = 20) {
-    $end_time = time() + $max_runtime_seconds;
+  public function execute() {
+    $end_time = time() + variable_get_value('campaignion_expiry_cron_time_limit');
     $last_id = 0;
     $contact_count = 0;
     while (time() < $end_time && ($contacts = $this->loadInactiveContacts($last_id))) {
