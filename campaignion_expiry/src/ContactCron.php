@@ -118,6 +118,8 @@ SQL;
     $last_id = 0;
     $contact_count = 0;
     $inactive_since = strtotime($this->inactiveSinceStr);
+    $args['@time'] = format_date($inactive_since);
+    watchdog('campaignion_expiry', 'Expiring contacts inactive since @time', $args, WATCHDOG_INFO);
     while (time() < $stop_after && ($contacts = $this->loadInactiveContacts($inactive_since, $last_id))) {
       foreach ($contacts as $contact) {
         $this->anonymize($contact);
