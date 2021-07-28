@@ -11,6 +11,16 @@ class ContactCron {
 
   /**
    * Create a new cron-job instance.
+   *
+   * @param int $time_limit
+   *   Soft time limit (in seconds): No new batches are started in the same
+   *   cron-run after the limit has been reached.
+   * @param string $inactive_since_str
+   *   String that can be passed to strtotime(). Expire all contacts that didn’t
+   *   have any activity logged in this time frame.
+   * @param bool $keep_mp_fields
+   *   If TRUE the MP data is copied to the anonymized contacts, otherwise it is
+   *   deleted.
    */
   public function __construct(int $time_limit, string $inactive_since_str, bool $keep_mp_fields = FALSE) {
     $this->timeLimit = $time_limit;
