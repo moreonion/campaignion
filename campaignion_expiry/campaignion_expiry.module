@@ -7,6 +7,36 @@
 
 use Drupal\campaignion_expiry\ContactCron;
 use Drupal\campaignion_expiry\SubmissionCron;
+use Drupal\little_helpers\Services\Container;
+
+/**
+ * Helper function to load cron services and invoke them.
+ */
+function _campaignion_expiry_run($service) {
+  Container::get()->loadService($service)->run();
+}
+
+/**
+ * Implements hook_little_helpers_services().
+ */
+function campaignion_expiry_little_helpers_services() {
+  $info['campaignion_expiry.SubmissionCron'] = [
+    'class' => SubmissionCron::class,
+    'arguments' => [
+      '!campaignion_expiry_cron_time_limit',
+      '!campaignion_expiry_submission_time_frame',
+      '!campaignion_expiry_submission_last_run',
+    ],
+  ];
+  $info['campaignion_expiry.ContactCron'] = [
+    'class' => ContactCron::class,
+    'arguments' => [
+      '!campaignion_expiry_cron_time_limit',
+      '!campaignion_expiry_contact_time_frame',
+    ],
+  ];
+  return $info;
+}
 
 /**
  * Implements hook_cronapi().
@@ -16,13 +46,15 @@ function campaignion_expiry_cronapi($op, $job = NULL) {
     'description' => 'Expire webform submissions',
     'rule' => '0+@ 0-6 * * *',
     'weight' => 100,
-    'callback' => [SubmissionCron::class, 'expireSubmissions'],
+    'callback' => '_campaignion_expiry_run',
+    'arguments' => ['campaignion_expiry.SubmissionCron'],
   ];
   $items['campaignion_expiry_contacts'] = [
     'description' => 'Expire contacts',
     'rule' => '0+@ 0-6 * * *',
     'weight' => 100,
-    'callback' => [ContactCron::class, 'run'],
+    'callback' => '_campaignion_expiry_run',
+    'arguments' => ['campaignion_expiry.ContactCron'],
   ];
   return $items;
 }

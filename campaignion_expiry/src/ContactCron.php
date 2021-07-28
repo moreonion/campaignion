@@ -10,25 +10,17 @@ use Drupal\campaignion\Contact;
 class ContactCron {
 
   /**
-   * Entry-point for the cron configuration.
-   */
-  public static function run() {
-    $inactive_since = strtotime(variable_get_value('campaignion_expiry_contact_time_frame'));
-    $job = new static($inactive_since);
-    $job->execute();
-  }
-
-  /**
    * Create a new cron-job instance.
    */
-  public function __construct(int $inactive_since, bool $keep_mp_fields = FALSE) {
-    $this->inactiveSince = $inactive_since;
+  public function __construct(int $time_limit, string $inactive_since_str, bool $keep_mp_fields = FALSE) {
+    $this->timeLimit = $time_limit;
+    $this->inactiveSinceStr = $inactive_since_str;
     $this->keepMpFields = $keep_mp_fields;
     $this->entityController = entity_get_controller('redhen_contact');
   }
 
   /**
-   * Remove all data from a contact or replace it.
+   * Create a new anonymous contact and copy over some data we want to keep.
    *
    * @param \Drupal\campaignion\Contact $contact
    *   Contact that is being anonymized.
@@ -64,7 +56,7 @@ class ContactCron {
     }
 
     $new_contact->created = $contact->created;
-    $new_contact->log = 'Contact not being updated since 12 months and has been anonymized';
+    $new_contact->log = "Contact not being updated since “{$this->inactiveSinceStr}” and has been anonymized";
     $new_contact->save();
 
     $this->entityController->resetCache([$contact->contact_id]);
@@ -95,7 +87,7 @@ SQL;
   /**
    * Load inactive contacts from the database.
    */
-  protected function loadInactiveContacts(int $last_id = 0, int $limit = 100) {
+  protected function loadInactiveContacts(int $inactive_since, int $last_id = 0, int $limit = 100) {
     $sql = <<<SQL
 SELECT c.contact_id
 FROM redhen_contact c
@@ -111,7 +103,7 @@ AND c.contact_id > :last_id
 ORDER BY c.contact_id
 LIMIT $limit;
 SQL;
-    $params = [':last_id' => $last_id, ':time' => $this->inactiveSince];
+    $params = [':last_id' => $last_id, ':time' => $inactive_since];
     if ($ids = db_query($sql, $params)->fetchCol()) {
       return entity_load('redhen_contact', $ids, [], TRUE);
     }
@@ -121,11 +113,12 @@ SQL;
   /**
    * Execute the cron-job.
    */
-  public function execute() {
-    $end_time = time() + variable_get_value('campaignion_expiry_cron_time_limit');
+  public function run() {
+    $stop_after = time() + $this->timeLimit;
     $last_id = 0;
     $contact_count = 0;
-    while (time() < $end_time && ($contacts = $this->loadInactiveContacts($last_id))) {
+    $inactive_since = strtotime($this->inactiveSinceStr);
+    while (time() < $stop_after && ($contacts = $this->loadInactiveContacts($inactive_since, $last_id))) {
       foreach ($contacts as $contact) {
         $this->anonymize($contact);
         $this->deleteOldRevisions($contact);
