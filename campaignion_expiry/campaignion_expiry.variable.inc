@@ -30,5 +30,12 @@ function campaignion_expiry_variable_info($options) {
     'default' => '-12 months',
     'localize' => FALSE,
   ];
+  $v['campaignion_expiry_contact_keep_mp_data'] = [
+    'title' => t('Contact expiry: keep MP data'),
+    'description' => t('A flag that decides whether MP data is kept when a contact is anonymized.'),
+    'type' => 'boolean',
+    'default' => TRUE,
+    'localize' => FALSE,
+  ];
   return $v;
 }
