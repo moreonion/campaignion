@@ -1,0 +1,8 @@
+name = Mind Expiry
+description = Expire form submissions in a cron-job.
+core = 7.x
+php = 7.3
+
+dependencies[] = campaignion:campaignion_activity
+dependencies[] = ultimate_cron:ultimate_cron
+dependencies[] = webform:webform

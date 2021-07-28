@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Hook and callback implementations for this module.
+ */
+
+use Drupal\campaignion_expiry\ContactCron;
+use Drupal\campaignion_expiry\SubmissionCron;
+
+/**
+ * Implements hook_cronapi().
+ */
+function campaignion_expiry_cronapi($op, $job = NULL) {
+  $items['campaignion_expiry_webform_submissions'] = [
+    'description' => 'Expire webform submissions',
+    'rule' => '0+@ 0-6 * * *',
+    'weight' => 100,
+    'callback' => [SubmissionCron::class, 'expireSubmissions'],
+  ];
+  $items['campaignion_expiry_contacts'] = [
+    'description' => 'Expire contacts',
+    'rule' => '0+@ 0-6 * * *',
+    'weight' => 100,
+    'callback' => [ContactCron::class, 'run'],
+  ];
+  return $items;
+}

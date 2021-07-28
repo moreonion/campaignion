@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Implement hooks called when installing, updating or uninstalling the module.
+ */
+
+/**
+ * Immplements hook_uninstall().
+ */
+function campaignion_expiry_uninstall() {
+  variable_del('campaignion_expiry_last_run');
+}
