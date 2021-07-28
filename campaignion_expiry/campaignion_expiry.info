@@ -1,5 +1,5 @@
-name = Mind Expiry
-description = Expire form submissions in a cron-job.
+name = Campaignion expiry
+description = Expire form submissions and contact data
 core = 7.x
 php = 7.3
 
