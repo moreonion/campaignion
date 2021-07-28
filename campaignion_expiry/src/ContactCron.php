@@ -87,7 +87,7 @@ SQL;
   /**
    * Load inactive contacts from the database.
    */
-  protected function loadInactiveContacts(int $inactive_since, int $last_id = 0, int $limit = 100) {
+  protected function loadInactiveContacts(int $inactive_since, int $last_id = 0, int $limit = 20) {
     $sql = <<<SQL
 SELECT c.contact_id
 FROM redhen_contact c
