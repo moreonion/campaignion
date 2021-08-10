@@ -43,12 +43,17 @@ class SubmissionCron {
       ->modify($this->expireUpToStr)
       ->getTimestamp();
     $last_sid = 0;
-    while ((time() < $stop_after) && ($last_sid = $this->expireSubmissionBatch($expire_up_to, $last_sid))) {
+    while (($still_time = time() < $stop_after) && ($last_sid = $this->expireSubmissionBatch($expire_up_to, $last_sid))) {
       watchdog('campaignion_expiry', 'Expired webform submissions up to sid=@last_sid', ['@last_sid' => $last_sid], WATCHDOG_DEBUG);
     }
-    watchdog('campaignion_expiry', 'No more submissions to anonymize for now.', [], WATCHDOG_DEBUG);
-    $args = ['@expire_up_to' => strftime('%d/%m/%Y %H:%M:%S', $expire_up_to)];
-    watchdog('campaignion_expiry', 'Expired all submissions up to @expire_up_to', $args, WATCHDOG_INFO);
+    if ($still_time) {
+      watchdog('campaignion_expiry', 'No more submissions to anonymize for now.', [], WATCHDOG_DEBUG);
+      $args = ['@expire_up_to' => strftime('%d/%m/%Y %H:%M:%S', $expire_up_to)];
+      watchdog('campaignion_expiry', 'Expired all submissions up to @expire_up_to', $args, WATCHDOG_INFO);
+    }
+    else {
+      watchdog('campaignion_expiry', 'Out of time to anonymize submissions in this cron-run.', [], WATCHDOG_INFO);
+    }
   }
 
   /**
