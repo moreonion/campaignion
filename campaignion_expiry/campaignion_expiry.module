@@ -25,7 +25,6 @@ function campaignion_expiry_little_helpers_services() {
     'arguments' => [
       '!campaignion_expiry_cron_time_limit',
       '!campaignion_expiry_submission_time_frame',
-      '!campaignion_expiry_submission_last_run',
     ],
   ];
   $info['campaignion_expiry.ContactCron'] = [
