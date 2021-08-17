@@ -1,0 +1,9 @@
+name = Campaignion expiry
+description = Expire form submissions and contact data
+core = 7.x
+php = 7.3
+
+dependencies[] = campaignion:campaignion_activity
+dependencies[] = ultimate_cron:ultimate_cron
+dependencies[] = variable:variable
+dependencies[] = webform:webform
