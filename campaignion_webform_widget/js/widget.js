@@ -49,18 +49,20 @@ function gaLinkerHandler() {
   }
 }
 
-function registerListeners() {
-  if (window.addEventListener) {
-    window.addEventListener("DOMSubtreeModified", function(){messageParent();}, true);
-    document.addEventListener("DOMContentLoaded", gaLinkerHandler);
-  } else if (window.attachEvent) {
-    window.attachEvent("onDOMSubtreeModified", function(){messageParent();});
+if (window.addEventListener) {
+  window.addEventListener("DOMContentLoaded", function() {
+    gaLinkerHandler();
+    messageParent();
+    window.addEventListener("DOMSubtreeModified", messageParent, true);
+  });
+}
+else {
+  window.onload = function() {
+    messageParent();
+    window.attachEvent("onDOMSubtreeModified", messageParent);
   }
 }
-window.onload = function() {
-  messageParent();
-  registerListeners();
-}
+
 window.onresize = function() {
   messageParent();
 }
