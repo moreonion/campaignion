@@ -49,18 +49,14 @@ function gaLinkerHandler() {
   }
 }
 
-if (window.addEventListener) {
-  window.addEventListener("DOMContentLoaded", function() {
-    gaLinkerHandler();
-    messageParent();
-    window.addEventListener("DOMSubtreeModified", messageParent, true);
-  });
-}
-else {
-  window.onload = function() {
-    messageParent();
-    window.attachEvent("onDOMSubtreeModified", messageParent);
-  }
+window.addEventListener("DOMContentLoaded", function() {
+  gaLinkerHandler();
+  messageParent();
+});
+
+window.onload = function() {
+  messageParent();
+  window.addEventListener("DOMSubtreeModified", messageParent, true);
 }
 
 window.onresize = function() {
