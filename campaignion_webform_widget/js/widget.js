@@ -49,18 +49,16 @@ function gaLinkerHandler() {
   }
 }
 
-function registerListeners() {
-  if (window.addEventListener) {
-    window.addEventListener("DOMSubtreeModified", function(){messageParent();}, true);
-    document.addEventListener("DOMContentLoaded", gaLinkerHandler);
-  } else if (window.attachEvent) {
-    window.attachEvent("onDOMSubtreeModified", function(){messageParent();});
-  }
-}
+window.addEventListener("DOMContentLoaded", function() {
+  gaLinkerHandler();
+  messageParent();
+});
+
 window.onload = function() {
   messageParent();
-  registerListeners();
+  window.addEventListener("DOMSubtreeModified", messageParent, true);
 }
+
 window.onresize = function() {
   messageParent();
 }
