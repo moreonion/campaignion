@@ -22,9 +22,6 @@ if (module_exists('webform')) {
     require_once dirname(__FILE__) . '/modules/webform_paymethod_select.php';
   }
 }
-if (module_exists('campaignion_newsletters')) {
-  require_once dirname(__FILE__) . '/modules/campaignion_newsletters.php';
-}
 
 /**
  * Implements hook_campaignion_activity_type_info().
