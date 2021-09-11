@@ -33,7 +33,7 @@ class WebformSubmission extends ActivityBase {
     return $query;
   }
 
-  public static function fromSubmission($submission, $contact, $data = []) {
+  public static function fromSubmission($submission, $data = []) {
     if ($activity = static::byNidSid($submission->nid, $submission->sid)) {
       return $activity;
     }
