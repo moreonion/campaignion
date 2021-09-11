@@ -29,6 +29,7 @@ function campaignion_activity_campaignion_action_taken($node, Submission $submis
 
   $activity = WebformSubmission::fromSubmission($submission, $contact);
   $activity->contact_id = $contact->contact_id;
+  $activity->created = $activity->created ?? $when;
   $activity->confirmed = $activity->confirmed ?? ($submission->confirmed ? $when : NULL);
 
   if ($payments = $submission->payments ?? NULL) {
