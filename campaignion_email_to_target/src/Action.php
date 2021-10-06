@@ -43,10 +43,9 @@ class Action extends ActionBase {
    * Choose an appropriate message for a given target.
    */
   public function getMessage($target) {
-    $is_stub = empty($target['email']);
     $templates = MessageTemplate::byNid($this->node->nid);
     foreach ($templates as $t) {
-      if ((!$is_stub || $t->type == 'exclusion') && $t->checkFilters($target)) {
+      if ($t->checkFilters($target)) {
         return $t->createInstance();
       }
     }
