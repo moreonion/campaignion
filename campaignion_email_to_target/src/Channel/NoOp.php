@@ -46,4 +46,11 @@ class NoOp {
     ];
   }
 
+  /**
+   * Remove or modify targets and messages for this channel.
+   */
+  public function filterPairs(array $pairs) {
+    return $pairs;
+  }
+
 }

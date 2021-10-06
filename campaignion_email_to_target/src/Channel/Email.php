@@ -112,4 +112,23 @@ class Email {
     ];
   }
 
+  /**
+   * Remove or modify targets and messages for this channel.
+   */
+  public function filterPairs(array $pairs, Submission $submission, bool $test_mode) {
+    $submission_email = $submission->valueByKey('email');
+    $new_pairs = [];
+    foreach ($pairs as $pair) {
+      list($target, $message) = $pair;
+      if (empty($target['email'])) {
+        continue;
+      }
+      if ($test_mode) {
+        $target['email'] = $submission_email;
+      }
+      $new_pairs[] = [$target, $message];
+    }
+    return $new_pairs;
+  }
+
 }

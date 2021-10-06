@@ -124,16 +124,16 @@ class Action extends ActionBase {
    *
    * @param \Drupal\little_helpers\Webform\Submission $submission_o
    *   A submisson object.
+   * @param mixed $channel
+   *   The channel responsible for delivering the message.
    * @param bool $test_mode
-   *   Whether to replace all target email addresses.
+   *   TRUE if the action is accessed in test-mode.
    *
    * @return array|\Drupal\campaignion_email_to_target\Exclusion
    *   Either an array of target messages pairs or an exclusion if no targets
    *   were found or all targets were excluded.
    */
-  public function targetMessagePairs(Submission $submission_o, $test_mode = FALSE) {
-    $email_override = $test_mode ? $submission_o->valueByKey('email') : NULL;
-
+  public function targetMessagePairs(Submission $submission_o, $channel, bool $test_mode) {
     $pairs = [];
     $exclusion = NULL;
     $token_defaults = [
@@ -148,9 +148,6 @@ class Action extends ActionBase {
 
     foreach ($contacts as $target) {
       if ($message = $this->getMessage($target)) {
-        if ($email_override && isset($target['email'])) {
-          $target['email'] = $email_override;
-        }
         $message->replaceTokens($target + $token_defaults, $submission_o, TRUE);
         if ($message instanceof Exclusion) {
           // The first exclusion-message is used.
@@ -163,6 +160,7 @@ class Action extends ActionBase {
         }
       }
     }
+    $pairs = $channel->filterPairs($pairs, $submission_o, $test_mode);
 
     if (empty($pairs)) {
       watchdog('campaignion_email_to_target', 'The API found no targets (dataset=@dataset, selector=@selector).', [
