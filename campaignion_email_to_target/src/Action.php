@@ -7,6 +7,7 @@ use Drupal\campaignion_action\ActionType;
 use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_email_to_target\Channel\Email;
 use Drupal\little_helpers\Services\Container;
+use Drupal\little_helpers\Services\Spec;
 use Drupal\little_helpers\Webform\Submission;
 
 /**
@@ -176,27 +177,12 @@ class Action extends ActionBase {
 
   /**
    * Get the configured channel.
-   */
-  public function channel() {
-    return $this->pluginInstance($this->parameters['channel']);
-  }
-
-  /**
-   * Create a new plugin instance based on a specification.
-   *
-   * @param mixed $spec
-   *   A spec can either be a fully qualified class name or an array with at
-   *   least one member 'class' which must be a fully qualified class name.
    *
    * @return mixed
-   *   A new plugin instance.
+   *   A new channel instance based on the action type’s configuration.
    */
-  protected function pluginInstance($spec) {
-    if (!is_array($spec)) {
-      $spec = ['class' => $spec];
-    }
-    $class = $spec['class'];
-    return $class::fromConfig($spec);
+  public function channel() {
+    return Spec::fromInfo($this->parameters['channel'])->instantiate();
   }
 
 }
