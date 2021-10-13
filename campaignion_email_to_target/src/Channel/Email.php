@@ -124,6 +124,7 @@ class Email {
         continue;
       }
       if ($test_mode) {
+        $message->toAddress = $submission_email;
         $target['email'] = $submission_email;
       }
       $new_pairs[] = [$target, $message];
