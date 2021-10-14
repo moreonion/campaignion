@@ -85,18 +85,30 @@ class EmailTest extends \DrupalUnitTestcase {
    */
   public function testFilterPairsTestMode() {
     $pairs = [
-      [['email' => 'test1@example.com', 'name' => 'One'], []],
+      [
+        ['email' => 'test1@example.com', 'name' => 'One'],
+        new Message(['toAddress' => 'test1@example.com']),
+      ],
       [['Name' => 'No email'], []],
-      [['email' => 'test2@example.com', 'name' => 'Two'], []],
+      [
+        ['email' => 'test2@example.com', 'name' => 'Two'],
+        new Message(['toAddress' => 'test2@example.com']),
+      ],
     ];
     $channel = new Email();
     $submission = $this->createMock(Submission::class);
-    $submission->method('valueByKey')->willReturn('test-mode@example.com');
+    $test_email = 'test-mode@example.com';
+    $submission->method('valueByKey')->willReturn($test_email);
     $new_pairs = $channel->filterPairs($pairs, $submission, TRUE);
     $this->assertEqual([
-      [['email' => 'test-mode@example.com', 'name' => 'One'], []],
-      [['email' => 'test-mode@example.com', 'name' => 'Two'], []],
-    ], $new_pairs);
+      ['email' => $test_email, 'name' => 'One'],
+      ['email' => $test_email, 'name' => 'Two'],
+    ], array_map(function ($p) { return $p[0]; }, $new_pairs));
+    foreach ($new_pairs as $pair) {
+      $message = $pair[1];
+      $to = $message->to();
+      $this->assertEqual("<$test_email>", substr($to, -(strlen($test_email)+2)));
+    }
   }
 
 }
