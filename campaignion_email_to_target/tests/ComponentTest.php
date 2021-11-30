@@ -133,7 +133,8 @@ class ComponentTest extends \DrupalUnitTestCase {
       ->setMethods(['mail'])
       ->disableOriginalConstructor()
       ->getMock();
-    $channel->expects($this->once())->method('mail');
+    $channel->expects($this->once())->method('mail')
+      ->willReturn(['result' => TRUE]);
     $component->sendEmails($serialized_messages, $submission, $channel);
   }
 
