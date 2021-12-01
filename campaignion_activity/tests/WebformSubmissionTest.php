@@ -44,13 +44,16 @@ class WebformSubmissionTest extends DrupalUnitTestCase {
       'sid' => 420002,
       'confirmed' => 0,
       'contact' => $this->contact,
+      'submitted' => $submitted_time = time() - 10,
     ];
     $submission = new Submission($node, $submission);
-    campaignion_activity_campaignion_action_taken(NULL, $submission, time());
+    $queued_time = time() - 5;
+    campaignion_activity_campaignion_action_taken(NULL, $submission, $queued_time);
 
     $activity = WebformSubmission::byNidSid($submission->nid, $submission->sid);
     $this->assertNotEmpty($activity);
     $this->assertEqual($this->contact->contact_id, $activity->contact_id);
+    $this->assertEqual($submitted_time, $activity->created);
   }
 
   /**
@@ -61,6 +64,7 @@ class WebformSubmissionTest extends DrupalUnitTestCase {
     $submission = (object) [
       'nid' => $node->nid,
       'sid' => 420002,
+      'submitted' => 0,
       'confirmed' => 0,
       'contact' => $this->contact,
       'payments' => [$payment = new \Payment(['pid' => 420003])],

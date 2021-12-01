@@ -39,6 +39,7 @@ class WebformSubmission extends ActivityBase {
     }
 
     $data = [
+      'created' => $submission->submitted,
       'nid' => $submission->nid,
       'sid' => $submission->sid,
     ] + $data;
