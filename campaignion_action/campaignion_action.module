@@ -79,8 +79,7 @@ function campaignion_action_module_implements_alter(&$impl, $hook) {
     }
     $impl = $new_impl;
   }
-  $module = 'campaignion_action';
-  $move_to_front = function () use (&$impl, $module) {
+  $move_to_front = function () use (&$impl) {
     // Add our implemetation first.
     $ours = $impl['campaignion_action'];
     unset($impl['campaignion_action']);
