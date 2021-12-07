@@ -96,8 +96,7 @@ class ProviderTest extends DrupalUnitTestCase {
    */
   public function testUnsubscribe404() {
     list($provider, $api) = $this->mockProvider();
-    $api->method('get')->willReturn(TRUE);
-    $api->method('delete')->will($this->throwException(new ApiError('dotmailer', 'Contact not found', [], 404)));
+    $api->method('get')->will($this->throwException(new ApiError('dotmailer', 'Contact not found', [], 404)));
     // No exception thrown.
     $list = new NewsletterList(['identifier' => 'mock_list']);
     $item = new QueueItem(['email' => 'test@example.com']);

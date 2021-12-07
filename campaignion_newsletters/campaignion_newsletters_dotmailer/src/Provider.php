@@ -145,16 +145,16 @@ class Provider extends ProviderBase {
    * @return: True on success.
    */
   public function unsubscribe(NewsletterList $list, QueueItem $item) {
-    if ($contact = $this->api->get('contacts/' . $item->email)) {
-      try {
+    try {
+      if ($contact = $this->api->get('contacts/' . $item->email)) {
         $this->api->delete("address-books/{$list->identifier}/contacts/{$contact['id']}");
       }
-      catch (ApiError $e) {
-        // Ignore 404 errors. It means we tried to delete a non-existent
-        // subscription. That’s fine.
-        if ($e->getCode() != 404) {
-          throw $e;
-        }
+    }
+    catch (ApiError $e) {
+      // Ignore 404 errors. It means we tried to delete a non-existent
+      // subscription. That’s fine.
+      if ($e->getCode() != 404) {
+        throw $e;
       }
     }
   }
