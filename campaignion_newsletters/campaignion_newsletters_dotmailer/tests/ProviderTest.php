@@ -104,6 +104,18 @@ class ProviderTest extends DrupalUnitTestCase {
   }
 
   /**
+   * Test unsubscribing an invalid email address.
+   */
+  public function testUnsubscribe400() {
+    list($provider, $api) = $this->mockProvider();
+    $api->method('get')->will($this->throwException(new ApiError('dotmailer', 'Email is not a valid email address', [], 400)));
+    // No exception thrown.
+    $list = new NewsletterList(['identifier' => 'mock_list']);
+    $item = new QueueItem(['email' => 'test@example.com']);
+    $this->assertNull($provider->unsubscribe($list, $item));
+  }
+
+  /**
    * Test getting an access denied error while unsubscribing
    */
   public function testUnsubscribe401() {

@@ -151,10 +151,17 @@ class Provider extends ProviderBase {
       }
     }
     catch (ApiError $e) {
-      // Ignore 404 errors. It means we tried to delete a non-existent
-      // subscription. That’s fine.
-      if ($e->getCode() != 404) {
-        throw $e;
+      switch ($e->getCode()) {
+        case 404:
+          // Ignore 404 errors. It means we tried to delete a non-existent
+          // subscription. That’s fine.
+          break;
+        case 400:
+          // Ignore invalid email addresses leading to a 400 on the GET request.
+          break;
+        default:
+          // Propagate (and log) everything else.
+          throw $e;
       }
     }
   }
