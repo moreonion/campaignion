@@ -92,19 +92,28 @@ class ProviderTest extends DrupalUnitTestCase {
   }
 
   /**
-   * Test errors while unsubscribing.
+   * Test unsubscribing an email address unknown to dotmailer.
    */
-  public function testUnsubscribeError() {
-    $list = new NewsletterList(['identifier' => 'mock_list']);
-    $item = new QueueItem(['email' => 'test@example.com']);
+  public function testUnsubscribe404() {
     list($provider, $api) = $this->mockProvider();
     $api->method('get')->willReturn(TRUE);
     $api->method('delete')->will($this->throwException(new ApiError('dotmailer', 'Contact not found', [], 404)));
     // No exception thrown.
-    $provider->unsubscribe($list, $item);
+    $list = new NewsletterList(['identifier' => 'mock_list']);
+    $item = new QueueItem(['email' => 'test@example.com']);
+    $this->assertNull($provider->unsubscribe($list, $item));
+  }
 
-    $this->expectException(ApiError::class);
+  /**
+   * Test getting an access denied error while unsubscribing
+   */
+  public function testUnsubscribe401() {
+    list($provider, $api) = $this->mockProvider();
+    $api->method('get')->willReturn(TRUE);
     $api->method('delete')->will($this->throwException(new ApiError('dotmailer', 'Access denied', [], 401)));
+    $this->expectException(ApiError::class);
+    $list = new NewsletterList(['identifier' => 'mock_list']);
+    $item = new QueueItem(['email' => 'test@example.com']);
     // Throw exception.
     $provider->unsubscribe($list, $item);
   }
