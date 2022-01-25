@@ -38,14 +38,13 @@ Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
   if (settings['campaignion_tracking'] && settings['campaignion_tracking']['context']) {
     settings['campaignion_tracking']['sent'] = settings['campaignion_tracking']['sent'] || [];
 
-    var node = settings.campaignion_tracking.context['node'] || {};
     var donation = settings.campaignion_tracking.context['donation'] || {};
     var webform = settings.campaignion_tracking.context['webform'] || {};
 
     if (donation['amount'] && donation['interval'] && donation['currency_code']) {
       var product = {
-        name: `${node['title']} (${donation['description']})`,
-        id: `${node['nid']}-${donation['amount_component']}`,
+        name: donation['name'],
+        id: donation['id'],
         price: String(donation['amount']),
         variant: String(donation['interval']),
         quantity: 1

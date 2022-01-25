@@ -114,12 +114,14 @@ function campaignion_tracking_form_webform_client_form_alter(&$form, &$form_stat
     // NB: Only after the amount step submit we get values.
     // Thus `interval` and `amount` might be "null" in JS (in case no values
     // have been submitted so far)
+    $description = $selected_line_item->description ?? '';
     $donation_settings['campaignion_tracking']['context']['donation'] = [
+      'id' => "{$node->nid}-{$paymethod['cid']}",
+      'name' => trim("{$node->title} {$description}"),
       'currency_code' => $currency_code,
       'interval' => $interval,
       'amount' => $selected_line_item ? $submission->valueByCid($selected_line_item->amount_component) : NULL,
       'amount_component' => $selected_line_item ? $selected_line_item->amount_component : NULL,
-      'description' => $selected_line_item ? $selected_line_item->description : NULL,
     ];
     $form['#attached']['js'][] = ['data' => $donation_settings, 'type' => 'setting'];
   }
