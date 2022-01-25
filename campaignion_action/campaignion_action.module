@@ -360,7 +360,7 @@ function campaignion_action_cron() {
     $d = &$item->data;
     $node = node_load($d['nid']);
     if ($submissionObj = WebformSubmission::load($d['nid'], $d['sid'])) {
-      module_invoke_all('campaignion_action_taken', $node, $submissionObj, $d['created']);
+      module_invoke_all('campaignion_action_taken', $node, $submissionObj, $d['created'] ?? time());
     }
     else {
       watchdog('campaignion_action', 'Submission(!nid,!sid) has vanished before import.', array('!nid' => $d['nid'], '!sid' => $d['sid']), WATCHDOG_INFO);
