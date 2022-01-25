@@ -96,14 +96,14 @@ function campaignion_tracking_form_webform_client_form_alter(&$form, &$form_stat
   // Information about a donation (in case the node is one).
   if ($is_donation) {
     // TODO: there might be more than 1 paymethod_select component in the form
-    $paymethod = $webform->componentByKey('paymethod_select');
-    $currency_code = isset($paymethod['extra']['currency_code']) ? $paymethod['extra']['currency_code'] : 'EUR';
+    $component = $webform->componentByKey('paymethod_select');
+    $currency_code = isset($component['extra']['currency_code']) ? $component['extra']['currency_code'] : 'EUR';
     $submission = $webform->formStateToSubmission($form_state);
     // Interval is read by key
     $interval = $submission->valueByKey('donation_interval');
     // Find first line item with has a value and use this as selected amount component
     $selected_line_item = NULL;
-    foreach ($paymethod['extra']['line_items'] as $line_item) {
+    foreach ($component['extra']['line_items'] as $line_item) {
       $value = $submission->valueByCid($line_item->amount_component);
       if ($value) {
         $selected_line_item = $line_item;
@@ -116,7 +116,7 @@ function campaignion_tracking_form_webform_client_form_alter(&$form, &$form_stat
     // have been submitted so far)
     $description = $selected_line_item->description ?? '';
     $donation_settings['campaignion_tracking']['context']['donation'] = [
-      'id' => "{$node->nid}-{$paymethod['cid']}",
+      'id' => "{$node->nid}-{$component['cid']}",
       'name' => trim("{$node->title} {$description}"),
       'currency_code' => $currency_code,
       'interval' => $interval,
