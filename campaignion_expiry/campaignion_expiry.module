@@ -7,6 +7,7 @@
 
 use Drupal\campaignion_expiry\ContactCron;
 use Drupal\campaignion_expiry\SubmissionCron;
+use Drupal\campaignion_expiry\Anonymizer;
 use Drupal\little_helpers\Services\Container;
 
 /**
@@ -30,8 +31,14 @@ function campaignion_expiry_little_helpers_services() {
   $info['campaignion_expiry.ContactCron'] = [
     'class' => ContactCron::class,
     'arguments' => [
+      '@campaignion_expiry.Anonymizer',
       '!campaignion_expiry_cron_time_limit',
       '!campaignion_expiry_contact_time_frame',
+    ],
+  ];
+  $info['campaignion_expiry.Anonymizer'] = [
+    'class' => Anonymizer::class,
+    'arguments' => [
       '!campaignion_expiry_contact_keep_mp_data',
     ],
   ];
