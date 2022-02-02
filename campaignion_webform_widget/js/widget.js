@@ -1,7 +1,9 @@
 var messageParent = function(scrollTop){
   // be sure this code runs when document.body is defined
   var height = document.body.scrollHeight;
-  if (scrollTop) height += 's';
+  if (scrollTop) {
+    height += 's';
+  }
   if (top.postMessage){
     top.postMessage(height, '*');
   } else {
@@ -56,7 +58,9 @@ window.addEventListener("DOMContentLoaded", function() {
 
 window.onload = function() {
   messageParent(false);
-  window.addEventListener("DOMSubtreeModified", function() { messageParent(false); }, true);
+  window.addEventListener("DOMSubtreeModified", function() {
+    messageParent(false);
+  }, true);
 }
 
 window.onresize = function() {
