@@ -63,7 +63,6 @@ class Address extends Field {
     $language = $source->getLanguageCode();
     // Explicitly set language specific default country.
     if (module_exists('i18n_variable') && ($country = i18n_variable_get('site_default_country', $language, ''))) {
-      echo "i18n_variable: $country\n";
       return $country;
     }
     // Default country for single language sites.
