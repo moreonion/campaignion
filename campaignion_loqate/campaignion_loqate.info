@@ -1,0 +1,6 @@
+name = Loqate
+description = Loqate validation for sort code and account number in webforms.
+core = 7.x
+
+dependencies[] = manual_direct_debit_uk
+dependencies[] = variable

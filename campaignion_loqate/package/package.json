@@ -1,0 +1,33 @@
+{
+  "name": "drupal-campaignion-loqate",
+  "version": "0.0.0",
+  "description": "JavaScript behavior for the loqate integration.",
+  "scripts": {
+    "dev": "parcel build --no-minify --no-source-maps -d dist -o main.js src/main.js",
+    "dist": "parcel build --no-source-maps -d dist -o main.js src/main.js",
+    "drupal:dev": "yarn run dev && cp dist/main.js ../campaignion_loqate.min.js",
+    "drupal:dist": "yarn run dist && cp dist/main.js ../campaignion_loqate.min.js",
+    "test": "mocha --require @babel/register --ui tdd --reporter dot test",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "@babel/register": "^7.7.7",
+    "babel-eslint": "^10.0.3",
+    "core-js": "3",
+    "eslint": "^5.16.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^9.0.1",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "mocha": "^6.2.2",
+    "parcel": "^1.12.4",
+    "regenerator-runtime": "^0.13.3",
+    "sinon": "^7.3.2"
+  },
+  "dependencies": {
+    "@moreonion/js-utils": "^0.1.2"
+  }
+}
