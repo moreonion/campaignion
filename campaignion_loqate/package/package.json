@@ -12,12 +12,13 @@
   "scripts": {
     "dev": "microbundle watch",
     "dist": "microbundle",
-    "drupal": "yarn dist && cp dist/main.js ../campaignion_loqate.min.js",
+    "drupal": "yarn dist && cp dist/main.umd.js ../campaignion_loqate.min.js",
     "test": "mocha --require @babel/register --ui tdd --reporter dot test",
     "lint": "eslint src",
     "fix": "eslint --fix src/**/*.js"
   },
   "devDependencies": {
+    "@moreonion/js-utils": "^0.1.2",
     "core-js": "3",
     "eslint": "^7.12.1",
     "eslint-config-standard": "^16.0.3",
@@ -27,8 +28,5 @@
     "microbundle": "^0.14.2",
     "mocha": "^9.2.0",
     "sinon": "^13.0.1"
-  },
-  "dependencies": {
-    "@moreonion/js-utils": "^0.1.2"
   }
 }
