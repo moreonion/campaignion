@@ -1,14 +1,19 @@
+/* globals: Drupal */
+
 /**
  * Handler for a single input element and it’s wrapper.
  */
 class Input {
-  constructor ($input, dependent = []) {
-    this.valid = false
-    this.lastValue = ''
-    this.validated = false
+  constructor ($input, msg, dependent = []) {
     this.$input = $input
     this.$wrapper = $input.closest('.form-group')
     this.dependent = dependent
+    this.formId = $input.closest('form').attr('id')
+    this.errorMessage = msg
+
+    this.valid = false
+    this.lastValue = ''
+    this.validated = false
   }
   bind () {
     this.$input.on('change keyup', () => {
@@ -17,16 +22,27 @@ class Input {
     return this
   }
   unmark () {
-    this.$input.removeClass('error')
-    this.$wrapper.removeClass('field-error field-success')
+    const validator = Drupal.myClientsideValidation.validators[this.formId]
+    const $wrapper = $('#clientsidevalidation-' + this.formId + '-errors')
+    const errors = validator.errorsFor(this.$input.get(0))
+    validator.addWrapper(errors).remove()
+    // Hide container if it’s empty.
+    if ($wrapper.length && !$wrapper.find(validator.settings.errorElement).length) {
+      $wrapper.hide()
+    }
     this.validated = false
   }
   markValid () {
-    this.$wrapper.addClass('field-success')
+    this.unmark()
   }
   markInvalid () {
-    this.$input.addClass('error')
-    this.$wrapper.addClass('field-error')
+    const validator = Drupal.myClientsideValidation.validators[this.formId]
+    const errors = {}
+    errors[this.$input.attr('name')] = this.errorMessage
+    // Needed so jQuery validate will find the element when removing errors.
+    validator.currentElements.push(this.$input.get(0))
+    // Trigger validation error.
+    validator.showErrors(errors)
   }
   setValid (valid) {
     this.valid = valid

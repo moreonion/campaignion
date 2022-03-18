@@ -20,9 +20,9 @@ class Validator {
     this.disabledButtons = $()
   }
   bind (wrapper) {
-    this.inputHolder = (new Input($('[name$="[holder]"]', wrapper))).bind()
-    this.inputAccount = (new Input($('[name$="[account]"]', wrapper))).bind()
-    this.inputSortCode = (new Input($('[name$="[bank_code]"]', wrapper), [this.inputAccount])).bind()
+    this.inputHolder = (new Input($('[name$="[holder]"]', wrapper), Drupal.t('Please enter the account holder’s name.'))).bind()
+    this.inputAccount = (new Input($('[name$="[account]"]', wrapper), Drupal.t('Please enter a valid account number.'))).bind()
+    this.inputSortCode = (new Input($('[name$="[bank_code]"]', wrapper), Drupal.t('Please enter a valid sort code.'), [this.inputAccount])).bind()
     let validate = debounce(() => {
       this.validate()
     }, this.settings.validateTimeout)
