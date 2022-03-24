@@ -17,14 +17,12 @@ function campaignion_loqate_payment_forms_payment_form_alter(&$form, \Payment $p
   if (!($key = variable_get_value('campaignion_loqate_api_key'))) {
     return;
   }
-  $form['#attributes']['class'][] = 'loqate-validate';
   $settings['sortCodeEndpoint'] = 'https://api.addressy.com/BankAccountValidation/Interactive/RetrieveBySortcode/v1.00/json3.ws';
   $settings['accountEndpoint'] = 'https://api.addressy.com/BankAccountValidation/Interactive/Validate/v2.00/json3.ws';
   $settings['key'] = $key;
   $js_settings['type'] = 'setting';
   $js_settings['data']['loqate'] = $settings;
   $form['#attached']['js'][] = $js_settings;
-  $form['#attached']['js'][] = drupal_get_path('module', 'campaignion_loqate') . '/campaignion_loqate.min.js';
   $form['#after_build'][] = '_campaignion_loqate_add_rules';
 }
 
