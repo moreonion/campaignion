@@ -25,4 +25,18 @@ function campaignion_loqate_payment_forms_payment_form_alter(&$form, \Payment $p
   $js_settings['data']['loqate'] = $settings;
   $form['#attached']['js'][] = $js_settings;
   $form['#attached']['js'][] = drupal_get_path('module', 'campaignion_loqate') . '/campaignion_loqate.min.js';
+  $form['#after_build'][] = '_campaignion_loqate_add_rules';
+}
+
+function _campaignion_loqate_add_rules(array $element, array &$form_state) {
+  $rules[$element['bank_code']['#name']]['loqateSortCode'] = TRUE;
+  $rules[$element['bank_code']['#name']]['messages']['loqateSortCode'] = t('Please enter a valid sort code.');
+  $rules[$element['account']['#name']]['loqateAccount']['sortCodeElement'] = "#{$element['bank_code']['#id']}";
+  $rules[$element['account']['#name']]['messages']['loqateAccount'] = t('Please enter a valid account number.');
+  $settings['clientsideValidation']['forms'][$form_state['complete form']['#id']]['rules'] = $rules;
+  $element['#attached']['js'][] = [
+    'type' => 'setting',
+    'data' => $settings,
+  ];
+  return $element;
 }
