@@ -1,6 +1,5 @@
 /* global Drupal, jQuery */
 
-import regeneratorRuntime from 'regenerator-runtime'
 import { Client } from './client'
 import * as validate from './validate'
 
