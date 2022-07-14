@@ -197,8 +197,8 @@ function campaignion_webform_widget_preprocess_page(&$vars) {
     if (campaignion_webform_widget_context_is_active($context)) {
       $vars['theme_hook_suggestions'][] = "page__$context";
       drupal_add_js(drupal_get_path('module', 'campaignion_webform_widget') . '/js/widget.js');
-      // Override the X-Frame-Options header for this request.
-      drupal_add_http_header('X-Frame-Options', 'allowall');
+      // Remove the X-Frame-Options header for this request.
+      remove_header('X-Frame-Options');
     }
   }
 }
