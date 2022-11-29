@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <section class="dsa-dataset-list">
     <input type="text" v-model="filter" :placeholder="text('filter placeholder')" class="field-input">
     <ul class="dsa-datasets">

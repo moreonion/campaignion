@@ -1,2 +1,5 @@
-build/*.js
-config/*.js
+node_modules/
+dist/
+api-server.js
+drupal-fixture.js
+vite.config.js

@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <el-dialog v-if="currentDataset"
     :title="dialogTitle"
     :visible="showEditDialog"
@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import EditValuePopup from '@/components/EditValuePopup'
+import EditValuePopup from '@/components/EditValuePopup.vue'
 import {mapState} from 'vuex'
 import {INVALID_CONTACT_STRING} from '@/utils'
 import find from 'lodash/find'

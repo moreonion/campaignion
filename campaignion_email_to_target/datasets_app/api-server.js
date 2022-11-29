@@ -15,7 +15,6 @@ const _ = require('lodash')
 const server = jsonServer.create()
 const router = jsonServer.router(path.join(__dirname, '/api-db.json'))
 router.db._.id = 'key'
-// router.db._.foreignKeySuffix = 'Key'
 const middlewares = jsonServer.defaults()
 
 // Set default middlewares (logger, static, cors and no-cache)
@@ -90,7 +89,7 @@ server.use((req, res, next) => {
 
 // Finetune output
 router.render = (req, res) => {
-  if (req.method === 'GET' && req.url.match("/contacts")) {
+  if (req.method === 'GET' && req.url.match('/contacts')) {
     // Only return the actual contacts
     res.jsonp(res.locals.data[0].contacts)
   } else {

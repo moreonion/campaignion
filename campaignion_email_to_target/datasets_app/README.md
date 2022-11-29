@@ -1,7 +1,6 @@
 # dataset_app
 
 Select and edit datasets via the e2t_api.
-The app can be loaded in two environments: The wizard’s target step and as a standalone dataset manager (the latter is yet to be implemented).
 
 ## Dev mode
 
@@ -13,14 +12,13 @@ E2T_API_TOKEN="<here goes the token>" yarn dev
 
 ## Production mode
 
-In production mode, Webpack is configured to leave certain vendor libraries out of the bundle and take them from the `campaignion_vue` global provided by the `campaignion_vue` module.
 The app uses the API url and token passed via `Drupal.settings.campaignion_email_to_target.endpoints['e2t-api']`.
 
 ## Usage
 
 ``` bash
 # install dependencies
-yarn install
+yarn
 
 # serve with hot reload at localhost:8080
 yarn dev
@@ -28,8 +26,11 @@ yarn dev
 # build for production with minification
 yarn build
 
-# run e2e tests in Chrome
-yarn e2e
+# run unit tests
+yarn test:unit
+
+# run e2e tests in Chrome (after running yarn build)
+yarn test:e2e
 ```
 
 ## Settings

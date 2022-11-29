@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <el-dialog
     :title="text('Choose your dataset')"
     :visible="showSelectDialog"
@@ -21,7 +21,7 @@
 
 <script>
 import {mapState} from 'vuex'
-import DatasetList from '@/components/DatasetList'
+import DatasetList from '@/components/DatasetList.vue'
 
 export default {
   components: {

@@ -1,5 +1,6 @@
 /* eslint-disable require-jsdoc */
 
+import { describe, it } from 'vitest'
 import assert from 'assert'
 
 import {INVALID_CONTACT_STRING, validateContacts} from '@/utils'

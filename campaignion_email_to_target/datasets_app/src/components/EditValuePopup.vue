@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <div v-if="editValue" :class="{
     'dsa-edit-value-popup': true,
     'dsa-has-error': showError && !valid

@@ -14,8 +14,8 @@
 
 <script>
 import {mapState} from 'vuex'
-import SelectDatasetDialog from '@/components/SelectDatasetDialog'
-import EditDatasetDialog from '@/components/EditDatasetDialog'
+import SelectDatasetDialog from '@/components/SelectDatasetDialog.vue'
+import EditDatasetDialog from '@/components/EditDatasetDialog.vue'
 import {clone} from '@/utils'
 
 export default {

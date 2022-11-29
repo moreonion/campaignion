@@ -1,7 +1,5 @@
-var config = require('../../../config')
-
 module.exports = {
-  url: 'http://localhost:' + (process.env.PORT || config.dev.port),
+  url: 'http://localhost:' + process.env.PREVIEW_PORT,
   elements: {
     chosenDataset: 'input.datasets-app-selected-dataset',
     introText: '.dsa-intro-text',

@@ -1,7 +1,5 @@
-// The Vue build version to load with the `import` command (runtime-only or
-// standalone) has been set in webpack.dev.conf and webpack.test.conf with an alias.
 import Vue from 'vue'
-import App from './App'
+import App from './App.vue'
 import store from './store'
 import {ClientTable} from 'vue-tables-2'
 import {VTooltip} from 'v-tooltip'
@@ -18,11 +16,14 @@ import {
   Option,
   Select
 } from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import locale from 'element-ui/lib/locale'
 
 // Set language for element-ui.
-if (Drupal.settings.campaignion_vue && Drupal.settings.campaignion_vue.element_ui_strings) {
-  const locale = require('element-ui/lib/locale')
+try {
   locale.use(Drupal.settings.campaignion_vue.element_ui_strings)
+} catch {
+  console.error('Could not load strings from Drupal.settings.campaignion_vue.element_ui_strings');
 }
 
 // Create a central event bus.
@@ -56,7 +57,7 @@ Vue.config.productionTip = false
 /* eslint-disable no-new */
 new Vue({
   el: '.datasets-app',
-  template: '<App/>',
+  render: (h) => h(App),
   settings: Drupal.settings.campaignion_email_to_target,
   datasetField: document.querySelector('.datasets-app-selected-dataset'),
   store,
