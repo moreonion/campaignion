@@ -1,10 +1,10 @@
 // This module is used to provide the Drupal global in development and test mode.
 // Functions taken from drupal.js.
 
-import exampleData from '../test/unit/fixtures/example-data'
-import initialData from '../test/unit/fixtures/initial-data'
+import exampleData from '/test/unit/fixtures/example-data'
+import initialData from '/test/unit/fixtures/initial-data'
 
-var Drupal = {
+const Drupal = {
   settings: {
     campaignion_email_to_target: (process.env.NODE_ENV === 'development')
       ? exampleData
@@ -19,16 +19,17 @@ var Drupal = {
    * @ingroup sanitization
    */
   checkPlain: function (str) {
-    var character, regex,
-        replace = { '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;' };
-    str = String(str);
+    var character; var regex
+
+    var replace = { '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;' }
+    str = String(str)
     for (character in replace) {
       if (replace.hasOwnProperty(character)) {
-        regex = new RegExp(character, 'g');
-        str = str.replace(regex, replace[character]);
+        regex = new RegExp(character, 'g')
+        str = str.replace(regex, replace[character])
       }
     }
-    return str;
+    return str
   },
 
   /**
@@ -48,26 +49,26 @@ var Drupal = {
    * @see Drupal.t()
    * @ingroup sanitization
    */
-  formatString: function(str, args) {
+  formatString: function (str, args) {
     // Transform arguments before inserting them.
     for (var key in args) {
       switch (key.charAt(0)) {
         // Escaped only.
         case '@':
-          args[key] = Drupal.checkPlain(args[key]);
-        break;
+          args[key] = Drupal.checkPlain(args[key])
+          break
         // Pass-through.
         case '!':
-          break;
+          break
         // Escaped and placeholder.
         case '%':
         default:
-          args[key] = Drupal.theme('placeholder', args[key]);
-          break;
+          args[key] = Drupal.theme('placeholder', args[key])
+          break
       }
-      str = str.replace(key, args[key]);
+      str = str.replace(key, args[key])
     }
-    return str;
+    return str
   },
 
   /**
@@ -90,18 +91,18 @@ var Drupal = {
    *   The translated string.
    */
   t: function (str, args, options) {
-    options = options || {};
-    options.context = options.context || '';
+    options = options || {}
+    options.context = options.context || ''
 
     // Fetch the localized version of the string.
     if (Drupal.locale.strings && Drupal.locale.strings[options.context] && Drupal.locale.strings[options.context][str]) {
-      str = Drupal.locale.strings[options.context][str];
+      str = Drupal.locale.strings[options.context][str]
     }
 
     if (args) {
-      str = Drupal.formatString(str, args);
+      str = Drupal.formatString(str, args)
     }
-    return str;
+    return str
   },
 
   /**
@@ -134,21 +135,19 @@ var Drupal = {
    *   A translated string.
    */
   formatPlural: function (count, singular, plural, args, options) {
-    var args = args || {};
-    args['@count'] = count;
+    var args = args || {}
+    args['@count'] = count
     // Determine the index of the plural form.
-    var index = Drupal.locale.pluralFormula ? Drupal.locale.pluralFormula(args['@count']) : ((args['@count'] == 1) ? 0 : 1);
+    var index = Drupal.locale.pluralFormula ? Drupal.locale.pluralFormula(args['@count']) : ((args['@count'] == 1) ? 0 : 1)
 
     if (index == 0) {
-      return Drupal.t(singular, args, options);
-    }
-    else if (index == 1) {
-      return Drupal.t(plural, args, options);
-    }
-    else {
-      args['@count[' + index + ']'] = args['@count'];
-      delete args['@count'];
-      return Drupal.t(plural.replace('@count', '@count[' + index + ']'), args, options);
+      return Drupal.t(singular, args, options)
+    } else if (index == 1) {
+      return Drupal.t(plural, args, options)
+    } else {
+      args['@count[' + index + ']'] = args['@count']
+      delete args['@count']
+      return Drupal.t(plural.replace('@count', '@count[' + index + ']'), args, options)
     }
   },
 
@@ -173,10 +172,10 @@ var Drupal = {
    *   but also a complex object.
    */
   theme: function (func) {
-    var args = Array.prototype.slice.apply(arguments, [1]);
+    var args = Array.prototype.slice.apply(arguments, [1])
 
-    return (Drupal.theme[func] || Drupal.theme.prototype[func]).apply(this, args);
+    return (Drupal.theme[func] || Drupal.theme.prototype[func]).apply(this, args)
   }
 }
 
-export default Drupal
+globalThis.Drupal = Drupal

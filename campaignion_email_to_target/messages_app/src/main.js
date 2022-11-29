@@ -1,7 +1,7 @@
 // The Vue build version to load with the `import` command (runtime-only or
 // standalone) has been set in webpack.dev.conf and webpack.test.conf with an alias.
 import Vue from 'vue'
-import App from './App'
+import App from './App.vue'
 import axios from 'axios'
 import store from './store'
 
@@ -15,11 +15,14 @@ import {
   Option,
   Select
 } from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import locale from 'element-ui/lib/locale'
 
 // Set language for element-ui.
-if (Drupal.settings.campaignion_vue && Drupal.settings.campaignion_vue.element_ui_strings) {
-  const locale = require('element-ui/lib/locale')
+try {
   locale.use(Drupal.settings.campaignion_vue.element_ui_strings)
+} catch {
+  console.error('Could not load strings from Drupal.settings.campaignion_vue.element_ui_strings');
 }
 
 // Create a central event bus.
@@ -46,7 +49,7 @@ Vue.config.productionTip = false
 /* eslint-disable no-new */
 new Vue({
   el: '.email-to-target-messages-widget',
-  template: '<App/>',
+  render: (h) => h(App),
   store,
   components: { App }
 })

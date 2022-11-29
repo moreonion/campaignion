@@ -4,7 +4,7 @@ Provides a UI to edit a spec’s filters.
 Use this component with the `.sync` modifier on the `filters` prop.
 </docs>
 
-<template lang="html">
+<template>
   <section class="filter-editor">
 
     <header>
@@ -58,10 +58,11 @@ Use this component with the `.sync` modifier on the `filters` prop.
 
 <script>
 import {clone} from '@/utils'
+import TypeAhead from './Typeahead.vue'
 
 export default {
   components: {
-    typeAhead: require('./Typeahead.vue')
+    TypeAhead
   },
 
   data () {

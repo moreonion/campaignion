@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest'
 import mutations from '@/store/mutations'
 import initialState from '@/store/state'
 import testData from '../fixtures/example-data'

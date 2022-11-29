@@ -23,10 +23,10 @@ import {mapState} from 'vuex'
 import {clone, dispatch, isEmptyMessage} from '@/utils'
 import isEqual from 'lodash.isequal'
 import omit from 'lodash.omit'
-import SpecList from './components/SpecList'
-import MessageEditor from './components/MessageEditor'
-import TokensList from './components/TokensList'
-import SpecDialog from './components/SpecDialog'
+import SpecList from './components/SpecList.vue'
+import MessageEditor from './components/MessageEditor.vue'
+import TokensList from './components/TokensList.vue'
+import SpecDialog from './components/SpecDialog.vue'
 
 export default {
 
@@ -215,6 +215,6 @@ export default {
   }
   .e2t-col {
     margin-top: 1rem;
-  } 
+  }
 }
 </style>

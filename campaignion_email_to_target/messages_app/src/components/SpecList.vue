@@ -3,12 +3,13 @@ SpecList component.
 Displays all specs and their error messages in a draggable list.
 </docs>
 
-<template lang="html">
+<template>
   <draggable
     v-model="specs"
-    element="ul"
+    tag="ul"
     class="specs"
-    :options="{ handle: '.spec-handle', forceFallback: true }"
+    handle=".spec-handle"
+    :forceFallback="true"
     @start="dragStart"
     @end="dragEnd"
     >
@@ -41,7 +42,7 @@ Displays all specs and their error messages in a draggable list.
 
 <script>
 import Draggable from 'vuedraggable'
-import SpecDescription from './SpecDescription'
+import SpecDescription from './SpecDescription.vue'
 
 export default {
 
