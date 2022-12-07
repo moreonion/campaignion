@@ -15,7 +15,7 @@
     "lint": "eslint --ext .js,.vue src test/e2e/specs"
   },
   "dependencies": {
-    "campaignion_vue": "1.4.3",
+    "campaignion_vue": "1.4.4",
     "lodash": "4.17.10"
   },
   "devDependencies": {

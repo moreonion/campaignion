@@ -1,6 +1,6 @@
 {
   "name": "campaignion_vue",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "A bundle of libraries shared by the Vue apps in Campaignion.",
   "main": "dist/campaignion_vue.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "lint": "eslint --ext .js,.vue src test/specs"
   },
   "dependencies": {
-    "axios": "0.16.2",
+    "axios": "0.21.1",
     "element-ui": "2.6.1",
     "es6-promise": "4.1.0",
     "vue": "2.6.8",
