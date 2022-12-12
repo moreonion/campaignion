@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 4173",
-    "test": "vitest --environment jsdom",
+    "unit": "vitest run --environment jsdom",
     "lint": "eslint --ext .js,.vue src test/unit/specs"
   },
   "dependencies": {

@@ -8,8 +8,8 @@
     "dev": "concurrently \"vite\" \"node api-server.js\"",
     "build": "vite build",
     "preview": "concurrently \"vite preview --port 4173\" \"node api-server.js\"",
-    "test:unit": "vitest --environment jsdom",
-    "test:e2e": "start-server-and-test preview http://localhost:4173/ 'PREVIEW_PORT=4173 nightwatch test/e2e/'",
+    "unit": "vitest run --environment jsdom",
+    "e2e": "start-server-and-test preview http://localhost:4173/ 'PREVIEW_PORT=4173 nightwatch test/e2e/'",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs"
   },
   "dependencies": {
