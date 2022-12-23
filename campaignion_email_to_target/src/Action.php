@@ -6,6 +6,7 @@ use Drupal\campaignion_action\ActionBase;
 use Drupal\campaignion_action\ActionType;
 use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_email_to_target\Channel\Email;
+use Drupal\campaignion_email_to_target\Channel\EmailNoSend;
 use Drupal\little_helpers\Services\Container;
 use Drupal\little_helpers\Services\Spec;
 use Drupal\little_helpers\Webform\Submission;
@@ -32,8 +33,15 @@ class Action extends ActionBase {
    *   Api client for the e2t_api serivce.
    */
   public function __construct(array $parameters, $node, Client $api = NULL) {
+    $channel = Email::class;
+    $parameters['testModeActive'] = Email::testModeActive();
+    if ($node->type == 'match_to_target') {
+      $channel = EmailNoSend::class;
+      $parameters['testModeActive'] = EmailNoSend::testModeActive();
+    }
+
     parent::__construct($parameters + [
-      'channel' => Email::class,
+      'channel' => $channel,
     ], $node);
     $this->options = $this->getOptions();
     $this->api = $api ?? Container::get()->loadService('campaignion_email_to_target.api.Client');
@@ -86,7 +94,12 @@ class Action extends ActionBase {
    * Create a link to view the action in test-mode.
    */
   public function testLink($title, $query = [], $options = []) {
-    return $this->_testLink($title, $query, $options);
+    if ($this->parameters['testModeActive'] == FALSE) {
+      return NULL;
+    }
+    else {
+      return $this->_testLink($title, $query, $options);
+    }
   }
 
   /**

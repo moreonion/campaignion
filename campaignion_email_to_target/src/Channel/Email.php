@@ -132,4 +132,10 @@ class Email {
     return $new_pairs;
   }
 
+  /**
+   * Set testmode to determine if a testlink should be generated and displayed.
+   */
+  public static function testModeActive() {
+    return TRUE;
+  }
 }
