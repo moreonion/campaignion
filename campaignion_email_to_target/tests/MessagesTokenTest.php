@@ -14,7 +14,7 @@ class MessagesTokenTest extends DrupalUnitTestCase {
   /**
    * Create a node-stub suitable for testing.
    */
-  protected function nodeStub(array $components) {
+  protected function nodeStub(array $components, string $type) {
     foreach ($components as $cid => &$component) {
       webform_component_defaults($component);
       $component += [
@@ -24,7 +24,7 @@ class MessagesTokenTest extends DrupalUnitTestCase {
     }
     $node_d = [
       'nid' => NULL,
-      'type' => 'email_to_target',
+      'type' => $type,
       'action' => FALSE,
     ];
     $node_d['webform']['components'] = $components;
@@ -63,7 +63,7 @@ class MessagesTokenTest extends DrupalUnitTestCase {
       'display' => 'Display name',
     ]);
     $data[1][] = serialize(['message' => $message->toArray()]);
-    $token_data['node'] = $this->nodeStub($components);
+    $token_data['node'] = $this->nodeStub($components, 'email_to_target');
     $token_data['webform-submission'] = $this->submissionStub($data);
 
     $actual = token_replace('[submission:email-to-target-messages]', $token_data);
