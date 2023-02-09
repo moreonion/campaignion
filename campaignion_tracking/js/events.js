@@ -1,5 +1,4 @@
 (function($) {
-$(function() {
 
 Drupal.campaignion_tracking = {eventsFired: {}};
 $.each(Drupal.settings.campaignion_tracking.events, function (i, event_name) {
@@ -14,5 +13,4 @@ $.each(Drupal.settings.campaignion_tracking.events, function (i, event_name) {
   });
 });
 
-});
 })(jQuery)

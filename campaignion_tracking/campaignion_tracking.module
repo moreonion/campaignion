@@ -17,8 +17,8 @@ function campaignion_tracking_init() {
   drupal_add_js($module_path . '/js/events.js', [
     'every_page' => TRUE,
     'group' => JS_LIBRARY,
-    // Should be before drupal.js with weight -1 to run before behaviors.
-    'weight' => -5,
+    // Load the script after the settings are defined with JS_LIBRARY, weight=0.
+    'weight' => 1,
   ]);
   $events = module_invoke_all('campaignion_tracking_events');
   drupal_alter('campaignion_tracking_events', $events);
