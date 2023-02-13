@@ -92,7 +92,6 @@ function _webform_table_e2t_selector($component, $value) {
     ArrayConfig::mergeDefaults($data, [
       'message' => [],
       'target' => ['salutation' => NULL, 'political_affiliation' => NULL],
-      'constituency' => ['name' => NULL, 'country' => ['name' => NULL]],
     ]);
     $data['message'] = new Message($data['message']);
     return ['data' => [
@@ -169,7 +168,6 @@ function _webform_csv_data_e2t_selector($component, $export_options, $value) {
       ArrayConfig::mergeDefaults($data, [
         'message' => [],
         'target' => ['name' => NULL, 'political_affiliation' => NULL],
-        'constituency' => ['name' => NULL, 'country' => ['name' => NULL]],
       ]);
       $message = new Message($data['message']);
       $t = 'campaignion_email_to_target_mail';
@@ -178,10 +176,10 @@ function _webform_csv_data_e2t_selector($component, $export_options, $value) {
         $message->to(),
         $message->subject,
         $m,
-        $data['constituency']['name'],
+        $data['target']['area']['name'] ?? '',
         $data['target']['salutation'],
         $data['target']['political_affiliation'],
-        $data['constituency']['country']['name'],
+        $data['target']['area']['country__name'] ?? $data['target']['area']['country']['name'] ?? '',
       ];
     }
     else {
