@@ -53,7 +53,7 @@ export default {
       'urlLabel': '',
       'message': {
         'subject': '',
-        'header': 'Dear [email-to-target:salutation],\n',
+        'header': 'Dear [email-to-target:salutation],\n\n',
         'footer': '\n\nYours sincerely,\n[submission:values:first_name] [submission:values:last_name]\n[submission:values:street_address]\n[submission:values:postcode]',
         'body': ''
       }
