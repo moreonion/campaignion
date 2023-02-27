@@ -33,7 +33,7 @@ export const productIsEqual = (product1, product2) => {
     // If at least one product has the property and their values differ
     // they are NOT equal. They are otherwise.
     if ((Object.prototype.hasOwnProperty.call(product1, key) || Object.prototype.hasOwnProperty.call(product2, key)) &&
-        product1[key] !== product2[key]
+      product1[key] !== product2[key]
     ) {
       return false
     }
@@ -147,8 +147,7 @@ export class GTMTracker {
   dispatch (eventName = '', eventData = {}, context = {}) {
     if (typeof this['handle_' + eventName] === 'function') {
       this['handle_' + eventName](eventName, eventData, context)
-    }
-    else {
+    } else {
       this.printDebug('no handler for event name:', eventName)
     }
   }
@@ -207,7 +206,7 @@ export class GTMTracker {
    * @param {object} eventData data of the event
    * @param {object} context context of the event
    */
-  handle_submission (eventName, eventData, context) { // eslint-disable-line camelcase
+  handle_submission (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
 
@@ -250,7 +249,7 @@ export class GTMTracker {
    * @param {object} eventData data of the event
    * @param {object} context context of the event
    */
-  handle_setDonationProduct (eventName, eventData, context) { // eslint-disable-line camelcase
+  handle_setDonationProduct (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
     if (eventData.currencyCode) {
@@ -318,7 +317,7 @@ export class GTMTracker {
    * @param {object} eventData data of the event
    * @param {object} context context of the event
    */
-  handle_checkoutBegin (eventName, eventData, context) { // eslint-disable-line camelcase
+  handle_checkoutBegin (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
     const product = eventData.product || this._context.donation.product || {}
@@ -349,7 +348,7 @@ export class GTMTracker {
    * @param {object} eventData data of the event
    * @param {object} context context of the event
    */
-  handle_checkoutEnd (eventName, eventData, context) { // eslint-disable-line camelcase
+  handle_checkoutEnd (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
     const product = eventData.product || this._context.donation.product || {}
@@ -383,7 +382,7 @@ export class GTMTracker {
    * @param {object} eventData data of the event
    * @param {object} context context of the event
    */
-  handle_donationSuccess (eventName, eventData, context) { // eslint-disable-line camelcase
+  handle_donationSuccess (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
     const product = eventData.product || this._context.donation.product || {}

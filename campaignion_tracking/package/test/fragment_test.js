@@ -1,4 +1,4 @@
-/* global suite test setup teardown suiteSetup suiteTeardown */
+/* global suite test */
 
 import { strict as assert } from 'assert'
 import sinon from 'sinon'
@@ -9,7 +9,7 @@ import {
   parseLocationHashForPrefixes,
   parsePartsWithPrefix,
   parsePart
-} from '../src/fragment'
+} from '../src/fragment.js'
 
 suite('parse location hash', () => {
   test('empty hash returns empty list', () => {

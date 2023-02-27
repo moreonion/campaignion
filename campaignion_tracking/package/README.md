@@ -15,7 +15,7 @@ There is also a fragment listener provided which checks URL fragments for
 some defined tracking signals. If some are found they are consumed and
 corresponding tracking events are dispatched onto the PubSub bus.
 
-The Drupal side can provide "tracking contexts" but enriching a data
+The Drupal side can provide "tracking contexts" by enriching a data
 structure in the `Drupal.settings` object. The common tracking functionality
 will read this and provide it as context to dispatched events.
 Examples are node id, node title, donation information.
@@ -26,9 +26,9 @@ Therefor you will need to implement a
 `window.campaignion_tracking_change_msg()` function.
 Currently only implemented for GTM.
 
-The different between tracking data and tracking context:
+The difference between tracking data and tracking context:
 "data" will be sent upstream as-is, a tracking "context" can be used in the
-specfici implementations to generate or enhance the data sent.
+specific implementations to generate or enhance the data sent.
 
 ## Channels
 

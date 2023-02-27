@@ -1,5 +1,5 @@
-import * as tm from './tracker-manager'
-import * as listener from './listener'
+import * as listener from './listener.js'
+import * as tm from './tracker-manager.js'
 
 /**
  * Mapping of codes to eventNames.
@@ -18,8 +18,7 @@ export const trackingCodes = {
  * Parse the value as int, so we can disable debugging by setting to "0".
  * `sessionStorage` only stores strings.
  */
-// eslint-disable-next-line no-unneeded-ternary
-var debug = !!parseInt(sessionStorage.getItem('campaignion_debug'))
+const debug = !!parseInt(sessionStorage.getItem('campaignion_debug'))
 
 const printDebug = (...args) => {
   if (debug) {
@@ -113,5 +112,5 @@ export const codeSubscription = tracker.subscribe('code', e => {
 })
 
 // re-exports
+export * as fragment from './fragment.js'
 export { tm, listener, debug }
-export { fragment } from './fragment'

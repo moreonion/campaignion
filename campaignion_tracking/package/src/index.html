@@ -1,4 +1,5 @@
 <html>
+
 <body>
   <h1>campaignion_tracking</h1>
   <p>Open the web console to use <code>campaignion_tracking</code>...</p>
@@ -7,7 +8,8 @@
 window.campaignion_tracking.tracker.publish('hello', {message: "this is an arbitrary message object"})
   </pre>
   <p>You should see your <code>msg</code> object feed back to you via the tracker PubSub mechanism.</p>
-  <p>(This test page works best in browsers with support for <code>&lt;script type="module"&gt;&lt;/script&gt;</code>, ie. modern browsers ie. not IE 11.)</p>
+  <p>(This test page works best in browsers with support for <code>&lt;script type="module"&gt;&lt;/script&gt;</code>,
+    ie. modern browsers ie. not IE 11.)</p>
   <script type="module" src="drupal-common.modern.js"></script>
   <script type="module">
     import { setupDebugProxy } from './debug.js'
@@ -21,4 +23,5 @@ window.campaignion_tracking.tracker.publish('hello', {message: "this is an arbit
     })
   </script>
 </body>
+
 </html>
