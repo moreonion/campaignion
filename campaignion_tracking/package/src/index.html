@@ -8,7 +8,7 @@ window.campaignion_tracking.tracker.publish('hello', {message: "this is an arbit
   </pre>
   <p>You should see your <code>msg</code> object feed back to you via the tracker PubSub mechanism.</p>
   <p>(This test page works best in browsers with support for <code>&lt;script type="module"&gt;&lt;/script&gt;</code>, ie. modern browsers ie. not IE 11.)</p>
-  <script src="./drupal-common.js"></script>
+  <script type="module" src="drupal-common.modern.js"></script>
   <script type="module">
     import { setupDebugProxy } from './debug.js'
 

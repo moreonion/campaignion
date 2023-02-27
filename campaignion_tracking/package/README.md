@@ -59,20 +59,20 @@ Install `nodejs` and `yarn`, then install the needed dependencies:
 
 Use the different `yarn` scripts for the development workflow:
 
-    yarn run lint
-    yarn run test
-    yarn run dev
+    yarn lint
+    yarn test
+    yarn dev
 
 For building a releaseable artifact (library file) use:
 
-    yarn run dist
+    yarn build
 
 The development files are configured to be created under `build/`, the
 releaseable files are created under `dist/`.
 
 For Drupal copy the releaseable files to `../js`:
 
-    yarn run drupal
+    yarn drupal
 
 You can enable debug verbosity of the JS by setting
 `sessionStorage.setItem('campaignion_debug', 1)` (then reloading).
