@@ -5,6 +5,7 @@
   "type": "module",
   "source": [
     "src/drupal-common.js",
+    "src/drupal-ga4.js",
     "src/drupal-gtm.js"
   ],
   "scripts": {
@@ -13,7 +14,8 @@
     "dev": "mkdir -p build && cp src/debug.js build/ && cp src/index.html build/ && yarn watch & serve build",
     "drupal:common": "cp dist/drupal-common.umd.js ../js/campaignion_tracking_common.min.js",
     "drupal:gtm": "cp dist/drupal-gtm.umd.js ../campaignion_tracking_gtm/js/campaignion_tracking_gtm.min.js",
-    "drupal": "yarn build && yarn drupal:common && yarn drupal:gtm",
+    "drupal:ga4": "cp dist/drupal-ga4.umd.js ../campaignion_tracking_ga4/js/campaignion_tracking_ga4.min.js",
+    "drupal": "yarn build && yarn drupal:common && yarn drupal:ga4 && yarn drupal:gtm",
     "test": "mocha --ui tdd --reporter dot test",
     "lint": "eslint src test",
     "fix": "eslint --fix src test",

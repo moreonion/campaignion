@@ -1,0 +1,6 @@
+name = Campaignion Tracking (GA4)
+description = Tracking integration with Google Analytics 4 (GTAG).
+core = 7.x
+package = Campaignion
+
+dependencies[] = campaignion_tracking
