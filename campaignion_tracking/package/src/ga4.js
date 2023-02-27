@@ -225,10 +225,11 @@ export class GA4Tracker {
 
     if (eventData.optins.length > 0) {
       let optinData = {
-        event: 'optin'
+        event: 'optin',
+        params: {}
       }
       for (const channel of eventData.optins) {
-        optinData[channel.channel] = channel.value
+        optinData.params[channel.channel] = channel.value
       }
       // Allow others to modify the data being sent to Google Analytics.
       optinData = this.callChangeHook(eventName, optinData, this._context)
