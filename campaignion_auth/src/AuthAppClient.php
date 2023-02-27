@@ -72,7 +72,7 @@ class AuthAppClient extends Client {
     if (($cache = cache_get(static::TOKEN_CID)) && $cache->expire > REQUEST_TIME) {
       return $cache->data;
     }
-    $token = $this->post('token/' . urlencode($this->organization), [], $this->key)['token'];
+    $token = $this->post('token', [], $this->key)['token'];
     cache_set(static::TOKEN_CID, $token, 'cache', REQUEST_TIME + $this->tokenLifetime);
     return $token;
   }
@@ -83,7 +83,8 @@ class AuthAppClient extends Client {
   public function getEditorToken() : string {
     $token = $this->getToken();
     $options['headers']['Authorization'] = "Bearer $token";
-    $token = $this->post('session', [], ['roles' => ['editor']], $options)['token'];
+    $session['roles'][$this->organization] = ['editor'];
+    $token = $this->post('session', [], $session, $options)['token'];
     return $token;
   }
 
