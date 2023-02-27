@@ -50,6 +50,23 @@ Channels implemented so far:
 - `w`: webform data
 - `d`: donation data
 
+## Events
+
+Listing internal event names. Depending on the implemented service, the events
+might show up under a different name there (i.e. 'setDonationProduct' → 'addToCart').
+
+### Webform
+
+1. 'submission': fired on thank you page
+2. 'opt-in': fired on thank you page if the submission contains opt-ins
+
+### Donation
+
+1. 'setDonationProduct': after choosing 'amount', 'interval' and 'currency'
+2. 'checkoutBegin': fired on the second (or only) form step
+3. 'checkoutEnd': fired on the last form step
+4. 'donationSuccess': fired on thank you page
+
 ## Development
 
 Install `nodejs` and `yarn`, then install the needed dependencies:
