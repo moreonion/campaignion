@@ -243,7 +243,7 @@ export class GA4Tracker {
    * Remove a (donation) product when one was added before. Thus we have a
    * "cart" with only 1 slot for 1 donation.
    *
-   * Event data: { product, currencyCode }
+   * Event data: { currency, value, items}
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -257,26 +257,36 @@ export class GA4Tracker {
     }
     const currencyCode = this._context.donation.currencyCode || null
     const currentProduct = this._context.donation.product || {}
+    const currentRevenue = this._context.donation.revenue || {}
     const newProduct = eventData.product || {}
+    const newRevenue = eventData.revenue || parseFloat(newProduct.price || 0) * parseInt(newProduct.quantity || 1)
 
     const addData = {
-      event: 'addToCart',
+      event: 'add_to_cart',
       ecommerce: {
-        currencyCode: currencyCode,
-        add: {
-          products: [newProduct]
-        }
+        currency: currencyCode,
+        value: newRevenue,
+        items: [{
+          item_name: newProduct?.name,
+          item_id: newProduct?.id,
+          price: newProduct?.price,
+          item_variant: newProduct?.variant,
+          quantity: newProduct?.quantity,
+        }],
       }
     }
-    if (currencyCode) {
-      addData.ecommerce.currencyCode = currencyCode
-    }
     const removeData = {
-      event: 'removeFromCart',
+      event: 'remove_from_cart',
       ecommerce: {
-        remove: {
-          products: [currentProduct]
-        }
+        currency: currencyCode,
+        value: currentRevenue,
+        items: [{
+          item_name: currentProduct?.name,
+          item_id: currentProduct?.id,
+          price: currentProduct?.price,
+          item_variant: currentProduct?.variant,
+          quantity: currentProduct?.quantity,
+        }],
       }
     }
     // Only push a remove if we can assume we have pushed a valid product before.
@@ -289,8 +299,8 @@ export class GA4Tracker {
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
 
-    const changedNewProduct = data.addData.ecommerce.add.products[0]
-    const changedCurrentProduct = data.removeData.ecommerce.remove.products[0]
+    const changedNewProduct = data.addData.ecommerce.items[0]
+    const changedCurrentProduct = data.removeData.ecommerce.items[0]
 
     // Only change something or send an event if the donation products differ.
     // Compare *after* any changes.
@@ -300,6 +310,7 @@ export class GA4Tracker {
     }
 
     this._context.donation.product = changedNewProduct
+    this._context.donation.revenue = data.addData.ecommerce.value
     this.saveToStorage('context', this._context)
 
     if (data.pushRemove) {
@@ -311,7 +322,7 @@ export class GA4Tracker {
   /**
    * Handle "checkoutBegin".
    *
-   * Event data: { product, currencyCode }
+   * Event data: { currency, value, items }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -322,17 +333,23 @@ export class GA4Tracker {
     this.updateContext(context)
     const product = eventData.product || this._context.donation.product || {}
     const currencyCode = eventData.currencyCode || this._context.donation.currencyCode || null
-    let data = {
-      event: 'checkoutBegin',
-      ecommerce: {
-        checkout: {
-          actionField: { step: 1 }, // begin == 1
-          products: [product]
-        }
-      }
+    let revenue = eventData.revenue || this._context.donation.revenue || null
+    if (revenue === null) {
+      revenue = parseFloat(product.price || 0) * parseInt(product.quantity || 1)
     }
-    if (currencyCode) {
-      data.ecommerce.currencyCode = currencyCode
+    let data = {
+      event: 'begin_checkout',
+      ecommerce: {
+        currency: currencyCode,
+        value: revenue,
+        items: [{
+          item_name: product?.name,
+          item_id: product?.id,
+          price: product?.price,
+          item_variant: product?.variant,
+          quantity: product?.quantity,
+        }],
+      }
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
@@ -342,7 +359,7 @@ export class GA4Tracker {
   /**
    * Handle "checkoutEnd".
    *
-   * Event data: { product, currencyCode }
+   * Event data: { currency, value, items }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -353,17 +370,23 @@ export class GA4Tracker {
     this.updateContext(context)
     const product = eventData.product || this._context.donation.product || {}
     const currencyCode = eventData.currencyCode || this._context.donation.currencyCode || null
-    let data = {
-      event: 'checkoutEnd',
-      ecommerce: {
-        checkout: {
-          actionField: { step: 2 }, // end == 2
-          products: [product]
-        }
-      }
+    let revenue = eventData.revenue || this._context.donation.revenue || null
+    if (revenue === null) {
+      revenue = parseFloat(product.price || 0) * parseInt(product.quantity || 1)
     }
-    if (currencyCode) {
-      data.ecommerce.currencyCode = currencyCode
+    let data = {
+      event: 'add_shipping_info',
+      ecommerce: {
+        currency: currencyCode,
+        value: revenue,
+        items: [{
+          item_name: product?.name,
+          item_id: product?.id,
+          price: product?.price,
+          item_variant: product?.variant,
+          quantity: product?.quantity,
+        }],
+      }
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
@@ -376,7 +399,7 @@ export class GA4Tracker {
    * The event data needs to include an transaction id.
    * Falls back to use a random number.
    *
-   * Event data: { tid, revenue, product, currencyCode }
+   * Event data: { tid, currency, value, items }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -395,24 +418,24 @@ export class GA4Tracker {
       this.printDebug('(handle)', 'already sent TID', eventName, eventData, context)
       return
     }
-    let revenue = eventData.revenue || null
+    let revenue = eventData.revenue || this._context.donation.revenue || null
     if (revenue === null) {
       revenue = parseFloat(product.price || 0) * parseInt(product.quantity || 1)
     }
     let data = {
       event: 'purchase',
       ecommerce: {
-        purchase: {
-          actionField: {
-            id: transactionID, // required
-            revenue: String(revenue)
-          },
-          products: [product]
-        }
+        transaction_id: transactionID,
+        currency: currencyCode,
+        value: revenue,
+        items: [{
+          item_name: product?.name,
+          item_id: product?.id,
+          price: product?.price,
+          item_variant: product?.variant,
+          quantity: product?.quantity,
+        }],
       }
-    }
-    if (currencyCode) {
-      data.ecommerce.currencyCode = currencyCode
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
