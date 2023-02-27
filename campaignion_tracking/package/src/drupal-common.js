@@ -111,6 +111,9 @@ export const codeSubscription = tracker.subscribe('code', e => {
   }
 })
 
+// set global variable
+window.campaignion_tracking = { tracker: tracker }
+
 // re-exports
 export * as fragment from './fragment.js'
 export { tm, listener, debug }

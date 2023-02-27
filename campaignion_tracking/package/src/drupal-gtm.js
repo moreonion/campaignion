@@ -18,6 +18,7 @@ if (typeof tracker === 'undefined') {
   console.log('No Tracker found')
 } else {
   gtmTracker = new gtm.GTMTracker(tracker, window.dataLayer, debug)
+  window.campaignion_tracking_gtm = { tracker: gtmTracker }
 }
 
 // re-exports

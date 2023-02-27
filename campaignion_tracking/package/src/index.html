@@ -17,7 +17,7 @@ window.campaignion_tracking.tracker.publish('hello', {message: "this is an arbit
     // setup a verbose dataLayer for GTM
     setupDebugProxy('dataLayer')
 
-    // the global window.campaignion_tracking is set by `parcel --global`
+    // log test messages to the console
     window.campaignion_tracking.tracker.subscribe('hello', (msg = {}) => {
       console.log('hello', msg)
     })
