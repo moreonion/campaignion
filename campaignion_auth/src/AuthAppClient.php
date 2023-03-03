@@ -78,12 +78,25 @@ class AuthAppClient extends Client {
   }
 
   /**
-   * Get editor token.
+   * Get token for acting as an editor.
    */
   public function getEditorToken() : string {
+    return $this->getUserToken(['editor']);
+  }
+
+  /**
+   * Get a token for a set of roles.
+   *
+   * @param string[] $roles
+   *   Access to these roles should be granted with the resulting JWT.
+   *
+   * @return string
+   *   The JWT from the auth app suitable for using in the Authorization header.
+   */
+  public function getUserToken(array $roles = []) : string {
     $token = $this->getToken();
     $options['headers']['Authorization'] = "Bearer $token";
-    $session['roles'][$this->organization] = ['editor'];
+    $session['roles'][$this->organization] = $roles;
     $token = $this->post('session', [], $session, $options)['token'];
     return $token;
   }
