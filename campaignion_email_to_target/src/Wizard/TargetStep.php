@@ -110,6 +110,7 @@ class TargetStep extends WizardStep {
       'url' => $this->api->getEndpoint(),
       'token' => $this->api->getAccessToken(),
     ];
+    $settings['datasetQuery'] = variable_get_value('campaignion_email_to_target_dataset_query');
 
     $settings = ['campaignion_email_to_target' => $settings];
     $dir = drupal_get_path('module', 'campaignion_email_to_target');
