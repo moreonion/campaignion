@@ -212,7 +212,7 @@ export class GA4Tracker {
 
     let submissionData = {
       event: 'submission',
-      webform: {
+      params: {
         nid: eventData.nid || null,
         sid: eventData.sid || null,
         title: eventData.title || null,
@@ -220,7 +220,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     submissionData = this.callChangeHook(eventName, submissionData, this._context)
-    this.dataLayer.push(submissionData)
+    this.dataLayer.push(['event', submissionData.event, submissionData.params])
     this.printDebug('(event)', submissionData)
 
     if (eventData.optins.length > 0) {
@@ -233,7 +233,7 @@ export class GA4Tracker {
       }
       // Allow others to modify the data being sent to Google Analytics.
       optinData = this.callChangeHook(eventName, optinData, this._context)
-      this.dataLayer.push(optinData)
+      this.dataLayer.push(['event', optinData.event, optinData.params])
       this.printDebug('(event)', optinData)
     }
   }
@@ -264,7 +264,7 @@ export class GA4Tracker {
 
     const addData = {
       event: 'add_to_cart',
-      ecommerce: {
+      params: {
         currency: currencyCode,
         value: newRevenue,
         items: [{
@@ -278,7 +278,7 @@ export class GA4Tracker {
     }
     const removeData = {
       event: 'remove_from_cart',
-      ecommerce: {
+      params: {
         currency: currencyCode,
         value: currentRevenue,
         items: [{
@@ -300,8 +300,8 @@ export class GA4Tracker {
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
 
-    const changedNewProduct = data.addData.ecommerce.items[0]
-    const changedCurrentProduct = data.removeData.ecommerce.items[0]
+    const changedNewProduct = data.addData.params.items[0]
+    const changedCurrentProduct = data.removeData.params.items[0]
 
     // Only change something or send an event if the donation products differ.
     // Compare *after* any changes.
@@ -311,13 +311,13 @@ export class GA4Tracker {
     }
 
     this._context.donation.product = changedNewProduct
-    this._context.donation.revenue = data.addData.ecommerce.value
+    this._context.donation.revenue = data.addData.params.value
     this.saveToStorage('context', this._context)
 
     if (data.pushRemove) {
-      this.dataLayer.push(data.removeData)
+      this.dataLayer.push(['event', data.removeData.event, data.removeData.params])
     }
-    this.dataLayer.push(data.addData)
+    this.dataLayer.push(['event', data.addData.event, data.addData.params])
   }
 
   /**
@@ -340,7 +340,7 @@ export class GA4Tracker {
     }
     let data = {
       event: 'begin_checkout',
-      ecommerce: {
+      params: {
         currency: currencyCode,
         value: revenue,
         items: [{
@@ -354,7 +354,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(data)
+    this.dataLayer.push(['event', data.event, data.params])
   }
 
   /**
@@ -377,7 +377,7 @@ export class GA4Tracker {
     }
     let data = {
       event: 'add_shipping_info',
-      ecommerce: {
+      params: {
         currency: currencyCode,
         value: revenue,
         items: [{
@@ -391,7 +391,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(data)
+    this.dataLayer.push(['event', data.event, data.params])
   }
 
   /**
@@ -425,7 +425,7 @@ export class GA4Tracker {
     }
     let data = {
       event: 'purchase',
-      ecommerce: {
+      params: {
         transaction_id: transactionID,
         currency: currencyCode,
         value: revenue,
@@ -440,7 +440,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(data)
+    this.dataLayer.push(['event', data.event, data.params])
     // Remember sent transactions ids.
     sentTransactionIDs.push(transactionID)
     this.saveToStorage('sentTransactionIDs', sentTransactionIDs)
