@@ -239,6 +239,61 @@ export class GA4Tracker {
   }
 
   /**
+   * Handle "draftBegin".
+   *
+   * Event data: { nid, title, type, completedStep }
+   *
+   * @param {String} eventName the event name
+   * @param {object} eventData data of the event
+   * @param {object} context context of the event
+   */
+  handle_draftBegin (eventName, eventData, context) {
+    this.printDebug('(handle)', eventName, eventData, context)
+    this.updateContext(context)
+
+    let data = {
+      event: 'begin_form',
+      params: {
+        nid: context.node.nid || null,
+        title: context.node.title || null,
+        type: context.node.type || null,
+        completedStep: context.webform.last_completed_step || null,
+      }
+    }
+    // Allow others to modify the data being sent to Google Analytics.
+    data = this.callChangeHook(eventName, data, this._context)
+    this.dataLayer.push(['event', data.event, data.params])
+    this.printDebug('(event)', data)
+  }
+
+  /**
+   * Handle "draftContinue".
+   *
+   * Event data: { nid, title, completedStep }
+   *
+   * @param {String} eventName the event name
+   * @param {object} eventData data of the event
+   * @param {object} context context of the event
+   */
+  handle_draftContinue (eventName, eventData, context) {
+    this.printDebug('(handle)', eventName, eventData, context)
+    this.updateContext(context)
+
+    let data = {
+      event: 'continue_form',
+      params: {
+        nid: context.node.nid || null,
+        title: context.node.title || null,
+        completedStep: context.webform.last_completed_step || null,
+      }
+    }
+    // Allow others to modify the data being sent to Google Analytics.
+    data = this.callChangeHook(eventName, data, this._context)
+    this.dataLayer.push(['event', data.event, data.params])
+    this.printDebug('(event)', data)
+  }
+
+  /**
    * Handle "setDonationProduct".
    *
    * Remove a (donation) product when one was added before. Thus we have a

@@ -60,6 +60,11 @@ might show up under a different name there (i.e. 'setDonationProduct' → 'addTo
 1. 'submission': fired on thank you page
 2. 'opt-in': fired on thank you page if the submission contains opt-ins
 
+On multi-step forms, there is also
+
+1. 'draftBegin': fired after completing the first form step
+2. 'draftContinue': fired on all consecutive form steps
+
 ### Donation
 
 1. 'setDonationProduct': after choosing 'amount', 'interval' and 'currency'
