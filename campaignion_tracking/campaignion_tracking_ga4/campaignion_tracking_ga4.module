@@ -18,3 +18,22 @@ function campaignion_tracking_ga4_page_build(&$page) {
     'preprocess' => FALSE,
   ];
 }
+
+/**
+ * Implements hook_campaignion_tracking_snippets().
+ */
+function campaignion_tracking_ga4_campaignion_tracking_snippets() {
+  if ($tag_id = variable_get('campaignion_tracking_ga4_id')) {
+    $exports['ga4'] = <<<SCRIPT
+      var script = document.createElement("script");
+      script.async = true;
+      script.src = "https://www.googletagmanager.com/gtag/js?id=$tag_id";
+      document.head.appendChild(script);
+      window.dataLayer = window.dataLayer || [];
+      function gtag () { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', '$tag_id');
+      SCRIPT;
+    return $exports;
+  }
+}
