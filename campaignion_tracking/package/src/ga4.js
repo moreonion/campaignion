@@ -6,17 +6,6 @@
 export const name = 'ga4'
 
 /**
- * Mapping of codes to eventNames.
- *
- * This also is a whitelist of which events should *also* be recognized as
- * codes.
- */
-export const codes = {
-  ds: 'donationSuccess',
-  s: 'submission',
-}
-
-/**
  * Compare two donation product objects.
  *
  * Keys considered: 'name', 'price', 'id', 'quantity'
@@ -76,6 +65,7 @@ export class GA4Tracker {
 
     if (typeof this.dataLayer === 'undefined') {
       this.printDebug('No datalayer found. Doing nothing.')
+      return
     }
 
     /**

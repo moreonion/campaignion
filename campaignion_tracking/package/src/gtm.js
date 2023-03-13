@@ -6,16 +6,6 @@
 export const name = 'gtm'
 
 /**
- * Mapping of codes to eventNames.
- *
- * This list of events should *also* be recognized as codes.
- */
-export const codes = {
-  ds: 'donationSuccess',
-  s: 'submission',
-}
-
-/**
  * Compare two donation product objects.
  *
  * Keys considered: 'name', 'price', 'id', 'quantity'
@@ -75,6 +65,7 @@ export class GTMTracker {
 
     if (typeof this.dataLayer === 'undefined') {
       this.printDebug('No datalayer found. Doing nothing.')
+      return
     }
 
     /**
