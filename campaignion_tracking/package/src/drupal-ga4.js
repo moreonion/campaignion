@@ -16,7 +16,8 @@ const tracker = window.campaignion_tracking.tracker
 let ga4Tracker = null
 if (typeof tracker === 'undefined') {
   console.log('No Tracker found')
-} else {
+}
+else {
   ga4Tracker = new ga4.GA4Tracker(tracker, window.dataLayer, debug)
   window.campaignion_tracking_ga4 = { tracker: ga4Tracker }
 }

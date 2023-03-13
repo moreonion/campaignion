@@ -48,7 +48,8 @@ export function consumeLocationHashForPrefixes (prefixes = [], locationHash = ''
   const result = allItems.reduce((acc, item) => {
     if (prefixes.includes(item.prefix)) {
       acc.items.push(item)
-    } else {
+    }
+    else {
       acc.rest.push(item.origPart)
     }
     return acc

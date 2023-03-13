@@ -16,7 +16,8 @@ const tracker = window.campaignion_tracking.tracker
 let gtmTracker = null
 if (typeof tracker === 'undefined') {
   console.log('No Tracker found')
-} else {
+}
+else {
   gtmTracker = new gtm.GTMTracker(tracker, window.dataLayer, debug)
   window.campaignion_tracking_gtm = { tracker: gtmTracker }
 }

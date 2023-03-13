@@ -18,6 +18,8 @@ module.exports = {
     // allow trailing comma in multline lists and objects
     'comma-dangle': ['error', 'only-multiline'],
     // don’t enforce object shorthand
-    'object-shorthand': ['error', 'consistent']
+    'object-shorthand': ['error', 'consistent'],
+    // put "else" on new line
+    'brace-style': ["error", "stroustrup"]
   }
 }

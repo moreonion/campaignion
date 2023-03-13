@@ -147,7 +147,8 @@ export class GTMTracker {
   dispatch (eventName = '', eventData = {}, context = {}) {
     if (typeof this['handle_' + eventName] === 'function') {
       this['handle_' + eventName](eventName, eventData, context)
-    } else {
+    }
+    else {
       this.printDebug('no handler for event name:', eventName)
     }
   }

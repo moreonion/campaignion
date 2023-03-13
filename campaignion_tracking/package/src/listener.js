@@ -46,7 +46,8 @@ export class FragmentListener {
       if (items.locationHash !== hash) {
         if (items.locationHash.length) {
           window.location.hash = '#' + items.locationHash
-        } else {
+        }
+        else {
           // use replaceState so we get rid of the superfluouse '#' when setting
           // window.location.hash to ''
           window.history.replaceState(
