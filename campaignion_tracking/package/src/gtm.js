@@ -8,8 +8,7 @@ export const name = 'gtm'
 /**
  * Mapping of codes to eventNames.
  *
- * This also is a whitelist of which events should *also* be recognized as
- * codes.
+ * This list of events should *also* be recognized as codes.
  */
 export const codes = {
   ds: 'donationSuccess',
