@@ -6,31 +6,6 @@
 export const name = 'ga4'
 
 /**
- * Compare two donation product objects.
- *
- * Keys considered: 'name', 'price', 'id', 'quantity'
- *
- * Comparing with JSON.stringify will not work robustly as the order is not
- * guaranteed.
- *
- * @param {object} product1 first product
- * @param {object} product2 second product
- * @returns {Boolean}
- */
-export const productIsEqual = (product1, product2) => {
-  for (const key of ['name', 'price', 'id', 'quantity']) {
-    // If at least one product has the property and their values differ
-    // they are NOT equal. They are otherwise.
-    if ((Object.prototype.hasOwnProperty.call(product1, key) || Object.prototype.hasOwnProperty.call(product2, key)) &&
-      product1[key] !== product2[key]
-    ) {
-      return false
-    }
-  }
-  return true
-}
-
-/**
  * Tracker for Google Tag Manager.
  *
  * Implements behaviour to dispatch events to Google Analytics.
@@ -303,8 +278,8 @@ export class GA4Tracker {
       this._context.donation.currencyCode = eventData.currencyCode
     }
     const currencyCode = this._context.donation.currencyCode || null
-    const currentProduct = this._context.donation.product || {}
-    const currentRevenue = this._context.donation.revenue || {}
+    const currentRevenue = this._context.donation.revenue || null
+    const currentProduct = eventData.prevProduct || {}
     const newProduct = eventData.product || {}
     const newRevenue = eventData.revenue || parseFloat(newProduct.price || 0) * parseInt(newProduct.quantity || 1)
 
@@ -346,24 +321,13 @@ export class GA4Tracker {
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
 
-    const changedNewProduct = data.addData.params.items[0]
-    const changedCurrentProduct = data.removeData.params.items[0]
-
-    // Only change something or send an event if the donation products differ.
-    // Compare *after* any changes.
-    if (productIsEqual(changedCurrentProduct, changedNewProduct)) {
-      this.printDebug('(handle)', eventName, 'same product', eventData, context)
-      return
-    }
-
-    this._context.donation.product = changedNewProduct
-    this._context.donation.revenue = data.addData.params.value
-    this.saveToStorage('context', this._context)
-
     if (data.pushRemove) {
       this.dataLayer.push(['event', data.removeData.event, data.removeData.params])
     }
     this.dataLayer.push(['event', data.addData.event, data.addData.params])
+
+    this._context.donation.revenue = newRevenue
+    this.saveToStorage('context', this._context)
   }
 
   /**

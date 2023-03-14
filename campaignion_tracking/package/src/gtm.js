@@ -6,31 +6,6 @@
 export const name = 'gtm'
 
 /**
- * Compare two donation product objects.
- *
- * Keys considered: 'name', 'price', 'id', 'quantity'
- *
- * Comparing with JSON.stringify will not work robustly as the order is not
- * guaranteed.
- *
- * @param {object} product1 first product
- * @param {object} product2 second product
- * @returns {Boolean}
- */
-export const productIsEqual = (product1, product2) => {
-  for (const key of ['name', 'price', 'id', 'quantity']) {
-    // If at least one product has the property and their values differ
-    // they are NOT equal. They are otherwise.
-    if ((Object.prototype.hasOwnProperty.call(product1, key) || Object.prototype.hasOwnProperty.call(product2, key)) &&
-      product1[key] !== product2[key]
-    ) {
-      return false
-    }
-  }
-  return true
-}
-
-/**
  * Tracker for Google Tag Manager.
  *
  * Implements behaviour to dispatch events to GTM.
@@ -300,15 +275,15 @@ export class GTMTracker {
     this.updateContext(context)
     if (eventData.currencyCode) {
       this._context.donation.currencyCode = eventData.currencyCode
+      this.saveToStorage('context', this._context)
     }
     const currencyCode = this._context.donation.currencyCode || null
-    const currentProduct = this._context.donation.product || {}
+    const currentProduct = eventData.prevProduct || {}
     const newProduct = eventData.product || {}
 
     const addData = {
       event: 'addToCart',
       ecommerce: {
-        currencyCode: currencyCode,
         add: {
           products: [newProduct]
         }
@@ -334,19 +309,6 @@ export class GTMTracker {
     }
     // Allow others to modify the data being sent to GTM.
     data = this.callChangeHook(eventName, data, this._context)
-
-    const changedNewProduct = data.addData.ecommerce.add.products[0]
-    const changedCurrentProduct = data.removeData.ecommerce.remove.products[0]
-
-    // Only change something or send a GTM event if the donation products differ.
-    // Compare *after* any changes.
-    if (productIsEqual(changedCurrentProduct, changedNewProduct)) {
-      this.printDebug('(handle)', eventName, 'same product', eventData, context)
-      return
-    }
-
-    this._context.donation.product = changedNewProduct
-    this.saveToStorage('context', this._context)
 
     if (data.pushRemove) {
       this.dataLayer.push(data.removeData)
