@@ -23,8 +23,7 @@ Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
   }
 
   if (settings['campaignion_tracking'] && settings['campaignion_tracking']['context']) {
-    settings['campaignion_tracking']['sent'] = settings['campaignion_tracking']['sent'] || [];
-
+    var sent = window.campaignion_tracking.tracker.loadFromStorage(undefined, 'sent') || [];
     var donation = settings.campaignion_tracking.context['donation'] || {};
     var webform = settings.campaignion_tracking.context['webform'] || {};
 
@@ -42,17 +41,15 @@ Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
      */
 
     // Fire `draftBegin` after completing the first step of multi-step forms.
-    if (!settings['campaignion_tracking']['sent'].includes('draftBegin')) {
-      if (webform['last_completed_step'] === 1) {
-        settings['campaignion_tracking']['sent'].push('draftBegin');
-        gracefulDispatch('webform', 'draftBegin', {}, settings.campaignion_tracking.context);
-      }
+    if (!sent.includes('draftBegin') && webform['last_completed_step'] === 1) {
+      sent.push('draftBegin');
+      gracefulDispatch('webform', 'draftBegin', {}, settings.campaignion_tracking.context);
     }
 
     // Fire `draftContinue` after every following step of multi-step forms.
-    if (!settings['campaignion_tracking']['sent'].includes('draftContinue' + webform['last_completed_step'])) {
+    if (!sent.includes('draftContinue' + webform['last_completed_step'])) {
       if (webform['last_completed_step'] > 1) {
-        settings['campaignion_tracking']['sent'].push('draftContinue' + webform['last_completed_step']);
+        sent.push('draftContinue' + webform['last_completed_step']);
         gracefulDispatch('webform', 'draftContinue', {}, settings.campaignion_tracking.context);
       }
     }
@@ -89,21 +86,23 @@ Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
 
       // Assume the checkout begins when we are on the second step or if
       // there is only one page.
-      if (!settings['campaignion_tracking']['sent'].includes('checkoutBegin')) {
+      if (!sent.includes('checkoutBegin')) {
         if (webform['current_step'] === 2 || webform['total_steps'] === 1) {
-          settings['campaignion_tracking']['sent'].push('checkoutBegin');
+          sent.push('checkoutBegin');
           gracefulDispatch('donation', 'checkoutBegin', {}, settings.campaignion_tracking.context);
         }
       }
 
       // Assume the checkout ends on the last webform step.
-      if (!settings['campaignion_tracking']['sent'].includes('checkoutEnd')) {
+      if (!sent.includes('checkoutEnd')) {
         if (webform['current_step'] === webform['total_steps']) {
-          settings['campaignion_tracking']['sent'].push('checkoutEnd');
+          sent.push('checkoutEnd');
           gracefulDispatch('donation', 'checkoutEnd', {}, settings.campaignion_tracking.context);
         }
       }
     }
+
+    window.campaignion_tracking.tracker.saveToStorage(undefined, 'sent', sent);
   }
 };
 })(jQuery);
