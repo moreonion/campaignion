@@ -97,6 +97,7 @@ function campaignion_tracking_form_webform_client_form_alter(&$form, &$form_stat
 
   // Information about the current webform.
   $webform_settings['campaignion_tracking']['context']['webform'] = [
+    'id' => $form_id,
     'total_steps' => $form_state['webform']['page_count'],
     'current_step' => $form_state['webform']['page_num'],
     'last_completed_step' => isset($form_state['webform']['page_visited']) ? $form_state['webform']['page_visited'] : 0,

@@ -51,9 +51,9 @@ Drupal.behaviors.campaignion_tracking = {};
 Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
 
   if (settings['campaignion_tracking'] && settings['campaignion_tracking']['context']) {
-    var sent = window.campaignion_tracking.tracker.loadFromStorage(undefined, 'sent') || [];
     var donation = settings.campaignion_tracking.context['donation'] || {};
     var webform = settings.campaignion_tracking.context['webform'] || {};
+    var store = window.campaignion_tracking.tracker.loadFromStorage(undefined, webform['id']) || { sent: [] };
 
     /**
      * Webform related events.
@@ -69,15 +69,15 @@ Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
      */
 
     // Fire `draftBegin` after completing the first step of multi-step forms.
-    if (!sent.includes('draftBegin') && webform['last_completed_step'] === 1) {
-      sent.push('draftBegin');
+    if (!store.sent.includes('draftBegin') && webform['last_completed_step'] === 1) {
+      store.sent.push('draftBegin');
       gracefulDispatch('webform', 'draftBegin', {}, settings.campaignion_tracking.context);
     }
 
     // Fire `draftContinue` after every following step of multi-step forms.
-    if (!sent.includes('draftContinue' + webform['last_completed_step'])) {
+    if (!store.sent.includes('draftContinue' + webform['last_completed_step'])) {
       if (webform['last_completed_step'] > 1) {
-        sent.push('draftContinue' + webform['last_completed_step']);
+        store.sent.push('draftContinue' + webform['last_completed_step']);
         gracefulDispatch('webform', 'draftContinue', {}, settings.campaignion_tracking.context);
       }
     }
@@ -106,7 +106,7 @@ Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
       };
 
       // Fire `setDonationProduct` when the product is new or has changed.
-      var prevProduct = window.campaignion_tracking.tracker.loadFromStorage(undefined, 'product') || {};
+      var prevProduct = store.product || {};
       if (!productIsEqual(product, prevProduct)) {
         var msg = {
           currencyCode: donation['currency_code'] || 'EUR',
@@ -114,28 +114,28 @@ Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
           prevProduct: prevProduct,
         };
         gracefulDispatch('donation', 'setDonationProduct', msg, settings.campaignion_tracking.context);
-        window.campaignion_tracking.tracker.saveToStorage(undefined, 'product', product);
+        store.product = product;
       }
 
       // Assume the checkout begins when we are on the second step or if
       // there is only one page.
-      if (!sent.includes('checkoutBegin')) {
+      if (!store.sent.includes('checkoutBegin')) {
         if (webform['current_step'] === 2 || webform['total_steps'] === 1) {
-          sent.push('checkoutBegin');
+          store.sent.push('checkoutBegin');
           gracefulDispatch('donation', 'checkoutBegin', {}, settings.campaignion_tracking.context);
         }
       }
 
       // Assume the checkout ends on the last webform step.
-      if (!sent.includes('checkoutEnd')) {
+      if (!store.sent.includes('checkoutEnd')) {
         if (webform['current_step'] === webform['total_steps']) {
-          sent.push('checkoutEnd');
+          store.sent.push('checkoutEnd');
           gracefulDispatch('donation', 'checkoutEnd', {}, settings.campaignion_tracking.context);
         }
       }
     }
 
-    window.campaignion_tracking.tracker.saveToStorage(undefined, 'sent', sent);
+    window.campaignion_tracking.tracker.saveToStorage(undefined, webform['id'], store);
   }
 };
 })(jQuery);
