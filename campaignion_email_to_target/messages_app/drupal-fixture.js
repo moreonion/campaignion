@@ -142,9 +142,11 @@ const Drupal = {
 
     if (index == 0) {
       return Drupal.t(singular, args, options)
-    } else if (index == 1) {
+    }
+    else if (index == 1) {
       return Drupal.t(plural, args, options)
-    } else {
+    }
+    else {
       args['@count[' + index + ']'] = args['@count']
       delete args['@count']
       return Drupal.t(plural.replace('@count', '@count[' + index + ']'), args, options)
