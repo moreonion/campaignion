@@ -74,6 +74,13 @@ export class GA4Tracker {
   }
 
   /**
+   * Copy gtag function as required by GA4.
+   */
+  gtag () {
+    this.dataLayer.push(arguments)
+  }
+
+  /**
    * Utility function to print to `console.debug`.
    *
    * Print only if debug is set to a truthy value.
@@ -186,7 +193,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     submissionData = this.callChangeHook(eventName, submissionData, this._context)
-    this.dataLayer.push(['event', submissionData.event, submissionData.params])
+    this.gtag('event', submissionData.event, submissionData.params)
     this.printDebug('(event)', submissionData)
 
     if (eventData.optins.length > 0) {
@@ -199,7 +206,7 @@ export class GA4Tracker {
       }
       // Allow others to modify the data being sent to Google Analytics.
       optinData = this.callChangeHook(eventName, optinData, this._context)
-      this.dataLayer.push(['event', optinData.event, optinData.params])
+      this.gtag('event', optinData.event, optinData.params)
       this.printDebug('(event)', optinData)
     }
   }
@@ -228,7 +235,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(['event', data.event, data.params])
+    this.gtag('event', data.event, data.params)
     this.printDebug('(event)', data)
   }
 
@@ -255,7 +262,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(['event', data.event, data.params])
+    this.gtag('event', data.event, data.params)
     this.printDebug('(event)', data)
   }
 
@@ -322,9 +329,9 @@ export class GA4Tracker {
     data = this.callChangeHook(eventName, data, this._context)
 
     if (data.pushRemove) {
-      this.dataLayer.push(['event', data.removeData.event, data.removeData.params])
+      this.gtag('event', data.removeData.event, data.removeData.params)
     }
-    this.dataLayer.push(['event', data.addData.event, data.addData.params])
+    this.gtag('event', data.addData.event, data.addData.params)
 
     this._context.donation.revenue = newRevenue
     this.saveToStorage('context', this._context)
@@ -364,7 +371,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(['event', data.event, data.params])
+    this.gtag('event', data.event, data.params)
   }
 
   /**
@@ -401,7 +408,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(['event', data.event, data.params])
+    this.gtag('event', data.event, data.params)
   }
 
   /**
@@ -450,7 +457,7 @@ export class GA4Tracker {
     }
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(['event', data.event, data.params])
+    this.gtag('event', data.event, data.params)
     // Remember sent transactions ids.
     sentTransactionIDs.push(transactionID)
     this.saveToStorage('sentTransactionIDs', sentTransactionIDs)
