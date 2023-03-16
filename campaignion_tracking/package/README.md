@@ -24,11 +24,16 @@ In theme specific code you can implement a callback to alter the events at
 the latest possibility (just before they are sent to the upstream API).
 Therefor you will need to implement a
 `window.campaignion_tracking_change_msg()` function.
-Currently only implemented for GTM.
+Currently only implemented for GTM and GA4.
 
 The difference between tracking data and tracking context:
 "data" will be sent upstream as-is, a tracking "context" can be used in the
 specific implementations to generate or enhance the data sent.
+
+To keep track of the context between form steps, it is saved to sessionStorage.
+While the tracking context gets reset after a successful form submission,
+events indicating that a certain step has been submitted for the first time
+will only fire once per form per browser session.
 
 ## Channels
 

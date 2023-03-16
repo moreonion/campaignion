@@ -381,8 +381,8 @@ export class GTMTracker {
   /**
    * Handle "donationSuccess".
    *
-   * The event data needs to include an transaction id.
-   * Falls back to use a random number.
+   * Google requires a transaction ID. If the event data passed to this
+   * method does not include a `tid`, a random ID will be added.
    *
    * Event data: { tid, revenue, product, currencyCode }
    *
@@ -395,7 +395,7 @@ export class GTMTracker {
     this.updateContext(context)
     const product = eventData.product || this._context.donation.product || {}
     const currencyCode = eventData.currencyCode || this._context.donation.currencyCode || null
-    // Ensure a transaction id.
+    // Ensure a transaction ID.
     const transactionID = eventData.tid || Math.floor(Math.random() * 2 ** 64)
     const sentTransactionIDs = this.loadFromStorage('sentTransactionIDs') || []
     // Do nothing if the transaction was already sent.
