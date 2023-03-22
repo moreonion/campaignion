@@ -312,8 +312,10 @@ export class GTMTracker {
 
     if (data.pushRemove) {
       this.dataLayer.push(data.removeData)
+      this.printDebug('(event)', data.removeData)
     }
     this.dataLayer.push(data.addData)
+    this.printDebug('(event)', data.addData)
   }
 
   /**
@@ -345,6 +347,7 @@ export class GTMTracker {
     // Allow others to modify the data being sent to GTM.
     data = this.callChangeHook(eventName, data, this._context)
     this.dataLayer.push(data)
+    this.printDebug('(event)', data)
   }
 
   /**
@@ -376,6 +379,7 @@ export class GTMTracker {
     // Allow others to modify the data being sent to GTM.
     data = this.callChangeHook(eventName, data, this._context)
     this.dataLayer.push(data)
+    this.printDebug('(event)', data)
   }
 
   /**
@@ -425,6 +429,7 @@ export class GTMTracker {
     // Allow others to modify the data being sent to GTM.
     data = this.callChangeHook(eventName, data, this._context)
     this.dataLayer.push(data)
+    this.printDebug('(event)', data)
     // Remember sent transactions ids.
     sentTransactionIDs.push(transactionID)
     this.saveToStorage('sentTransactionIDs', sentTransactionIDs)

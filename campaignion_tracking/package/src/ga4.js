@@ -330,8 +330,10 @@ export class GA4Tracker {
 
     if (data.pushRemove) {
       this.gtag('event', data.removeData.event, data.removeData.params)
+      this.printDebug('(event)', data.removeData)
     }
     this.gtag('event', data.addData.event, data.addData.params)
+    this.printDebug('(event)', data.addData)
 
     this._context.donation.revenue = newRevenue
     this.saveToStorage('context', this._context)
@@ -372,6 +374,7 @@ export class GA4Tracker {
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
     this.gtag('event', data.event, data.params)
+    this.printDebug('(event)', data)
   }
 
   /**
@@ -409,6 +412,7 @@ export class GA4Tracker {
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
     this.gtag('event', data.event, data.params)
+    this.printDebug('(event)', data)
   }
 
   /**
@@ -458,6 +462,7 @@ export class GA4Tracker {
     // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
     this.gtag('event', data.event, data.params)
+    this.printDebug('(event)', data)
     // Remember sent transactions ids.
     sentTransactionIDs.push(transactionID)
     this.saveToStorage('sentTransactionIDs', sentTransactionIDs)
