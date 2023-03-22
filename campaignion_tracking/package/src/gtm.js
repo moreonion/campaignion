@@ -275,10 +275,9 @@ export class GTMTracker {
     this.updateContext(context)
     if (eventData.currencyCode) {
       this._context.donation.currencyCode = eventData.currencyCode
-      this.saveToStorage('context', this._context)
     }
     const currencyCode = this._context.donation.currencyCode || null
-    const currentProduct = eventData.prevProduct || {}
+    const currentProduct = this._context.donation.product || {}
     const newProduct = eventData.product || {}
 
     const addData = {
@@ -316,6 +315,9 @@ export class GTMTracker {
     }
     this.dataLayer.push(data.addData)
     this.printDebug('(event)', data.addData)
+
+    this._context.donation.product = newProduct
+    this.saveToStorage('context', this._context)
   }
 
   /**

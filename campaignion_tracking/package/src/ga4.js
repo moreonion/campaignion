@@ -286,7 +286,7 @@ export class GA4Tracker {
     }
     const currencyCode = this._context.donation.currencyCode || null
     const currentRevenue = this._context.donation.revenue || null
-    const currentProduct = eventData.prevProduct || {}
+    const currentProduct = this._context.donation.product || {}
     const newProduct = eventData.product || {}
     const newRevenue = eventData.revenue || parseFloat(newProduct.price || 0) * parseInt(newProduct.quantity || 1)
 
@@ -296,11 +296,11 @@ export class GA4Tracker {
         currency: currencyCode,
         value: newRevenue,
         items: [{
-          item_name: newProduct?.name,
-          item_id: newProduct?.id,
-          price: newProduct?.price,
-          item_variant: newProduct?.variant,
-          quantity: newProduct?.quantity,
+          item_name: newProduct.name,
+          item_id: newProduct.id,
+          price: newProduct.price,
+          item_variant: newProduct.variant,
+          quantity: newProduct.quantity,
         }],
       }
     }
@@ -310,11 +310,11 @@ export class GA4Tracker {
         currency: currencyCode,
         value: currentRevenue,
         items: [{
-          item_name: currentProduct?.name,
-          item_id: currentProduct?.id,
-          price: currentProduct?.price,
-          item_variant: currentProduct?.variant,
-          quantity: currentProduct?.quantity,
+          item_name: currentProduct.name,
+          item_id: currentProduct.id,
+          price: currentProduct.price,
+          item_variant: currentProduct.variant,
+          quantity: currentProduct.quantity,
         }],
       }
     }
@@ -336,6 +336,7 @@ export class GA4Tracker {
     this.printDebug('(event)', data.addData)
 
     this._context.donation.revenue = newRevenue
+    this._context.donation.product = newProduct
     this.saveToStorage('context', this._context)
   }
 
@@ -363,11 +364,11 @@ export class GA4Tracker {
         currency: currencyCode,
         value: revenue,
         items: [{
-          item_name: product?.name,
-          item_id: product?.id,
-          price: product?.price,
-          item_variant: product?.variant,
-          quantity: product?.quantity,
+          item_name: product.name,
+          item_id: product.id,
+          price: product.price,
+          item_variant: product.variant,
+          quantity: product.quantity,
         }],
       }
     }
@@ -401,11 +402,11 @@ export class GA4Tracker {
         currency: currencyCode,
         value: revenue,
         items: [{
-          item_name: product?.name,
-          item_id: product?.id,
-          price: product?.price,
-          item_variant: product?.variant,
-          quantity: product?.quantity,
+          item_name: product.name,
+          item_id: product.id,
+          price: product.price,
+          item_variant: product.variant,
+          quantity: product.quantity,
         }],
       }
     }
@@ -451,11 +452,11 @@ export class GA4Tracker {
         currency: currencyCode,
         value: revenue,
         items: [{
-          item_name: product?.name,
-          item_id: product?.id,
-          price: product?.price,
-          item_variant: product?.variant,
-          quantity: product?.quantity,
+          item_name: product.name,
+          item_id: product.id,
+          price: product.price,
+          item_variant: product.variant,
+          quantity: product.quantity,
         }],
       }
     }

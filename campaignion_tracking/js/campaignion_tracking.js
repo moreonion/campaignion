@@ -111,7 +111,6 @@ Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
         var msg = {
           currencyCode: donation['currency_code'] || 'EUR',
           product: product,
-          prevProduct: prevProduct,
         };
         gracefulDispatch('donation', 'setDonationProduct', msg, settings.campaignion_tracking.context);
         store.product = product;
