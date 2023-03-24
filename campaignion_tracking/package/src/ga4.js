@@ -173,7 +173,7 @@ export class GA4Tracker {
   /**
    * Handle "submission".
    *
-   * Event data: { nid, sid, title }
+   * Event data: { nid, sid, action_title }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -188,7 +188,7 @@ export class GA4Tracker {
       params: {
         nid: eventData.nid || null,
         sid: eventData.sid || null,
-        title: eventData.title || null,
+        action_title: eventData.title || null,
       }
     }
     // Allow others to modify the data being sent to Google Analytics.
@@ -199,7 +199,7 @@ export class GA4Tracker {
     if (eventData.optins.length > 0) {
       let optinData = {
         event: 'optin',
-        params: {}
+        ...submissionData.params,
       }
       for (const channel of eventData.optins) {
         optinData.params[channel.channel] = channel.value
@@ -214,7 +214,7 @@ export class GA4Tracker {
   /**
    * Handle "draftBegin".
    *
-   * Event data: { nid, title, type, completedStep }
+   * Event data: { nid, action_title, step }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -225,12 +225,11 @@ export class GA4Tracker {
     this.updateContext(context)
 
     let data = {
-      event: 'begin_form',
+      event: 'begin_action',
       params: {
         nid: context.node.nid || null,
-        title: context.node.title || null,
-        type: context.node.type || null,
-        completedStep: context.webform.last_completed_step || null,
+        action_title: context.node.title || null,
+        step: 1,
       }
     }
     // Allow others to modify the data being sent to Google Analytics.
@@ -242,7 +241,7 @@ export class GA4Tracker {
   /**
    * Handle "draftContinue".
    *
-   * Event data: { nid, title, completedStep }
+   * Event data: { nid, action_title, step }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -253,11 +252,11 @@ export class GA4Tracker {
     this.updateContext(context)
 
     let data = {
-      event: 'continue_form',
+      event: 'continue_action',
       params: {
         nid: context.node.nid || null,
-        title: context.node.title || null,
-        completedStep: context.webform.last_completed_step || null,
+        action_title: context.node.title || null,
+        step: context.webform.last_completed_step || null,
       }
     }
     // Allow others to modify the data being sent to Google Analytics.
