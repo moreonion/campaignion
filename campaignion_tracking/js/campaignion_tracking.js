@@ -69,15 +69,15 @@ Drupal.behaviors.campaignion_tracking.attach = function(context, settings) {
      */
 
     // Fire `draftBegin` after completing the first step of multi-step forms.
-    if (!store.sent.includes('draftBegin') && webform['last_completed_step'] === 1) {
+    if (!store.sent.includes('draftBegin') && webform['current_step'] === 2) {
       store.sent.push('draftBegin');
       gracefulDispatch('webform', 'draftBegin', {}, settings.campaignion_tracking.context);
     }
 
     // Fire `draftContinue` after every following step of multi-step forms.
-    if (!store.sent.includes('draftContinue' + webform['last_completed_step'])) {
-      if (webform['last_completed_step'] > 1) {
-        store.sent.push('draftContinue' + webform['last_completed_step']);
+    else if (!store.sent.includes('draftContinue' + webform['current_step'])) {
+      if (webform['current_step'] > 2) {
+        store.sent.push('draftContinue' + webform['current_step']);
         gracefulDispatch('webform', 'draftContinue', {}, settings.campaignion_tracking.context);
       }
     }
