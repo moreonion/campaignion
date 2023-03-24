@@ -191,7 +191,8 @@ export class GTMTracker {
 
     if (eventData.optins.length > 0) {
       let optinData = {
-        event: 'optin'
+        ...submissionData,
+        event: 'optin',
       }
       for (const channel of eventData.optins) {
         optinData[channel.channel] = channel.value
@@ -206,7 +207,7 @@ export class GTMTracker {
   /**
    * Handle "draftBegin".
    *
-   * Event data: { nid, title, type, completedStep }
+   * Event data: { nid, title, step }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -217,12 +218,11 @@ export class GTMTracker {
     this.updateContext(context)
 
     let data = {
-      event: 'formBegin',
+      event: 'actionBegin',
       webform: {
         nid: context.node.nid || null,
         title: context.node.title || null,
-        type: context.node.type || null,
-        completedStep: context.webform.last_completed_step || null,
+        step: 1,
       }
     }
     // Allow others to modify the data being sent to GTM.
@@ -234,7 +234,7 @@ export class GTMTracker {
   /**
    * Handle "draftContinue".
    *
-   * Event data: { nid, title, completedStep }
+   * Event data: { nid, title, step }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -245,11 +245,11 @@ export class GTMTracker {
     this.updateContext(context)
 
     let data = {
-      event: 'formContinue',
+      event: 'actionContinue',
       webform: {
         nid: context.node.nid || null,
         title: context.node.title || null,
-        completedStep: context.webform.last_completed_step || null,
+        step: context.webform.last_completed_step || null,
       }
     }
     // Allow others to modify the data being sent to GTM.
