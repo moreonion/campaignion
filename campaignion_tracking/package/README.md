@@ -57,25 +57,25 @@ Channels implemented so far:
 
 ## Events
 
-Listing internal event names. Depending on the implemented service, the events
-might show up under a different name there (i.e. 'setDonationProduct' → 'addToCart').
+The campaignion tracking module triggers the following generic events that
+sub-modules can listen to for sending events specific to their implementation
+(see sub-module READMEs for actual tracking events).
 
 ### Webform
 
-1. 'submission': fired on thank you page
-2. 'opt-in': fired on thank you page if the submission contains opt-ins
+1. `submission`: fired on thank you page (includes opt-ins)
 
 On multi-step forms, there is also
 
-1. 'draftBegin': fired after completing the first form step
-2. 'draftContinue': fired on all consecutive form steps
+1. `draftBegin`: fired once after completing the first form step
+2. `draftContinue`: fired once on all consecutive form steps
 
 ### Donation
 
-1. 'setDonationProduct': after choosing 'amount', 'interval' and 'currency'
-2. 'checkoutBegin': fired on the second (or only) form step
-3. 'checkoutEnd': fired on the last form step
-4. 'donationSuccess': fired on thank you page
+1. `setDonationProduct`: fired on the form step after choosing 'amount' and 'interval'
+2. `checkoutBegin`: fired on the second (or only) form step
+3. `checkoutEnd`: fired on the last form step
+4. `donationSuccess`: fired on thank you page
 
 ## Development
 
