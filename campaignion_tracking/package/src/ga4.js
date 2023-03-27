@@ -171,6 +171,25 @@ export class GA4Tracker {
   }
 
   /**
+   * Format product data from campaignion_tracking for GA4.
+   *
+   * @param {object} product
+   * @returns object
+   */
+  formatProduct (product) {
+    if (!product) {
+      return null
+    }
+    return {
+      item_name: product.name,
+      item_id: product.id,
+      price: product.price,
+      item_variant: product.variant,
+      quantity: product.quantity,
+    }
+  }
+
+  /**
    * Handle "submission".
    *
    * Event data: { nid, sid, action_title }
@@ -285,8 +304,8 @@ export class GA4Tracker {
     }
     const currencyCode = this._context.donation.currencyCode || null
     const currentRevenue = this._context.donation.revenue || null
-    const currentProduct = this._context.donation.product || {}
-    const newProduct = eventData.product || {}
+    const currentProduct = this._context.donation.product || null
+    const newProduct = this.formatProduct(eventData.product)
     const newRevenue = eventData.revenue || parseFloat(newProduct.price || 0) * parseInt(newProduct.quantity || 1)
 
     const addData = {
@@ -294,13 +313,7 @@ export class GA4Tracker {
       params: {
         currency: currencyCode,
         value: newRevenue,
-        items: [{
-          item_name: newProduct.name,
-          item_id: newProduct.id,
-          price: newProduct.price,
-          item_variant: newProduct.variant,
-          quantity: newProduct.quantity,
-        }],
+        items: [newProduct],
       }
     }
     const removeData = {
@@ -308,17 +321,11 @@ export class GA4Tracker {
       params: {
         currency: currencyCode,
         value: currentRevenue,
-        items: [{
-          item_name: currentProduct.name,
-          item_id: currentProduct.id,
-          price: currentProduct.price,
-          item_variant: currentProduct.variant,
-          quantity: currentProduct.quantity,
-        }],
+        items: [currentProduct],
       }
     }
     // Only push a remove if we can assume we have pushed a valid product before.
-    const pushRemove = Object.prototype.hasOwnProperty.call(currentProduct, 'price')
+    const pushRemove = !!currentProduct
     let data = {
       addData: addData,
       removeData: removeData,
@@ -351,7 +358,7 @@ export class GA4Tracker {
   handle_checkoutBegin (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
-    const product = eventData.product || this._context.donation.product || {}
+    const product = this.formatProduct(eventData.product) || this._context.donation.product || null
     const currencyCode = eventData.currencyCode || this._context.donation.currencyCode || null
     let revenue = eventData.revenue || this._context.donation.revenue || null
     if (revenue === null) {
@@ -362,13 +369,7 @@ export class GA4Tracker {
       params: {
         currency: currencyCode,
         value: revenue,
-        items: [{
-          item_name: product.name,
-          item_id: product.id,
-          price: product.price,
-          item_variant: product.variant,
-          quantity: product.quantity,
-        }],
+        items: [product],
       }
     }
     // Allow others to modify the data being sent to Google Analytics.
@@ -389,7 +390,7 @@ export class GA4Tracker {
   handle_checkoutEnd (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
-    const product = eventData.product || this._context.donation.product || {}
+    const product = this.formatProduct(eventData.product) || this._context.donation.product || null
     const currencyCode = eventData.currencyCode || this._context.donation.currencyCode || null
     let revenue = eventData.revenue || this._context.donation.revenue || null
     if (revenue === null) {
@@ -400,13 +401,7 @@ export class GA4Tracker {
       params: {
         currency: currencyCode,
         value: revenue,
-        items: [{
-          item_name: product.name,
-          item_id: product.id,
-          price: product.price,
-          item_variant: product.variant,
-          quantity: product.quantity,
-        }],
+        items: [product],
       }
     }
     // Allow others to modify the data being sent to Google Analytics.
@@ -430,7 +425,7 @@ export class GA4Tracker {
   handle_donationSuccess (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
-    const product = eventData.product || this._context.donation.product || {}
+    const product = this.formatProduct(eventData.product) || this._context.donation.product || null
     const currencyCode = eventData.currencyCode || this._context.donation.currencyCode || null
     // Ensure a transaction ID.
     const transactionID = eventData.tid || Math.floor(Math.random() * 2 ** 64)
@@ -450,13 +445,7 @@ export class GA4Tracker {
         transaction_id: transactionID,
         currency: currencyCode,
         value: revenue,
-        items: [{
-          item_name: product.name,
-          item_id: product.id,
-          price: product.price,
-          item_variant: product.variant,
-          quantity: product.quantity,
-        }],
+        items: [product],
       }
     }
     // Allow others to modify the data being sent to Google Analytics.
