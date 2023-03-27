@@ -74,7 +74,7 @@ export class GA4Tracker {
   }
 
   /**
-   * Copy gtag function as required by GA4.
+   * Pass an arguments object to the dataLayer, same as GA4’s gtag function.
    */
   gtag () {
     this.dataLayer.push(arguments)
