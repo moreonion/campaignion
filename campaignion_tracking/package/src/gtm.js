@@ -176,7 +176,7 @@ export class GTMTracker {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
 
-    let submissionData = {
+    const submissionData = {
       event: 'submission',
       webform: {
         nid: eventData.nid || null,
@@ -185,9 +185,9 @@ export class GTMTracker {
       }
     }
     // Allow others to modify the data being sent to GTM.
-    submissionData = this.callChangeHook(eventName, submissionData, this._context)
-    this.dataLayer.push(submissionData)
-    this.printDebug('(event)', submissionData)
+    const submissionDataFinal = this.callChangeHook(eventName, submissionData, this._context)
+    this.dataLayer.push(submissionDataFinal)
+    this.printDebug('(event)', submissionDataFinal)
 
     if (eventData.optins.length > 0) {
       let optinData = {

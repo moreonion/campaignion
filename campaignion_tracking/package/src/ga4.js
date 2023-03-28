@@ -202,7 +202,7 @@ export class GA4Tracker {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
 
-    let submissionData = {
+    const submissionData = {
       event: 'submission',
       params: {
         nid: eventData.nid || null,
@@ -211,14 +211,14 @@ export class GA4Tracker {
       }
     }
     // Allow others to modify the data being sent to Google Analytics.
-    submissionData = this.callChangeHook(eventName, submissionData, this._context)
-    this.gtag('event', submissionData.event, submissionData.params)
-    this.printDebug('(event)', submissionData)
+    const submissionDataFinal = this.callChangeHook(eventName, submissionData, this._context)
+    this.gtag('event', submissionDataFinal.event, submissionDataFinal.params)
+    this.printDebug('(event)', submissionDataFinal)
 
     if (eventData.optins.length > 0) {
       let optinData = {
+        ...submissionData,
         event: 'optin',
-        ...submissionData.params,
       }
       for (const channel of eventData.optins) {
         optinData.params[channel.channel] = channel.value
