@@ -14,7 +14,13 @@ class ApiError extends _ApiError {
    * Create an API-Error instance from a HttpError exception.
    */
   public static function fromHttpError(HttpError $e, $verb, $path) {
-    if ($data = drupal_json_decode($e->result->data)) {
+    $json_data = $e->result->data;
+    if (isset($e->result->headers['content-encoding'])) {
+      if ($e->result->headers['content-encoding'] == 'gzip') {
+        $json_data = gzdecode($e->result->data);
+      }
+    }
+    if ($data = drupal_json_decode($json_data)) {
       $code = $e->getCode();
       $msg = "Got @code for %verb %path: @title - @detail %errors";
       $vars = [
