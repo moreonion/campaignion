@@ -2,27 +2,24 @@
 
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
   parserOptions: {
     sourceType: 'module'
   },
   env: {
     browser: true,
   },
-  globals: {
-  },
+  globals: {},
   // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
-  extends: 'standard',
+  extends: ['standard'],
   // add your custom rules here
   'rules': {
-    // allow paren-less arrow functions
-    'arrow-parens': 0,
-    // allow async-await
-    'generator-star-spacing': 0,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-    'no-unused-vars': 0,
-    'comma-dangle': 0,
-    'brace-style': [2, 'stroustrup'],
+    // allow trailing comma in multline lists and objects
+    'comma-dangle': ['error', 'only-multiline'],
+    // don’t enforce object shorthand
+    'object-shorthand': ['error', 'consistent'],
+    // put "else" on new line
+    'brace-style': ["error", "stroustrup"]
   }
 }

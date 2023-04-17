@@ -1,4 +1,4 @@
-import * as fragment from './fragment'
+import * as fragment from './fragment.js'
 
 /**
  * Listener to check the location hash string for events to trigger.
@@ -41,7 +41,7 @@ export class FragmentListener {
    */
   setup () {
     window.addEventListener('load', (e) => {
-      const hash = window.location.hash.substr(1)
+      const hash = window.location.hash.substring(1)
       const items = fragment.consumeLocationHashForPrefixes(this.prefixes, hash)
       if (items.locationHash !== hash) {
         if (items.locationHash.length) {

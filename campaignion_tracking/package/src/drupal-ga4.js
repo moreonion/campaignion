@@ -1,4 +1,4 @@
-import * as gtm from './gtm.js'
+import * as ga4 from './ga4.js'
 
 /**
  * Check if we want debugging output.
@@ -11,16 +11,16 @@ const debug = !!parseInt(sessionStorage.getItem('campaignion_debug'))
 // ensure window.dataLayer
 window.dataLayer = window.dataLayer || []
 
-// common tracker manager, listener, gtm
+// common tracker manager, listener, ga4
 const tracker = window.campaignion_tracking.tracker
-let gtmTracker = null
+let ga4Tracker = null
 if (typeof tracker === 'undefined') {
   console.log('No Tracker found')
 }
 else {
-  gtmTracker = new gtm.GTMTracker(tracker, window.dataLayer, debug)
-  window.campaignion_tracking_gtm = { tracker: gtmTracker }
+  ga4Tracker = new ga4.GA4Tracker(tracker, window.dataLayer, debug)
+  window.campaignion_tracking_ga4 = { tracker: ga4Tracker }
 }
 
 // re-exports
-export { gtm, gtmTracker }
+export { ga4, ga4Tracker }

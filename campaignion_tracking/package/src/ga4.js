@@ -3,19 +3,19 @@
  *
  * Use for referencing tracker specifics like storage keys, channel names, ...
  */
-export const name = 'gtm'
+export const name = 'ga4'
 
 /**
  * Tracker for Google Tag Manager.
  *
- * Implements behaviour to dispatch events to GTM.
+ * Implements behaviour to dispatch events to Google Analytics.
  */
-export class GTMTracker {
+export class GA4Tracker {
   /**
    * Constructor.
    *
    * @param {TrackerManager} tracker the shared tracker manager object
-   * @param {object} dataLayer the GTM datalayer to use (default `window.dataLayer`)
+   * @param {object} dataLayer the datalayer to use (default `window.dataLayer`)
    * @param {Boolean} debug set to true for debugging
    */
   constructor (tracker, dataLayer = window.dataLayer, debug = false) {
@@ -54,9 +54,9 @@ export class GTMTracker {
      * @param {object} e Tracking event
      */
     this._dispatch = e => {
-      this.printDebug('campaignion_tracking_gtm', 'handle_form', e)
+      this.printDebug('campaignion_tracking_ga4', 'handle_form', e)
 
-      this.printDebug('campaignion_tracking_gtm', 'handle_event', e.name, e.data, e.context)
+      this.printDebug('campaignion_tracking_ga4', 'handle_event', e.name, e.data, e.context)
 
       // dispatch to my handlers
       this.dispatch(e.name, e.data, e.context)
@@ -74,6 +74,13 @@ export class GTMTracker {
   }
 
   /**
+   * Pass an arguments object to the dataLayer, same as GA4’s gtag function.
+   */
+  gtag () {
+    this.dataLayer.push(arguments)
+  }
+
+  /**
    * Utility function to print to `console.debug`.
    *
    * Print only if debug is set to a truthy value.
@@ -82,20 +89,20 @@ export class GTMTracker {
    */
   printDebug (...args) {
     if (this.debug) {
-      console.debug('[campaignion_tracking]', '(gtm)', ...args)
+      console.debug('[campaignion_tracking]', '(ga4)', ...args)
     }
   }
 
   saveToStorage (key = 'default', data) {
-    this.tracker.saveToStorage('campaignion_tracking:gtm:', key, data)
+    this.tracker.saveToStorage('campaignion_tracking:ga4:', key, data)
   }
 
   loadFromStorage (key = 'default') {
-    return this.tracker.loadFromStorage('campaignion_tracking:gtm:', key)
+    return this.tracker.loadFromStorage('campaignion_tracking:ga4:', key)
   }
 
   removeFromStorage (key = 'default') {
-    return this.tracker.removeFromStorage('campaignion_tracking:gtm:', key)
+    return this.tracker.removeFromStorage('campaignion_tracking:ga4:', key)
   }
 
   /**
@@ -103,7 +110,7 @@ export class GTMTracker {
    *
    * The handler are named according to the `eventName`, prefixed with
    * `handle_`. The handlers are responsible for the actual sending of valid
-   * events to GTM.
+   * events to Google Analytics.
    *
    * @param {String} eventName the name of the event
    * @param {object} eventData data of the event
@@ -119,21 +126,21 @@ export class GTMTracker {
   }
 
   /**
-   * Hook to allow users to manipulate GTM data.
+   * Hook to allow users to manipulate GA4 data.
    *
-   * Maybe some projects/sites want different values for some GTM fields.
+   * Maybe some projects/sites want different values for some event fields.
    * Provide a way to allow for that customizations.
    *
    * @param {String} eventName the campaignion_tracking event name
-   * @param {object} gtmData the data which will get sent to GTM data layer
+   * @param {object} ga4Data the data which will get sent to the data layer
    * @param {object} context the tracking context
    */
-  callChangeHook (eventName, gtmData, context) {
+  callChangeHook (eventName, ga4Data, context) {
     // maybe also inject tracker
     if (typeof window.campaignion_tracking_change_msg === 'function') {
-      gtmData = window.campaignion_tracking_change_msg('gtm', eventName, gtmData, context)
+      ga4Data = window.campaignion_tracking_change_msg('ga4', eventName, ga4Data, context)
     }
-    return gtmData
+    return ga4Data
   }
 
   /**
@@ -164,9 +171,28 @@ export class GTMTracker {
   }
 
   /**
+   * Format product data from campaignion_tracking for GA4.
+   *
+   * @param {object} product
+   * @returns object
+   */
+  formatProduct (product) {
+    if (!product) {
+      return null
+    }
+    return {
+      item_name: product.name,
+      item_id: product.id,
+      price: product.price,
+      item_variant: product.variant,
+      quantity: product.quantity,
+    }
+  }
+
+  /**
    * Handle "submission".
    *
-   * Event data: { nid, sid, title }
+   * Event data: { nid, sid, action_title }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -178,15 +204,15 @@ export class GTMTracker {
 
     const submissionData = {
       event: 'submission',
-      webform: {
+      params: {
         nid: eventData.nid || null,
         sid: eventData.sid || null,
-        title: eventData.title || null,
+        action_title: eventData.title || null,
       }
     }
-    // Allow others to modify the data being sent to GTM.
+    // Allow others to modify the data being sent to Google Analytics.
     const submissionDataFinal = this.callChangeHook(eventName, submissionData, this._context)
-    this.dataLayer.push(submissionDataFinal)
+    this.gtag('event', submissionDataFinal.event, submissionDataFinal.params)
     this.printDebug('(event)', submissionDataFinal)
 
     if (eventData.optins.length > 0) {
@@ -195,11 +221,11 @@ export class GTMTracker {
         event: 'optin',
       }
       for (const channel of eventData.optins) {
-        optinData[channel.channel] = channel.value
+        optinData.params[channel.channel] = channel.value
       }
-      // Allow others to modify the data being sent to GTM.
+      // Allow others to modify the data being sent to Google Analytics.
       optinData = this.callChangeHook(eventName, optinData, this._context)
-      this.dataLayer.push(optinData)
+      this.gtag('event', optinData.event, optinData.params)
       this.printDebug('(event)', optinData)
     }
   }
@@ -207,7 +233,7 @@ export class GTMTracker {
   /**
    * Handle "draftBegin".
    *
-   * Event data: { nid, title, step }
+   * Event data: { nid, action_title, step }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -218,23 +244,23 @@ export class GTMTracker {
     this.updateContext(context)
 
     let data = {
-      event: 'actionBegin',
-      webform: {
+      event: 'begin_action',
+      params: {
         nid: context.node.nid || null,
-        title: context.node.title || null,
+        action_title: context.node.title || null,
         step: 1,
       }
     }
-    // Allow others to modify the data being sent to GTM.
+    // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(data)
+    this.gtag('event', data.event, data.params)
     this.printDebug('(event)', data)
   }
 
   /**
    * Handle "draftContinue".
    *
-   * Event data: { nid, title, step }
+   * Event data: { nid, action_title, step }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -245,16 +271,16 @@ export class GTMTracker {
     this.updateContext(context)
 
     let data = {
-      event: 'actionContinue',
-      webform: {
+      event: 'continue_action',
+      params: {
         nid: context.node.nid || null,
-        title: context.node.title || null,
+        action_title: context.node.title || null,
         step: context.webform.last_completed_step || null,
       }
     }
-    // Allow others to modify the data being sent to GTM.
+    // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(data)
+    this.gtag('event', data.event, data.params)
     this.printDebug('(event)', data)
   }
 
@@ -264,7 +290,7 @@ export class GTMTracker {
    * Remove a (donation) product when one was added before. Thus we have a
    * "cart" with only 1 slot for 1 donation.
    *
-   * Event data: { product, currencyCode }
+   * Event data: { currency, value, items}
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -277,45 +303,45 @@ export class GTMTracker {
       this._context.donation.currencyCode = eventData.currencyCode
     }
     const currencyCode = this._context.donation.currencyCode || null
-    const currentProduct = this._context.donation.product || {}
-    const newProduct = eventData.product || {}
+    const currentRevenue = this._context.donation.revenue || null
+    const currentProduct = this._context.donation.product || null
+    const newProduct = this.formatProduct(eventData.product)
+    const newRevenue = eventData.revenue || parseFloat(newProduct.price || 0) * parseInt(newProduct.quantity || 1)
 
     const addData = {
-      event: 'addToCart',
-      ecommerce: {
-        add: {
-          products: [newProduct]
-        }
+      event: 'add_to_cart',
+      params: {
+        currency: currencyCode,
+        value: newRevenue,
+        items: [newProduct],
       }
     }
-    if (currencyCode) {
-      addData.ecommerce.currencyCode = currencyCode
-    }
     const removeData = {
-      event: 'removeFromCart',
-      ecommerce: {
-        remove: {
-          products: [currentProduct]
-        }
+      event: 'remove_from_cart',
+      params: {
+        currency: currencyCode,
+        value: currentRevenue,
+        items: [currentProduct],
       }
     }
     // Only push a remove if we can assume we have pushed a valid product before.
-    const pushRemove = Object.prototype.hasOwnProperty.call(currentProduct, 'price')
+    const pushRemove = !!currentProduct
     let data = {
       addData: addData,
       removeData: removeData,
       pushRemove: pushRemove
     }
-    // Allow others to modify the data being sent to GTM.
+    // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
 
     if (data.pushRemove) {
-      this.dataLayer.push(data.removeData)
+      this.gtag('event', data.removeData.event, data.removeData.params)
       this.printDebug('(event)', data.removeData)
     }
-    this.dataLayer.push(data.addData)
+    this.gtag('event', data.addData.event, data.addData.params)
     this.printDebug('(event)', data.addData)
 
+    this._context.donation.revenue = newRevenue
     this._context.donation.product = newProduct
     this.saveToStorage('context', this._context)
   }
@@ -323,7 +349,7 @@ export class GTMTracker {
   /**
    * Handle "checkoutBegin".
    *
-   * Event data: { product, currencyCode }
+   * Event data: { currency, value, items }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -332,30 +358,30 @@ export class GTMTracker {
   handle_checkoutBegin (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
-    const product = eventData.product || this._context.donation.product || {}
+    const product = this.formatProduct(eventData.product) || this._context.donation.product || null
     const currencyCode = eventData.currencyCode || this._context.donation.currencyCode || null
+    let revenue = eventData.revenue || this._context.donation.revenue || null
+    if (revenue === null) {
+      revenue = parseFloat(product.price || 0) * parseInt(product.quantity || 1)
+    }
     let data = {
-      event: 'checkoutBegin',
-      ecommerce: {
-        checkout: {
-          actionField: { step: 1 }, // begin == 1
-          products: [product]
-        }
+      event: 'begin_checkout',
+      params: {
+        currency: currencyCode,
+        value: revenue,
+        items: [product],
       }
     }
-    if (currencyCode) {
-      data.ecommerce.currencyCode = currencyCode
-    }
-    // Allow others to modify the data being sent to GTM.
+    // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(data)
+    this.gtag('event', data.event, data.params)
     this.printDebug('(event)', data)
   }
 
   /**
    * Handle "checkoutEnd".
    *
-   * Event data: { product, currencyCode }
+   * Event data: { currency, value, items }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -364,23 +390,23 @@ export class GTMTracker {
   handle_checkoutEnd (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
-    const product = eventData.product || this._context.donation.product || {}
+    const product = this.formatProduct(eventData.product) || this._context.donation.product || null
     const currencyCode = eventData.currencyCode || this._context.donation.currencyCode || null
+    let revenue = eventData.revenue || this._context.donation.revenue || null
+    if (revenue === null) {
+      revenue = parseFloat(product.price || 0) * parseInt(product.quantity || 1)
+    }
     let data = {
-      event: 'checkoutEnd',
-      ecommerce: {
-        checkout: {
-          actionField: { step: 2 }, // end == 2
-          products: [product]
-        }
+      event: 'add_shipping_info',
+      params: {
+        currency: currencyCode,
+        value: revenue,
+        items: [product],
       }
     }
-    if (currencyCode) {
-      data.ecommerce.currencyCode = currencyCode
-    }
-    // Allow others to modify the data being sent to GTM.
+    // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(data)
+    this.gtag('event', data.event, data.params)
     this.printDebug('(event)', data)
   }
 
@@ -390,7 +416,7 @@ export class GTMTracker {
    * Google requires a transaction ID. If the event data passed to this
    * method does not include a `tid`, a random ID will be added.
    *
-   * Event data: { tid, revenue, product, currencyCode }
+   * Event data: { tid, currency, value, items }
    *
    * @param {String} eventName the event name
    * @param {object} eventData data of the event
@@ -399,7 +425,7 @@ export class GTMTracker {
   handle_donationSuccess (eventName, eventData, context) {
     this.printDebug('(handle)', eventName, eventData, context)
     this.updateContext(context)
-    const product = eventData.product || this._context.donation.product || {}
+    const product = this.formatProduct(eventData.product) || this._context.donation.product || null
     const currencyCode = eventData.currencyCode || this._context.donation.currencyCode || null
     // Ensure a transaction ID.
     const transactionID = eventData.tid || Math.floor(Math.random() * 2 ** 64)
@@ -409,28 +435,22 @@ export class GTMTracker {
       this.printDebug('(handle)', 'already sent TID', eventName, eventData, context)
       return
     }
-    let revenue = eventData.revenue || null
+    let revenue = eventData.revenue || this._context.donation.revenue || null
     if (revenue === null) {
       revenue = parseFloat(product.price || 0) * parseInt(product.quantity || 1)
     }
     let data = {
       event: 'purchase',
-      ecommerce: {
-        purchase: {
-          actionField: {
-            id: transactionID, // required
-            revenue: String(revenue)
-          },
-          products: [product]
-        }
+      params: {
+        transaction_id: transactionID,
+        currency: currencyCode,
+        value: revenue,
+        items: [product],
       }
     }
-    if (currencyCode) {
-      data.ecommerce.currencyCode = currencyCode
-    }
-    // Allow others to modify the data being sent to GTM.
+    // Allow others to modify the data being sent to Google Analytics.
     data = this.callChangeHook(eventName, data, this._context)
-    this.dataLayer.push(data)
+    this.gtag('event', data.event, data.params)
     this.printDebug('(event)', data)
     // Remember sent transactions ids.
     sentTransactionIDs.push(transactionID)

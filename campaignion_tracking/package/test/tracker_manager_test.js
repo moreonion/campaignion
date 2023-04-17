@@ -1,13 +1,14 @@
-/* global suite test setup teardown suiteSetup suiteTeardown */
+/* global suite test */
 
 import { strict as assert } from 'assert'
 import sinon from 'sinon'
 
-import { TrackerManager } from '../src/tracker-manager'
+import { TrackerManager } from '../src/tracker-manager.js'
 
 suite('TrackerManager', () => {
   test('it is instantiable', () => {
     const tracker = new TrackerManager()
+    assert.ok(tracker instanceof TrackerManager)
   })
 
   test('subscribe to topics', () => {

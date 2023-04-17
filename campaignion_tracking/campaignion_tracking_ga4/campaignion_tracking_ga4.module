@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for the Campaignion Tracking module for GA4.
+ */
+
+/**
+ * Implements hook_page_build().
+ */
+function campaignion_tracking_ga4_page_build(&$page) {
+  $module_path = drupal_get_path('module', 'campaignion_tracking_ga4');
+
+  // Add javascript.
+  $page['content']['#attached']['js'][$module_path . '/js/campaignion_tracking_ga4.min.js'] = [
+    'scope' => 'header',
+    'group' => JS_LIBRARY - 100,
+    'preprocess' => FALSE,
+  ];
+}
+
+/**
+ * Implements hook_campaignion_tracking_snippets().
+ */
+function campaignion_tracking_ga4_campaignion_tracking_snippets() {
+  if ($tag_id = variable_get('campaignion_tracking_ga4_id')) {
+    $exports['ga4'] = <<<SCRIPT
+      var script = document.createElement("script");
+      script.async = true;
+      script.src = "https://www.googletagmanager.com/gtag/js?id=$tag_id";
+      document.head.appendChild(script);
+      window.dataLayer = window.dataLayer || [];
+      function gtag () { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', '$tag_id');
+      SCRIPT;
+    return $exports;
+  }
+}

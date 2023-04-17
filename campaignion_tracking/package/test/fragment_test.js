@@ -1,4 +1,4 @@
-/* global suite test setup teardown suiteSetup suiteTeardown */
+/* global suite test */
 
 import { strict as assert } from 'assert'
 import sinon from 'sinon'
@@ -9,7 +9,7 @@ import {
   parseLocationHashForPrefixes,
   parsePartsWithPrefix,
   parsePart
-} from '../src/fragment'
+} from '../src/fragment.js'
 
 suite('parse location hash', () => {
   test('empty hash returns empty list', () => {
@@ -34,13 +34,13 @@ suite('parse location hash', () => {
     sinon.assert.match(parsed[1].codes, ['b', 'c'])
   })
 
-  test('return nothing if no prefix is whitelisted', () => {
+  test('return nothing if no prefix is allowed', () => {
     const locationHash = 'key1=a;key2=b,c;prefix1:key3=d'
     const parsed = parseLocationHashForPrefixes([], locationHash)
     assert(parsed.length === 0)
   })
 
-  test('return matches for whitelisted prefixes', () => {
+  test('return matches for allowed prefixes', () => {
     const locationHash = 'key1=a;prefix1:key2=b,c;prefix3:key3=d'
     const parsed = parseLocationHashForPrefixes(['prefix1', 'prefix3'], locationHash)
     // matches nested objects
@@ -48,7 +48,7 @@ suite('parse location hash', () => {
     sinon.assert.match(parsed[1], { prefix: 'prefix3' })
   })
 
-  test('return matches for whitelisted prefixes in order of location hash', () => {
+  test('return matches for allowed prefixes in order of location hash', () => {
     const locationHash = 'key1=a;prefix1:key2=b,c;prefix3:key3=d'
     const parsed = parseLocationHashForPrefixes(['prefix3', 'prefix1'], locationHash)
     // matches nested objects
