@@ -30,7 +30,7 @@ class ClientTest extends \DrupalUnitTestCase {
   protected function instrumentedApi() {
     $auth = $this->createMock(AuthAppClient::class);
     $api = $this->getMockBuilder(Client::class)
-      ->setConstructorArgs(['http://mock', $auth])
+      ->setConstructorArgs(['http://mock', $auth, 'impact-stack>test'])
       ->setMethods(['send'])
       ->getMock();
     return $api;
@@ -73,6 +73,19 @@ class ClientTest extends \DrupalUnitTestCase {
       ->method('send')
       ->with($this->equalTo('test-dataset/select'), $this->equalTo($args));
     $api->getTargets('test-dataset', $args);
+  }
+
+  /**
+   * Test that fetching the dataset list filters for the current organization.
+   */
+  public function testDatasetListFilteredByOrganization() {
+    $api = $this->instrumentedApi();
+    $args['organization'] = 'impact-stack>test';
+    $api->expects($this->once())
+      ->method('send')
+      ->with($this->equalTo(''), $this->equalTo($args))
+      ->will($this->returnValue([]));
+    $api->getDatasetList();
   }
 
 }

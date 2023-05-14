@@ -82,6 +82,7 @@ function campaignion_email_to_target_little_helpers_services() {
     'arguments' => [
       '!campaignion_email_to_target_e2t_api_url',
       '@campaignion_auth.AuthAppClient',
+      '!campaignion_organization',
     ],
   ];
   return $info;
