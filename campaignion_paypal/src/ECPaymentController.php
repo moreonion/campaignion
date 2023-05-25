@@ -2,15 +2,22 @@
 
 namespace Drupal\campaignion_paypal;
 
+/**
+ * Paypal express checkout controller with campaignion integration.
+ */
 class ECPaymentController extends \PayPalPaymentECPaymentMethodController {
 
-  // callback for user form
+  /**
+   * Callback for the payment UI form elements.
+   *
+   * @var callback
+   */
   public $payment_configuration_form_elements_callback = 'campaignion_paypal_payment_method_form';
 
   /**
    * Implements PaymentMethodController::execute().
    */
-  function execute(\Payment $payment) {
+  public function execute(\Payment $payment) {
     // Prepare the PayPal checkout token.
     $authentication = NULL;
     if ($payment->pid) {
@@ -44,4 +51,5 @@ class ECPaymentController extends \PayPalPaymentECPaymentMethodController {
     $nvp['SOLUTIONTYPE'] = 'Sole';
     return $nvp;
   }
+
 }
