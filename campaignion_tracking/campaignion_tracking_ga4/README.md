@@ -15,7 +15,7 @@ included in a different way, e.g. via the profile.
 
 ```json
 {
-  "event": "begin_action",      // triggered by draftBegin
+  "event": "begin_action",      // triggered by draftBegin (fired once after completing the first form step)
   "params": {
     "nid": "135",               // node id
     "action_title": "Example",  // node public title
@@ -23,7 +23,7 @@ included in a different way, e.g. via the profile.
   }
 },
 {
-  "event": "continue_action",   // triggered by draftContinue
+  "event": "continue_action",   // triggered by draftContinue (fired once on all form steps after the first step)
   "params": {
     "nid": "135",               // node id
     "action_title": "Example",  // node public title
@@ -31,7 +31,7 @@ included in a different way, e.g. via the profile.
   }
 },
 {
-  "event": "submission",        // triggered by submission
+  "event": "submission",        // triggered by form submission
   "params": {
     "nid": "135",               // node id
     "sid": "117",               // submission id
@@ -39,7 +39,7 @@ included in a different way, e.g. via the profile.
   }
 },
 {
-  "event": "optin",             // triggered by submission
+  "event": "optin",             // triggered by form submission
   "params": {
     "nid": "135",               // node id
     "sid": "117",               // submission id
@@ -55,7 +55,7 @@ included in a different way, e.g. via the profile.
 
 ```json
 {
-  "event": "add_to_cart",       // triggered by setDonationProduct
+  "event": "add_to_cart",       // triggered by setDonationProduct (fired after choosing 'amount' and 'interval')
   "params": {
     "currency": "EUR",
     "value": 10,                // donation sum
@@ -71,7 +71,7 @@ included in a different way, e.g. via the profile.
   }
 },
 {
-  "event": "remove_from_cart",  // triggered by setDonationProduct
+  "event": "remove_from_cart",  // triggered by setDonationProduct (fired after deselecting 'amount' and 'interval'))
   "params": {
     "currency": "EUR",
     "value": 10,                // donation sum
@@ -87,7 +87,7 @@ included in a different way, e.g. via the profile.
   }
 },
 {
-  "event": "begin_checkout",    // triggered by checkoutBegin
+  "event": "begin_checkout",    // triggered by checkoutBegin (fired on the second (or only) form step)
   "params": {
     "currency": "EUR",
     "value": 10,                // donation sum
@@ -103,7 +103,7 @@ included in a different way, e.g. via the profile.
   }
 },
 {
-  "event": "add_shipping_info", // triggered by checkoutEnd
+  "event": "add_shipping_info", // triggered by checkoutEnd (fired on the last form step)
   "params": {
     "currency": "EUR",
     "value": 10,                // donation sum
@@ -119,7 +119,7 @@ included in a different way, e.g. via the profile.
   }
 },
 {
-  "event": "purchase",          // triggered by donationSuccess
+  "event": "purchase",          // triggered by donationSuccess (fired on thank you page)
   "params": {
     "transaction_id": "117",    // submission id
     "currency": "EUR",
