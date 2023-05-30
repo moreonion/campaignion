@@ -34,11 +34,14 @@ class Client extends _Client {
    *   The URL for the API endpoint (withut the version prefix).
    * @param \Drupal\campaignion_auth\AuthAppClient $auth_client
    *   A auth app API client.
+   * @param string $organization
+   *   The Impact-Stack organization, which’s data we are working on.
    */
-  public function __construct(string $url, AuthAppClient $auth_client) {
+  public function __construct(string $url, AuthAppClient $auth_client, $organization) {
     parent::__construct($url . '/' . static::API_VERSION);
     $this->authClient = $auth_client;
     $this->datasets = &drupal_static(__CLASS__ . '.datasets', []);
+    $this->organization = $organization;
   }
 
   /**
@@ -64,7 +67,7 @@ class Client extends _Client {
    *   An array of datasets keyed by their machine names.
    */
   public function getDatasetList() {
-    $dataset_list = $this->get('');
+    $dataset_list = $this->get('', ['organization' => $this->organization]);
     foreach ($dataset_list as $dataset) {
       $ds = Dataset::fromArray($dataset);
       $this->datasets[$ds->key] = $ds;
