@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Main module file that implements hooks and callbacks.
+ */
+
+/**
  * Implements hook_payment_method_controller_info_alter().
  */
 function campaignion_paypal_payment_method_controller_info_alter(&$info) {
@@ -13,7 +18,7 @@ function campaignion_paypal_payment_method_controller_info_alter(&$info) {
 }
 
 /**
- * callback for the ECPaymentController
+ * Form element callback for the ECPaymentController.
  */
 function campaignion_paypal_payment_method_form(array $element, array &$form_state) {
   $form = array();
