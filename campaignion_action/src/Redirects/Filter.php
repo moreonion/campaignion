@@ -29,9 +29,8 @@ class Filter extends Model {
    *   Data representing the filter.
    */
   public static function fromArray(array $data) {
-    $data += ['id' => NULL, 'weight' => 0];
+    $data += ['weight' => 0];
     $filter = new static();
-    $filter->id = $data['id'];
     $filter->setData($data);
     return $filter;
   }
