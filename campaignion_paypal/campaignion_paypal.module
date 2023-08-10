@@ -54,3 +54,20 @@ function campaignion_paypal_paypal_payment_pps_data_alter($payment, &$data) {
     }
   }
 }
+
+/**
+ * Implements hook_payment_load().
+ */
+function campaignion_paypal_payment_load(array $payments) {
+  $pids = array_keys($payments);
+  foreach (db_select('paypal_payment_ipn', 'i')->fields('i')->condition("pid", $pids)->execute()->fetchAll() as $row) {
+    $payment = $payments[$row->pid];
+    foreach ($payment->statuses as $status_item) {
+      if ($status_item->psiid == $row->psiid) {
+        unset($row->pid);
+        unset($row->psiid);
+        $status_item->ipn = $row;
+      }
+    }
+  }
+}
