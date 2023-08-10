@@ -32,13 +32,11 @@ function campaignion_activity_campaignion_action_taken($node, Submission $submis
   ]);
   $activity->confirmed = $submission->confirmed ?? NULL;
 
-  if ($payments = $submission->payments ?? NULL) {
-    foreach ($payments as $payment) {
-      if (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_SUCCESS)) {
-        $activity = new WebformPayment($activity);
-        $activity->pid = $payment->pid;
-        break;
-      }
+  foreach (array_filter($submission->payments ?? []) as $payment) {
+    if (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_SUCCESS)) {
+      $activity = new WebformPayment($activity);
+      $activity->pid = $payment->pid;
+      break;
     }
   }
   $activity->save();
