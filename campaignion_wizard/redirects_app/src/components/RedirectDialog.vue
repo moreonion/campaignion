@@ -3,7 +3,7 @@ RedirectDialog component.
 The dialog to edit a redirect.
 </docs>
 
-<template lang="html">
+<template>
   <ElDialog
     :title="dialogTitle"
     :visible="visible"
@@ -57,8 +57,8 @@ import api from '@/utils/api'
 import {mapState} from 'vuex'
 import isEqual from 'lodash/isEqual'
 import omit from 'lodash/omit'
-import {DestinationField} from 'campaignion_vue'
-import FilterEditor from './FilterEditor'
+import DestinationField from './DestinationField.vue'
+import FilterEditor from './FilterEditor.vue'
 
 export default {
   components: {

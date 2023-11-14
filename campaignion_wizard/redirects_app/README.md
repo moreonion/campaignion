@@ -133,17 +133,15 @@ yarn dev
 
 # build for production with minification
 yarn build
+```
 
-# build nightwatch-xhr for the e2e tests
-cd node_modules/nightwatch-xhr
-yarn install
-cd ../..
+## Tests currently not working well
 
+The drag'n'drop test keeps failing with the current setup, probably due to compatibility issues between legacy Nightwatch / webdriver and current chromedriver. Decision to leave this like it is for now.
+
+``` bash
 # run e2e tests
 yarn e2e
-
-# run all tests
-yarn test
 ```
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

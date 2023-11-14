@@ -3,7 +3,7 @@ RedirectList component.
 Displays all redirects in a draggable list.
 </docs>
 
-<template lang="html">
+<template>
   <Draggable
     v-model="redirects"
     element="ul"
@@ -33,7 +33,7 @@ Displays all redirects in a draggable list.
 
 <script>
 import Draggable from 'vuedraggable'
-import RedirectDescription from './RedirectDescription'
+import RedirectDescription from './RedirectDescription.vue'
 
 export default {
 

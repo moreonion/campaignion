@@ -31,9 +31,9 @@ import {mapState} from 'vuex'
 import isEqual from 'lodash/isEqual'
 import {clone, dispatch, validateDestination} from '@/utils'
 import api from '@/utils/api'
-import RedirectList from './components/RedirectList'
-import RedirectDialog from './components/RedirectDialog'
-import {DestinationField} from 'campaignion_vue'
+import RedirectList from './components/RedirectList.vue'
+import RedirectDialog from './components/RedirectDialog.vue'
+import DestinationField from './components/DestinationField.vue'
 
 export default {
   name: 'app',

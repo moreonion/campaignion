@@ -4,7 +4,7 @@ Provides a UI to edit a redirect’s filters.
 Use this component with the `.sync` modifier on the `filters` prop.
 </docs>
 
-<template lang="html">
+<template>
   <section class="pra-filter-editor">
 
     <header>

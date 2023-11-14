@@ -1,5 +1,3 @@
-var config = require('../../../config')
-
 function destinationField (selector) {
   return {
     destinationInput: selector + ' input',
@@ -8,7 +6,7 @@ function destinationField (selector) {
 }
 
 module.exports = {
-  url: 'http://localhost:' + (process.env.PORT || config.dev.port),
+  url: 'http://localhost:' + process.env.PREVIEW_PORT,
   elements: [
     destinationField('.pra-default-redirect'),
     {

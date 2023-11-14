@@ -3,7 +3,7 @@ RedirectDescription component.
 Display a human readable description of a redirect’s filters.
 </docs>
 
-<template lang="html">
+<template>
   <ul class="pra-redirect-info-filters">
     <li v-for="filter in redirect.filters">
       <template v-if="filter.type === 'opt-in'">{{ filter.value ? text('User has opted in') : text('User has not opted in') }}</template>

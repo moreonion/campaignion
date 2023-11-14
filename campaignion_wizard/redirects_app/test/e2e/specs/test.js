@@ -90,9 +90,8 @@ module.exports = {
   },
 
   'redirect drag’n’drop': function (browser) {
-    // In chromium this test regularly fails, probably due to a selenium issue.
-    // Workaround: Place the mouse pointer somewhere inside the browser window.
-    console.log('If this test keeps failing, place the mouse pointer inside the browser window.')
+    // #TODO This one keeps failing with the current setup, probably due to incompatibility issues between legacy
+    // Nightwatch / webdriver and current chromedriver
     var app = browser.page.app()
     var redirect = app.section.redirectList.section.redirect
     var redirectSelectors = listSelectors(redirect.selector, 2)

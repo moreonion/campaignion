@@ -1,9 +1,8 @@
-const path = require('path')
-const fakeNodes = require('../test/fixtures/node-list.js')
-const initialData = require('../test/fixtures/initial-data.js')
-const jsonServer = require('json-server')
+import path from 'path'
+import fakeNodes from './test/fixtures/node-list.mjs'
+import jsonServer from 'json-server'
 const server = jsonServer.create()
-const router = jsonServer.router(path.join(__dirname, '/api-db.json'))
+const router = jsonServer.router('./api-db.json')
 const middlewares = jsonServer.defaults()
 
 // Set default middlewares (logger, static, cors and no-cache)

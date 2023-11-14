@@ -1,4 +1,4 @@
-module.exports = function (url) {
+export default function (url) {
   var slices = url.match(/.+\?(.+)=(.+)/)
   var queryString = slices && slices[2] || ''
 
