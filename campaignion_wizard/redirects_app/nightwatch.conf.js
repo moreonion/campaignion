@@ -18,10 +18,10 @@ module.exports = {
     port: 9515
   },
 
-  test_settings : {
-    default : {
-      desiredCapabilities : {
-        browserName : 'chrome'
+  test_settings: {
+    default: {
+      desiredCapabilities: {
+        browserName: 'chrome'
       },
       screenshots: {
         enabled: true,

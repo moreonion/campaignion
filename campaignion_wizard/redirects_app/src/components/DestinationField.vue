@@ -37,7 +37,7 @@ You can use this component with `v-model` to get/set its value.
 </template>
 
 <script>
-import {fixedEncodeURIComponent, escapeRegExp} from '../utils'
+import { fixedEncodeURIComponent, escapeRegExp } from '../utils'
 
 const _DELAY_ = 200
 
@@ -123,7 +123,7 @@ export default {
       return {
         template: typeof this.template === 'string' ? '<span v-html="this.template"></span>' : '<span v-html="highlight(item.' + this.labelKey + ', value)"></span>',
         props: {
-          item: {default: null},
+          item: { default: null },
           value: String
         },
         methods: {
@@ -187,7 +187,7 @@ export default {
       if (this.urlMode) {
         return
       }
-      var lastVal = this.val
+      const lastVal = this.val
       setTimeout(() => {
         // Only query if the value didn’t change during the delay period.
         if (this.val === lastVal) {
@@ -208,7 +208,7 @@ export default {
       }).then(response => {
         // get the search term from the url
         const re = new RegExp('[&|?]' + this.queryParam + '=([^&]*)')
-        var searchVal
+        let searchVal
         try {
           searchVal = response.config.url.match(re)[1]
         } catch (error) {
@@ -217,7 +217,7 @@ export default {
         // Throw the response away if the typeahead value has changed in the meantime.
         if (fixedEncodeURIComponent(this.val) !== searchVal) return
 
-        var data = response.data
+        const data = response.data
         this.items = (this.dataKey ? data[this.dataKey] : data).slice(0, this.count)
         this.showDropdown = this.items.length > 0
       })

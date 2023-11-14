@@ -51,10 +51,10 @@ The dialog to edit a redirect.
 </template>
 
 <script>
-import {clone, validateDestination} from '@/utils'
-import {OPERATORS, emptyRedirect} from '@/utils/defaults'
+import { clone, validateDestination } from '@/utils'
+import { OPERATORS, emptyRedirect } from '@/utils/defaults'
 import api from '@/utils/api'
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 import isEqual from 'lodash/isEqual'
 import omit from 'lodash/omit'
 import DestinationField from './DestinationField.vue'
@@ -86,7 +86,7 @@ export default {
         return Drupal.t('Add personalized redirect')
       } else if (this.currentRedirectIndex >= 0) {
         if (this.currentRedirect.label) {
-          return Drupal.t('Edit @itemName', {'@itemName': this.currentRedirect.label})
+          return Drupal.t('Edit @itemName', { '@itemName': this.currentRedirect.label })
         } else {
           return Drupal.t('Edit personalized redirect')
         }
@@ -170,8 +170,8 @@ export default {
      */
     tryClose (options) {
       // Any changes?
-      if (this.currentRedirectIndex !== -1 && isEqual(this.currentRedirect, this.redirects[this.currentRedirectIndex]) ||
-        this.currentRedirectIndex === -1 && this.currentRedirectIsEmpty ||
+      if ((this.currentRedirectIndex !== -1 && isEqual(this.currentRedirect, this.redirects[this.currentRedirectIndex])) ||
+        (this.currentRedirectIndex === -1 && this.currentRedirectIsEmpty) ||
         (this.modalDirty && options && options.button === 'cancel')) {
         // No changes or force close via cancel button: allow to close modal.
         return true
@@ -197,7 +197,7 @@ export default {
      * Handle dialog closing via the Cancel button.
      */
     cancelButtonHandler () {
-      if (this.tryClose({button: 'cancel'})) {
+      if (this.tryClose({ button: 'cancel' })) {
         this.close()
       }
     },
@@ -210,7 +210,7 @@ export default {
         this.showErrors = true
         return
       }
-      this.$store.commit({type: 'updateRedirect', redirect: this.currentRedirect})
+      this.$store.commit({ type: 'updateRedirect', redirect: this.currentRedirect })
       this.close()
     },
 
@@ -236,12 +236,12 @@ export default {
     })
     this.$root.$on('editRedirect', index => {
       this.currentRedirect = clone(this.redirects[index])
-      this.$store.commit({type: 'editRedirect', index})
+      this.$store.commit({ type: 'editRedirect', index })
     })
     this.$root.$on('duplicateRedirect', index => {
       const duplicate = clone(this.redirects[index])
       duplicate.id = emptyRedirect().id
-      duplicate.label = Drupal.t('Copy of @redirectLabel', {'@redirectLabel': duplicate.label})
+      duplicate.label = Drupal.t('Copy of @redirectLabel', { '@redirectLabel': duplicate.label })
       this.currentRedirect = duplicate
       this.$store.commit('editNewRedirect')
     })

@@ -1,1 +1,1 @@
-import '/drupal-fixture.js'
+import '../../drupal-fixture.js'

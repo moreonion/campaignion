@@ -7,7 +7,7 @@ export const OPERATORS = {
     label: Drupal.t('is not'),
     phrase: Drupal.t('@attribute is not @value')
   },
-  'contains': {
+  contains: {
     label: Drupal.t('contains'),
     phrase: Drupal.t('@attribute contains @value')
   },
@@ -15,7 +15,7 @@ export const OPERATORS = {
     label: Drupal.t('does not contain'),
     phrase: Drupal.t('@attribute doesn’t contain @value')
   },
-  'regexp': {
+  regexp: {
     label: Drupal.t('matches'),
     phrase: Drupal.t('@attribute matches @value')
   },

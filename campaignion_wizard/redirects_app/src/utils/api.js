@@ -24,7 +24,7 @@ export default {
    * @param {Object} options.headers - Headers to send along.
    * @return {Promise} A Promise resolving if the request succeeds.
    */
-  postData: function ({url, data, headers}) {
+  postData: function ({ url, data, headers }) {
     return axios.put(url, data)
   },
 
@@ -37,7 +37,7 @@ export default {
    * @param {Object} options.headers - Headers to send along.
    * @return {Promise} A Promise resolving if the request succeeds.
    */
-  getNodes: function ({url, queryParam, queryString, headers}) {
+  getNodes: function ({ url, queryParam, queryString, headers }) {
     return axios.get(paramReadyUrl(url) + queryParam + '=' + queryString)
   }
 }

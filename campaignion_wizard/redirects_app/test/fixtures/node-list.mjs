@@ -1,8 +1,8 @@
 export default function (url) {
-  var slices = url.match(/.+\?(.+)=(.+)/)
-  var queryString = slices && slices[2] || ''
+  const slices = url.match(/.+\?(.+)=(.+)/)
+  const queryString = (slices && slices[2]) || ''
 
-  var values = []
+  const values = []
   if (!queryString) {
     for (let i = 1; i <= 300; i++) {
       values.push({
@@ -19,5 +19,5 @@ export default function (url) {
     }
   }
 
-  return {values}
+  return { values }
 }

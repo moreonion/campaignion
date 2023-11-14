@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import {clone} from '@/utils'
+import { clone } from '@/utils'
 
 export default {
   /**
@@ -9,7 +9,7 @@ export default {
    * @param {Object[]} payload.redirects - Collection of redirects, Collection of objects describing the target attributes: {name: 'contact.email', label: 'Email address', description: ''}including the default redirect as the last item.
    * @param {string} payload.defaultRedirectUrl - If there is no redirects array or if it’s empty, use this url for the default redirect.
    */
-  initData (state, {redirects, defaultRedirectUrl}) {
+  initData (state, { redirects, defaultRedirectUrl }) {
     if (defaultRedirectUrl && (typeof redirects === 'undefined' || !redirects.length)) {
       state.defaultRedirect.destination = defaultRedirectUrl
       state.defaultRedirect.prettyDestination = defaultRedirectUrl
@@ -37,7 +37,7 @@ export default {
    * @param {Object} payload - The mutation’s payload.
    * @param {integer} payload.index - The redirect’s index in the redirect array.
    */
-  editRedirect (state, {index}) {
+  editRedirect (state, { index }) {
     state.currentRedirectIndex = index
   },
 
@@ -47,7 +47,7 @@ export default {
    * @param {Object} payload - The mutation’s payload.
    * @param {integer} payload.index - The redirect’s index in the redirects array.
    */
-  removeRedirect (state, {index}) {
+  removeRedirect (state, { index }) {
     state.redirects.splice(index, 1)
   },
 
@@ -65,7 +65,7 @@ export default {
    * @param {Object} payload - The mutation’s payload.
    * @param {Object} payload.redirect - The redirect to be saved.
    */
-  updateRedirect (state, {redirect}) {
+  updateRedirect (state, { redirect }) {
     if (state.currentRedirectIndex === null) return
     if (state.currentRedirectIndex === -1) {
       state.redirects.push(redirect)
@@ -81,7 +81,7 @@ export default {
    * @param {Object} payload.destination - The default redirect’s internal value.
    * @param {Object} payload.prettyDestination - The default redirect’s display value.
    */
-  updateDefaultRedirect (state, {destination, prettyDestination}) {
+  updateDefaultRedirect (state, { destination, prettyDestination }) {
     state.defaultRedirect.destination = destination
     state.defaultRedirect.prettyDestination = prettyDestination
   },
@@ -92,7 +92,7 @@ export default {
    * @param {Object} payload - The mutation’s payload.
    * @param {Object[]} payload.redirects - The collection of redirects to be saved.
    */
-  updateRedirects (state, {redirects}) {
+  updateRedirects (state, { redirects }) {
     state.redirects = redirects
   }
 }

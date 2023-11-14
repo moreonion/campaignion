@@ -1,4 +1,3 @@
-import path from 'path'
 import fakeNodes from './test/fixtures/node-list.mjs'
 import jsonServer from 'json-server'
 const server = jsonServer.create()

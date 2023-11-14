@@ -82,8 +82,8 @@ export default {
      * @return {Object[]} Collection of options like `{value: '==', label: 'is'}`
      */
     operatorOptions () {
-      var arr = []
-      Object.keys(this.operators).map(key => {
+      const arr = []
+      Object.keys(this.operators).forEach(key => {
         arr.push({
           value: key,
           label: this.operators[key].label
@@ -97,7 +97,7 @@ export default {
      * @return {boolean} Has an opt-in filter already been used?
      */
     optInUsed () {
-      return !!find(this.f, {type: 'opt-in'})
+      return !!find(this.f, { type: 'opt-in' })
     }
   },
 
@@ -136,7 +136,7 @@ export default {
      * @param {string} type - The type of the new filter.
      */
     addFilter (type) {
-      var filter = {
+      const filter = {
         id: null,
         type
       }

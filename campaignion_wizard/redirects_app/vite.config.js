@@ -7,9 +7,9 @@ import vitePluginImp from 'vite-plugin-imp'
 
 const vueDocsPlugin = {
   name: 'vue-docs',
-  transform(code, id) {
+  transform (code, id) {
     if (!/vue&type=docs/.test(id)) return
-    return `export default ''`
+    return 'export default \'\''
   }
 }
 
@@ -59,9 +59,9 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8081',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
   },
   test: {
     globals: true,

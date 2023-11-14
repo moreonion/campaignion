@@ -27,9 +27,9 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 import isEqual from 'lodash/isEqual'
-import {clone, dispatch, validateDestination} from '@/utils'
+import { clone, dispatch, validateDestination } from '@/utils'
 import api from '@/utils/api'
 import RedirectList from './components/RedirectList.vue'
 import RedirectDialog from './components/RedirectDialog.vue'
@@ -142,8 +142,6 @@ export default {
         } else {
           leavePage()
         }
-
-        return
       } else if (e.type === 'request-submit-page') {
         // User clicked one of the submit buttons.
 
@@ -201,11 +199,11 @@ export default {
     persistData () {
       return new Promise((resolve, reject) => {
         // Append the default redirect to the redirects array.
-        var redirects = clone(this.redirects)
+        const redirects = clone(this.redirects)
         redirects.push(clone(this.defaultRedirect))
         api.postData({
           url: this.$root.$options.settings.endpoints.redirects,
-          data: {redirects},
+          data: { redirects },
           headers: {}
         }).then(() => {
           resolve()

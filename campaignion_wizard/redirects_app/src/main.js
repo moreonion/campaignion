@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
-import {createStore} from './store'
+import { createStore } from './store'
 
 import {
   Button,
@@ -18,7 +18,7 @@ import locale from 'element-ui/lib/locale'
 // Set language for element-ui.
 try {
   locale.use(Drupal.settings.campaignion_vue.element_ui_strings)
-} catch {
+} catch (e) {
   console.error('Could not load strings from Drupal.settings.campaignion_vue.element_ui_strings')
 }
 
@@ -52,6 +52,6 @@ containers.forEach(drupalContainer => {
     settings: {},
     render: (h) => h(App),
     store: createStore(),
-    components: {App}
+    components: { App }
   })
 })

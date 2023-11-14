@@ -15,7 +15,7 @@ const dropdownItemHeight = 20
  */
 function fakeDropdown (dropdownHeight) {
   const items = []
-  for (var i = 0; i < 20; i++) {
+  for (let i = 0; i < 20; i++) {
     items.push({
       offsetTop: dropdownItemHeight * i,
       clientHeight: dropdownItemHeight
@@ -35,7 +35,7 @@ describe('DestinationField.vue', function () {
     })
     it('returns correct init values for attributes.', function () {
       assert.deepEqual(c.data.call({
-        value: {value: 'node/2', label: 'My node'}
+        value: { value: 'node/2', label: 'My node' }
       }), {
         val: 'My node',
         showDropdown: false,
@@ -54,7 +54,7 @@ describe('DestinationField.vue', function () {
         const templateComp = c.computed.templateComp.call(context)
         assert.equal(templateComp.template, '<span v-html="highlight(item.foo, value)"></span>')
         assert.deepEqual(templateComp.props, {
-          item: {default: null},
+          item: { default: null },
           value: String
         })
         assert.equal(typeof templateComp.methods.highlight, 'function')
@@ -73,16 +73,16 @@ describe('DestinationField.vue', function () {
     describe('urlMode', function () {
       const urlMode = c.computed.urlMode
       it('returns true if this.val starts with ww', function () {
-        assert(urlMode.call({val: 'wwfoo'}) === true)
+        assert(urlMode.call({ val: 'wwfoo' }) === true)
       })
       it('returns true if this.val starts with ht', function () {
-        assert(urlMode.call({val: 'htbla'}) === true)
+        assert(urlMode.call({ val: 'htbla' }) === true)
       })
       it('returns true if this.val starts with a slash', function () {
-        assert(urlMode.call({val: '/foo'}) === true)
+        assert(urlMode.call({ val: '/foo' }) === true)
       })
       it('returns false if this.val starts with something else.', function () {
-        assert(urlMode.call({val: 'foo'}) === false)
+        assert(urlMode.call({ val: 'foo' }) === false)
       })
     })
   })
@@ -93,8 +93,8 @@ describe('DestinationField.vue', function () {
         assert(c.watch.value.deep === true)
       })
       it('updates this.val.label', function () {
-        const context = {val: 'foo'}
-        c.watch.value.handler.call(context, {value: 'some value', label: 'bar'})
+        const context = { val: 'foo' }
+        c.watch.value.handler.call(context, { value: 'some value', label: 'bar' })
         assert(context.val === 'bar')
       })
       // TODO test if branch?
@@ -116,7 +116,7 @@ describe('DestinationField.vue', function () {
 
     describe('update', function () {
       const update = c.methods.update
-      var context, clock
+      let context, clock
 
       beforeEach(function () {
         // State: a suggestion is selected.
@@ -183,13 +183,13 @@ describe('DestinationField.vue', function () {
 
     describe('query', function () {
       const query = c.methods.query
-      var context
+      let context
       const responseData = {
         myItems: [
-          {value: '1', label: 'One'},
-          {value: '2', label: 'Two'},
-          {value: '3', label: 'Three'},
-          {value: '4', label: 'Four'}
+          { value: '1', label: 'One' },
+          { value: '2', label: 'Two' },
+          { value: '3', label: 'Three' },
+          { value: '4', label: 'Four' }
         ]
       }
 
@@ -199,7 +199,7 @@ describe('DestinationField.vue', function () {
           dataKey: 'myItems',
           queryParam: 'search',
           url: 'http://foo.bar.com',
-          headers: {'Foo': 'bar'},
+          headers: { Foo: 'bar' },
           count: 3,
           getData: sinon.spy(function () {
             return Promise.resolve({
@@ -218,7 +218,7 @@ describe('DestinationField.vue', function () {
         assert(context.getData.calledOnce)
         assert.deepEqual(context.getData.firstCall.args[0], {
           url: 'http://foo.bar.com',
-          headers: {'Foo': 'bar'},
+          headers: { Foo: 'bar' },
           queryParam: context.queryParam,
           queryString: 'bar'
         })
@@ -229,7 +229,7 @@ describe('DestinationField.vue', function () {
         assert(context.getData.calledOnce)
         assert.equal(context.getData.firstCall.args[0].queryString, '%26%3F')
       })
-      it('sets this.items if the query string matches this.val',() => new Promise (done => {
+      it('sets this.items if the query string matches this.val', () => new Promise(done => { // eslint-disable-line promise/param-names
         context.val = 'bar' // The spy returns the response for the search term 'bar'.
         query.call(context)
         setTimeout(() => {
@@ -238,7 +238,7 @@ describe('DestinationField.vue', function () {
           done()
         }, 0)
       }))
-      it('throws the response away if the response query string doesn’t match this.val', () => new Promise (done => {
+      it('throws the response away if the response query string doesn’t match this.val', () => new Promise(done => { // eslint-disable-line promise/param-names
         context.val = 'barista' // The spy returns the response for the search term 'bar'.
         query.call(context)
         setTimeout(() => {
@@ -246,7 +246,7 @@ describe('DestinationField.vue', function () {
           done()
         }, 0)
       }))
-      it('shows the dropdown if there are items', () => new Promise (done => {
+      it('shows the dropdown if there are items', () => new Promise(done => { // eslint-disable-line promise/param-names
         context.val = 'bar' // The spy returns the response for the search term 'bar'.
         query.call(context)
         setTimeout(() => {
@@ -261,8 +261,8 @@ describe('DestinationField.vue', function () {
       it('clears the items, resets the current item and hides the dropdown.', function () {
         const context = {
           items: [
-            {value: '1', label: 'One'},
-            {value: '2', label: 'Two'}
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' }
           ],
           current: 1,
           showDropdown: true
@@ -276,14 +276,14 @@ describe('DestinationField.vue', function () {
 
     describe('setActive', function () {
       it('sets the current item.', function () {
-        const context = {current: 0}
+        const context = { current: 0 }
         c.methods.setActive.call(context, 5)
         assert.equal(context.current, 5)
       })
     })
 
     describe('isActive', function () {
-      const context = {current: 7}
+      const context = { current: 7 }
       it('returns true if the specified item is active.', function () {
         assert.equal(c.methods.isActive.call(context, 7), true)
       })
@@ -294,13 +294,13 @@ describe('DestinationField.vue', function () {
 
     describe('hit', function () {
       const hit = c.methods.hit
-      var context
+      let context
 
       beforeEach(function () {
         context = {
           items: [
-            {val: '1', text: 'One'},
-            {val: '2', text: 'Two'}
+            { val: '1', text: 'One' },
+            { val: '2', text: 'Two' }
           ],
           val: 'foo', // current value of the input
           current: 1, // the second dropdown item is active
@@ -340,7 +340,7 @@ describe('DestinationField.vue', function () {
 
     describe('up', function () {
       const up = c.methods.up
-      var context
+      let context
 
       beforeEach(function () {
         context = {
@@ -383,7 +383,7 @@ describe('DestinationField.vue', function () {
 
     describe('down', function () {
       const down = c.methods.down
-      var context
+      let context
 
       beforeEach(function () {
         context = {
@@ -426,11 +426,11 @@ describe('DestinationField.vue', function () {
 
     describe('esc', function () {
       const esc = c.methods.esc
-      var context, e
+      let context, e
 
       beforeEach(function () {
-        context = {showDropdown: true}
-        e = {stopPropagation: sinon.fake()}
+        context = { showDropdown: true }
+        e = { stopPropagation: sinon.fake() }
       })
 
       it('stops event propagation if the dropdown is open.', function () {
