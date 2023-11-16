@@ -1,34 +1,15 @@
 <?php
 
-// Filter for css files.
-function _campaignion_vue_filter_css($filename) {
-  return (strpos($filename, '.css') === strlen($filename) - 4);
-}
-
 // Add scripts, settings and styles needed by vue apps.
-function _campaignion_vue_add_assets($add_dependencies) {
+function _campaignion_vue_add_assets() {
   $module_path = drupal_get_path('module', 'campaignion_vue');
 
-  // Add javascript.
-  if ($add_dependencies) {
-    drupal_add_js($module_path . '/js/campaignion_vue.min.js', [
-      'scope' => 'footer',
-      'group' => JS_LIBRARY,
-      'preprocess' => FALSE,
-    ]);
-  }
   drupal_add_js($module_path . '/js/interrupt-submit.js');
 
   // Add element-ui locale.
   if ($strings = _campaignion_vue_get_strings()) {
     $settings['campaignion_vue']['element_ui_strings'] = json_decode($strings, TRUE);
     drupal_add_js($settings, 'setting');
-  }
-
-  // Add element-ui stylesheets.
-  $stylesheets = array_filter(scandir($module_path . '/css'), '_campaignion_vue_filter_css');
-  foreach ($stylesheets as $stylesheet) {
-    drupal_add_css($module_path . '/css/' . $stylesheet);
   }
 }
 
@@ -60,20 +41,13 @@ function _campaignion_vue_get_strings($language = NULL) {
 function campaignion_vue_preprocess_html(&$vars) {
   $js = drupal_add_js();
   $found = FALSE;
-  $add_dependencies = FALSE;
   foreach ($js as $path => $options) {
-    if (substr($path, -24) == 'redirects_app.vue.min.js') {
-      // Add dependencies for the redirects_app only, the other apps are now
-      // bundled with their dependencies.
-      $add_dependencies = TRUE;
-      $found = TRUE;
-      break;
-    } elseif (substr($path, -11) == '.vue.min.js') {
+    if (substr($path, -11) == '.vue.min.js') {
       $found = TRUE;
       break;
     }
   }
   if ($found) {
-    _campaignion_vue_add_assets($add_dependencies);
+    _campaignion_vue_add_assets();
   }
 }
