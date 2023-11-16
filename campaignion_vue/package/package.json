@@ -6,7 +6,7 @@
     "build": "node extract-locale.js"
   },
   "dependencies": {
-    "element-ui": "2.6.1"
+    "element-ui": "2.15.12"
   },
   "devDependencies": {
     "require-dir": "0.3.2"
