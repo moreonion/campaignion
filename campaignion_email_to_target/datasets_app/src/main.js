@@ -22,8 +22,8 @@ import locale from 'element-ui/lib/locale'
 // Set language for element-ui.
 try {
   locale.use(Drupal.settings.campaignion_vue.element_ui_strings)
-} catch {
-  console.error('Could not load strings from Drupal.settings.campaignion_vue.element_ui_strings');
+} catch (e) {
+  console.error('Could not load strings from Drupal.settings.campaignion_vue.element_ui_strings')
 }
 
 // Create a central event bus.
