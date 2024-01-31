@@ -52,7 +52,9 @@ const Drupal = {
           url: process.env.E2T_API_URL, // url injected by Vite
           token: process.env.E2T_API_TOKEN // token injected by Vite
         }
-      }
+      },
+      datasetQuery: '',
+      organization: ''
     }
   },
 
