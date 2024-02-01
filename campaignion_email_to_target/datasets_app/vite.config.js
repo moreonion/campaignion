@@ -9,6 +9,7 @@ import vitePluginImp from 'vite-plugin-imp'
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
+    assetsInlineLimit: 32000,
     rollupOptions: {
       output: {
         manualChunks: {
