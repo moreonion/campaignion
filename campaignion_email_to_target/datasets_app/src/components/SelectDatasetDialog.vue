@@ -9,7 +9,7 @@
 
     <template slot="title">
       <span class="el-dialog__title">{{ text('Choose your dataset') }}</span>
-      <el-button type="button" @click="editNewDataset" class="dsa-add-new-dataset">{{ text('Add new dataset') }}</el-button>
+      <el-button @click="editNewDataset" class="dsa-add-new-dataset">{{ text('Add new dataset') }}</el-button>
     </template>
 
     <p class="dsa-hint">{{ text('hint') }}</p>

@@ -10,8 +10,8 @@
       {{ label }}
     </div>
     <input type="text" v-model="value" @keydown.enter.stop="save" @keydown.esc.stop="cancel" ref="input" class="dsa-edit-value-input field-input"/>
-    <el-button type="button" @click="save" class="dsa-edit-value-save">{{ text('save') }}</el-button>
-    <el-button type="button" @click="cancel" class="dsa-edit-value-cancel">{{ text('cancel') }}</el-button>
+    <el-button @click="save" class="dsa-edit-value-save">{{ text('save') }}</el-button>
+    <el-button @click="cancel" class="dsa-edit-value-cancel">{{ text('cancel') }}</el-button>
   </div>
 </template>
 

@@ -3,7 +3,7 @@
     <div v-if="livingInWizard" v-loading="showSpinner && !showSelectDialog && !showEditDialog" class="dsa-wizard-step">
       <div class="ae-legend">{{ text('Your targets') }}</div>
       <div class="dsa-intro-text" v-html="introText"></div>
-      <ElButton type="button" @click="openDialog" :disabled="apiError || showSpinner" class="dsa-select-or-edit-dataset">{{ buttonText }}</ElButton>
+      <el-button @click="openDialog" :disabled="apiError || showSpinner" class="dsa-select-or-edit-dataset">{{ buttonText }}</el-button>
     </div>
     <div v-if="apiError" class="dsa-has-error">{{ text('api error') }}</div>
 

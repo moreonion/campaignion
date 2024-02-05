@@ -1,6 +1,8 @@
 // This module is used to provide the Drupal global in development and test mode.
 // Functions taken from drupal.js.
 
+import elementUiStrings from 'element-ui/lib/locale/lang/en'
+
 const Drupal = {
   settings: {
     campaignion_email_to_target: {
@@ -55,6 +57,9 @@ const Drupal = {
       },
       datasetQuery: '',
       organization: ''
+    },
+    campaignion_vue: {
+      element_ui_strings: elementUiStrings
     }
   },
 

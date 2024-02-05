@@ -79,7 +79,7 @@
             <span class="VueTables__heading"></span>
           </template>
         </v-client-table>
-        <el-button type="button" @click="addContact" class="dsa-add-contact">{{ text('add row') }}</el-button>
+        <el-button @click="addContact" class="dsa-add-contact">{{ text('add row') }}</el-button>
       </div>
     </div>
 

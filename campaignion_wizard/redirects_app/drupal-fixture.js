@@ -2,11 +2,15 @@
 // Functions taken from drupal.js.
 
 import exampleData from './test/fixtures/example-data'
+import elementUiStrings from 'element-ui/lib/locale/lang/en'
 
 const Drupal = {
   settings: {
     campaignion_wizard: {
       'personalized-redirects-widget--5': exampleData
+    },
+    campaignion_vue: {
+      element_ui_strings: elementUiStrings
     }
   },
 

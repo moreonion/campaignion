@@ -3,12 +3,16 @@
 
 import exampleData from '/test/unit/fixtures/example-data'
 import initialData from '/test/unit/fixtures/initial-data'
+import elementUiStrings from 'element-ui/lib/locale/lang/en'
 
 const Drupal = {
   settings: {
     campaignion_email_to_target: (process.env.NODE_ENV === 'development')
       ? exampleData
-      : initialData
+      : initialData,
+    campaignion_vue: {
+      element_ui_strings: elementUiStrings
+    }
   },
 
   locale: {},
