@@ -73,11 +73,9 @@
             }">{{ column.title }}</span>
           </template>
 
-          <template v-slot:h____error="props"></template>
+          <template slot="h____error">&nbsp;</template>
 
-          <template v-slot:h____delete="props">
-            <span class="VueTables__heading"></span>
-          </template>
+          <template slot="h____delete">&nbsp;</template>
         </v-client-table>
         <el-button @click="addContact" class="dsa-add-contact">{{ text('add row') }}</el-button>
       </div>

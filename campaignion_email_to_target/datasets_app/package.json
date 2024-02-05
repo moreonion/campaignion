@@ -22,7 +22,7 @@
     "popper.js": "1.16.1",
     "v-tooltip": "2.0.0-rc.33",
     "vue": "2.7.7",
-    "vue-tables-2": "2.0.15",
+    "vue-tables-2": "1.4.86",
     "vuedraggable": "2.14.1",
     "vuex": "2.3.1"
   },
