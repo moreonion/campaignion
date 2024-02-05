@@ -470,4 +470,7 @@ input#dsa-updoad-data {
 .table-responsive {
   overflow-x: auto;
 }
+.dsa-contacts-table .VueTables__search-field {
+  display: inline-block;
+}
 </style>
