@@ -1,0 +1,41 @@
+{
+  "data": {
+    "redirects": [
+      {
+        "id": null,
+        "label": "foo",
+        "destination": "node/4",
+        "prettyDestination": "Some Node title (4)",
+        "filters": [
+          {
+            "id": null,
+            "type": "opt-in",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": null,
+        "label": "bar",
+        "destination": "node/5",
+        "prettyDestination": "Some Node title (5)",
+        "filters": [
+          {
+            "id": null,
+            "type": "submission-field",
+            "field": "f_name",
+            "operator": "==",
+            "value": "Mark"
+          }
+        ]
+      },
+      {
+        "id": null,
+        "label": "",
+        "destination": "http://old-default-url.com",
+        "prettyDestination": "http://old-default-url.com",
+        "filters": []
+      }
+    ]
+  }
+}

@@ -1,6 +1,7 @@
+import { describe, it } from 'vitest'
 import assert from 'assert'
 
-import EditDatasetDialog from '@/components/EditDatasetDialog'
+import EditDatasetDialog from '@/components/EditDatasetDialog.vue'
 
 describe('EditDatasetDialog', function () {
   describe('computed', function () {

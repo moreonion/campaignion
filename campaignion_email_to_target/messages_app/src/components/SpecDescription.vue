@@ -1,9 +1,9 @@
 <docs>
 SpecDescription component.
-Shows a sentence describing a spec’s functionality.
+Shows a sentence describing a spec's functionality.
 </docs>
 
-<template lang="html">
+<template>
   <span>
     {{ specDescription }}
     <template v-if="spec.filters.length" v-for="(filter, index) in spec.filters">

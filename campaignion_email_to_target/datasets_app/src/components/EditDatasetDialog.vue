@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <el-dialog v-if="currentDataset"
     :title="dialogTitle"
     :visible="showEditDialog"
@@ -73,13 +73,11 @@
             }">{{ column.title }}</span>
           </template>
 
-          <template v-slot:h____error="props"></template>
+          <template slot="h____error">&nbsp;</template>
 
-          <template v-slot:h____delete="props">
-            <span class="VueTables__heading"></span>
-          </template>
+          <template slot="h____delete">&nbsp;</template>
         </v-client-table>
-        <el-button type="button" @click="addContact" class="dsa-add-contact">{{ text('add row') }}</el-button>
+        <el-button @click="addContact" class="dsa-add-contact">{{ text('add row') }}</el-button>
       </div>
     </div>
 
@@ -95,7 +93,7 @@
 </template>
 
 <script>
-import EditValuePopup from '@/components/EditValuePopup'
+import EditValuePopup from '@/components/EditValuePopup.vue'
 import {mapState} from 'vuex'
 import {INVALID_CONTACT_STRING} from '@/utils'
 import find from 'lodash/find'
@@ -471,5 +469,8 @@ input#dsa-updoad-data {
 }
 .table-responsive {
   overflow-x: auto;
+}
+.dsa-contacts-table .VueTables__search-field {
+  display: inline-block;
 }
 </style>

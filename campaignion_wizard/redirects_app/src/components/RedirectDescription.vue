@@ -3,7 +3,7 @@ RedirectDescription component.
 Display a human readable description of a redirect’s filters.
 </docs>
 
-<template lang="html">
+<template>
   <ul class="pra-redirect-info-filters">
     <li v-for="filter in redirect.filters">
       <template v-if="filter.type === 'opt-in'">{{ filter.value ? text('User has opted in') : text('User has not opted in') }}</template>
@@ -13,7 +13,7 @@ Display a human readable description of a redirect’s filters.
 </template>
 
 <script>
-import {OPERATORS} from '@/utils/defaults'
+import { OPERATORS } from '@/utils/defaults'
 import find from 'lodash/find'
 
 export default {
@@ -35,8 +35,8 @@ export default {
      * @return {string} The filter operator’s translated phrase.
      */
     filterDescription (filter) {
-      const fieldLabel = find(this.$root.$options.settings.fields, {id: filter.field}).label
-      return Drupal.t(OPERATORS[filter.operator].phrase, {'@attribute': fieldLabel, '@value': filter.value})
+      const fieldLabel = find(this.$root.$options.settings.fields, { id: filter.field }).label
+      return Drupal.t(OPERATORS[filter.operator].phrase, { '@attribute': fieldLabel, '@value': filter.value })
     }
   }
 }

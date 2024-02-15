@@ -3,7 +3,7 @@ RedirectList component.
 Displays all redirects in a draggable list.
 </docs>
 
-<template lang="html">
+<template>
   <Draggable
     v-model="redirects"
     element="ul"
@@ -33,7 +33,7 @@ Displays all redirects in a draggable list.
 
 <script>
 import Draggable from 'vuedraggable'
-import RedirectDescription from './RedirectDescription'
+import RedirectDescription from './RedirectDescription.vue'
 
 export default {
 
@@ -48,7 +48,7 @@ export default {
         return this.$store.state.redirects
       },
       set (val) {
-        this.$store.commit({type: 'updateRedirects', redirects: val})
+        this.$store.commit({ type: 'updateRedirects', redirects: val })
       }
     }
   },
@@ -77,14 +77,14 @@ export default {
     removeRedirect (index) {
       const title = Drupal.t('Remove redirect?')
       const question = this.redirects[index].label
-        ? Drupal.t('Do you really want to remove the redirect "@label"?', {'@label': this.redirects[index].label})
-        : Drupal.t('Do you really want to remove the redirect to @url?', {'@url': this.redirects[index].prettyDestination})
+        ? Drupal.t('Do you really want to remove the redirect "@label"?', { '@label': this.redirects[index].label })
+        : Drupal.t('Do you really want to remove the redirect to @url?', { '@url': this.redirects[index].prettyDestination })
       this.$confirm(question, title, {
         confirmButtonText: 'Remove',
         cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
-        this.$store.commit({type: 'removeRedirect', index})
+        this.$store.commit({ type: 'removeRedirect', index })
       }, () => {})
     },
 

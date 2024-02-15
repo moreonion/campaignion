@@ -5,7 +5,7 @@
 ## Installation
 
 ``` bash
-yarn install
+yarn
 ```
 
 ## Development mode
@@ -24,24 +24,11 @@ export E2T_API_TOKEN="my.token" && yarn dev
 yarn build
 ```
 
-The JavaScript is bundled to `campaignion_email_to_target/js/messages_app/app.vue.min.js`, the CSS ends up in `campaignion_email_to_target/css/messages_app/e2t_messages_app.min.css` and can be overridden by the theme layer. The vendor JavaScript is automatically catered by campaignion_vue.
-
-``` bash
-# build for production and view the bundle analyzer report
-yarn build --report
-```
-
-For detailed explanation on the Webpack template, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+The JavaScript is bundled to `campaignion_email_to_target/js/messages_app/app.vue.min.js`, the CSS ends up in `campaignion_email_to_target/css/messages_app/e2t_messages_app.min.css` and can be overridden by the theme layer.
 
 ## Testing
 
 ``` bash
 # run unit tests
-yarn unit
-
-# run e2e tests
-yarn e2e
-
-# run all tests
 yarn test
 ```

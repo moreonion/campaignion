@@ -112,7 +112,7 @@ export default {
     'nodes': '/wizard/nodes',
     'e2t-api': {
       'url': 'https://e2t-api.more-onion.com/v2',
-      'token': process.env.E2T_API_TOKEN || 'xxxx', // token injected by webpack.DefinePlugin
+      'token': process.env.E2T_API_TOKEN || 'xxx', // token injected by Vite
       'dataset': 'mp'
     }
   }

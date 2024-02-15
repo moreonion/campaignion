@@ -8,8 +8,8 @@
  * @return {string[]} An array like `['<selector>:nth-of-type(1)', '<selector>:nth-of-type(2)']`.
  */
 function listSelectors (selector, length) {
-  var arr = []
-  for (var i = 1; i <= length; i++) {
+  const arr = []
+  for (let i = 1; i <= length; i++) {
     arr.push(selector + ':nth-of-type(' + i + ')')
   }
   return arr
@@ -17,7 +17,7 @@ function listSelectors (selector, length) {
 
 module.exports = {
   'app is being rendered': function (browser) {
-    var app = browser.page.app()
+    const app = browser.page.app()
 
     app.navigate()
 
@@ -30,10 +30,10 @@ module.exports = {
   },
 
   'app loads initial data': function (browser) {
-    var app = browser.page.app()
-    var redirectList = app.section.redirectList
-    var redirect = redirectList.section.redirect
-    var redirectSelectors = listSelectors(redirect.selector, 2)
+    const app = browser.page.app()
+    const redirectList = app.section.redirectList
+    const redirect = redirectList.section.redirect
+    const redirectSelectors = listSelectors(redirect.selector, 2)
 
     browser.assert.elementCount(redirect.selector, 2)
 
@@ -50,7 +50,7 @@ module.exports = {
   },
 
   'app allows going back when nothing has changed': function (browser) {
-    var app = browser.page.app()
+    const app = browser.page.app()
     app.click('@back')
     browser.getAlertText(function (result) {
       browser.expect(result.value).to.be.equal('You can leave the page now.')
@@ -59,7 +59,7 @@ module.exports = {
   },
 
   'app allows submitting when nothing has changed': function (browser) {
-    var app = browser.page.app()
+    const app = browser.page.app()
     app.click('@submit')
     browser.getAlertText(function (result) {
       browser.expect(result.value).to.be.equal('You can leave the page now.')
@@ -68,8 +68,8 @@ module.exports = {
   },
 
   'app warns on going back when the default destination was changed': function (browser) {
-    var app = browser.page.app()
-    var msgBox = app.section.messageBox
+    const app = browser.page.app()
+    const msgBox = app.section.messageBox
     app.clearValue('@destinationInput').setValue('@destinationInput', '/something_else')
     app.click('@back')
 
@@ -90,12 +90,11 @@ module.exports = {
   },
 
   'redirect drag’n’drop': function (browser) {
-    // In chromium this test regularly fails, probably due to a selenium issue.
-    // Workaround: Place the mouse pointer somewhere inside the browser window.
-    console.log('If this test keeps failing, place the mouse pointer inside the browser window.')
-    var app = browser.page.app()
-    var redirect = app.section.redirectList.section.redirect
-    var redirectSelectors = listSelectors(redirect.selector, 2)
+    // #TODO This one keeps failing with the current setup, probably due to incompatibility issues between legacy
+    // Nightwatch / webdriver and current chromedriver
+    const app = browser.page.app()
+    const redirect = app.section.redirectList.section.redirect
+    const redirectSelectors = listSelectors(redirect.selector, 2)
 
     browser
       .pause(300)
@@ -113,12 +112,12 @@ module.exports = {
   },
 
   'edit a redirect': function (browser) {
-    var app = browser.page.app()
-    var redirect = app.section.redirectList.section.redirect
-    var redirectSelectors = listSelectors(redirect.selector, 3)
-    var dialog = app.section.dialog
-    var filterEditor = dialog.section.filterEditor
-    var filterList = filterEditor.section.filterList
+    const app = browser.page.app()
+    const redirect = app.section.redirectList.section.redirect
+    const redirectSelectors = listSelectors(redirect.selector, 3)
+    const dialog = app.section.dialog
+    const filterEditor = dialog.section.filterEditor
+    const filterList = filterEditor.section.filterList
 
     browser.assert.elementCount(redirect.selector, 2)
 
@@ -171,12 +170,12 @@ module.exports = {
   },
 
   'adding a new redirect': function (browser) {
-    var app = browser.page.app()
-    var redirect = app.section.redirectList.section.redirect
-    var redirectSelectors = listSelectors(redirect.selector, 3)
-    var dialog = app.section.dialog
-    var filterEditor = dialog.section.filterEditor
-    var filterList = filterEditor.section.filterList
+    const app = browser.page.app()
+    const redirect = app.section.redirectList.section.redirect
+    const redirectSelectors = listSelectors(redirect.selector, 3)
+    const dialog = app.section.dialog
+    const filterEditor = dialog.section.filterEditor
+    const filterList = filterEditor.section.filterList
 
     browser.assert.elementCount(redirect.selector, 2)
 
@@ -222,12 +221,12 @@ module.exports = {
   },
 
   'duplicate a redirect': function (browser) {
-    var app = browser.page.app()
-    var redirect = app.section.redirectList.section.redirect
-    var redirectSelectors = listSelectors(redirect.selector, 4)
-    var dialog = app.section.dialog
-    var filterEditor = dialog.section.filterEditor
-    var filterList = filterEditor.section.filterList
+    const app = browser.page.app()
+    const redirect = app.section.redirectList.section.redirect
+    const redirectSelectors = listSelectors(redirect.selector, 4)
+    const dialog = app.section.dialog
+    const filterEditor = dialog.section.filterEditor
+    const filterList = filterEditor.section.filterList
 
     browser.assert.elementCount(redirect.selector, 3)
 
@@ -259,10 +258,10 @@ module.exports = {
   },
 
   'delete a redirect': function (browser) {
-    var app = browser.page.app()
-    var redirect = app.section.redirectList.section.redirect
-    var redirectSelectors = listSelectors(redirect.selector, 4)
-    var msgBox = app.section.messageBox
+    const app = browser.page.app()
+    const redirect = app.section.redirectList.section.redirect
+    const redirectSelectors = listSelectors(redirect.selector, 4)
+    const msgBox = app.section.messageBox
 
     browser.assert.elementCount(redirect.selector, 4)
 
@@ -293,7 +292,7 @@ module.exports = {
   },
 
   'save redirects to server': function (browser) {
-    var app = browser.page.app()
+    const app = browser.page.app()
 
     browser
       .listenXHR()
@@ -311,7 +310,7 @@ module.exports = {
         browser.assert.equal(xhrs[0].method, 'PUT')
         browser.assert.equal(xhrs[0].httpResponseCode, '200')
 
-        var redirects = JSON.parse(xhrs[0].requestData).redirects
+        const redirects = JSON.parse(xhrs[0].requestData).redirects
 
         browser.assert.equal(redirects.length, 4)
         browser.assert.deepEqual(redirects[0], {

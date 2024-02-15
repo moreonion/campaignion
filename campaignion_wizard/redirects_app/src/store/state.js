@@ -1,4 +1,4 @@
-import {emptyRedirect} from '@/utils/defaults'
+import { emptyRedirect } from '@/utils/defaults'
 
 /**
  * State factory function.

@@ -1,8 +1,6 @@
-// The Vue build version to load with the `import` command (runtime-only or
-// standalone) has been set in webpack.dev.conf and webpack.test.conf with an alias.
 import Vue from 'vue'
-import App from './App'
-import {createStore} from './store'
+import App from './App.vue'
+import { createStore } from './store'
 
 import {
   Button,
@@ -14,11 +12,14 @@ import {
   Option,
   Select
 } from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import locale from 'element-ui/lib/locale'
 
 // Set language for element-ui.
-if (Drupal.settings.campaignion_vue && Drupal.settings.campaignion_vue.element_ui_strings) {
-  const locale = require('element-ui/lib/locale')
+try {
   locale.use(Drupal.settings.campaignion_vue.element_ui_strings)
+} catch (e) {
+  console.error('Could not load strings from Drupal.settings.campaignion_vue.element_ui_strings')
 }
 
 // Register element-ui components.
@@ -49,8 +50,8 @@ containers.forEach(drupalContainer => {
     el,
     drupalContainer,
     settings: {},
-    template: '<App/>',
+    render: (h) => h(App),
     store: createStore(),
-    components: {App}
+    components: { App }
   })
 })

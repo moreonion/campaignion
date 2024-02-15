@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   default_redirect_url: 'http://old-default-url.com', // This could be the old redirect url.
   redirects: [],
   fields: [

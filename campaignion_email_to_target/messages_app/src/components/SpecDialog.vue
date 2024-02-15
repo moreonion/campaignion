@@ -3,7 +3,7 @@ SpecDialog component.
 The dialog to edit a spec.
 </docs>
 
-<template lang="html">
+<template>
   <el-dialog
     :title="dialogTitle"
     :visible="visible"
@@ -77,16 +77,16 @@ The dialog to edit a spec.
 </template>
 
 <script>
-import {clone, validateDestination} from '@/utils'
+import {clone, paramReadyUrl, validateDestination} from '@/utils'
 import {OPERATORS, emptySpec} from '@/utils/defaults'
 import {mapState} from 'vuex'
 import isEqual from 'lodash.isequal'
 import omit from 'lodash.omit'
 import animatedScrollTo from 'animated-scrollto'
-import FilterEditor from './FilterEditor'
-import MessageEditor from './MessageEditor'
-import TokensList from './TokensList'
-import {DestinationField, utils as commonUtils} from 'campaignion_vue'
+import DestinationField from './DestinationField.vue'
+import FilterEditor from './FilterEditor.vue'
+import MessageEditor from './MessageEditor.vue'
+import TokensList from './TokensList.vue'
 
 export default {
 
@@ -205,7 +205,7 @@ export default {
      * @return {Promise} A Promise resolving if the request succeeds.
      */
     getNodes ({url, queryParam, queryString, headers}) {
-      return this.$http.get(commonUtils.paramReadyUrl(url) + queryParam + '=' + queryString, {headers})
+      return this.$http.get(paramReadyUrl(url) + queryParam + '=' + queryString, {headers})
     },
 
     /**

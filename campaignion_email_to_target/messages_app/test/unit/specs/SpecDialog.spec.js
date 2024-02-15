@@ -1,7 +1,8 @@
+import { afterEach, beforeEach, describe, it } from 'vitest'
 import assert from 'assert'
 import sinon from 'sinon'
 
-import c from '@/components/SpecDialog'
+import c from '@/components/SpecDialog.vue'
 
 import {OPERATORS, emptySpec} from '@/utils/defaults'
 

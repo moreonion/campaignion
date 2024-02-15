@@ -1,14 +1,18 @@
 root: true
-extends: standard
+plugins:
+  - babel
+  - html
+  - mocha
+extends:
+  - standard
+  - plugin:vue/base
 env:
   browser: true
+  mocha: true
 globals:
+  assert: false
   Drupal: false
-parser: 'babel-eslint'
-parserOptions:
-  sourceType: module
-plugins:
-  - html
+  globalThis: false
 rules:
   allow-parens: 0
   generator-star-spacing: 0
@@ -16,7 +20,8 @@ rules:
     - error
     - {ignoreEOLComments: true}
   no-debugger: 0
-  require-jsdoc: error
-  valid-jsdoc:
-    - error
-    - {requireReturn: false}
+overrides:
+  -
+    files: test/**/specs/**/*.js
+    rules:
+      no-unused-expressions: off

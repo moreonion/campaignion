@@ -2,12 +2,19 @@
 
 A bundle of libraries shared by the Vue apps in Campaignion.
 
-Uses the Webpack library starter by Krasimir Tsonev https://github.com/krasimir/webpack-library-starter
+As all Vue apps include their own dependencies now, since v 1.5.0, the campaignion_vue module only does two things when a Vue app is detected:
 
-## test
+- Load `interrupt-submit.js`
+- Provide localized strings for Element UI under `Drupal.settings.campaignion_vue.element_ui_strings`
 
-`yarn run test`
+## Update Element UI strings
 
-## build
+To extract the stings from Element UI and collect them under `campaignion_vue/locale/`, run the following:
 
-`yarn run build`
+```bash
+# install element-ui
+yarn
+
+# run string extraction script
+yarn run build
+```

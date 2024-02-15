@@ -1,6 +1,7 @@
+import { describe, it } from 'vitest'
 import assert from 'assert'
 
-import EditValuePopup from '@/components/EditValuePopup'
+import EditValuePopup from '@/components/EditValuePopup.vue'
 
 describe('EditValuePopup', function () {
   describe('computed', function () {
