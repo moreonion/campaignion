@@ -29,7 +29,7 @@ function campaignion_manage_menu() {
   $items['admin/supporters'] = array(
     'title' => t('Manage Supporters'),
     'type' => MENU_NORMAL_ITEM,
-    'access arguments' => array('manage redhen contacts'),
+    'access arguments' => array('access redhen contacts'),
     'page callback' => 'campaignion_manage_supporters_page',
   );
   return $items;

@@ -36,4 +36,12 @@ STR;
 
     return $messages;
   }
+
+  /**
+   * Check if the currently active user has access to the operation.
+   */
+  public function userHasAccess() {
+    return user_access('bypass node access') || user_access('administer nodes');
+  }
+
 }
