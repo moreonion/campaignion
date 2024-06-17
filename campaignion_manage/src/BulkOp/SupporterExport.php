@@ -100,7 +100,7 @@ class SupporterExport implements BatchInterface {
    * @param integer $level GZIP compression level (default: 9)
    * @return string New filename (with .gz appended) if success, or FALSE if operation fails
    */
-  protected function compressFile($src_file_name, $dest_file_name = NULL, $level = 9){ 
+  protected function compressFile($src_file_name, $dest_file_name = NULL, $level = 9){
     if ($dest_file_name == NULL) {
       $dest_file_name = $src_file_name . '.gz';
     }
@@ -114,13 +114,21 @@ class SupporterExport implements BatchInterface {
         fclose($fp_in);
       }
       else {
-        $result = FALSE; 
+        $result = FALSE;
       }
-      gzclose($fp_out); 
+      gzclose($fp_out);
     } else {
       $result = FALSE;
     }
 
     return $result;
   }
+
+  /**
+   * Check if the currently active user has access to the operation.
+   */
+  public function userHasAccess() {
+    return user_access('administer redhen contacts') || user_access('manage redhen contacts') || user_access('access redhen contacts');
+  }
+
 }

@@ -46,4 +46,12 @@ class SupporterNewsletter implements BatchInterface {
   }
 
   public function batchFinish(&$data, &$results) {}
+
+  /**
+   * Check if the currently active user has access to the operation.
+   */
+  public function userHasAccess() {
+    return user_access('administer redhen contacts') || user_access('manage redhen contacts');
+  }
+
 }

@@ -31,6 +31,9 @@ class BulkOpForm {
     );
 
     foreach ($this->ops as $name => $op) {
+      if (!$op->userHasAccess()) {
+        continue;
+      }
       $form['bulk-wrapper']['operations']['#options'][$name] = $op->title();
       $form['bulk-wrapper']['op-wrapper']['op'][$name] = array(
         '#type' => 'fieldset',
