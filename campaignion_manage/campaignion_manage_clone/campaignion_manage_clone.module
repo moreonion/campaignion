@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations and callbacks for the campaignion_manage_clone module.
+ */
+
+use Drupal\campaignion_email_to_target\MessageTemplate;
+use Drupal\little_helpers\Services\Container;
+
+/**
+ * Implements hook_menu_alter().
+ */
+function campaignion_manage_menu_alter(&$items) {
+  if ($item = &$items['node/%node/clone/%clone_token'] ?? NULL) {
+    // Don’t display an inline link for the clone action when viewing pages.
+    $item['type'] = MENU_CALLBACK;
+    $item['context'] = MENU_CONTEXT_NONE;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function campaignion_manage_clone_form_clone_node_confirm_alter(&$form, &$form_state) {
+  $form['#submit'] = ['clone_node_confirm_submit'];
+  // Add a custom submit-handler in order to redirect to the wizard.
+  $form['#submit'][] = 'campaignion_manage_clone_node_confirm_submit';
+}
+
+/**
+ * Submit handler for clone_node_confirm.
+ */
+function campaignion_manage_clone_node_confirm_submit($form, &$form_state) {
+  if (module_exists('campaignion_wizard')) {
+    $node = node_load($form_state['values']['nid']);
+    if (Container::get()->loadService('campaignion_action.loader')->isActionType($node->type)) {
+      $form_state['redirect'] = "node/{$node->nid}/wizard";
+    }
+  }
+}
+
+/**
+ * Implements hook_clone_node_alter().
+ */
+function campaignion_manage_clone_clone_node_alter($node, $context) {
+  $wrapped_node = entity_metadata_wrapper('node', $node);
+  if (property_exists($node, 'field_admin_title') && !empty($wrapped_node->field_admin_title->value()) ) {
+    $wrapped_node->field_admin_title->set('[DUPLICATE] ' . $wrapped_node->field_admin_title->value());
+  }
+  else  {
+    $node->title = $node->public_title = '[DUPLICATE] ' . $node->title;
+  }
+}
+
+/**
+ * Implements hook_clone_node_cloned().
+ */
+function campaignion_manage_clone_clone_node_cloned($node, $original_node, $context) {
+  if (!empty($node->field_thank_you_pages)) {
+    foreach ($node->field_thank_you_pages['und'] as &$item) {
+      if ($typ_nid = $item['node_reference_nid']) {
+        $item['node_reference_nid'] = clone_node_save($typ_nid);
+      }
+    }
+  }
+  if (module_exists('campaignion_email_to_target')) {
+    foreach (MessageTemplate::byNid($original_node->nid) as $m) {
+      $message = clone $m;
+      $message->nid = $node->nid;
+      $message->save();
+    }
+  }
+  return TRUE;
+}

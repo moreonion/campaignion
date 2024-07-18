@@ -126,15 +126,23 @@ class ContentListing {
         $edit_path_part = 'wizard';
       }
     }
+    $destination = ['destination' => 'admin/manage/content_and_actions'];
     foreach (array($edit_path_part => t('Edit'), 'translate' => t('Translate'), 'view' => t('View page'), 'delete' => t('Delete')) as $path => $title) {
       $action = in_array($path, ['wizard', 'edit']) ? 'update' : $path;
       if (node_access($action, $node)) {
         $links[$path] = array(
           'href' => "node/{$node->nid}/$path",
           'title' => $title,
-          'query' => array('destination' => 'admin/manage/content_and_actions')
+          'query' => $destination,
         );
       }
+    }
+    if (module_exists('clone') && clone_access_cloning($node)) {
+      $links['clone'] = [
+        'title' => t('Clone'),
+        'href' => "node/{$node->nid}/clone/" . clone_get_token($node->nid),
+        'query' => $destination,
+      ];
     }
     return $links;
   }

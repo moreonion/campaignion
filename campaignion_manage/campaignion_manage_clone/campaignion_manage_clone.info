@@ -1,0 +1,6 @@
+name = Campaignion Manage - Clone actions
+description = Implement functionality needed for cloning actions
+core = 7.x
+package = Campaignion
+
+dependencies[] = node_clone:clone

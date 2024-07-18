@@ -11,6 +11,7 @@ use Drupal\campaignion_manage\Filter\ContentTitle;
 use Drupal\campaignion_manage\Filter\ContentStatus;
 use Drupal\campaignion_manage\Filter\ContentType;
 use Drupal\campaignion_manage\Query\Content;
+use Drupal\campaignion_manage_clone\ContentClone;
 
 /**
  * Manage content page.
@@ -46,6 +47,9 @@ class ContentPage extends Page {
     if (!module_exists('change_publishing_status_permission') || user_access('change publishing status')) {
       $ops['publish'] = new ContentPublish();
       $ops['unpublish'] = new ContentUnpublish();
+    }
+    if (module_exists('campaignion_manage_clone')) {
+      $ops['clone'] = new ContentClone();
     }
     $this->bulkOpForm = new BulkOpForm($ops);
   }

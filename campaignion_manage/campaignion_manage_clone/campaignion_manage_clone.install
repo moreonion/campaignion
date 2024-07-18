@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function campaignion_manage_clone_install() {
+  variable_set('clone_method', 'save-edit');
+}
