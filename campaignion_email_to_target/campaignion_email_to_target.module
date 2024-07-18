@@ -22,6 +22,7 @@ use Drupal\campaignion_email_to_target\Action;
 use Drupal\campaignion_email_to_target\Component;
 use Drupal\campaignion_email_to_target\Loader as SelectionModeLoader;
 use Drupal\campaignion_email_to_target\MessageEndpoint;
+use Drupal\campaignion_email_to_target\MessageTemplate;
 use Drupal\campaignion_email_to_target\Tokens;
 use Drupal\campaignion_email_to_target\Api\Client;
 use Drupal\campaignion_email_to_target\SelectionMode\All;
@@ -362,4 +363,18 @@ function campaignion_email_to_target_mail($key, &$message, $params) {
   $message['headers'] = array_merge($message['headers'], $params['headers']);
   $message['subject'] = $params['subject'];
   $message['body'][] = $params['message'];
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function campaignion_email_to_target_node_insert($node) {
+  // Copy the messages if the node was cloned.
+  if ($source_nid = $node->clone_from_original_nid ?? NULL) {
+    foreach (MessageTemplate::byNid($source_nid) as $m) {
+      $message = clone $m;
+      $message->nid = $node->nid;
+      $message->save();
+    }
+  }
 }

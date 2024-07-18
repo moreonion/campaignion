@@ -5,7 +5,6 @@
  * Hook implementations and callbacks for the campaignion_manage_clone module.
  */
 
-use Drupal\campaignion_email_to_target\MessageTemplate;
 use Drupal\little_helpers\Services\Container;
 
 /**
@@ -62,13 +61,6 @@ function campaignion_manage_clone_clone_node_cloned($node, $original_node, $cont
       if ($typ_nid = $item['node_reference_nid']) {
         $item['node_reference_nid'] = clone_node_save($typ_nid);
       }
-    }
-  }
-  if (module_exists('campaignion_email_to_target')) {
-    foreach (MessageTemplate::byNid($original_node->nid) as $m) {
-      $message = clone $m;
-      $message->nid = $node->nid;
-      $message->save();
     }
   }
   return TRUE;
