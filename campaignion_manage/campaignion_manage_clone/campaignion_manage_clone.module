@@ -43,6 +43,7 @@ function campaignion_manage_clone_node_confirm_submit($form, &$form_state) {
  * Implements hook_clone_node_alter().
  */
 function campaignion_manage_clone_clone_node_alter($node, $context) {
+  // Prefix the node title.
   $wrapped_node = entity_metadata_wrapper('node', $node);
   if (property_exists($node, 'field_admin_title') && !empty($wrapped_node->field_admin_title->value()) ) {
     $wrapped_node->field_admin_title->set('[DUPLICATE] ' . $wrapped_node->field_admin_title->value());
@@ -50,12 +51,7 @@ function campaignion_manage_clone_clone_node_alter($node, $context) {
   else  {
     $node->title = $node->public_title = '[DUPLICATE] ' . $node->title;
   }
-}
-
-/**
- * Implements hook_clone_node_cloned().
- */
-function campaignion_manage_clone_clone_node_cloned($node, $original_node, $context) {
+  // Clone thank you pages.
   if (!empty($node->field_thank_you_pages)) {
     foreach ($node->field_thank_you_pages['und'] as &$item) {
       if ($typ_nid = $item['node_reference_nid']) {
@@ -63,5 +59,4 @@ function campaignion_manage_clone_clone_node_cloned($node, $original_node, $cont
       }
     }
   }
-  return TRUE;
 }
