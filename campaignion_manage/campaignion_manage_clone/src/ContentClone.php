@@ -22,13 +22,12 @@ class ContentClone {
   }
 
   public function apply($nids, $values) {
+    module_load_include('pages.inc', 'clone');
     $messages = [];
     $nodes = node_load_multiple($nids);
-
     foreach ($nodes as $node) {
       clone_node_save($node->nid);
     }
-
     return $messages;
   }
 
