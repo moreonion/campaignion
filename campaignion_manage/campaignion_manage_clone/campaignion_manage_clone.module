@@ -61,14 +61,4 @@ function campaignion_manage_clone_clone_node_alter($node, $context) {
       }
     }
   }
-  // Reset some node flags to their defaults.
-  // This is copied from _clone_node_prepare but it resets by default.
-  if (variable_get('clone_reset_' . $node->type, TRUE)) {
-    $node_options = variable_get('node_options_' . $node->type, array('status', 'promote'));
-    // Fill in the default values.
-    foreach (array('status', 'moderate', 'promote', 'sticky', 'revision') as $key) {
-      // Cast to int since that's how they need to be saved to the DB.
-      $node->$key = (int) in_array($key, $node_options);
-    }
-  }
 }
