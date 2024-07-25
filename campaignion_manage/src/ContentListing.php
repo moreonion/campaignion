@@ -127,20 +127,38 @@ class ContentListing {
       }
     }
     $destination = ['destination' => 'admin/manage/content_and_actions'];
-    foreach (array($edit_path_part => t('Edit'), 'translate' => t('Translate'), 'view' => t('View page'), 'delete' => t('Delete')) as $path => $title) {
-      $action = in_array($path, ['wizard', 'edit']) ? 'update' : $path;
-      if (node_access($action, $node)) {
-        $links[$path] = array(
-          'href' => "node/{$node->nid}/$path",
-          'title' => $title,
-          'query' => $destination,
-        );
-      }
+    if (node_access('update', $node)) {
+      $links['edit'] = [
+        'href' => "node/{$node->nid}/{$edit_path_part}",
+        'title' => t('Edit'),
+        'query' => $destination,
+      ];
+    }
+    if (node_access('translate', $node)) {
+      $links['translate'] = [
+        'href' => "node/{$node->nid}/translate",
+        'title' => t('Translate'),
+        'query' => $destination,
+      ];
     }
     if (module_exists('clone') && clone_access_cloning($node)) {
       $links['clone'] = [
         'title' => t('Duplicate'),
         'href' => "node/{$node->nid}/clone/" . clone_get_token($node->nid),
+        'query' => $destination,
+      ];
+    }
+    if (node_access('view', $node)) {
+      $links['view'] = [
+        'href' => "node/{$node->nid}",
+        'title' => t('View page'),
+        'query' => $destination,
+      ];
+    }
+    if (node_access('delete', $node)) {
+      $links['delete'] = [
+        'href' => "node/{$node->nid}/delete",
+        'title' => t('Delete'),
         'query' => $destination,
       ];
     }
