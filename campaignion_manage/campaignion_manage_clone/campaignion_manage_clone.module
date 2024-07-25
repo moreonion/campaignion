@@ -23,6 +23,7 @@ function campaignion_manage_menu_alter(&$items) {
  */
 function campaignion_manage_clone_form_clone_node_confirm_alter(&$form, &$form_state) {
   $form['description']['#markup'] = t('Are you sure you want to duplicate %title?', ['%title' => $node->title]);
+  $form['actions']['submit']['#value'] = t('Duplicate');
   $form['#submit'] = ['clone_node_confirm_submit'];
   // Add a custom submit-handler in order to redirect to the wizard.
   $form['#submit'][] = 'campaignion_manage_clone_node_confirm_submit';
