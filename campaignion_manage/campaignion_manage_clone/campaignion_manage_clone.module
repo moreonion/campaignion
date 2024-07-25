@@ -50,7 +50,7 @@ function campaignion_manage_clone_clone_node_alter($node, $context) {
     $wrapped_node->field_admin_title->set('[DUPLICATE] ' . $wrapped_node->field_admin_title->value());
   }
   else  {
-    $node->title = $node->public_title = '[DUPLICATE] ' . $node->title;
+    $node->title = $node->public_title = '[DUPLICATE] ' . $context['original_node']->title;
   }
   // Clone thank you pages.
   if (!empty($node->field_thank_you_pages)) {
