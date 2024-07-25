@@ -11,11 +11,11 @@ class ContentClone {
   }
 
   public function title() {
-    return t('Clone');
+    return t('Duplicate');
   }
 
   public function helpText() {
-    return t('Clone an page or action including the form, all emails and thank you pages.');
+    return t('Duplicate a page or action including the form, all emails and thank you pages.');
   }
 
   public function formElement(&$element, &$form_state) {

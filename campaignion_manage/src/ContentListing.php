@@ -139,7 +139,7 @@ class ContentListing {
     }
     if (module_exists('clone') && clone_access_cloning($node)) {
       $links['clone'] = [
-        'title' => t('Clone'),
+        'title' => t('Duplicate'),
         'href' => "node/{$node->nid}/clone/" . clone_get_token($node->nid),
         'query' => $destination,
       ];
