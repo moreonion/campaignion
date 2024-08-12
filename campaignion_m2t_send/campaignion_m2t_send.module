@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Hook and callback implementations for this module.
+ */
+
+use Drupal\campaignion_m2t_send\SendMessagesCron;
+use Drupal\little_helpers\Services\Container;
+
+/**
+ * Implements hook_little_helpers_services().
+ */
+function campaignion_m2t_send_little_helpers_services() {
+  $info['campaignion_m2t_send.SendMessagesCron'] = [
+    'class' => SendMessagesCron::class,
+    'arguments' => [
+      '!campaignion_m2t_send_content_types',
+    ],
+  ];
+  return $info;
+}
+
+/**
+ * Implements hook_cronapi().
+ */
+function campaignion_m2t_send_cronapi($op, $job = NULL) {
+  $items['campaignion_m2t_send'] = [
+    'description' => 'Send m2t messages',
+    'rule' => '*+@ * * * *',
+    'weight' => 100,
+    'callback' => '_campaignion_m2t_send_run',
+    'arguments' => ['campaignion_m2t_send.SendMessagesCron'],
+  ];
+  return $items;
+}
+
+/**
+ * Helper function to load a cron service and invoke it.
+ */
+function _campaignion_m2t_send_run($service) {
+  Container::get()->loadService($service)->run();
+}
