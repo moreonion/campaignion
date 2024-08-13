@@ -1,0 +1,79 @@
+<?php
+
+use Drupal\campaignion_m2t_send\Submission;
+
+/**
+ * Implements hook_install().
+ *
+ * Migrate flags stored in webform_submitted_data.
+ */
+function campaignion_m2t_send_install() {
+  $nids = db_select('webform_component', 'c')
+    ->fields('c', ['nid'])
+    ->groupBy('nid')
+    ->condition('type', 'e2t_selector')
+    ->execute()
+    ->fetchCol();
+  $nodes = entity_load('node', $nids);
+
+  foreach (Submission::iterate($nodes) as $submission) {
+    foreach (array_keys($submission->webform->componentsByType('e2t_selector')) as $cid) {
+      foreach ($submission->valuesByCid($cid) as $no => $data) {
+        $m = unserialize($data);
+        if ($m['sent'] ?? NULL) {
+          db_merge('campaignion_m2t_send')
+            ->key(['nid' => $submission->nid, 'sid' => $submission->sid, 'cid' => $cid, 'no' => $no])
+            ->fields(['sent_at' => 0])
+            ->execute();
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_schema().
+ */
+function campaignion_m2t_send_schema() {
+  $tables['campaignion_m2t_send'] = [
+    'description' => 'Stores data about email to target messages that have been sent.',
+    'fields' => [
+      'nid' => [
+        'description' => 'The node identifier of a webform.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'sid' => [
+        'description' => 'The unique identifier for this submission.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'cid' => [
+        'description' => 'The identifier for this component within this node, starts at 0 for each node.',
+        'type' => 'int',
+        'size' => 'small',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'no' => [
+        'description' => 'Usually this value is 0, but if a field has multiple values (such as a time or date), it may require multiple rows in the database.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '0',
+      ],
+      'sent_at' => [
+        'desrciption' => 'The timestamp for when the email was sent',
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['nid', 'sid', 'cid', 'no'],
+  ];
+  return $tables;
+}

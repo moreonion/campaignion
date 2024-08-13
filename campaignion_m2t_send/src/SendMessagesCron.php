@@ -2,10 +2,10 @@
 
 namespace Drupal\campaignion_m2t_send;
 
+use Drupal\campaignion_m2t_send\Submission;
 use Drupal\campaignion_email_to_target\Channel\Email;
 use Drupal\campaignion_email_to_target\Component;
 use Drupal\little_helpers\Services\Container;
-use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Cron job for sending out M2T messages as emails.
@@ -56,48 +56,33 @@ class SendMessagesCron {
   /**
    * Send the target emails for a submission using new data from the e2t-api.
    */
-  protected function processSubmission(Submission $submission) {
+  protected function processSubmission(Submission $submission, array $data) {
     $channel = new Email();
-    $targets = NULL;
+    $targets = $this->getCurrentTargets($submission, $action->getOptions()['dataset_name']);
     $email = $submission->valueByKey('email');
     echo "Checking submission (nid={$submission->nid}, sid={$submission->sid}) by $email …\n";
-    $components = $submission->webform->componentsByType('e2t_selector');
-    foreach ($components as $cid => $component) {
-      echo "\tComponent {$cid} (form_key={$component['form_key']}):\n";
-      $component_o = Component::fromComponent($component);
-      $values = array_filter(array_map('unserialize', $submission->valuesByCid($cid)), function ($m) {
-        return !($m['sent'] ?? FALSE);
-      });
-      if (!$values) {
-        echo "\t\tNo unsent messages found.\n";
-        continue;
+    $data = array_filter(array_map(function ($d) use ($targets) {
+      $m = unserialize($d->data);
+      if ($new_target = $targets[0] ?? NULL) {
+        $d->new_data = serialize($this->replaceTarget($m, $new_target));
+        return $d;
       }
-      $cnt = count($values);
-      echo "\t\t$cnt unsent messages found.\n";
-      if (!$targets) {
-        $targets = $this->getCurrentTargets($submission);
-      }
-      $values = array_filter(array_map(function ($m) use ($targets) {
-        if ($new_target = $targets[0] ?? NULL) {
-          return $this->replaceTarget($m, $new_target);
-        }
-        return NULL;
-      }, $values));
-      $cnt = count($values);
-      echo "\t\t$cnt new targets found.\n";
-      if ($values) {
-        $values_to_send = array_map('serialize', $values);
-        $component_o->sendEmails($values_to_send, $submission, $channel);
-        foreach ($values_to_send as $no => $serialized) {
-          db_update('webform_submitted_data')
-            ->fields(['data' => $serialized])
-            ->condition('nid', $submission->nid)
-            ->condition('sid', $submission->sid)
-            ->condition('cid', $cid)
-            ->condition('no', $no)
-            ->execute();
-        }
-      }
+      return NULL;
+    }, $data));
+    foreach ($data as $d) {
+      $component_o = Component::fromComponent($submission->webform->component($d->cid));
+      $component_o->sendEmails([$d->new_data], $submission, $channel);
+      db_update('webform_submitted_data')
+        ->fields(['data' => $d->new_data])
+        ->condition('nid', $submission->nid)
+        ->condition('sid', $submission->sid)
+        ->condition('cid', $d->cid)
+        ->condition('no', $d->no)
+        ->execute();
+      db_merge('webform_submitted_data')
+        ->key(['nid' => $submission->nid, 'sid' => $submission->sid, 'cid' => $d->cid, 'no' => $d->no])
+        ->fields(['sent_at' => time()])
+        ->execute();
     }
   }
 
@@ -115,27 +100,42 @@ class SendMessagesCron {
       ->fetchCol();
     $nodes = entity_load('node', $nids);
 
+    $data_sql = <<<SQL
+    SELECT nid, sid, cid, no, data
+    FROM {webform_submissions} s
+      INNER JOIN {webform_component} c ON c.nid=s.nid AND c.type='e2t_selector'
+      INNER JOIN {webform_submitted_data} d USING(nid, sid, cid)
+      LEFT OUTER JOIN {campaignion_m2t_send} m USING(nid, sid, cid, no)
+    WHERE m.sid IS NULL AND nid=:nid AND sid IN(:sids);
+    SQL;
+
     $submission_sql = <<<SQL
-    SELECT sid
-    FROM {webform_submissions}
-    WHERE nid=:nid AND sid>:last_sid
+    SELECT DISTINCT sid
+    FROM {webform_submissions} s
+      INNER JOIN {webform_component} c ON c.nid=s.nid AND c.type='e2t_selector'
+      INNER JOIN {webform_submitted_data} d USING(nid, sid, cid)
+      LEFT OUTER JOIN {campaignion_m2t_send} m USING(nid, sid, cid, no)
+    WHERE m.sid IS NULL AND s.nid=:nid AND s.sid>:last_sid
     ORDER BY sid
-    LIMIT 100;
+    LIMIT 100
     SQL;
 
     $count_processed = 0;
     foreach ($nodes as $node) {
       $args = [':last_sid' => 0, ':nid' => $node->nid];
       while ($sids = db_query($submission_sql, $args)->fetchCol()) {
-        foreach ($sids as $sid) {
-          if ($submission = Submission::load($node->nid, $sid, TRUE)) {
-            $this->processSubmission($submission);
-            $count_processed += 1;
-          }
+        $data_per_sid = [];
+        foreach (db_query($data_sql, [':nid' => $node->nid, ':sids' => $sids]) as $data) {
+          $data_per_sid[$data->sid][] = $data;
+        }
+        foreach (webform_get_submissions(['ws.sid' => $sids]) as $s) {
+          $submission = new Submission($nodes[$s->nid], $s);
+          $this->processSubmission($submission, $data_per_sid[$submission->sid] ?? []);
+          $count_processed += 1;
           if ($count_processed % 100 == 0) {
             echo "$count_processed submissions processed.\n";
           }
-          $args[':last_sid'] = $sid;
+          $args[':last_sid'] = $s->sid;
         }
         gc_collect_cycles();
       }

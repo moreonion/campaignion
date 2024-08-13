@@ -8,3 +8,4 @@ dependencies[] = campaignion:campaignion_email_to_target
 dependencies[] = little_helpers:little_helpers
 dependencies[] = ultimate_cron:ultimate_cron
 dependencies[] = variable:variable
+dependencien[] = webform:webform
