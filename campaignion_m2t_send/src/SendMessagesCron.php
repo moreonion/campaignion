@@ -13,17 +13,17 @@ use Drupal\little_helpers\Services\Container;
 class SendMessagesCron {
 
   /**
-   * An array of node type machine names to send data for.
+   * An array of nids for which sending is enabled.
    *
-   * @var str[]
+   * @var array
    */
-  protected $nodeTypes;
+  protected $enabledNodes;
 
   /**
    * Create a new cron-job instance based on config.
    */
-  public function __construct($content_types) {
-    $this->nodeTypes = $content_types;
+  public function __construct(array $enabled_nodes) {
+    $this->enabledNodes = $enabled_nodes;
   }
 
   /**
@@ -90,14 +90,7 @@ class SendMessagesCron {
    * Main function of the cron-job.
    */
   public function run() {
-    $q = db_select('field_data_field_email_to_target_options', 'o');
-    $q->join('node', 'n', "o.entity_type='node' AND o.entity_id=n.nid");
-    $nids = $q
-      ->fields('o', ['entity_id'])
-      ->condition('o.field_email_to_target_options_dataset_name', ['mp'])
-      ->condition('n.type', $this->nodeTypes)
-      ->execute()
-      ->fetchCol();
+    $nids = array_keys(array_filter($this->enabledNodes));
     $nodes = entity_load('node', $nids);
 
     $data_sql = <<<SQL

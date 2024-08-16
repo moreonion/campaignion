@@ -15,7 +15,7 @@ function campaignion_m2t_send_little_helpers_services() {
   $info['campaignion_m2t_send.SendMessagesCron'] = [
     'class' => SendMessagesCron::class,
     'arguments' => [
-      '!campaignion_m2t_send_content_types',
+      '!campaignion_m2t_send_enabled_nodes',
     ],
   ];
   return $info;
@@ -26,7 +26,7 @@ function campaignion_m2t_send_little_helpers_services() {
  */
 function campaignion_m2t_send_cronapi($op, $job = NULL) {
   $items['campaignion_m2t_send'] = [
-    'description' => 'Send m2t messages',
+    'description' => 'Send M2T messages of selected nodes',
     'rule' => '*+@ * * * *',
     'weight' => 100,
     'callback' => '_campaignion_m2t_send_run',
