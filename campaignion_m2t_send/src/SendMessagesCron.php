@@ -2,7 +2,9 @@
 
 namespace Drupal\campaignion_m2t_send;
 
+use Drupal\campaignion_action\Loader as ActionLoader;
 use Drupal\campaignion_m2t_send\Submission;
+use Drupal\campaignion_email_to_target\Action;
 use Drupal\campaignion_email_to_target\Channel\Email;
 use Drupal\campaignion_email_to_target\Component;
 use Drupal\little_helpers\Services\Container;
@@ -32,10 +34,10 @@ class SendMessagesCron {
    * @return array
    *   Targets with email address grouped by party name.
    */
-  protected function getCurrentTargets(Submission $submission) {
+  protected function getCurrentTargets(Submission $submission, string $dataset) {
     /** @var Drupal\campaignion_email_to_target\Api\Client */
     $client = Container::get()->loadService('campaignion_email_to_target.api.Client');
-    return $client->getTargets('mp', ['postcode' => $submission->valueByKey('postcode')]);
+    return $client->getTargets($dataset, ['postcode' => $submission->valueByKey('postcode')]);
   }
 
   /**
@@ -56,7 +58,7 @@ class SendMessagesCron {
   /**
    * Send the target emails for a submission using new data from the e2t-api.
    */
-  protected function processSubmission(Submission $submission, array $data) {
+  protected function processSubmission(Submission $submission, Action $action, array $data) {
     $channel = new Email();
     $targets = $this->getCurrentTargets($submission, $action->getOptions()['dataset_name']);
     $email = $submission->valueByKey('email');
@@ -90,8 +92,12 @@ class SendMessagesCron {
    * Main function of the cron-job.
    */
   public function run() {
+    module_load_include('inc', 'webform', 'includes/webform.submissions');
     $nids = array_keys(array_filter($this->enabledNodes));
     $nodes = entity_load('node', $nids);
+    $actions = array_map(function ($node) {
+      return ActionLoader::instance()->actionFromNode($node);
+    }, $nodes);
 
     $data_sql = <<<SQL
     SELECT nid, sid, cid, no, data
@@ -123,7 +129,7 @@ class SendMessagesCron {
         }
         foreach (webform_get_submissions(['ws.sid' => $sids]) as $s) {
           $submission = new Submission($nodes[$s->nid], $s);
-          $this->processSubmission($submission, $data_per_sid[$submission->sid] ?? []);
+          $this->processSubmission($submission, $actions[$submission->nid], $data_per_sid[$submission->sid] ?? []);
           $count_processed += 1;
           if ($count_processed % 100 == 0) {
             echo "$count_processed submissions processed.\n";
