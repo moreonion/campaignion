@@ -22,6 +22,21 @@ class SendMessagesCron {
   protected $enabledNodes;
 
   /**
+   * Number of messages sent for each target.
+   *
+   * @var int[]
+   */
+  protected $sendHistory = [];
+
+  /**
+   * Message statistics.
+   */
+  protected $messageStats = [
+    'sent' => 0,
+    'withheld' => 0,
+  ];
+
+  /**
    * Create a new cron-job instance based on config.
    */
   public function __construct(array $enabled_nodes) {
@@ -56,16 +71,36 @@ class SendMessagesCron {
   }
 
   /**
+   * Check whether to send an additional email to the target or not.
+   */
+  protected function rateLimit($target) {
+    $email = $target['email'];
+    $count = $this->sendHistory[$email] ?? 0;
+    if ($count === FALSE) {
+      $this->messageStats['withheld'] += 1;
+      return FALSE;
+    }
+    if (rand(0, 1) === 1) {
+      $this->sendHistory[$email] = $count + 1;
+      $this->messageStats['sent'] += 1;
+      return TRUE;
+    }
+    else {
+      $this->sendHistory[$email] = FALSE;
+      $this->messageStats['withheld'] += 1;
+      return FALSE;
+    }
+  }
+
+  /**
    * Send the target emails for a submission using new data from the e2t-api.
    */
   protected function processSubmission(Submission $submission, Action $action, array $data) {
     $channel = new Email();
     $targets = $this->getCurrentTargets($submission, $action->getOptions()['dataset_name']);
-    $email = $submission->valueByKey('email');
-    echo "Checking submission (nid={$submission->nid}, sid={$submission->sid}) by $email …\n";
     $data = array_filter(array_map(function ($d) use ($targets) {
       $m = unserialize($d->data);
-      if ($new_target = $targets[0] ?? NULL) {
+      if (($new_target = $targets[0] ?? NULL) && $this->rateLimit($new_target)) {
         $d->new_data = serialize($this->replaceTarget($m, $new_target));
         return $d;
       }
@@ -131,15 +166,17 @@ class SendMessagesCron {
           $submission = new Submission($nodes[$s->nid], $s);
           $this->processSubmission($submission, $actions[$submission->nid], $data_per_sid[$submission->sid] ?? []);
           $count_processed += 1;
-          if ($count_processed % 100 == 0) {
-            echo "$count_processed submissions processed.\n";
-          }
           $args[':last_sid'] = $s->sid;
         }
         gc_collect_cycles();
       }
     }
-    echo "$count_processed submissions processed. done.\n";
+    $vars = [
+      '@submissions' => $count_processed,
+      '@sent' => $this->messageStats['sent'],
+      '@withheld' => $this->messageStats['withheld']
+    ];
+    watchdog('campaignion_m2t_send', '@submissions submissions processed, @sent emails sent (@withheld emails not sent).', $vars, WATCHDOG_INFO);
   }
 
 }
