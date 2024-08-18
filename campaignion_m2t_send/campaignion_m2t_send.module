@@ -7,6 +7,7 @@
 
 use Drupal\campaignion_m2t_send\SendMessagesCron;
 use Drupal\little_helpers\Services\Container;
+use Drupal\little_helpers\Webform\Submission;
 
 /**
  * Implements hook_little_helpers_services().
@@ -40,4 +41,53 @@ function campaignion_m2t_send_cronapi($op, $job = NULL) {
  */
 function _campaignion_m2t_send_run($service) {
   Container::get()->loadService($service)->run();
+}
+
+/**
+ * Implements hook_webform_submission_insert().
+ */
+function campaignion_m2t_send_webform_submission_insert($node, $submission) {
+  $s = new Submission($node, $submission);
+  foreach ($s->webform->componentsByType('e2t_selector') as $component) {
+    $values = $s->valuesByCid($component['cid']);
+    db_delete('campaignion_m2t_send')
+      ->condition('nid', $node->nid)
+      ->condition('sid', $submission->sid)
+      ->condition('cid', $component['cid'])
+      ->condition('no', array_keys($values), 'NOT IN')
+      ->execute();
+    foreach ($values as $no => $value) {
+      db_merge('campaignion_m2t_send')->key([
+        'nid' => $node->nid,
+        'sid' => $submission->sid,
+        'cid' => $component['cid'],
+        'no' => $no,
+      ])->execute();
+    }
+  }
+}
+
+/**
+ * Implements hook_webform_submission_update().
+ */
+function campaignion_m2t_send_webform_submission_update($node, $submission) {
+  campaignion_m2t_send_webform_submission_insert($node, $submission);
+}
+
+/**
+ * Implements hook_webform_submission_delete().
+ */
+function campaignion_m2t_send_webform_submission_delete($node, $submission) {
+  db_delete('campaignion_m2t_send')
+    ->condition('sid', $submission->sid)
+    ->execute();
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function campaignion_m2t_send_node_delete($node) {
+  db_delete('campaignion_m2t_send')
+    ->condition('nid', $node->nid)
+    ->execute();
 }

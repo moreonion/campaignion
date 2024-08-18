@@ -8,6 +8,15 @@ use Drupal\campaignion_m2t_send\Submission;
  * Migrate flags stored in webform_submitted_data.
  */
 function campaignion_m2t_send_install() {
+  $sql = <<<SQL
+  INSERT INTO {campaignion_m2t_send}
+  SELECT nid, sid, cid, no, NULL
+  FROM {webform_submissions} s
+    INNER JOIN {webform_component} c USING(nid)
+    INNER JOIN {webform_submitted_data} d USING(nid, sid, cid)
+  WHERE c.type='e2t_selector'
+  SQL;
+  db_query($sql);
   $nids = db_select('webform_component', 'c')
     ->fields('c', ['nid'])
     ->groupBy('nid')
@@ -21,8 +30,11 @@ function campaignion_m2t_send_install() {
       foreach ($submission->valuesByCid($cid) as $no => $data) {
         $m = unserialize($data);
         if ($m['sent'] ?? NULL) {
-          db_merge('campaignion_m2t_send')
-            ->key(['nid' => $submission->nid, 'sid' => $submission->sid, 'cid' => $cid, 'no' => $no])
+          db_update('campaignion_m2t_send')
+            ->condition('nid', $submission->nid)
+            ->condition('sid', $submission->sid)
+            ->condition('cid', $cid)
+            ->condition('no', $no)
             ->fields(['sent_at' => 0])
             ->execute();
         }
@@ -36,7 +48,7 @@ function campaignion_m2t_send_install() {
  */
 function campaignion_m2t_send_schema() {
   $tables['campaignion_m2t_send'] = [
-    'description' => 'Stores data about email to target messages that have been sent.',
+    'description' => 'Stores the send status of email to target emails.',
     'fields' => [
       'nid' => [
         'description' => 'The node identifier of a webform.',
@@ -68,12 +80,18 @@ function campaignion_m2t_send_schema() {
         'default' => '0',
       ],
       'sent_at' => [
-        'desrciption' => 'The timestamp for when the email was sent',
+        'desrciption' => 'The timestamp for when the email was sent (if)',
         'type' => 'int',
-        'not null' => TRUE,
+        'not null' => FALSE,
       ],
     ],
     'primary key' => ['nid', 'sid', 'cid', 'no'],
+    'indexes' => [
+      'node' => ['nid'],
+      'submission' => ['sid'],
+      'component' => ['nid', 'sid', 'cid'],
+      'unsent' => ['nid', 'sent_at']
+    ],
   ];
   return $tables;
 }

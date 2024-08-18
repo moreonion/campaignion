@@ -136,21 +136,18 @@ class SendMessagesCron {
 
     $data_sql = <<<SQL
     SELECT nid, sid, cid, no, data
-    FROM {webform_submissions} s
-      INNER JOIN {webform_component} c ON c.nid=s.nid AND c.type='e2t_selector'
-      INNER JOIN {webform_submitted_data} d USING(nid, sid, cid)
-      LEFT OUTER JOIN {campaignion_m2t_send} m USING(nid, sid, cid, no)
-    WHERE m.sid IS NULL AND nid=:nid AND sid IN(:sids);
+    FROM {webform_submitted_data} d
+      INNER JOIN {campaignion_m2t_send} m USING(nid, sid, cid, no)
+    WHERE nid=:nid AND sid IN(:sids) AND sent_at IS NULL
     SQL;
 
     $submission_sql = <<<SQL
-    SELECT DISTINCT sid
+    SELECT s.sid
     FROM {webform_submissions} s
-      INNER JOIN {webform_component} c ON c.nid=s.nid AND c.type='e2t_selector'
-      INNER JOIN {webform_submitted_data} d USING(nid, sid, cid)
-      LEFT OUTER JOIN {campaignion_m2t_send} m USING(nid, sid, cid, no)
-    WHERE m.sid IS NULL AND s.nid=:nid AND s.sid>:last_sid
-    ORDER BY sid
+    WHERE s.sid IN (
+      SELECT sid FROM {campaignion_m2t_send} WHERE nid=:nid AND sent_at IS NULL
+    ) AND s.sid>:last_sid
+    ORDER BY s.sid
     LIMIT 100
     SQL;
 
