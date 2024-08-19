@@ -52,7 +52,9 @@ class SendMessagesCron {
   protected function getCurrentTargets(Submission $submission, string $dataset) {
     /** @var Drupal\campaignion_email_to_target\Api\Client */
     $client = Container::get()->loadService('campaignion_email_to_target.api.Client');
-    return $client->getTargets($dataset, ['postcode' => $submission->valueByKey('postcode')]);
+    return array_filter($client->getTargets($dataset, ['postcode' => $submission->valueByKey('postcode')]), function ($target) {
+      return (bool) ($target['email'] ?? NULL);
+    });
   }
 
   /**
