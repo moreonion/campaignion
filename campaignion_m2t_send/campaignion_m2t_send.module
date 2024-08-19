@@ -29,7 +29,7 @@ function campaignion_m2t_send_little_helpers_services() {
 function campaignion_m2t_send_cronapi($op, $job = NULL) {
   $items['campaignion_m2t_send'] = [
     'description' => 'Send M2T messages of selected nodes',
-    'rule' => '*+@ * * * *',
+    'rule' => '*+@ 8-23 * * *',
     'weight' => 100,
     'callback' => '_campaignion_m2t_send_run',
     'arguments' => ['campaignion_m2t_send.SendMessagesCron'],
