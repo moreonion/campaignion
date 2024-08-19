@@ -17,6 +17,7 @@ function campaignion_m2t_send_little_helpers_services() {
     'class' => SendMessagesCron::class,
     'arguments' => [
       '!campaignion_m2t_send_enabled_nodes',
+      '!campaignion_m2t_send_cron_time_limit',
     ],
   ];
   return $info;

@@ -37,10 +37,18 @@ class SendMessagesCron {
   ];
 
   /**
+   * Cron time limit in seconds.
+   *
+   * @var int
+   */
+  protected $timeLimit;
+
+  /**
    * Create a new cron-job instance based on config.
    */
-  public function __construct(array $enabled_nodes) {
+  public function __construct(array $enabled_nodes, int $time_limit) {
     $this->enabledNodes = $enabled_nodes;
+    $this->timeLimit = $time_limit;
   }
 
   /**
@@ -131,6 +139,7 @@ class SendMessagesCron {
    */
   public function run() {
     module_load_include('inc', 'webform', 'includes/webform.submissions');
+    $time_limit =  REQUEST_TIME + $this->timeLimit;
     $nids = array_keys(array_filter($this->enabledNodes));
     $nodes = entity_load('node', $nids);
     $actions = array_map(function ($node) {
@@ -151,6 +160,9 @@ class SendMessagesCron {
     foreach (Submission::iterate($nodes, $submission_sql) as $submission) {
       $this->processSubmission($submission, $actions[$submission->nid]);
       $count_processed += 1;
+      if (time() > $time_limit) {
+        break;
+      }
     }
     $vars = [
       '@submissions' => $count_processed,
