@@ -68,6 +68,21 @@ function campaignion_m2t_send_webform_submission_insert($node, $submission) {
 }
 
 /**
+ * Implements hook_webform_submission_load().
+ */
+function campaignion_m2t_send_webform_submission_load(&$submissions) {
+  $data_sql = <<<SQL
+  SELECT nid, sid, cid, no, data
+  FROM {webform_submitted_data} d
+    INNER JOIN {campaignion_m2t_send} m USING(nid, sid, cid, no)
+  WHERE sid IN(:sids) AND sent_at IS NULL
+  SQL;
+  foreach (db_query($data_sql, [':sids' => array_keys($submissions)]) as $d) {
+    $submissions[$d->sid]->m2t_unsent_messages[] = $d;
+  }
+}
+
+/**
  * Implements hook_webform_submission_update().
  */
 function campaignion_m2t_send_webform_submission_update($node, $submission) {

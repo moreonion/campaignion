@@ -33,7 +33,7 @@ class Submission extends _Submission {
       $args = [':last_sid' => 0, ':nid' => $node->nid];
       while ($sids = db_query($submission_sql, $args)->fetchCol()) {
         foreach (webform_get_submissions(['ws.sid' => $sids]) as $s) {
-          yield new _Submission($nodes[$s->nid], $s);
+          yield new static($nodes[$s->nid], $s);
           $args[':last_sid'] = $s->sid;
         }
         gc_collect_cycles();

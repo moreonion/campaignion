@@ -95,7 +95,7 @@ class SendMessagesCron {
   /**
    * Send the target emails for a submission using new data from the e2t-api.
    */
-  protected function processSubmission(Submission $submission, Action $action, array $data) {
+  protected function processSubmission(Submission $submission, Action $action) {
     $channel = new Email();
     $targets = $this->getCurrentTargets($submission, $action->getOptions()['dataset_name']);
     $data = array_filter(array_map(function ($d) use ($targets) {
@@ -106,7 +106,7 @@ class SendMessagesCron {
         return $d;
       }
       return NULL;
-    }, $data));
+    }, $submission->m2t_unsent_messages));
     foreach ($data as $d) {
       $component_o = Component::fromComponent($submission->webform->component($d->cid));
       $component_o->sendEmails([$d->new_data], $submission, $channel);
@@ -135,13 +135,6 @@ class SendMessagesCron {
       return ActionLoader::instance()->actionFromNode($node);
     }, $nodes);
 
-    $data_sql = <<<SQL
-    SELECT nid, sid, cid, no, data
-    FROM {webform_submitted_data} d
-      INNER JOIN {campaignion_m2t_send} m USING(nid, sid, cid, no)
-    WHERE nid=:nid AND sid IN(:sids) AND sent_at IS NULL
-    SQL;
-
     $submission_sql = <<<SQL
     SELECT s.sid
     FROM {webform_submissions} s
@@ -153,21 +146,9 @@ class SendMessagesCron {
     SQL;
 
     $count_processed = 0;
-    foreach ($nodes as $node) {
-      $args = [':last_sid' => 0, ':nid' => $node->nid];
-      while ($sids = db_query($submission_sql, $args)->fetchCol()) {
-        $data_per_sid = [];
-        foreach (db_query($data_sql, [':nid' => $node->nid, ':sids' => $sids]) as $data) {
-          $data_per_sid[$data->sid][] = $data;
-        }
-        foreach (webform_get_submissions(['ws.sid' => $sids]) as $s) {
-          $submission = new Submission($nodes[$s->nid], $s);
-          $this->processSubmission($submission, $actions[$submission->nid], $data_per_sid[$submission->sid] ?? []);
-          $count_processed += 1;
-          $args[':last_sid'] = $s->sid;
-        }
-        gc_collect_cycles();
-      }
+    foreach (Submission::iterate($nodes, $submission_sql) as $submission) {
+      $this->processSubmission($submission, $actions[$submission->nid]);
+      $count_processed += 1;
     }
     $vars = [
       '@submissions' => $count_processed,
