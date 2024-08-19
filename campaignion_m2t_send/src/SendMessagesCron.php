@@ -102,6 +102,7 @@ class SendMessagesCron {
       $m = unserialize($d->data);
       if (($new_target = $targets[0] ?? NULL) && $this->rateLimit($new_target)) {
         $d->new_data = serialize($this->replaceTarget($m, $new_target));
+        $d->new_target = $new_target;
         return $d;
       }
       return NULL;
@@ -116,9 +117,9 @@ class SendMessagesCron {
         ->condition('cid', $d->cid)
         ->condition('no', $d->no)
         ->execute();
-      db_merge('webform_submitted_data')
+      db_merge('campaignion_m2t_send')
         ->key(['nid' => $submission->nid, 'sid' => $submission->sid, 'cid' => $d->cid, 'no' => $d->no])
-        ->fields(['sent_at' => time()])
+        ->fields(['sent_at' => time(), 'target_email' => $d->new_target['email']])
         ->execute();
     }
   }

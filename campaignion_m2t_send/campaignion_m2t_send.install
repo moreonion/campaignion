@@ -10,7 +10,7 @@ use Drupal\campaignion_m2t_send\Submission;
 function campaignion_m2t_send_install() {
   $sql = <<<SQL
   INSERT INTO {campaignion_m2t_send}
-  SELECT nid, sid, cid, no, NULL
+  SELECT nid, sid, cid, no, NULL, NULL
   FROM {webform_submissions} s
     INNER JOIN {webform_component} c USING(nid)
     INNER JOIN {webform_submitted_data} d USING(nid, sid, cid)
@@ -35,7 +35,7 @@ function campaignion_m2t_send_install() {
             ->condition('sid', $submission->sid)
             ->condition('cid', $cid)
             ->condition('no', $no)
-            ->fields(['sent_at' => 0])
+            ->fields(['sent_at' => 0, 'target_email' => $m['target']['email']])
             ->execute();
         }
       }
@@ -79,6 +79,12 @@ function campaignion_m2t_send_schema() {
         'not null' => TRUE,
         'default' => '0',
       ],
+      'target_email' => [
+        'description' => 'Email address of the target the email was sent to.',
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => FALSE,
+      ],
       'sent_at' => [
         'desrciption' => 'The timestamp for when the email was sent (if)',
         'type' => 'int',
@@ -90,7 +96,8 @@ function campaignion_m2t_send_schema() {
       'node' => ['nid'],
       'submission' => ['sid'],
       'component' => ['nid', 'sid', 'cid'],
-      'unsent' => ['nid', 'sent_at']
+      'unsent' => ['nid', 'sent_at'],
+      'target' => ['target_email'],
     ],
   ];
   return $tables;
