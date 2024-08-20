@@ -5,6 +5,7 @@
  * Hook and callback implementations for this module.
  */
 
+use Drupal\campaignion_email_to_target\Channel\EmailNoSend;
 use Drupal\campaignion_m2t_send\SendMessagesCron;
 use Drupal\little_helpers\Services\Container;
 use Drupal\little_helpers\Webform\Submission;
@@ -45,9 +46,28 @@ function _campaignion_m2t_send_run($service) {
 }
 
 /**
+ * Helper function to get all M2T content types.
+ *
+ * @return str[] Array of node type machine names.
+ */
+function _campaignion_m2t_send_content_types() {
+  $types = &drupal_static(__FUNCTION__);
+  if ($types === NULL) {
+    $info = array_filter(module_invoke_all('campaignion_action_info'), function ($i) {
+      return ($i['channel'] ?? NULL) == EmailNoSend::class;
+    });
+    $types = array_keys($info);
+  }
+  return $types;
+}
+
+/**
  * Implements hook_webform_submission_insert().
  */
 function campaignion_m2t_send_webform_submission_insert($node, $submission) {
+  if (!in_array($node->type, _campaignion_m2t_send_content_types())) {
+    return;
+  }
   $s = new Submission($node, $submission);
   foreach ($s->webform->componentsByType('e2t_selector') as $component) {
     $values = $s->valuesByCid($component['cid']);

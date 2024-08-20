@@ -8,19 +8,20 @@ use Drupal\campaignion_m2t_send\Submission;
  * Migrate flags stored in webform_submitted_data.
  */
 function campaignion_m2t_send_install() {
+  $types = _campaignion_m2t_send_content_types();
   $sql = <<<SQL
   INSERT INTO {campaignion_m2t_send}
   SELECT nid, sid, cid, no, NULL, NULL
-  FROM {webform_submissions} s
+  FROM {node} n
+    INNER JOIN {webform_submissions} s USING (nid)
     INNER JOIN {webform_component} c USING(nid)
     INNER JOIN {webform_submitted_data} d USING(nid, sid, cid)
-  WHERE c.type='e2t_selector'
+  WHERE n.type IN(:types) AND c.type='e2t_selector'
   SQL;
-  db_query($sql);
-  $nids = db_select('webform_component', 'c')
-    ->fields('c', ['nid'])
+  db_query($sql, [':types' => $types]);
+  $nids = db_select('campaignion_m2t_send', 'm')
+    ->fields('m', ['nid'])
     ->groupBy('nid')
-    ->condition('type', 'e2t_selector')
     ->execute()
     ->fetchCol();
   $nodes = entity_load('node', $nids);
