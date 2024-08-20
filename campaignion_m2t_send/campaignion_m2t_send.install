@@ -1,0 +1,105 @@
+<?php
+
+use Drupal\campaignion_m2t_send\Submission;
+
+/**
+ * Implements hook_install().
+ *
+ * Migrate flags stored in webform_submitted_data.
+ */
+function campaignion_m2t_send_install() {
+  $types = _campaignion_m2t_send_content_types();
+  $sql = <<<SQL
+  INSERT INTO {campaignion_m2t_send}
+  SELECT nid, sid, cid, no, NULL, NULL
+  FROM {node} n
+    INNER JOIN {webform_submissions} s USING (nid)
+    INNER JOIN {webform_component} c USING(nid)
+    INNER JOIN {webform_submitted_data} d USING(nid, sid, cid)
+  WHERE n.type IN(:types) AND c.type='e2t_selector'
+  SQL;
+  db_query($sql, [':types' => $types]);
+  $nids = db_select('campaignion_m2t_send', 'm')
+    ->fields('m', ['nid'])
+    ->groupBy('nid')
+    ->execute()
+    ->fetchCol();
+  $nodes = entity_load('node', $nids);
+
+  foreach (Submission::iterate($nodes) as $submission) {
+    foreach (array_keys($submission->webform->componentsByType('e2t_selector')) as $cid) {
+      foreach ($submission->valuesByCid($cid) as $no => $data) {
+        $m = unserialize($data);
+        if ($m['sent'] ?? NULL) {
+          db_update('campaignion_m2t_send')
+            ->condition('nid', $submission->nid)
+            ->condition('sid', $submission->sid)
+            ->condition('cid', $cid)
+            ->condition('no', $no)
+            ->fields(['sent_at' => 0, 'target_email' => $m['target']['email']])
+            ->execute();
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_schema().
+ */
+function campaignion_m2t_send_schema() {
+  $tables['campaignion_m2t_send'] = [
+    'description' => 'Stores the send status of email to target emails.',
+    'fields' => [
+      'nid' => [
+        'description' => 'The node identifier of a webform.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'sid' => [
+        'description' => 'The unique identifier for this submission.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'cid' => [
+        'description' => 'The identifier for this component within this node, starts at 0 for each node.',
+        'type' => 'int',
+        'size' => 'small',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'no' => [
+        'description' => 'Usually this value is 0, but if a field has multiple values (such as a time or date), it may require multiple rows in the database.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '0',
+      ],
+      'target_email' => [
+        'description' => 'Email address of the target the email was sent to.',
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => FALSE,
+      ],
+      'sent_at' => [
+        'desrciption' => 'The timestamp for when the email was sent (if)',
+        'type' => 'int',
+        'not null' => FALSE,
+      ],
+    ],
+    'primary key' => ['nid', 'sid', 'cid', 'no'],
+    'indexes' => [
+      'node' => ['nid'],
+      'submission' => ['sid'],
+      'component' => ['nid', 'sid', 'cid'],
+      'unsent' => ['nid', 'sent_at'],
+      'target' => ['target_email'],
+    ],
+  ];
+  return $tables;
+}

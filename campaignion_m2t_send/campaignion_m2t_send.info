@@ -1,0 +1,11 @@
+name = Match to target send
+description = Send M2T messages asynchronously
+core = 7.x
+package = Campaignion
+
+dependencies[] = psr0:psr0
+dependencies[] = campaignion:campaignion_email_to_target
+dependencies[] = little_helpers:little_helpers
+dependencies[] = ultimate_cron:ultimate_cron
+dependencies[] = variable:variable
+dependencien[] = webform:webform
