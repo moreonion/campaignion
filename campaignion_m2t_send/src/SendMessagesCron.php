@@ -22,11 +22,11 @@ class SendMessagesCron {
   protected $enabledNodes;
 
   /**
-   * Number of messages sent for each target.
+   * Store a flag for each target, that shows if more messages should be sent or not.
    *
-   * @var int[]
+   * @var bool[]
    */
-  protected $sendHistory = [];
+  protected $stopSending = [];
 
   /**
    * Message statistics.
@@ -81,25 +81,24 @@ class SendMessagesCron {
   }
 
   /**
-   * Check whether to send an additional email to the target or not.
+   * Decide whether to send an additional email to the target or not.
+   *
+   * This should be somewhat random as to look natural. It also keeps the
+   * order of messages.
    */
   protected function rateLimit($target) {
     $email = $target['email'];
-    $count = $this->sendHistory[$email] ?? 0;
-    if ($count === FALSE) {
-      $this->messageStats['withheld'] += 1;
-      return FALSE;
+    if (!($this->stopSending[$email] ?? FALSE)) {
+      if (rand(0, 1) === 1) { // 50:50 chance.
+        $this->messageStats['sent'] += 1;
+        return TRUE;
+      }
+      else {
+        $this->stopSending[$email] = TRUE;
+      }
     }
-    if (rand(0, 1) === 1) {
-      $this->sendHistory[$email] = $count + 1;
-      $this->messageStats['sent'] += 1;
-      return TRUE;
-    }
-    else {
-      $this->sendHistory[$email] = FALSE;
-      $this->messageStats['withheld'] += 1;
-      return FALSE;
-    }
+    $this->messageStats['withheld'] += 1;
+    return FALSE;
   }
 
   /**
