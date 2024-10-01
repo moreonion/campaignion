@@ -150,7 +150,7 @@ class ContentListing {
     }
     if (node_access('view', $node)) {
       $links['view'] = [
-        'href' => "node/{$node->nid}",
+        'href' => "node/{$node->nid}/view",
         'title' => t('View page'),
         'query' => $destination,
       ];
