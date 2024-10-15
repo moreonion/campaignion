@@ -197,10 +197,8 @@ class Subscription extends Model {
    * Calculate the arguments for a queue item.
    */
   public function queueItemArgs() {
-    $args['send_welcome'] = FALSE;
     $args['send_optin'] = FALSE;
     foreach ($this->components as $component) {
-      $args['send_welcome'] = $args['send_welcome'] || !empty($component['extra']['send_welcome']);
       $args['send_optin'] = $args['send_optin'] || empty($component['extra']['opt_in_implied']);
     }
     return $args;
