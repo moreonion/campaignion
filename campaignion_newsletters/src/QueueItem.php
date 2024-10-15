@@ -223,13 +223,6 @@ SQL;
   }
 
   /**
-   * Check whether a welcome email should besent.
-   */
-  public function welcome() {
-    return !empty($this->args['send_welcome']);
-  }
-
-  /**
    * Trigger the queued action on the list’s provider.
    *
    * @throws \Drupal\campaignion_newsletters\ApiError

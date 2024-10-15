@@ -101,7 +101,6 @@ function campaignion_webform_component_defaults_alter(&$component, $type) {
   $component['extra'] += [
     'lists' => [],
     'opt_in_implied' => 1,
-    'send_welcome' => 0,
     'optout_all_lists' => TRUE,
   ];
 }
@@ -153,22 +152,6 @@ function campaignion_newsletters_form_webform_component_edit_form_alter(&$elemen
       1 => t('Included in this form: This form includes a double-opt-in process no further action is needed'),
     ],
     '#parents' => ['extra', 'opt_in_implied'],
-  ];
-
-  $element['list_management']['welcome'] = [
-    '#type' => 'container',
-    '#attributes' => ['class' => ['form-item']],
-  ];
-  $element['list_management']['welcome']['label'] = [
-    '#theme' => 'form_element_label',
-    '#title' => t('Welcome email'),
-    '#title_display' => 'before',
-  ];
-  $element['list_management']['welcome']['enabled'] = [
-    '#type' => 'checkbox',
-    '#title' => t('Send a welcome email (for new subscribers).'),
-    '#default_value' => !empty($component['extra']['send_welcome']),
-    '#parents' => ['extra', 'send_welcome'],
   ];
 
   $element['behavior']['optout_all_lists'] = [
