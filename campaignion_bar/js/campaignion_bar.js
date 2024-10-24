@@ -28,7 +28,7 @@
 
           // call window.load (ie. when all images are loaded) to set
           // the correct calculated sizes
-          $(window).load(function () {
+          $(window).on('load', function () {
             setTimeout(Drupal.aeBar.setDimensions, 1);
           });
         });
