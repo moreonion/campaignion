@@ -93,23 +93,17 @@ class Component {
   public function unsubscribe($email) {
     // Determine the set of subscriptions to revoke.
     $all_lists = !empty($this->component['extra']['optout_all_lists']);
-    if ($all_lists && $this->unsubscribeUnknown) {
-      // Generate on-the-fly subsrciptions for all lists known to this site.
-      $subscriptions = array_map(function ($list_id) use ($email) {
-        return Subscription::byData($list_id, $email);
-      }, $this->getAllListIds());
+    $selected_lists_ids = array_keys(array_filter($this->component['extra']['lists']));
+    $list_ids_to_unsubscribe = $all_lists ? $this->getAllListIds() : $selected_lists_ids;
+    $known_subscriptions = [];
+    foreach (Subscription::byEmail($email) as $subscription) {
+      $known_subscriptions[$subscription->list_id] = $subscription;
     }
-    else {
-      // Start with all known subscriptions for this email address.
-      $subscriptions = Subscription::byEmail($email);
-      if (!$all_lists) {
-        // Remove all lists that are not selected in this component.
-        $lists = $this->component['extra']['lists'];
-        $subscriptions = array_filter($subscriptions, function ($subscription) use ($lists) {
-          return !empty($lists[$subscription->list_id]);
-        });
-      }
-    }
+    $subscriptions = array_filter(array_map(function($list_id) use ($email, $known_subscriptions) {
+      $default = $this->unsubscribeUnknown ? Subscription::byData($list_id, $email, []) : NULL;
+      return $known_subscriptions[$list_id] ?? $default;
+    }, $list_ids_to_unsubscribe));
+    // Mark the selected subscriptions as deleted.
     foreach ($subscriptions as $subscription) {
       $subscription->delete = TRUE;
     }

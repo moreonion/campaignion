@@ -93,6 +93,18 @@ class ComponentTest extends \DrupalUnitTestCase {
     foreach ($subscriptions as $s) {
       $this->assertTrue($s->delete);
     }
+
+    $component['extra']['lists'] = [3 => 3];
+    $component['extra']['optout_all_lists'] = FALSE;
+    $c = new Component($component, TRUE);
+    $c->setAllListIds([1, 2, 3]);
+    $subscriptions = $c->getSubscriptions($e, $this->submission);
+    $this->assertEquals([3], array_map(function ($s) {
+      return $s->list_id;
+    }, $subscriptions));
+    foreach ($subscriptions as $s) {
+      $this->assertTrue($s->delete);
+    }
   }
 
   /**

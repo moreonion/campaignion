@@ -111,8 +111,8 @@ class SubscriptionTest extends \DrupalWebTestCase {
    * Test merging subscriptions.
    */
   public function testMerge() {
-    $c1 = ['cid' => 1, 'extra' => ['opt_in_implied' => 1, 'send_welcome' => 1]];
-    $c2 = ['cid' => 2, 'extra' => ['opt_in_implied' => 0, 'send_welcome' => 0]];
+    $c1 = ['cid' => 1, 'extra' => ['opt_in_implied' => 1]];
+    $c2 = ['cid' => 2, 'extra' => ['opt_in_implied' => 0]];
     $email = 'merge@test.com';
     $s1 = Subscription::byData(1, $email, [
       'fingerprint' => 'fingerprint1',
@@ -129,7 +129,6 @@ class SubscriptionTest extends \DrupalWebTestCase {
     $this->assertEqual($s1->fingerprint, '');
     // TRUE wins.
     $args = $s1->queueItemArgs();
-    $this->assertTrue($args['send_welcome']);
     $this->assertTrue($args['send_optin']);
   }
 }
