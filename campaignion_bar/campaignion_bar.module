@@ -298,3 +298,11 @@ function _campaignion_bar_add_sublinks_to_output(&$output, $sublinks) {
   }
   $output .= '</ul>';
 }
+
+/**
+ * Implements d7csp_hosts().
+ */
+function campaignion_bar_d7csp_hosts() {
+  $hosts['img-src'][] = 'ucarecdn.com';
+  return $hosts;
+}
