@@ -39,3 +39,11 @@ function campaignion_tracking_ga4_campaignion_tracking_snippets() {
     return $exports;
   }
 }
+
+/**
+ * Implements hook_d7csp_hosts().
+ */
+function campaignion_tracking_ga4_d7csp_hosts() {
+  $hosts['connect-src'][] = '*.google-analytics.com';
+  return $hosts;
+}
