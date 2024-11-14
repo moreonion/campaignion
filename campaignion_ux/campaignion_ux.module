@@ -1,2 +1,10 @@
 <?php
 
+/**
+ * Implements hook_d7csp_hosts().
+ */
+function campaignion_ux_d7csp_hosts() {
+  // Allow inline styles in content.
+  $hosts['style-src'][] = "'unsafe-inline'";
+  return $hosts;
+}
