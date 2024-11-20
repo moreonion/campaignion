@@ -45,5 +45,6 @@ function campaignion_tracking_ga4_campaignion_tracking_snippets() {
  */
 function campaignion_tracking_ga4_d7csp_hosts() {
   $hosts['connect-src'][] = '*.google-analytics.com';
+  $hosts['connect-src'][] = '*.analytics.google.com';
   return $hosts;
 }
