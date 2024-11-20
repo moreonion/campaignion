@@ -42,5 +42,6 @@ function campaignion_tracking_gtm_campaignion_tracking_snippets() {
 function campaignion_tracking_gtm_d7csp_hosts() {
   $hosts['connect-src'][] = 'https://www.google.com';
   $hosts['frame-src'][] = 'https://www.googletagmanager.com';
+  $hosts['img-src'][] = 'https://www.google-analytics.com';
   return $hosts;
 }
