@@ -41,6 +41,7 @@ function campaignion_facebook_pixel_campaignion_tracking_snippets() {
 !function(f,b,e,v,n,t,s){if(f.fbq&&!f.fbq.dummy)return;
 f.fbq.dummy=0;
 t=b.createElement(e);t.async=!0;
+n=b.querySelector('[nonce]');n&&t.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));
 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
 SNIPPET;

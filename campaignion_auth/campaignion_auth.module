@@ -21,3 +21,15 @@ function campaignion_auth_little_helpers_services() {
   ];
   return $info;
 }
+
+/**
+ * Implements hook_d7csp_csp_hosts().
+ */
+function campaignion_auth_d7csp_hosts() {
+  $hosts = [];
+  if ($url = variable_get_value('campaignion_auth_app_url')) {
+    $parts = parse_url($url);
+    $hosts['connect-src'][] = "{$parts['scheme']}://{$parts['host']}";
+  }
+  return $hosts;
+}
