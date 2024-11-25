@@ -58,9 +58,10 @@ window.addEventListener("DOMContentLoaded", function() {
 
 window.onload = function() {
   messageParent(false);
-  window.addEventListener("DOMSubtreeModified", function() {
+  // Notify the parent window of changed content after AJAX requests.
+  (new MutationObserver(function() {
     messageParent(false);
-  }, true);
+  })).observe(document.body, { subtree: true, childList: true });
 }
 
 window.onresize = function() {
