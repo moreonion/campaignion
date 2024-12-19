@@ -29,7 +29,7 @@ Per default, you can use this component with `v-model` to get/set its value.
     <ul v-if="showDropdown" @scroll="scroll" ref="dropdown" class="dropdown-menu">
       <li v-for="(item, index) in items" :class="{'active': isActive(index)}">
         <a class="dropdown-item" @mousedown.prevent="hit" @mousemove="setActive(index)">
-          <component :is="templateComp" :item="item" :value="val"></component>
+          <HighlightedText :text="item" :search="val"></HighlightedText>
         </a>
       </li>
     </ul>
@@ -37,6 +37,8 @@ Per default, you can use this component with `v-model` to get/set its value.
 </template>
 
 <script>
+import HighlightedText from './HighlightedText.vue';
+
 const _DELAY_ = 200
 
 /**
@@ -66,6 +68,10 @@ function fixedEncodeURIComponent (str) {
 
 export default {
 
+  components: {
+    HighlightedText
+  },
+
   created () {
     this.items = this.primitiveData
   },
@@ -85,7 +91,6 @@ export default {
       type: Object,
       default: {}
     },
-    template: String,    /** Used to render suggestion. */
     dataKey: {           /** The key of the suggestions array in the response JSON. If not set, the response itself is expected to by an array of suggestions. */
       type: String,
       default: null
@@ -156,26 +161,6 @@ export default {
   },
 
   computed: {
-    /**
-     * A vue component that uses the `template` prop and offers a `highlight` method
-     * for the template to use.
-     * @return {Object} The templateComp component.
-     */
-    templateComp () {
-      return {
-        template: typeof this.template === 'string' ? '<span v-html="this.template"></span>' : '<span v-html="highlight(item, value)"></span>',
-        props: {
-          item: {default: null},
-          value: String
-        },
-        methods: {
-          highlight (string, phrase) {
-            return (string && phrase && string.replace(new RegExp('(' + phrase + ')', 'gi'), '<strong>$1</strong>')) || string
-          }
-        }
-      }
-    },
-
     /**
      * Client-side mode: return a filtered array of items.
      * HTTP mode: return an empty array.

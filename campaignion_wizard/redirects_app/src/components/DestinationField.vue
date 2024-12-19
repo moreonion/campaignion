@@ -29,7 +29,7 @@ You can use this component with `v-model` to get/set its value.
     <ul v-if="showDropdown" ref="dropdown" class="dropdown-menu">
       <li v-for="(item, index) in items" :class="{'active': isActive(index)}">
         <a class="dropdown-item" @mousedown.stop.prevent="hit" @mousemove="setActive(index)">
-          <component :is="templateComp" :item="item" :value="val"></component>
+          <HighlightedText :text="item[labelKey]" :search="val"></HighlightedText>
         </a>
       </li>
     </ul>
@@ -38,10 +38,14 @@ You can use this component with `v-model` to get/set its value.
 
 <script>
 import { fixedEncodeURIComponent, escapeRegExp } from '../utils'
+import HighlightedText from './HighlightedText.vue';
 
 const _DELAY_ = 200
 
 export default {
+  components: {
+    HighlightedText,
+  },
   props: {
     value: {             /** The component’s value. */
       type: Object,
@@ -58,7 +62,6 @@ export default {
       type: Number,
       default: 8
     },
-    template: String,    /** Used to render a suggestion. */
     dataKey: {           /** The key of the suggestions array in the response JSON. If not set, the response itself is expected to by an array of suggestions. */
       type: String,
       default: null
@@ -114,26 +117,6 @@ export default {
   },
 
   computed: {
-    /**
-     * A vue component that uses the `template` prop and offers a `highlight` method
-     * for the template to use.
-     * @return {Object} The templateComp component.
-     */
-    templateComp () {
-      return {
-        template: typeof this.template === 'string' ? '<span v-html="this.template"></span>' : '<span v-html="highlight(item.' + this.labelKey + ', value)"></span>',
-        props: {
-          item: { default: null },
-          value: String
-        },
-        methods: {
-          highlight (string, phrase) {
-            return (string && phrase && string.replace(new RegExp('(' + escapeRegExp(phrase) + ')', 'gi'), '<strong>$1</strong>')) || string
-          }
-        }
-      }
-    },
-
     /**
      * Guess whether the user entered a url or a path.
      * @return {boolean} `true` if the user probably entered a url or a path.
