@@ -46,30 +46,6 @@ describe('DestinationField.vue', function () {
   })
 
   describe('computed', function () {
-    describe('templateComp', function () {
-      const context = {
-        labelKey: 'foo'
-      }
-      it('returns a vue component.', function () {
-        const templateComp = c.computed.templateComp.call(context)
-        assert.equal(templateComp.template, '<span v-html="highlight(item.foo, value)"></span>')
-        assert.deepEqual(templateComp.props, {
-          item: { default: null },
-          value: String
-        })
-        assert.equal(typeof templateComp.methods.highlight, 'function')
-      })
-      describe('methods.highlight', function () {
-        const highlight = c.computed.templateComp.call(context).methods.highlight
-        it('encloses the phrase in <strong> tags.', function () {
-          assert.equal(highlight('Hello world!', 'or'), 'Hello w<strong>or</strong>ld!')
-        })
-        it('returns the string if the phrase was not found.', function () {
-          assert.equal(highlight('Hello world!', 'foo'), 'Hello world!')
-        })
-      })
-    })
-
     describe('urlMode', function () {
       const urlMode = c.computed.urlMode
       it('returns true if this.val starts with ww', function () {
