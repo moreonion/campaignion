@@ -4,12 +4,12 @@ Puts matching parts of a text in <strong> tags to highlight them.
 </docs>
 
 <template>
- <span>
- <template v-for="part in getParts(text, search)">
-  <strong v-if="part.highlight">{{ part.text }}</strong>
-  <template v-else>{{ part.text }}</template>
- </template>
- </span>
+  <span>
+    <template v-for="part in getParts(text, search)">
+      <strong v-if="part.highlight">{{ part.text }}</strong>
+      <template v-else>{{ part.text }}</template>
+    </template>
+  </span>
 </template>
 
 <script>
