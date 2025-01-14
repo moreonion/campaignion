@@ -97,6 +97,7 @@ FROM {webform_submitted_data} wsd
   INNER JOIN {webform_component} wc USING(nid, cid)
   INNER JOIN {tmp_pseudo_addresses} USING(nid, sid)
 WHERE wc.form_key NOT IN ('email', 'donation_amount')
+  AND wc.type != 'opt_in'
 SQL;
     db_query($sql_delete_submitted_data);
 
