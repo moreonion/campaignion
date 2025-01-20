@@ -41,7 +41,7 @@ export default {
   components: {
     RedirectList,
     RedirectDialog,
-    DestinationField
+    DestinationField,
   },
 
   data () {
