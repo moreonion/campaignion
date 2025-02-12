@@ -44,5 +44,6 @@ function campaignion_tracking_gtm_d7csp_hosts() {
   $hosts['frame-src'][] = 'https://www.googletagmanager.com';
   $hosts['img-src'][] = 'https://www.google-analytics.com';
   $hosts['img-src'][] = 'https://www.googletagmanager.com';
+  $hosts['script-src'][] = 'https://www.googletagmanager.com';
   return $hosts;
 }
