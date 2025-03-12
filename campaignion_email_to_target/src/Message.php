@@ -47,14 +47,10 @@ class Message extends MessageTemplateInstance {
   /**
    * Quote strings for use in address headers.
    *
-   * Quote backslashes and any double quotation marks by prepending a
-   * backslash.
-   * See https://tools.ietf.org/html/rfc5322#section-3.2.4
+   * Encode UTF-8 characters as needed then quote double quotes.
    */
-  protected function quoteMail($string) {
-    $quoted1 = preg_replace("/\\\\/", "\\\\\\\\", $string);
-    $quoted2 = preg_replace('/"/', '\\\\"', $quoted1);
-    return $quoted2;
+  protected function quoteMail($string): string {
+    return addcslashes(mb_encode_mimeheader($string, 'UTF-8', 'Q'), '"\\');
   }
 
   /**
