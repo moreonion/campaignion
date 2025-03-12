@@ -57,7 +57,7 @@ jobs:
         ln -s $REPO $ROOT/sites/all/modules/module_under_test
         cd $ROOT
         curl https://www.drupal.org/files/issues/1891356-drupal_static_reset-on-module-changes-30-D7.patch | patch -p1
-        drush dl --cache-duration-releasexml=0 little_helpers-2.0-alpha12
+        drush dl --cache-duration-releasexml=0 addressfield-1.3 chr-1.9 context-3.12 ctools-1.21 currency-2.6 date-2.14 entity-1.11 entityreference-1.9 features-2.15 field_collection-1.2 field_type_language-1.0 file_entity-2.40 form_builder-2.0-alpha8 i18n-1.35 jquery_update-4.1 libraries-2.5 little_helpers-2.0-alpha12 media-2.30 options_element-1.12 oowizard-1.0-alpha3 payment-1.20 payment_context-1.0 payment_recurrence-1.0-alpha2 paypal_payment-1.5 polling-1.1 postal_code_validation-1.7 psr0-1.6 redhen-1.13 references-2.4 save_draft-1.4 select2-1.0 strongarm-2.0 token-1.9 ultimate_cron-2.11 uuid-1.3 uuid_features-1.0-rc2 variable-2.5 views-3.29 webform-4.27 webform_ajax-2.0 webform_confirm_email-2.20 webform_country_list-1.6 webform_paymethod_select-2.11 webform_template-4.0 webform_validation-1.18
         drush --yes pm-enable campaignion_test
     - name: Run phpunit tests
       run: UPAL_ROOT=$ROOT UPAL_WEB_URL=http://127.0.0.1 XDEBUG_MODE=coverage phpunit --bootstrap=$COMPOSER_HOME/vendor/torotil/upal/bootstrap.php --coverage-clover=coverage.xml .
