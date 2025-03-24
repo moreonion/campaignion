@@ -112,11 +112,11 @@ class MessageTest extends \DrupalUnitTestCase {
     $data = [
       'fromName' => 'I have, a comma but am no "addr-list"',
       'fromAddress' => 'from@example.com',
-      'toName' => ' to \ be " quoted',
+      'toName' => ' to \ be " quoted Ümlaut',
       'toAddress' => 'to@example.com',
     ];
     $m = new Message($data);
-    $this->assertEqual('"to \\\\ be \" quoted" <to@example.com>', $m->to());
+    $this->assertEqual('"to \\\\ be \" quoted =?UTF-8?Q?=C3=9Cmlaut?=" <to@example.com>', $m->to());
     $this->assertEqual('"I have, a comma but am no \"addr-list\"" <from@example.com>', $m->from());
   }
 
