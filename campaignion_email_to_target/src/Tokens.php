@@ -10,6 +10,41 @@ use Drupal\little_helpers\Webform\Submission;
 abstract class Tokens {
 
   /**
+   * Recursively flatten an array.
+   * @param array $data The array to flatten
+   * @param mixed $sep The separator used to concatenate keys.
+   * @return array
+   */
+  public static function arrayFlatten(array $data, $sep = '.', $prefix = '') {
+    $result = [];
+    foreach ($data as $key => $value) {
+      if (is_array($value)) {
+        $result += self::arrayFlatten($value, $sep, $prefix . $key . $sep);
+      }
+      else {
+        $result[$prefix . $key] = $value;
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Normalize target data for token like usage.
+   *
+   * @param array $data
+   * @return array
+   */
+  public static function normalizeTargetData(array $data) {
+    $my_data['contact'] = $data;
+    foreach ($my_data['contact'] as $key => $sub_array) {
+      if (is_array($sub_array)) {
+        $my_data[$key] = $sub_array;
+      }
+    }
+    return self::arrayFlatten($my_data);
+  }
+
+  /**
    * Generate replacements for submission tokens.
    */
   public static function submissionTokens(array $tokens, Submission $submission) {
@@ -44,19 +79,12 @@ abstract class Tokens {
    */
   public static function messageTokens(array $tokens, array $data) {
     $replacements = [];
-    $my_data['contact'] = $data;
-    foreach ($my_data['contact'] as $key => $sub_array) {
-      if (is_array($sub_array)) {
-        $my_data[$key] = $sub_array;
-      }
-    }
-
+    $my_data = self::normalizeTargetData($data);
     foreach ($tokens as $name => $original) {
       if (strpos($name, '.') === FALSE) {
         $name = 'contact.' . $name;
       }
-      $value = drupal_array_get_nested_value($my_data, explode('.', $name));
-      if (!is_null($value)) {
+      if (!is_null($value = $my_data[$name] ?? NULL)) {
         $replacements[$original] = (string) $value;
       }
       else {
