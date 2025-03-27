@@ -10,8 +10,9 @@ use \Drupal\campaignion_newsletters\ApiError;
 
 class Client extends _Client {
   public function __construct($username, $password) {
-    $endpoint = "https://$username:$password@api.dotmailer.com/v2";
-    parent::__construct($endpoint);
+    $endpoint = "https://api.dotmailer.com/v2";
+    $options['headers']['Authorization'] = 'Basic ' . base64_encode("$username:$password");
+    parent::__construct($endpoint, $options);
   }
 
   protected function send($path, array $query = [], $data = NULL, array $options = []) {
