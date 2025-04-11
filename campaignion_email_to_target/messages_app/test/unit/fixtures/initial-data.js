@@ -61,32 +61,32 @@ export default {
   ],
   'targetAttributes': [
     {
-      'name': 'contact.title',
+      'name': 'title',
       'label': 'Title',
       'description': ''
     },
     {
-      'name': 'contact.first_name',
+      'name': 'first_name',
       'label': 'First name',
       'description': ''
     },
     {
-      'name': 'contact.last_name',
+      'name': 'last_name',
       'label': 'Last name',
       'description': ''
     },
     {
-      'name': 'contact.email',
+      'name': 'email',
       'label': 'Email address',
       'description': ''
     },
     {
-      'name': 'contact.salutation',
+      'name': 'salutation',
       'label': 'Salutation',
       'description': 'Full name and titles'
     },
     {
-      'name': 'contact.political_affiliation',
+      'name': 'political_affiliation',
       'label': 'Political Affiliation',
       'description': ''
     },

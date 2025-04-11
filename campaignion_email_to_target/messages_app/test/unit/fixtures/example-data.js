@@ -20,7 +20,7 @@ data = {
         {
           'id': newId(),
           'type': 'target-attribute',
-          'attributeName': 'contact.political_affiliation',
+          'attributeName': 'political_affiliation',
           'operator': '==',
           'value': 'Green Party'
         }
@@ -43,7 +43,7 @@ data = {
         {
           'id': newId(),
           'type': 'target-attribute',
-          'attributeName': 'contact.political_affiliation',
+          'attributeName': 'political_affiliation',
           'operator': '!=',
           'value': 'Labour'
         }
@@ -58,14 +58,14 @@ data = {
         {
           'id': newId(),
           'type': 'target-attribute',
-          'attributeName': 'contact.first_name',
+          'attributeName': 'first_name',
           'operator': '!=',
           'value': 'jane'
         },
         {
           'id': newId(),
           'type': 'target-attribute',
-          'attributeName': 'contact.political_affiliation',
+          'attributeName': 'political_affiliation',
           'operator': '==',
           'value': 'Green Party'
         }
@@ -88,14 +88,14 @@ data = {
         {
           'id': newId(),
           'type': 'target-attribute',
-          'attributeName': 'contact.political_affiliation',
+          'attributeName': 'political_affiliation',
           'operator': '==',
           'value': 'Green Party'
         },
         {
           'id': newId(),
           'type': 'target-attribute',
-          'attributeName': 'contact.first_name',
+          'attributeName': 'first_name',
           'operator': '!=',
           'value': 'jane'
         }
@@ -110,7 +110,7 @@ data = {
         {
           'id': newId(),
           'type': 'target-attribute',
-          'attributeName': 'contact.first_name',
+          'attributeName': 'first_name',
           'operator': '!=',
           'value': 'jane'
         }
@@ -140,14 +140,14 @@ data = {
         {
           'id': newId(),
           'type': 'target-attribute',
-          'attributeName': 'contact.first_name',
+          'attributeName': 'first_name',
           'operator': '!=',
           'value': 'jane'
         },
         {
           'id': newId(),
           'type': 'target-attribute',
-          'attributeName': 'contact.political_affiliation',
+          'attributeName': 'political_affiliation',
           'operator': '==',
           'value': ''
         }

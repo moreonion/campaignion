@@ -9,7 +9,7 @@ export default {
    * @param {Object} state - vuex state.
    * @param {Object} payload - The mutation’s payload.
    * @param {Object[]} payload.messageSelection - Collection of messages and exclusions, including the default message as the last item.
-   * @param {Object[]} payload.targetAttributes - Collection of objects describing the target attributes: {name: 'contact.email', label: 'Email address', description: ''}
+   * @param {Object[]} payload.targetAttributes - Collection of objects describing the target attributes: {name: 'email', label: 'Email address', description: ''}
    * @param {Object[]} payload.tokens - Collection of categories with a `title`, a `description` and a collection of `tokens`. The `tokens` each have a `title`, a `description` and a `token`.
    * @param {boolean} payload.hardValidation - Don’t persist the data if there are validation errors.
    */

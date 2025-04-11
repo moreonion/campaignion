@@ -37,9 +37,9 @@ class Message extends MessageTemplateInstance {
     $data += [
       'fromName' => '[submission:values:first_name] [submission:values:last_name]',
       'fromAddress' => '[submission:values:email]',
-      'toName' => '[email-to-target:contact.title] [email-to-target:contact.first_name] [email-to-target:contact.last_name]',
-      'toAddress' => '[email-to-target:contact.email]',
-      'display' => '[email-to-target:contact.display_name]',
+      'toName' => '[email-to-target:title] [email-to-target:first_name] [email-to-target:last_name]',
+      'toAddress' => '[email-to-target:email]',
+      'display' => '[email-to-target:display_name]',
     ];
     parent::__construct($data);
   }

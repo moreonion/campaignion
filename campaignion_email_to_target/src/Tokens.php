@@ -35,13 +35,7 @@ abstract class Tokens {
    * @return array
    */
   public static function normalizeTargetData(array $data) {
-    $my_data['contact'] = $data;
-    foreach ($my_data['contact'] as $key => $sub_array) {
-      if (is_array($sub_array)) {
-        $my_data[$key] = $sub_array;
-      }
-    }
-    return self::arrayFlatten($my_data);
+    return self::arrayFlatten($data);
   }
 
   /**
@@ -81,9 +75,6 @@ abstract class Tokens {
     $replacements = [];
     $my_data = self::normalizeTargetData($data);
     foreach ($tokens as $name => $original) {
-      if (strpos($name, '.') === FALSE) {
-        $name = 'contact.' . $name;
-      }
       if (!is_null($value = $my_data[$name] ?? NULL)) {
         $replacements[$original] = (string) $value;
       }

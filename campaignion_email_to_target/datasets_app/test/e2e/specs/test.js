@@ -149,11 +149,11 @@ module.exports = {
           description: 'We’re testing.',
           is_custom: true,
           attributes: [
-            {description: '', 'key': 'contact.email', 'title': 'Email address'},
-            {description: '', 'key': 'contact.title', 'title': 'Title'},
-            {description: '', 'key': 'contact.first_name', 'title': 'First name'},
-            {description: '', 'key': 'contact.last_name', 'title': 'Last name'},
-            {description: 'Full name and titles', 'key': 'contact.salutation', 'title': 'Salutation'}
+            {description: '', 'key': 'email', 'title': 'Email address'},
+            {description: '', 'key': 'title', 'title': 'Title'},
+            {description: '', 'key': 'first_name', 'title': 'First name'},
+            {description: '', 'key': 'last_name', 'title': 'Last name'},
+            {description: 'Full name and titles', 'key': 'salutation', 'title': 'Salutation'}
           ]
         }
         var contacts = [

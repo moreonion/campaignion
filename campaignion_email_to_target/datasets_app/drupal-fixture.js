@@ -6,7 +6,6 @@ import elementUiStrings from 'element-ui/lib/locale/lang/en'
 const Drupal = {
   settings: {
     campaignion_email_to_target: {
-      contactPrefix: 'contact.',
       standardColumns: [
         {
           key: 'email',

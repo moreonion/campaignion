@@ -3,7 +3,6 @@ const state = {
   currentDataset: null,    /** {(Object|null)} The dataset being edited. */
   selectedDataset: null,   /** {(Object|null)} The dataset currently selected in the wizard field. */
   contacts: [],            /** {Object[]} Array of contacts belonging to the current dataset. */
-  contactPrefix: '',       /** {string} A prefix used to identify a contact attribute in a dataset’s attributes list. */
   columns: [],             /** {Object[]} Array of objects describing each column in the current dataset: {key: 'foo', title: 'Foo', description: 'The foo column.'} */
   tableColumns: [],        /** {string[]} Array of column identifiers for the columns that are shown in the table. */
   standardColumns: [],     /** {Object[]} Array of objects describing the columns that have to be present in every dataset. */

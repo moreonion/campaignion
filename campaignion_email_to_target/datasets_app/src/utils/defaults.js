@@ -17,11 +17,6 @@ function uuid (a) { return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : 
  */
 export function emptyDataset (state) {
   const attributes = clone(state.standardColumns)
-  // Prefix attribute keys.
-  for (var i = 0, j = attributes.length; i < j; i++) {
-    attributes[i].key = state.contactPrefix + attributes[i].key
-  }
-
   return {
     attributes,
     title: '',
