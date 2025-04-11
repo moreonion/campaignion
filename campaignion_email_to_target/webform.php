@@ -179,7 +179,7 @@ function _webform_csv_data_e2t_selector($component, $export_options, $value) {
         $data['target']['area']['name'] ?? '',
         $data['target']['salutation'],
         $data['target']['political_affiliation'],
-        $data['target']['area']['country__name'] ?? $data['target']['area']['country']['name'] ?? '',
+        $data['target']['area']['country']['name'] ?? '',
       ];
     }
     else {
