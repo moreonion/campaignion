@@ -38,13 +38,11 @@ export default {
    * @param {Object} state - vuex state.
    * @param {Object} payload - The mutation’s payload.
    * @param {Object} payload.settings - A settings object with the following properties:
-   * @param {string} payload.settings.contactPrefix - A prefix used to identify a contact attribute in a dataset’s attributes list. Defaults to `contact.`.
    * @param {Object[]} payload.settings.standardColumns - An array of objects describing the columns that have to be present in every dataset.
    * @param {Object} payload.settings.validations - Validations for each column: strings containing regular expressions, keyed by columns key.
    * @param {Object} payload.settings.maxFieldLengths - Maximum characters for each column. Dictionary of integers, keyed by column name.
    */
   init (state, {settings}) {
-    state.contactPrefix = settings.contactPrefix || 'contact.'
     state.standardColumns = settings.standardColumns || []
     state.validations = settings.validations || {}
     state.maxFieldLengths = settings.maxFieldLengths || {}
@@ -110,18 +108,8 @@ export default {
    * @param {Object[]} payload.contacts - The contacts belonging to this dataset.
    */
   editDataset (state, {dataset, contacts}) {
-    // Get the columns from the dataset: only columns prefixed with 'contact.'
-    const columns = []
-    var attribute
-    for (var i = 0, j = dataset.attributes.length; i < j; i++) {
-      if (dataset.attributes[i].key.indexOf(state.contactPrefix) === 0) {
-        attribute = clone(dataset.attributes[i])
-        attribute.key = attribute.key.substr(state.contactPrefix.length)
-        columns.push(attribute)
-      }
-    }
     state.currentDataset = clone(dataset)
-    state.columns = columns
+    state.columns = clone(dataset.attributes)
     state.tableColumns.splice(0, state.tableColumns.length, ...filterTableColumns(state.columns, state.currentDataset.is_custom)) // don’t replace with a new array to keep table binding
     state.contacts.splice(0, state.contacts.length, ...contacts) // don’t replace with a new array to keep table binding
     state.datasetChanged = false

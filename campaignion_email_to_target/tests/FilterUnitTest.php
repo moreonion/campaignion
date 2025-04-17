@@ -14,7 +14,7 @@ class FilterUnitTest extends \DrupalUnitTestCase {
   }
 
   public function test_match_nonExistingAttribute_doesNotMatch() {
-    $f = Filter::fromArray(['type' => 'target-attribute', 'config' => ['attributeName' => 'contact.first_name', 'operator' => '==', 'value' => 'test']]);
+    $f = Filter::fromArray(['type' => 'target-attribute', 'config' => ['attributeName' => 'first_name', 'operator' => '==', 'value' => 'test']]);
     $this->assertFalse($f->match([]));
   }
 
@@ -43,4 +43,3 @@ class FilterUnitTest extends \DrupalUnitTestCase {
   }
 
 }
-

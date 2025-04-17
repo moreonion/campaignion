@@ -39,7 +39,6 @@ The app needs the following settings in the `Drupal.settings.campaignion_email_t
 
 | Key               | Type     | Value                                                                                                           | Example                                                          | Default |
 |-------------------|----------|-----------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|---------|
-| `contactPrefix`   | string   | A prefix used to identify a contact attribute in a dataset’s attributes list.                                   | `'contact.'`                                                     | `''`    |
 | `standardColumns` | Object[] | Array of objects describing the columns that have to be present in every dataset.                               | `[{key: 'email', description: '', title: 'Email address'}, ...]` | `[]`    |
 | `validations`     | Object   | Validations for each column. Dictionary of regex strings, keyed by column name. Backslashes have to be escaped! | `{'first_name': '\\S+'}`                                         | `{}`    |
 | `maxFieldLengths` | Object   | Maximum characters for each column. Dictionary of integers, keyed by column name.                               | see `drupal-fixture.js`                                          |         |

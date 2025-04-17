@@ -163,7 +163,7 @@ export default {
     ...mapState([
       'specs',            /** {Object[]} Specifications for specific targets, these are either of type `message-template` or `exclusion`. */
       'currentSpecIndex', /** {(integer|null)} The index of the item in the specs array that is currently being edited or `-1` for a new item, or `null`, if no item is being edited. */
-      'targetAttributes', /** {Object[]} Collection of objects describing the target attributes: {name: 'contact.email', label: 'Email address', description: ''} */
+      'targetAttributes', /** {Object[]} Collection of objects describing the target attributes: {name: 'email', label: 'Email address', description: ''} */
       'tokenCategories'   /** {Object[]} Collection of categories with a `title`, a `description` and a collection of `tokens`. The `tokens` each have a `title`, a `description` and a `token`. */
     ])
   },

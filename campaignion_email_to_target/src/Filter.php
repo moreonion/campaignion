@@ -22,16 +22,6 @@ class Filter extends Model {
     return new static($data);
   }
 
-  public function __construct($data = array(), $new = TRUE) {
-    parent::__construct($data, $new);
-
-    if ($this->type == 'target-attribute') {
-      if (strpos($this->config['attributeName'], '.') === FALSE) {
-        $this->config['attributeName'] = 'contact.' . $this->config['attributeName'];
-      }
-    }
-  }
-
   /**
    * Update filter data from array.
    */
