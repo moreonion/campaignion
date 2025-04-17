@@ -79,16 +79,9 @@ class Filter extends Model {
 
   public function match($target) {
     if ($this->type == 'target-attribute') {
-      $data['contact'] = $target;
-      foreach ($target as $key => $sub_array) {
-        if (is_array($sub_array)) {
-          $data[$key] = $sub_array;
-        }
-      }
+      $data = Tokens::normalizeTargetData($target);
       $name = $this->config['attributeName'];
-      $key_exists = NULL;
-      $value = drupal_array_get_nested_value($data, explode('.', $name), $key_exists);
-      return $key_exists ? $this->matchValue($value) : FALSE;
+      return array_key_exists($name, $data) ? $this->matchValue($data[$name]) : FALSE;
     }
     return TRUE;
   }
