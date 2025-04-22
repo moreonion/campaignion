@@ -46,3 +46,12 @@ function campaignion_tracking_gtm_d7csp_hosts() {
   $hosts['img-src'][] = 'https://www.googletagmanager.com';
   return $hosts;
 }
+
+/**
+ * Implements hook_seckit_csp_report_alter().
+ */
+function campaignion_tracking_gtm_csp_report_alter(&$report, &$process) {
+  if ($report->{'blocked-uri'} === 'eval' && $report->{'source-file'} == 'https://www.googletagmanager.com/gtm.js') {
+    $process = FALSE;
+  }
+}
