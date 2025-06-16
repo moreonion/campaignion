@@ -23,5 +23,12 @@ function campaignion_email_to_target_variable_info($options) {
     'default' => '',
     'localize' => FALSE,
   ];
+  $v['campaignion_email_to_target_mp_datasets'] = [
+    'title' => t('MP datasets'),
+    'description' => t('List of dataset keys for all datasets that are considered MP datasets'),
+    'type' => 'array',
+    'default' => ['mp'],
+    'localize' => FALSE,
+  ];
   return $v;
 }

@@ -121,7 +121,8 @@ function _webform_show_single_target_e2t_selector($nid) {
   $loader = Loader::instance();
   if (($node = node_load($nid)) && ($action = $loader->actionFromNode($node))) {
     if ($action instanceof Action) {
-      $return = $action->getOptions()['dataset_name'] == 'mp';
+      $mp_datasets = variable_get_value('campaignion_email_to_target_mp_datasets');
+      $return = in_array($action->getOptions()['dataset_name'], $mp_datasets);
     }
   }
   $static_cache[$nid] = $return;
