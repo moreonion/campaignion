@@ -5,11 +5,11 @@
  * Webform module email_to_target_selector component.
  */
 
-use \Drupal\campaignion_action\Loader;
-use \Drupal\campaignion_email_to_target\Action;
-use \Drupal\campaignion_email_to_target\Message;
-use \Drupal\little_helpers\ArrayConfig;
-use \Drupal\little_helpers\Webform\Webform;
+use Drupal\campaignion_action\Loader;
+use Drupal\campaignion_email_to_target\Action;
+use Drupal\campaignion_email_to_target\Message;
+use Drupal\campaignion_email_to_target\Tokens;
+use Drupal\little_helpers\ArrayConfig;
 
 /**
  * Implements _webform_defaults_[component]().
@@ -172,14 +172,15 @@ function _webform_csv_data_e2t_selector($component, $export_options, $value) {
       $message = new Message($data['message']);
       $t = 'campaignion_email_to_target_mail';
       $m = theme([$t, $t . '_' . $component['nid']], ['message' => $message]);
+      $target = Tokens::arrayFlatten($data['target']);
       return [
         $message->to(),
         $message->subject,
         $m,
-        $data['target']['area']['name'] ?? '',
-        $data['target']['salutation'],
-        $data['target']['political_affiliation'],
-        $data['target']['area']['country']['name'] ?? '',
+        $target['area.name'] ?? '',
+        $target['salutation'] ?? '',
+        $target['political_affiliation'] ?? '',
+        $target['area.country.name'] ?? '',
       ];
     }
     else {
