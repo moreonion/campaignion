@@ -57,7 +57,7 @@ function campaignion_tracking_ga4_d7csp_hosts() {
     'https://*.analytics.google.com',
     'https://*.g.doubleclick.net',
     'https://*.google.com',
-    'https://googleads.g.doubleclick.net',
+    'https://google.com',
     'https://pagead2.googlesyndication.com',
     'https://www.googleadservices.com'
   ];
