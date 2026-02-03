@@ -57,32 +57,37 @@ class TargetStep extends WizardStep {
         'key' => 'title',
         'description' => '',
         'title' => 'Title',
+        'public' => TRUE,
       ],
       [
         'key' => 'first_name',
         'description' => '',
         'title' => 'First name',
+        'public' => TRUE,
       ],
       [
         'key' => 'last_name',
         'description' => '',
         'title' => 'Last name',
+        'public' => TRUE,
       ],
       [
         'key' => 'salutation',
         'description' => 'This field is how the target will be addressed in the message opening so should include any appropriate titles e.g. ‘Rt Hon John Smith MP’',
         'title' => 'Salutation',
+        'public' => TRUE,
       ],
       [
         'key' => 'display_name',
         'title' => 'Display name of target',
         'description' => 'This name will be shown in the target list, so it needs to be clear to supporters.',
+        'public' => TRUE,
       ],
       [
         'key' => 'group',
         'title' => 'Group',
-        'description' => 'Use this field to segment your list if you want to provide different versions of the message to different people, e.g. one CEO gets one message, another CEO gets a different message. You can set these specific messages up on the next step of the page builder.
-        ',
+        'description' => 'Use this field to segment your list if you want to provide different versions of the message to different people, e.g. one CEO gets one message, another CEO gets a different message. You can set these specific messages up on the next step of the page builder.',
+        'public' => TRUE,
       ],
     ];
     // Used by the front end vue app. A set of 'key' => 'regex' pairs.
