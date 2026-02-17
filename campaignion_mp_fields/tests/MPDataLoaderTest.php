@@ -27,22 +27,17 @@ class MPDataLoaderTest extends \DrupalUnitTestCase {
       'id' => '387269',
       'email' => 'mp@parliament.uk',
       'first_name' => 'Catherine',
-      'constituency' => [
-        'country' => [
-          'code' => 'E',
-          'name' => 'England',
-          'id' => 1,
-        ],
-        'name' => 'Hornsey and Wood Green',
-        'type' => 'WMC',
-        'id' => 22544,
-      ]
+      'area.name' => 'Hornsey and Wood Green',
+      'area.type' => 'WMC',
+      'area.gss_code' => 'E14001293',
+      'area.country.code' => 'E',
+      'area.country.name' => 'England',
     ];
     $api->method('getTargets')->willReturn($test_data);
     // The field itself is unused in this test. we can use any existing field.
-    $setters['field_address'] = function ($field, $constituency, $target) use (&$output) {
-      if (!empty($constituency['name'])) {
-        $output = $constituency['name'];
+    $setters['field_address'] = function ($field, $target) use (&$output) {
+      if (!empty($target['area.name'])) {
+        $output = $target['area.name'];
       }
     };
     return [$api, new MPDataLoader($container, $setters)];
@@ -85,4 +80,3 @@ class MPDataLoaderTest extends \DrupalUnitTestCase {
   }
 
 }
-

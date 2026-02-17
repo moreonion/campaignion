@@ -24,24 +24,24 @@ class MPDataLoader {
    */
   public static function fromConfig(Container $container) {
     $setters = [
-      'mp_constituency' => function ($field, $constituency, $target) {
-        if (!empty($constituency['name'])) {
-          $field->set($constituency['name']);
+      'mp_constituency' => function ($field, $target) {
+        if (!empty($target['area.name'])) {
+          $field->set($target['area.name']);
         }
       },
-      'mp_country' => function ($field, $constituency, $target) {
-        if (!empty($constituency['country']['name'])) {
+      'mp_country' => function ($field, $target) {
+        if (!empty($target['area.country.name'])) {
           $tagger = Tagger::byNameAndParentUuid('mp_country');
-          $tagger->tagSingle($field, $constituency['country']['name'], TRUE);
+          $tagger->tagSingle($field, $target['area.country.name'], TRUE);
         }
       },
-      'mp_party' => function ($field, $constituency, $target) {
+      'mp_party' => function ($field, $target) {
         if (!empty($target['political_affiliation'])) {
           $tagger = Tagger::byNameAndParentUuid('mp_party');
           $tagger->tagSingle($field, $target['political_affiliation'], TRUE);
         }
       },
-      'mp_salutation' => function ($field, $constituency, $target) {
+      'mp_salutation' => function ($field, $target) {
         if (!empty($target['salutation'])) {
           $field->set($target['salutation']);
         }
@@ -111,10 +111,9 @@ class MPDataLoader {
       $data = $api->getTargets('mp', ['postcode' => $postcode]);
       if ($data) {
         $target = !empty($data[0]) ? $data[0] : NULL;
-        $constituency = !empty($target['constituency']) ? $target['constituency'] : NULL;
         $wrapped = entity_metadata_wrapper($entity_type, $entity);
         foreach ($target_fields as $field_name => $field) {
-          $this->setters[$field_name]($wrapped->{$field_name}, $constituency, $target);
+          $this->setters[$field_name]($wrapped->{$field_name}, $target);
         }
       }
     }
