@@ -49,24 +49,6 @@ class Supporter implements ContactTypeInterface {
   public function exporter($type, $language) {
     $map = array();
     switch ($type) {
-      case 'cleverreach':
-        $map['email'] = new WrapperField('email');
-        $map['salutation'] = new WrapperField('field_salutation');
-        $map['firstname'] = new SingleValueField('first_name');
-        $map['lastname'] = new SingleValueField('last_name');
-        $map['title'] = new WrapperField('field_title');
-        $map['gender'] = new WrapperField('field_gender');
-        $map['date_of_birth'] = new DateField('field_date_of_birth', '%Y-%m-%d');
-        $map['street'] = new KeyedField('field_address', 'thoroughfare');
-        $map['country'] = new KeyedField('field_address', 'country');
-        $map['zip'] = new KeyedField('field_address', 'postal_code');
-        $map['city'] = new KeyedField('field_address', 'locality');
-        $map['region'] = new KeyedField('field_address', 'administrative_area');
-        $map['language'] = new WrapperField('field_preferred_language');
-        $map['created'] = new DateField('created', '%Y-%m-%d');
-        $map['updated'] = new DateField('updated', '%Y-%m-%d');
-        $map['tags'] = new TagsField('supporter_tags', TRUE);
-        break;
       case 'mailchimp':
         $map['EMAIL'] = new WrapperField('email');
         $map['FNAME'] = new SingleValueField('first_name');

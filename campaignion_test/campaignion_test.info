@@ -19,7 +19,6 @@ dependencies[] = campaignion:campaignion_layout
 dependencies[] = campaignion:campaignion_manage
 dependencies[] = campaignion:campaignion_mp_fields
 dependencies[] = campaignion:campaignion_newsletters
-dependencies[] = campaignion:campaignion_newsletters_cleverreach
 dependencies[] = campaignion:campaignion_newsletters_dotmailer
 dependencies[] = campaignion:campaignion_newsletters_mailchimp
 dependencies[] = campaignion:campaignion_newsletters_mailchimp_interests
