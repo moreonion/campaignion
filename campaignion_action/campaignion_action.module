@@ -381,7 +381,7 @@ function campaignion_action_campaignion_action_taken($node, Submission $submissi
     return;
   }
   // Don’t import drafts or forms without email address.
-  if ($submission->is_draft || !$submission->webform->componentByKey('email')) {
+  if ($submission->is_draft || !($email_component = $submission->webform->componentByKey('email'))) {
     return;
   }
   $m = ContactTypeManager::instance();
@@ -393,7 +393,11 @@ function campaignion_action_campaignion_action_taken($node, Submission $submissi
     $contact = $importer->findOrCreateContact($submission);
   }
   catch (NoEmailException $e) {
-    // Log the missing email address.
+    // Don’t log if the email field is not required.
+    if (!$email_component['required']) {
+      return;
+    }
+    // Log that the email address was missing.
     $ids = $submission->ids();
     $args = array('@nid' => $ids['nid'], '@sid' => $ids['sid']);
     $msg = "Can't import supporter without email-address for Submission(@nid, @sid).";
