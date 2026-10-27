@@ -27,6 +27,8 @@ SCRIPT;
     'every_page' => TRUE,
     'group' => JS_LIBRARY,
     'weight' => 10,
+    'preprocess' => FALSE,
+    'attributes' => ['id' => drupal_html_id('tracking-snippets')],
   ]);
   $module_path = drupal_get_path('module', 'campaignion_tracking');
   drupal_add_js($module_path . '/js/events.js', [
